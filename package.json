@@ -3,7 +3,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "ts-node ./src/index.ts --parser babel",
-    "ncu": "npx npm-check-updates"
+    "ncu": "npx npm-check-updates",
+    "publish-all": "for d in ./packages/eslint-config-matthis-* ; do (cd \"$d\" && npm publish); done"
   },
   "devDependencies": {
     "@types/node": "^16.9.3",
