@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "incremental": true,
+    "locale": "en-us",
+    "module": "None",
+    "moduleResolution": "node",
+    "newLine": "LF",
+    "noErrorTruncation": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmit": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "preserveWatchOutput": true,
+    "pretty": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext"
+  }
+}
