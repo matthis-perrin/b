@@ -39,7 +39,7 @@ function generateEslintConfig(type: ProjectType): Record<string, unknown> {
 function generatePackageJson(type: ProjectType): Record<string, unknown> {
   const eslintPlugins = PLUGINS_FOR_TYPE[type];
   const baseDependencies = {
-    eslint: '7.28.x',
+    eslint: '7.32.x',
   };
   const dependencies = eslintPlugins.reduce(
     (prev, curr) => ({...prev, ...curr.dependencies}),

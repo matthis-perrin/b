@@ -274,6 +274,7 @@ export const eslintCore: EslintMetadata = {
     'prefer-const': 'off',
     'prefer-destructuring': 'off',
     'prefer-exponentiation-operator': 'off',
+    'prefer-message-ids': 'off',
     'prefer-named-capture-group': 'off',
     'prefer-numeric-literals': 'off',
     'prefer-object-spread': 'off',
@@ -291,6 +292,7 @@ export const eslintCore: EslintMetadata = {
     // Use @typescript-eslint/require-await
     'require-await': 'off',
     'require-jsdoc': 'off',
+    'require-meta-docs-url': 'off',
     'require-unicode-regexp': 'off',
     'require-yield': 'off',
     'rest-spread-spacing': 'off',
