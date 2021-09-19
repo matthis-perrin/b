@@ -134,7 +134,6 @@ export const eslintReact: EslintMetadata = {
     'react/jsx-no-script-url': 'warn',
     'react/jsx-no-target-blank': ['warn', {warnOnSpreadAttributes: true}],
     'react/jsx-no-undef': 'warn',
-    'react/jsx-no-useless-fragment': 'warn',
     'react/jsx-pascal-case': ['warn', {allowAllCaps: true, ignore: []}],
     'react/jsx-uses-vars': 'warn',
     'react/no-access-state-in-setstate': 'warn',

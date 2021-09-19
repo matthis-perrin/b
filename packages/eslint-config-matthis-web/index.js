@@ -800,7 +800,7 @@ module.exports = {
     "react/jsx-no-script-url": "warn",
     "react/jsx-no-target-blank": ["warn", { warnOnSpreadAttributes: true }],
     "react/jsx-no-undef": "warn",
-    "react/jsx-no-useless-fragment": "warn",
+    "react/jsx-no-useless-fragment": "off",
     "react/jsx-one-expression-per-line": "off",
     "react/jsx-pascal-case": ["warn", { allowAllCaps: true, ignore: [] }],
     "react/jsx-props-no-multi-spaces": "off",
