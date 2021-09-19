@@ -26,6 +26,9 @@ function generateEslintConfig(type: ProjectType): Record<string, unknown> {
       es6: true,
     },
     parser: '@typescript-eslint/parser',
+    parserOptions: {
+      project: './tsconfig.json',
+    },
     settings: plugins.reduce((all, {settings}) => ({...all, ...settings}), {}),
     plugins: plugins.reduce<string[]>((all, {plugin}) => [...all, ...plugin], []),
     rules: plugins.reduce((all, {allOff, onlyOn}) => ({...all, ...allOff, ...onlyOn}), {}),

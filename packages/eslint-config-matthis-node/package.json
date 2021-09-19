@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-matthis-node",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "UNLICENSED",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "4.27.x",
@@ -13,6 +13,7 @@
     "eslint-plugin-node": "11.1.x",
     "eslint-plugin-prettier": "3.4.x",
     "eslint-plugin-simple-import-sort": "7.0.x",
-    "eslint-plugin-unicorn": "33.0.x"
+    "eslint-plugin-unicorn": "33.0.x",
+    "prettier": "2.4.x"
   }
 }

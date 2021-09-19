@@ -2,6 +2,7 @@ module.exports = {
   root: true,
   env: { browser: true, node: false, es6: true },
   parser: "@typescript-eslint/parser",
+  parserOptions: { project: "./tsconfig.json" },
   settings: {
     "import/parsers": { "@typescript-eslint/parser": [".ts", ".tsx"] },
     react: { version: "17.0.x" },
