@@ -10,6 +10,12 @@ export const eslintImport: EslintMetadata = {
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
+    'import/extensions': ['.ts', '.tsx'],
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
   },
   allOff: {
     'import/default': 'off',

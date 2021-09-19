@@ -115,7 +115,7 @@ export const eslintReact: EslintMetadata = {
     'react/forbid-dom-props': ['warn', {forbid: forbiddenProps}],
     'react/function-component-definition': [
       'warn',
-      {namedComponent: 'arrow-function', unnamedComponent: 'arrow-function'},
+      {namedComponents: 'arrow-function', unnamedComponents: 'arrow-function'},
     ],
     'react/jsx-boolean-value': 'warn',
     'react/jsx-fragments': ['warn', 'element'],

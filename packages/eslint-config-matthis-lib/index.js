@@ -5,6 +5,8 @@ module.exports = {
   parserOptions: { project: "./tsconfig.json" },
   settings: {
     "import/parsers": { "@typescript-eslint/parser": [".ts", ".tsx"] },
+    "import/extensions": [".ts", ".tsx"],
+    "import/resolver": { node: { extensions: [".js", ".jsx", ".ts", ".tsx"] } },
   },
   plugins: [
     "eslint-comments",
@@ -267,7 +269,7 @@ module.exports = {
       "toolbar",
       "top",
     ],
-    "no-restricted-imports": ["warn", { patterns: ["./*", "../*"] }],
+    "no-restricted-imports": "off",
     "no-restricted-modules": "off",
     "no-restricted-properties": "off",
     "no-restricted-syntax": "off",

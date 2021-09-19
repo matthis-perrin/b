@@ -5,6 +5,8 @@ module.exports = {
   parserOptions: { project: "./tsconfig.json" },
   settings: {
     "import/parsers": { "@typescript-eslint/parser": [".ts", ".tsx"] },
+    "import/extensions": [".ts", ".tsx"],
+    "import/resolver": { node: { extensions: [".js", ".jsx", ".ts", ".tsx"] } },
     react: { version: "17.0.x" },
   },
   plugins: [
@@ -270,7 +272,7 @@ module.exports = {
       "toolbar",
       "top",
     ],
-    "no-restricted-imports": ["warn", { patterns: ["./*", "../*"] }],
+    "no-restricted-imports": "off",
     "no-restricted-modules": "off",
     "no-restricted-properties": "off",
     "no-restricted-syntax": "off",
@@ -758,7 +760,10 @@ module.exports = {
     "react/forbid-prop-types": "off",
     "react/function-component-definition": [
       "warn",
-      { namedComponent: "arrow-function", unnamedComponent: "arrow-function" },
+      {
+        namedComponents: "arrow-function",
+        unnamedComponents: "arrow-function",
+      },
     ],
     "react/jsx-boolean-value": "warn",
     "react/jsx-child-element-spacing": "off",

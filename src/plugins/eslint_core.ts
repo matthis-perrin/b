@@ -456,7 +456,6 @@ export const eslintCore: EslintMetadata = {
       'toolbar',
       'top',
     ],
-    'no-restricted-imports': ['warn', {patterns: ['./*', '../*']}],
     'no-return-await': 'warn',
     'no-script-url': 'warn',
     'no-self-assign': 'warn',
