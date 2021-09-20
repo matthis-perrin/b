@@ -1,5 +1,5 @@
 import {join} from 'path';
-import {VERSION} from './constants';
+import {ESLINT_VERSION, VERSION} from './constants';
 
 import {cleanDir, writeJsonFile, writeJsFile} from './fs';
 import {ProjectType} from './models';
@@ -39,7 +39,7 @@ function generateEslintConfig(type: ProjectType): Record<string, unknown> {
 function generatePackageJson(type: ProjectType): Record<string, unknown> {
   const eslintPlugins = PLUGINS_FOR_TYPE[type];
   const baseDependencies = {
-    eslint: '7.32.x',
+    eslint: ESLINT_VERSION,
   };
   const dependencies = eslintPlugins.reduce(
     (prev, curr) => ({...prev, ...curr.dependencies}),

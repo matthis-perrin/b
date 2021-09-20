@@ -1,10 +1,13 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
     "esModuleInterop": true,
     "incremental": true,
+    "isolatedModules": true,
     "locale": "en-us",
-    "module": "None",
+    "module": "commonjs",
+    "target": "es5",
     "moduleResolution": "node",
     "newLine": "LF",
     "noErrorTruncation": true,
@@ -17,7 +20,6 @@
     "preserveWatchOutput": true,
     "pretty": true,
     "skipLibCheck": true,
-    "strict": true,
-    "target": "ESNext"
+    "strict": true
   }
 }
