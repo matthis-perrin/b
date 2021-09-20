@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-matthis-web",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "license": "UNLICENSED",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "4.31.x",
@@ -14,7 +14,7 @@
     "eslint-plugin-react": "7.25.x",
     "eslint-plugin-react-hooks": "4.2.x",
     "eslint-plugin-simple-import-sort": "7.0.x",
-    "eslint-plugin-unicorn": "33.0.x",
+    "eslint-plugin-unicorn": "36.0.x",
     "prettier": "2.4.x"
   }
 }
