@@ -3,8 +3,8 @@ import {EslintMetadata} from '../models';
 export const eslintTypescript: EslintMetadata = {
   plugin: ['@typescript-eslint'],
   dependencies: {
-    '@typescript-eslint/eslint-plugin': '4.27.x',
-    '@typescript-eslint/parser': '4.27.x',
+    '@typescript-eslint/eslint-plugin': '4.31.x',
+    '@typescript-eslint/parser': '4.31.x',
   },
   settings: {},
   allOff: {
@@ -60,6 +60,7 @@ export const eslintTypescript: EslintMetadata = {
     '@typescript-eslint/no-loop-func': 'off',
     '@typescript-eslint/no-loss-of-precision': 'off',
     '@typescript-eslint/no-magic-numbers': 'off',
+    '@typescript-eslint/no-meaningless-void-operator': 'off',
     '@typescript-eslint/no-misused-new': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
     '@typescript-eslint/no-namespace': 'off',
@@ -103,6 +104,7 @@ export const eslintTypescript: EslintMetadata = {
     '@typescript-eslint/prefer-readonly-parameter-types': 'off',
     '@typescript-eslint/prefer-readonly': 'off',
     '@typescript-eslint/prefer-reduce-type-parameter': 'off',
+    '@typescript-eslint/prefer-return-this-type': 'off',
     '@typescript-eslint/prefer-regexp-exec': 'off',
     '@typescript-eslint/prefer-string-starts-ends-with': 'off',
     '@typescript-eslint/prefer-ts-expect-error': 'off',
@@ -193,6 +195,7 @@ export const eslintTypescript: EslintMetadata = {
         ignoreEnums: true,
       },
     ],
+    '@typescript-eslint/no-meaningless-void-operator': 'warn',
     '@typescript-eslint/no-misused-new': 'warn',
     '@typescript-eslint/no-misused-promises': [
       'warn',
@@ -245,6 +248,7 @@ export const eslintTypescript: EslintMetadata = {
     '@typescript-eslint/prefer-readonly': 'warn',
     '@typescript-eslint/prefer-regexp-exec': 'warn',
     '@typescript-eslint/prefer-reduce-type-parameter': 'warn',
+    '@typescript-eslint/prefer-return-this-type': 'warn',
     '@typescript-eslint/prefer-string-starts-ends-with': 'warn',
     '@typescript-eslint/prefer-ts-expect-error': 'warn',
     '@typescript-eslint/promise-function-async': 'warn',

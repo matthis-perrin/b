@@ -10,7 +10,7 @@ const forbiddenProps = [
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
-    'eslint-plugin-react': '7.24.x',
+    'eslint-plugin-react': '7.25.x',
   },
   settings: {
     react: {
@@ -92,6 +92,7 @@ export const eslintReact: EslintMetadata = {
     'react/no-unused-state': 'off',
     'react/no-will-update-set-state': 'off',
     'react/prefer-es6-class': 'off',
+    'react/prefer-exact-props': 'off',
     'react/prefer-read-only-props': 'off',
     'react/prefer-stateless-function': 'off',
     'react/prop-types': 'off',
@@ -154,6 +155,7 @@ export const eslintReact: EslintMetadata = {
     'react/no-typos': 'warn',
     'react/no-unsafe': ['warn', {checkAliases: true}],
     'react/no-will-update-set-state': 'warn',
+    'react/prefer-exact-props': 'warn',
     'react/prefer-stateless-function': 'warn',
     'react/require-render-return': 'warn',
     'react/state-in-constructor': 'warn',

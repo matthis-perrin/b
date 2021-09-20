@@ -1,16 +1,16 @@
 {
   "name": "eslint-config-matthis-lib",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "license": "UNLICENSED",
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "4.27.x",
-    "@typescript-eslint/parser": "4.27.x",
+    "@typescript-eslint/eslint-plugin": "4.31.x",
+    "@typescript-eslint/parser": "4.31.x",
     "eslint": "7.32.x",
-    "eslint-import-resolver-typescript": "2.4.x",
+    "eslint-import-resolver-typescript": "2.5.x",
     "eslint-plugin-eslint-comments": "3.2.x",
-    "eslint-plugin-import": "2.23.x",
+    "eslint-plugin-import": "2.24.x",
     "eslint-plugin-no-null": "1.0.x",
-    "eslint-plugin-prettier": "3.4.x",
+    "eslint-plugin-prettier": "4.0.x",
     "eslint-plugin-simple-import-sort": "7.0.x",
     "eslint-plugin-unicorn": "33.0.x",
     "prettier": "2.4.x"
