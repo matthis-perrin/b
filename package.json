@@ -1,10 +1,10 @@
 {
-  "name": "matthis-eslint",
+  "name": "b",
   "license": "UNLICENSED",
   "scripts": {
     "start": "ts-node ./src/index.ts --parser babel",
     "ncu": "ts-node ./src/ncu.ts --parser babel",
-    "publish-all": "for d in ./packages/eslint-config-matthis-* ; do (cd \"$d\" && npm publish); done"
+    "publish-all": "for d in ./packages/* ; do (cd \"$d\" && npm publish); done"
   },
   "devDependencies": {
     "@types/node": "^16.9.3",
