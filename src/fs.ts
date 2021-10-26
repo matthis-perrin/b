@@ -14,11 +14,13 @@ export async function writeJsFile(path: string, js: string): Promise<void> {
 }
 
 export async function cleanDir(dirPath: string): Promise<void> {
+
   try {
-    await rm(dirPath, {recursive: true});
+    await access(dirPath)
+    const dirs = await readdir(dirPath);
+    const dirsToDelete = dirs.filter(d => d.startsWith('eslint-config'))
+    await Promise.all(dirsToDelete);
   } catch {
-    // dir doesn't exist
-  } finally {
     await mkdir(dirPath, {recursive: true});
   }
 }

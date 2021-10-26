@@ -1,0 +1,9 @@
+{
+  "name": "@matthis/prettier-config",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "main": "prettier.config.js",
+  "dependencies": {
+    "prettier": "2.4.x"
+  }
+}
