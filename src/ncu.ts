@@ -1,25 +1,51 @@
 import packageMetadata from 'package-json';
+import {join, resolve} from 'path';
 import {satisfies} from 'semver';
 import {ESLINT_VERSION, REACT_VERSION} from './constants';
 import {PLUGINS_FOR_TYPE} from './eslint/plugins';
+import {readdir, readFile} from './fs';
 
 export async function check(): Promise<void> {
-  const deps = [...new Set(Object.values(PLUGINS_FOR_TYPE).flat()).values()]
-    .map(plugin => Object.entries(plugin.dependencies))
-    .flat();
+  const packagePath = join(resolve('.'), 'packages');
+  const packageDirs = await readdir(packagePath);
+  const packageJsonFiles = await Promise.all(
+    packageDirs.map(d => readFile(join(packagePath, d, 'package.json')))
+  );
+  const dependencies = packageJsonFiles.map(
+    f => (JSON.parse(f.toString()).dependencies ?? {}) as Record<string, string>
+  );
+  const flatDependencies: Record<string, [string, number]> = {};
+  const errors: string[] = [];
+  for (const [index, deps] of Object.entries(dependencies)) {
+    for (const [name, version] of Object.entries(deps)) {
+      const current = flatDependencies[name];
+      if (current !== undefined && current[0] !== version) {
+        errors.push(
+          `Package ${name} has version ${version} in ${
+            packageDirs[parseFloat(index)]
+          } and version ${current[0]} in ${packageDirs[current[1]]}`
+        );
+        continue;
+      }
+      flatDependencies[name] = [version, parseFloat(index)];
+    }
+  }
 
-  const res = await Promise.all([
-    checkPackage('eslint', ESLINT_VERSION),
-    checkPackage('react', REACT_VERSION),
-    ...deps.map(dep => checkPackage(dep[0], dep[1])),
-  ]);
+  if (errors.length > 0) {
+    console.error(errors.join('\n'));
+    process.exit(1);
+  }
+
+  const res = await Promise.all(
+    Object.entries(flatDependencies).map(([name, version]) => checkPackage(name, version[0]))
+  );
   const outdated = res.filter(r => r !== undefined) as [string, string, string][];
   if (outdated.length === 0) {
     console.log('Everything is up-to-date');
   } else {
     const maxNameLength = Math.max(...outdated.map(o => o[0].length));
     console.log(
-      `\n${outdated.map(o => `${padRight(o[0], maxNameLength)} ${o[1]} ${o[2]}`).join('\n')}\n`
+      `\n${outdated.map(o => `${padRight(o[0], maxNameLength)} ${o[1]} -> ${o[2]}`).join('\n')}\n`
     );
   }
 }
