@@ -1,7 +1,7 @@
 import packageMetadata from 'package-json';
 import {join, resolve} from 'path';
 import {satisfies} from 'semver';
-import {ESLINT_VERSION, REACT_VERSION} from './constants';
+import {ESLINT_VERSION, REACT_VERSION} from './versions';
 import {PLUGINS_FOR_TYPE} from './eslint/plugins';
 import {readdir, readFile} from './fs';
 

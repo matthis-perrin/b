@@ -1,4 +1,4 @@
-import {REACT_VERSION} from '../../constants';
+import {REACT_VERSION} from '../../versions';
 import {EslintMetadata} from '../models';
 
 const forbiddenProps = [

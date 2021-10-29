@@ -1,0 +1,8 @@
+{
+  "name": "@matthis/tsconfig-node",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "typescript": "4.3.x"
+  }
+}

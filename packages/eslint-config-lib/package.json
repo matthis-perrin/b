@@ -1,5 +1,5 @@
 {
-  "name": "eslint-config-matthis-lib",
+  "name": "@matthis/eslint-config-lib",
   "version": "1.0.8",
   "license": "UNLICENSED",
   "dependencies": {
@@ -13,6 +13,7 @@
     "eslint-plugin-prettier": "4.0.x",
     "eslint-plugin-simple-import-sort": "7.0.x",
     "eslint-plugin-unicorn": "36.0.x",
-    "prettier": "2.4.x"
+    "prettier": "2.4.x",
+    "typescript": "4.3.x"
   }
 }

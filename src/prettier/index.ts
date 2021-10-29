@@ -1,5 +1,5 @@
 import {join, resolve} from 'path';
-import {PACKAGE_VERSIONS, PRETTIER_VERSION} from '../constants';
+import {PACKAGE_VERSIONS, PRETTIER_VERSION} from '../versions';
 
 import {cleanDir, writeJsFile, writeJsonFile} from '../fs';
 

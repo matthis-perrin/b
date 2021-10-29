@@ -1,3 +1,4 @@
+import {TYPESCRIPT_VERSION} from '../../versions';
 import {EslintMetadata} from '../models';
 
 export const eslintTypescript: EslintMetadata = {
@@ -5,6 +6,7 @@ export const eslintTypescript: EslintMetadata = {
   dependencies: {
     '@typescript-eslint/eslint-plugin': '4.31.x',
     '@typescript-eslint/parser': '4.31.x',
+    typescript: TYPESCRIPT_VERSION,
   },
   settings: {},
   allOff: {

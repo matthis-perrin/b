@@ -1,5 +1,5 @@
 import {join} from 'path';
-import {ESLINT_VERSION, PACKAGE_VERSIONS} from '../constants';
+import {ESLINT_VERSION, PACKAGE_VERSIONS} from '../versions';
 
 import {cleanDir, writeJsonFile, writeJsFile} from '../fs';
 import {ProjectType} from './models';
@@ -50,7 +50,7 @@ function generatePackageJson(type: ProjectType): Record<string, unknown> {
   );
 
   return {
-    name: `eslint-config-matthis-${type}`,
+    name: `@matthis/eslint-config-${type}`,
     version: PACKAGE_VERSIONS.eslint,
     license: 'UNLICENSED',
     dependencies: sortedDependencies,

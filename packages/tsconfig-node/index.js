@@ -1,0 +1,25 @@
+module.exports = {
+  compilerOptions: {
+    allowSyntheticDefaultImports: true,
+    esModuleInterop: true,
+    incremental: true,
+    isolatedModules: false,
+    locale: "en-us",
+    newLine: "LF",
+    noErrorTruncation: true,
+    noFallthroughCasesInSwitch: true,
+    noEmit: true,
+    noImplicitReturns: true,
+    noUncheckedIndexedAccess: true,
+    pretty: true,
+    skipLibCheck: true,
+    strict: true,
+    tsBuildInfoFile: "tmp/.tsbuildinfo",
+    module: "nodenext",
+    moduleResolution: "nodenext",
+    lib: ["es2021"],
+    target: "es2021",
+    types: ["node"],
+  },
+};
+

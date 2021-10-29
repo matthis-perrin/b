@@ -1,4 +1,4 @@
-import {PRETTIER_VERSION} from '../../constants';
+import {PRETTIER_VERSION} from '../../versions';
 import {EslintMetadata} from '../models';
 
 export const eslintPrettier: EslintMetadata = {
