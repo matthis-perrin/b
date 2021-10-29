@@ -1,7 +1,7 @@
 export const PACKAGE_VERSIONS = {
-  eslint: '1.0.8',
+  eslint: '1.0.11',
   prettier: '1.0.0',
-  tsconfig: '1.0.0',
+  tsconfig: '1.0.1',
 };
 
 export const REACT_VERSION = '17.0.x';

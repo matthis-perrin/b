@@ -8,10 +8,7 @@ export async function generateForType(path: string, type: ProjectType): Promise<
   await cleanDir(path);
   await Promise.all([
     writeJsonFile(join(path, 'package.json'), generatePackageJson(type)),
-    writeJsFile(
-      join(path, 'index.js'),
-      `module.exports = ${JSON.stringify(generateTsConfig(type))}`
-    ),
+    writeJsonFile(join(path, 'tsconfig.json'), generateTsConfig(type)),
   ]);
 }
 
@@ -124,6 +121,7 @@ function generatePackageJson(type: ProjectType): Record<string, unknown> {
     name: `@matthis/tsconfig-${type}`,
     version: PACKAGE_VERSIONS.tsconfig,
     license: 'UNLICENSED',
+    main: 'tsconfig.json',
     dependencies: {
       typescript: TYPESCRIPT_VERSION,
     },
