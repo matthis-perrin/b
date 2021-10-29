@@ -28,7 +28,7 @@ function generatePrettierConfig(): Record<string, unknown> {
 
 function generatePackageJson(): Record<string, unknown> {
   return {
-    name: `prettier-config`,
+    name: `@matthis/prettier-config`,
     version: PACKAGE_VERSIONS.prettier,
     license: 'UNLICENSED',
     dependencies: {
