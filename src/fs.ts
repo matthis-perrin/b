@@ -13,13 +13,14 @@ export async function writeJsFile(path: string, js: string): Promise<void> {
   await writeFile(path, `${format(js, {parser: 'babel'})}\n`);
 }
 
-export async function cleanDir(dirPath: string): Promise<void> {
-
+export async function cleanDir(dirPath: string, prefix?: string): Promise<void> {
   try {
-    await access(dirPath)
+    await access(dirPath);
     const dirs = await readdir(dirPath);
-    const dirsToDelete = dirs.filter(d => d.startsWith('eslint-config'))
-    await Promise.all(dirsToDelete);
+    if (prefix !== undefined) {
+      const dirsToDelete = dirs.filter(d => d.startsWith(prefix));
+      await Promise.all(dirsToDelete);
+    }
   } catch {
     await mkdir(dirPath, {recursive: true});
   }

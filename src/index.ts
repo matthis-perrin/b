@@ -1,13 +1,6 @@
-import {join, resolve} from 'path';
-
-import {cleanDir} from './fs';
-import {generateForType} from './generators';
-import {ALL_TYPES} from './models';
+import {eslintPackages} from './eslint';
+import {prettierPackage} from './prettier';
 
 (async () => {
-  const packagesDir = join(resolve('.'), 'packages');
-  await cleanDir(packagesDir);
-  await Promise.all(
-    ALL_TYPES.map(type => generateForType(join(packagesDir, `eslint-config-matthis-${type}`), type))
-  );
+  await Promise.all([eslintPackages(), prettierPackage()]);
 })().catch(console.error);

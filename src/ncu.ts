@@ -1,7 +1,7 @@
 import packageMetadata from 'package-json';
 import {satisfies} from 'semver';
 import {ESLINT_VERSION, REACT_VERSION} from './constants';
-import {PLUGINS_FOR_TYPE} from './plugins';
+import {PLUGINS_FOR_TYPE} from './eslint/plugins';
 
 export async function check(): Promise<void> {
   const deps = [...new Set(Object.values(PLUGINS_FOR_TYPE).flat()).values()]
