@@ -1,7 +1,7 @@
 import {join} from 'path';
-import {ESLINT_VERSION, PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '../versions';
+import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '../versions';
 
-import {cleanDir, writeJsonFile, writeJsFile} from '../fs';
+import {cleanDir, writeJsonFile} from '../fs';
 import {ProjectType} from './models';
 
 export async function generateForType(path: string, type: ProjectType): Promise<void> {
@@ -13,24 +13,6 @@ export async function generateForType(path: string, type: ProjectType): Promise<
 }
 
 function generateTsConfig(type: ProjectType): Record<string, unknown> {
-  const test = {
-    compilerOptions: {
-      module: 'CommonJS',
-      moduleResolution: 'Node',
-      newLine: 'LF',
-      noErrorTruncation: true,
-      noFallthroughCasesInSwitch: true,
-      noEmit: true,
-      noImplicitReturns: true,
-      noUncheckedIndexedAccess: true,
-      pretty: true,
-      skipLibCheck: true,
-      tsBuildInfoFile: 'tmp/.tsbuildinfo',
-      strict: true,
-      target: 'ES2020',
-    },
-  };
-
   const baseCompilerOptions = {
     allowSyntheticDefaultImports: true,
     // Emit __importStar and __importDefault helpers for runtime babel ecosystem compatibility

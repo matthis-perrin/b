@@ -13,6 +13,11 @@ export async function writeJsFile(path: string, js: string): Promise<void> {
   await writeFile(path, `${format(js, {parser: 'babel'})}\n`);
 }
 
+export async function writeRawFile(path: string, content: string): Promise<void> {
+  console.log(`write ${path}`);
+  await writeFile(path, content);
+}
+
 export async function cleanDir(dirPath: string): Promise<void> {
   console.log('clean', dirPath);
   try {

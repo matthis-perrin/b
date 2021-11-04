@@ -12,7 +12,6 @@
     "newLine": "LF",
     "noErrorTruncation": true,
     "noFallthroughCasesInSwitch": true,
-    "noEmit": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,

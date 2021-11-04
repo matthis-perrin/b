@@ -1,6 +1,5 @@
 import {join, resolve} from 'path';
 
-import {cleanDir} from '../fs';
 import {generateForType} from './generators';
 import {ALL_TYPES} from './models';
 
