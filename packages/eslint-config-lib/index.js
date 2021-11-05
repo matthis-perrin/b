@@ -1,5 +1,6 @@
 module.exports = {
   root: true,
+  ignorePatterns: ["webpack.config.js"],
   env: { browser: false, node: false, es6: true },
   parser: "@typescript-eslint/parser",
   parserOptions: { project: "./tsconfig.json" },

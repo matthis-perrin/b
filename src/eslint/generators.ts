@@ -20,6 +20,7 @@ function generateEslintConfig(type: ProjectType): Record<string, unknown> {
   const plugins = PLUGINS_FOR_TYPE[type];
   const eslintConfig = {
     root: true,
+    ignorePatterns: ['webpack.config.js'],
     env: {
       browser: type === ProjectType.Web,
       node: type === ProjectType.Node,
