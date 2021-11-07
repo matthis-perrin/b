@@ -2,7 +2,7 @@ import {join} from 'path';
 import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '../versions';
 
 import {cleanDir, writeJsonFile} from '../fs';
-import {ProjectType} from './models';
+import {ProjectType} from '../models';
 
 export async function generateForType(path: string, type: ProjectType): Promise<void> {
   await cleanDir(path);

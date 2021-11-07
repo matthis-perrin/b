@@ -1,7 +1,7 @@
 import {join, resolve} from 'path';
 
 import {generateForType} from './generators';
-import {ALL_TYPES} from './models';
+import {ALL_TYPES} from '../models';
 
 export async function eslintPackages(): Promise<void> {
   await Promise.all(

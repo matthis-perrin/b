@@ -17,7 +17,7 @@ export async function compile(entry: string, dst: string): Promise<void> {
     module: {rules: [{test: /\.ts$/, loader: 'ts-loader'}]},
     resolve: {extensions: ['.ts', '.js']},
     externals: ({request}, callback) =>
-      request?.startsWith('./') || request === entry
+      request?.startsWith('./') || request?.startsWith('../') || request === entry
         ? callback()
         : callback(undefined, 'commonjs ' + request),
   };
@@ -27,7 +27,7 @@ export async function compile(entry: string, dst: string): Promise<void> {
       if (err) {
         reject(err);
       } else if (stats?.hasErrors()) {
-        reject(new Error(stats?.toString()));
+        reject(new Error(stats?.toString({errorDetails: true})));
       } else {
         resolve();
       }

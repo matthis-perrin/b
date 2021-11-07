@@ -2,7 +2,7 @@ import {join} from 'path';
 import {ESLINT_VERSION, PACKAGE_VERSIONS} from '../versions';
 
 import {cleanDir, writeJsonFile, writeJsFile} from '../fs';
-import {ProjectType} from './models';
+import {ProjectType} from '../models';
 import {PLUGINS_FOR_TYPE} from './plugins';
 
 export async function generateForType(path: string, type: ProjectType): Promise<void> {

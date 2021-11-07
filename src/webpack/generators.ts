@@ -1,5 +1,5 @@
 import {join} from 'path';
-import {ProjectType} from '../eslint/models';
+import {ProjectType} from '../models';
 import {cleanDir, writeJsonFile} from '../fs';
 import {compile} from '../packager';
 import {PACKAGE_VERSIONS} from '../versions';
@@ -14,6 +14,9 @@ export async function generateForType(path: string, type: ProjectType): Promise<
 }
 
 function generatePackageJson(type: ProjectType): Record<string, unknown> {
+  if (type !== ProjectType.Web) {
+    throw new Error(`Project type "${type}" not supported for webpack`);
+  }
   const {dependencies} = webConfig();
   return {
     name: `@matthis/webpack-${type}`,

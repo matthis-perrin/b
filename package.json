@@ -6,6 +6,9 @@
     "ncu": "ts-node ./src/ncu.ts --parser babel",
     "publish-all": "for d in ./packages/* ; do (cd \"$d\" && npm publish --access public && cd ..); done"
   },
+  "eslintConfig": {
+    "ignorePatterns": "project/templates/*"
+  },
   "devDependencies": {
     "@types/node": "16.9.3",
     "@types/prettier": "2.3.2",

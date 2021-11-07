@@ -9,7 +9,8 @@ import {eslintReactHooks} from './eslint_react_hooks';
 import {eslintSimpleImportSort} from './eslint_simple_import_sort';
 import {eslintTypescript} from './eslint_typescript';
 import {eslintUnicorn} from './eslint_unicorn';
-import {EslintMetadata, ProjectType} from '../models';
+import {EslintMetadata} from '../models';
+import {ProjectType} from '../../models';
 
 const BASE_PLUGINS = [
   eslintComments,

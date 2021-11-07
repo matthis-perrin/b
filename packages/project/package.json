@@ -1,0 +1,11 @@
+{
+  "name": "@matthis/project",
+  "version": "1.0.4",
+  "license": "UNLICENSED",
+  "bin": {
+    "main": "./index.js"
+  },
+  "dependencies": {
+    "prompts": "2.4.x"
+  }
+}

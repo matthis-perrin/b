@@ -20,5 +20,6 @@
     "pretty": true,
     "skipLibCheck": true,
     "strict": true
-  }
+  },
+  "exclude": ["src/project/templates/*"]
 }
