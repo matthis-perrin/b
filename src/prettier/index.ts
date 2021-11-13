@@ -31,6 +31,7 @@ function generatePackageJson(): Record<string, unknown> {
     name: `@matthis/prettier-config`,
     version: PACKAGE_VERSIONS.prettier,
     license: 'UNLICENSED',
+    main: 'index.js',
     dependencies: {
       prettier: PRETTIER_VERSION,
     },
