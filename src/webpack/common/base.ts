@@ -7,7 +7,6 @@ export function baseConfig(): WebpackConfigFragment {
     dependencies: {
       webpack: '5.61.x',
       'webpack-cli': '4.9.x',
-      'webpack-dev-server': '4.4.x',
       ...terserPluginConfig.dependencies,
     },
     config: () => ({

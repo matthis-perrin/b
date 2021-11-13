@@ -1,24 +1,21 @@
 import {join} from 'path';
 import {baseConfig} from './common/base';
-import {babelLoaderWeb, sourceMapLoader} from './common/loaders';
+import {babelLoaderNode, sourceMapLoader} from './common/loaders';
 import {definePlugin, htmlPlugin, forkTsCheckerPlugin, cleanTerminalPlugin} from './common/plugins';
 import {getDistDir, getProjectDir, isProd, WebpackConfigFragment} from './common/utils';
 
-export function webConfig(): WebpackConfigFragment {
+export function nodeConfig(): WebpackConfigFragment {
   const base = baseConfig();
   const define = definePlugin();
-  const html = htmlPlugin();
   const forkTsChecker = forkTsCheckerPlugin();
   const cleanTerminal = cleanTerminalPlugin();
-  const babel = babelLoaderWeb();
+  const babel = babelLoaderNode();
   const sourceMap = sourceMapLoader();
 
   return {
     dependencies: {
-      'webpack-dev-server': '4.4.x',
       ...base.dependencies,
       ...define.dependencies,
-      ...html.dependencies,
       ...forkTsChecker.dependencies,
       ...cleanTerminal.dependencies,
       ...babel.dependencies,
@@ -26,22 +23,14 @@ export function webConfig(): WebpackConfigFragment {
     },
     config: () => ({
       ...base.config(),
-      target: 'web',
+      target: 'node',
       entry: {
-        main: join(getProjectDir(), `src/index.tsx`),
+        main: join(getProjectDir(), `src/index.ts`),
       },
       module: {
         rules: [babel.config(), sourceMap.config()],
       },
-      plugins: [define.config(), html.config(), forkTsChecker.config(), cleanTerminal.config()],
-      devServer: !isProd()
-        ? {
-            static: getDistDir(),
-            compress: true,
-            port: 3000,
-            hot: true,
-          }
-        : undefined,
+      plugins: [define.config(), forkTsChecker.config(), cleanTerminal.config()],
     }),
   };
 }

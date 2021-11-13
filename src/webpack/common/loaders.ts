@@ -2,7 +2,7 @@
 
 import {WebpackConfigFragment} from './utils';
 
-export function babelLoader(): WebpackConfigFragment {
+export function babelLoaderWeb(): WebpackConfigFragment {
   return {
     dependencies: {
       '@babel/core': '7.16.x',
@@ -27,6 +27,35 @@ export function babelLoader(): WebpackConfigFragment {
             },
           ],
           ['@babel/preset-react'],
+          ['@babel/preset-typescript'],
+        ],
+      },
+    }),
+  };
+}
+
+export function babelLoaderNode(): WebpackConfigFragment {
+  return {
+    dependencies: {
+      '@babel/core': '7.16.x',
+      '@babel/preset-env': '7.16.x',
+      '@babel/preset-typescript': '7.16.x',
+      'babel-loader': '8.2.x',
+    },
+    config: () => ({
+      test: /\.tsx?$/u,
+      exclude: /\/node_modules\//u,
+      loader: 'babel-loader',
+      options: {
+        presets: [
+          [
+            '@babel/preset-env',
+            {
+              targets: {
+                node: 16,
+              },
+            },
+          ],
           ['@babel/preset-typescript'],
         ],
       },
