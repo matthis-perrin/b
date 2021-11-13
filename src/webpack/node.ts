@@ -1,8 +1,8 @@
 import {join} from 'path';
 import {baseConfig} from './common/base';
 import {babelLoaderNode, sourceMapLoader} from './common/loaders';
-import {definePlugin, htmlPlugin, forkTsCheckerPlugin, cleanTerminalPlugin} from './common/plugins';
-import {getDistDir, getProjectDir, isProd, WebpackConfigFragment} from './common/utils';
+import {definePlugin, forkTsCheckerPlugin, cleanTerminalPlugin} from './common/plugins';
+import {getProjectDir, WebpackConfigFragment} from './common/utils';
 
 export function nodeConfig(): WebpackConfigFragment {
   const base = baseConfig();

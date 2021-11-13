@@ -1,3 +1,3 @@
-import {webConfig} from './web';
+import {nodeConfig} from './node';
 
-export default webConfig().config();
+export default nodeConfig().config();
