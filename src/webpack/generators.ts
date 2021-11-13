@@ -14,9 +14,6 @@ export async function generateForType(path: string, type: ProjectType): Promise<
 }
 
 function generatePackageJson(type: ProjectType): Record<string, unknown> {
-  if (type !== ProjectType.Web) {
-    throw new Error(`Project type "${type}" not supported for webpack`);
-  }
   const {dependencies} = webConfig();
   return {
     name: `@matthis/webpack-${type}`,
