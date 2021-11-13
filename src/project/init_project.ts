@@ -9,6 +9,7 @@ import {
   REACT_VERSION,
   STYLED_COMPONENTS_TYPES_VERSION,
   STYLED_COMPONENTS_VERSION,
+  NODE_TYPES_VERSION
 } from '../versions';
 
 const templatesPath = join(__dirname, 'templates');
@@ -62,11 +63,12 @@ async function generateProject(dst: string, name: string, type: ProjectType): Pr
     REACT_VERSION,
     STYLED_COMPONENTS_TYPES_VERSION,
     STYLED_COMPONENTS_VERSION,
+    NODE_TYPES_VERSION,
   };
-  const files = await getFiles(join(templatesPath, 'project'));
+  const files = await getFiles(join(templatesPath, type));
   await Promise.all(
     files.map(async f => {
-      const fileContent = await readFile(join(templatesPath, 'project', f));
+      const fileContent = await readFile(join(templatesPath, type, f));
       const compiledContent = fileContent
         .toString()
         .replace(/\{\{([^\}]+)\}\}/gu, (match, vName) => variables[vName] ?? '');

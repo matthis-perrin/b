@@ -1,5 +1,5 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.0.5',
+  project: '1.0.6',
   eslint: '1.0.12',
   prettier: '1.0.0',
   tsconfig: '1.0.1',
@@ -14,3 +14,4 @@ export const REACT_VERSION = '17.0.x';
 export const REACT_ROUTER_VERSION = '5.3.x';
 export const STYLED_COMPONENTS_TYPES_VERSION = '5.3.x';
 export const STYLED_COMPONENTS_VERSION = '5.1.x';
+export const NODE_TYPES_VERSION = '16.11.x';
