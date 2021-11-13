@@ -84,8 +84,8 @@ function generateTsConfig(type: ProjectType): Record<string, unknown> {
     };
   } else if (type === ProjectType.Node) {
     additionalCompilerOptions = {
-      module: 'nodenext',
-      moduleResolution: 'nodenext',
+      module: 'commonjs',
+      moduleResolution: 'node',
       lib: ['es2021'],
       target: 'es2021',
       //

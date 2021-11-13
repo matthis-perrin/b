@@ -1,9 +1,9 @@
 {
   "name": "@matthis/tsconfig-lib",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "UNLICENSED",
   "main": "tsconfig.json",
   "dependencies": {
-    "typescript": "4.5.1-rc"
+    "typescript": "4.4.x"
   }
 }

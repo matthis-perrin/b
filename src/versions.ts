@@ -1,14 +1,14 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.0.8',
-  eslint: '1.0.13',
+  project: '1.0.9',
+  eslint: '1.0.14',
   prettier: '1.0.1',
-  tsconfig: '1.0.2',
+  tsconfig: '1.0.3',
   webpack: '1.0.7',
 };
 
 export const ESLINT_VERSION = '7.32.x';
 export const PRETTIER_VERSION = '2.4.x';
-export const TYPESCRIPT_VERSION = '4.5.1-rc';
+export const TYPESCRIPT_VERSION = '4.4.x';
 
 export const REACT_VERSION = '17.0.x';
 export const REACT_ROUTER_VERSION = '5.3.x';

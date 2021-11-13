@@ -15,8 +15,8 @@
     "skipLibCheck": true,
     "strict": true,
     "tsBuildInfoFile": "tmp/.tsbuildinfo",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "lib": [
       "es2021"
     ],

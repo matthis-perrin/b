@@ -1,6 +1,6 @@
 {
   "name": "@matthis/eslint-config-node",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "license": "UNLICENSED",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "4.31.x",
@@ -15,6 +15,6 @@
     "eslint-plugin-simple-import-sort": "7.0.x",
     "eslint-plugin-unicorn": "36.0.x",
     "prettier": "2.4.x",
-    "typescript": "4.5.1-rc"
+    "typescript": "4.4.x"
   }
 }
