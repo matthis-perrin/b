@@ -54,6 +54,7 @@ export default async function initProject(): Promise<void> {
 }
 
 async function generateProject(dst: string, name: string, type: ProjectType): Promise<void> {
+  console.log(dst, name, type)
   const variables: Record<string, string> = {
     PROJECT_NAME: name,
     PROJECT_TYPE: type,
@@ -68,7 +69,7 @@ async function generateProject(dst: string, name: string, type: ProjectType): Pr
       const fileContent = await readFile(join(templatesPath, 'project', f));
       const compiledContent = fileContent
         .toString()
-        .replace(/\{\{([^\}]+)\}\}/gu, vName => variables[vName] ?? '');
+        .replace(/\{\{([^\}]+)\}\}/gu, (match, vName) => variables[vName] ?? '');
       const fPath = join(dst, f);
       await mkdir(dirname(fPath), {recursive: true});
       await writeFile(fPath, compiledContent);
