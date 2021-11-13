@@ -1,6 +1,6 @@
 {
   "name": "@matthis/webpack-web",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {

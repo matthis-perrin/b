@@ -3,7 +3,7 @@ export const PACKAGE_VERSIONS = {
   eslint: '1.0.13',
   prettier: '1.0.1',
   tsconfig: '1.0.2',
-  webpack: '1.0.6',
+  webpack: '1.0.7',
 };
 
 export const ESLINT_VERSION = '7.32.x';

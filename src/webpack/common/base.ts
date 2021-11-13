@@ -1,7 +1,8 @@
 import {terserPlugin} from './plugins';
 import {getDistDir, isProd, WebpackConfigFragment} from './utils';
 
-export function baseConfig(): WebpackConfigFragment {
+export function baseConfig(opts: {hashOutput: boolean}): WebpackConfigFragment {
+  const {hashOutput} = opts;
   const terserPluginConfig = terserPlugin();
   return {
     dependencies: {
@@ -14,7 +15,7 @@ export function baseConfig(): WebpackConfigFragment {
       devtool: isProd() ? 'source-map' : 'eval',
       output: {
         path: getDistDir(),
-        filename: '[name].[contenthash].js',
+        filename: `[name]${hashOutput ? '.[contenthash]' : ''}.js`,
         clean: true,
       },
 
