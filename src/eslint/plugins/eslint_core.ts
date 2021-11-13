@@ -349,7 +349,6 @@ export const eslintCore: EslintMetadata = {
     'no-debugger': 'warn',
     'no-delete-var': 'warn',
     'no-dupe-args': 'warn',
-    'no-dupe-class-members': 'warn',
     'no-dupe-else-if': 'warn',
     'no-dupe-keys': 'warn',
     'no-duplicate-case': 'warn',

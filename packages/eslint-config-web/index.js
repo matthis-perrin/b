@@ -139,7 +139,7 @@ module.exports = {
     "no-delete-var": "warn",
     "no-div-regex": "off",
     "no-dupe-args": "warn",
-    "no-dupe-class-members": "warn",
+    "no-dupe-class-members": "off",
     "no-dupe-else-if": "warn",
     "no-dupe-keys": "warn",
     "no-duplicate-case": "warn",
