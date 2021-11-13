@@ -4,6 +4,7 @@ import {cleanDir, writeJsonFile} from '../fs';
 import {compile} from '../packager';
 import {PACKAGE_VERSIONS} from '../versions';
 import {webConfig} from './web';
+import { nodeConfig } from './node';
 
 export async function generateForType(path: string, type: ProjectType): Promise<void> {
   await cleanDir(path);
@@ -14,7 +15,7 @@ export async function generateForType(path: string, type: ProjectType): Promise<
 }
 
 function generatePackageJson(type: ProjectType): Record<string, unknown> {
-  const {dependencies} = webConfig();
+  const {dependencies} = type === ProjectType.Web ? webConfig() : nodeConfig();
   return {
     name: `@matthis/webpack-${type}`,
     version: PACKAGE_VERSIONS.webpack,

@@ -1,19 +1,16 @@
 {
   "name": "@matthis/webpack-node",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {
-    "webpack-dev-server": "4.4.x",
     "webpack": "5.61.x",
     "webpack-cli": "4.9.x",
     "terser-webpack-plugin": "5.2.x",
-    "html-webpack-plugin": "5.5.x",
     "fork-ts-checker-webpack-plugin": "6.4.x",
     "clean-terminal-webpack-plugin": "3.0.x",
     "@babel/core": "7.16.x",
     "@babel/preset-env": "7.16.x",
-    "@babel/preset-react": "7.16.x",
     "@babel/preset-typescript": "7.16.x",
     "babel-loader": "8.2.x",
     "source-map-loader": "3.0.x"
