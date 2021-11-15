@@ -13,6 +13,8 @@ export function webConfig(): WebpackConfigFragment {
   const babel = babelLoaderWeb();
   const sourceMap = sourceMapLoader();
 
+  const baseWebpackConfig = base.config();
+
   return {
     dependencies: {
       'webpack-dev-server': '4.4.x',
@@ -25,7 +27,7 @@ export function webConfig(): WebpackConfigFragment {
       ...sourceMap.dependencies,
     },
     config: () => ({
-      ...base.config(),
+      ...baseWebpackConfig,
       target: 'web',
       entry: {
         main: join(getProjectDir(), `src/index.tsx`),
@@ -42,6 +44,19 @@ export function webConfig(): WebpackConfigFragment {
             hot: true,
           }
         : undefined,
+      optimization: {
+        ...baseWebpackConfig.optimization,
+        splitChunks: {
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              chunks: 'initial',
+              name: 'vendor',
+              enforce: true,
+            },
+          },
+        },
+      },
     }),
   };
 }

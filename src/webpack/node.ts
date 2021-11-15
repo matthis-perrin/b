@@ -31,6 +31,16 @@ export function nodeConfig(): WebpackConfigFragment {
         rules: [babel.config(), sourceMap.config()],
       },
       plugins: [define.config(), forkTsChecker.config(), cleanTerminal.config()],
+      externals: (
+        ctx: {request: string; context: string},
+        cb: (err?: Error | null, result?: string) => void
+      ) => {
+        const {request, context} = ctx;
+        if (request.startsWith('.') && !context.includes('node_modules')) {
+          return cb();
+        }
+        return cb(null, 'commonjs ' + request);
+      },
     }),
   };
 }
