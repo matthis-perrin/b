@@ -12,6 +12,8 @@ export function nodeConfig(): WebpackConfigFragment {
   const babel = babelLoaderNode();
   const sourceMap = sourceMapLoader();
 
+  const entry = join(getProjectDir(), `src/index.ts`);
+
   return {
     dependencies: {
       ...base.dependencies,
@@ -24,9 +26,7 @@ export function nodeConfig(): WebpackConfigFragment {
     config: () => ({
       ...base.config(),
       target: 'node',
-      entry: {
-        main: join(getProjectDir(), `src/index.ts`),
-      },
+      entry: {main: entry},
       module: {
         rules: [babel.config(), sourceMap.config()],
       },
@@ -36,7 +36,7 @@ export function nodeConfig(): WebpackConfigFragment {
         cb: (err?: Error | null, result?: string) => void
       ) => {
         const {request, context} = ctx;
-        if (request.startsWith('.') && !context.includes('node_modules')) {
+        if ((request.startsWith('.') && !context.includes('node_modules')) || request === entry) {
           return cb();
         }
         return cb(null, 'commonjs ' + request);
