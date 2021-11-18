@@ -1,6 +1,6 @@
 {
   "name": "@matthis/project",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "license": "UNLICENSED",
   "bin": {
     "main": "./index.js"

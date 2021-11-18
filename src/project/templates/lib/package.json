@@ -1,0 +1,21 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "license": "UNLICENSED",
+  "scripts": {
+    "lint": "eslint --ext ts,tsx src",
+    "tsc": "tsc -p tsconfig.json"
+  },
+  "prettier": "@matthis/prettier-config",
+  "eslintConfig": {
+    "extends": [
+      "@matthis/eslint-config-{{PROJECT_TYPE}}"
+    ]
+  },
+  "devDependencies": {
+    "@matthis/eslint-config-{{PROJECT_TYPE}}": "latest",
+    "@matthis/prettier-config": "latest",
+    "@matthis/tsconfig-{{PROJECT_TYPE}}": "latest"
+  },
+  "dependencies": {
+  }
+}
