@@ -737,6 +737,7 @@ module.exports = {
     "unicorn/require-post-message-target-origin": "warn",
     "unicorn/string-content": "off",
     "unicorn/switch": "off",
+    "unicorn/template-indent": "warn",
     "unicorn/throw-new-error": "warn",
     "unicorn/whitespace-insensitive": "warn",
     "unicorn/prefer-array-flat": "warn",

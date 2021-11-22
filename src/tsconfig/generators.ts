@@ -20,6 +20,8 @@ function generateTsConfig(type: ProjectType): Record<string, unknown> {
     // Allow default imports from modules with no default export.
     // This does not affect code emit, just typechecking.
     // --
+    // Enable iterating through iterators in for..of loops
+    downlevelIteration: true,
     // Allows us to import some library nicely. ie. import React from '@shared-frontend-lib/react'
     // Enabled automatically when setting the flag `esModuleInterop` to true
     esModuleInterop: true,
