@@ -3,7 +3,7 @@ import {EslintMetadata} from '../models';
 export const eslintUnicorn: EslintMetadata = {
   plugin: ['unicorn'],
   dependencies: {
-    'eslint-plugin-unicorn': '36.0.x',
+    'eslint-plugin-unicorn': '39.0.x',
   },
   settings: {},
   allOff: {
@@ -27,8 +27,10 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/no-array-method-this-argument': 'off',
     'unicorn/no-array-push-push': 'off',
     'unicorn/no-array-reduce': 'off',
+    'unicorn/no-await-expression-member': 'off',
     'unicorn/no-console-spaces': 'off',
     'unicorn/no-document-cookie': 'off',
+    'unicorn/no-empty-file': 'off',
     'unicorn/no-for-loop': 'off',
     'unicorn/no-hex-escape': 'off',
     'unicorn/no-instanceof-array': 'off',
@@ -56,11 +58,13 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/prefer-array-flat-map': 'off',
     'unicorn/prefer-array-index-of': 'off',
     'unicorn/prefer-at': 'off',
+    'unicorn/prefer-code-point': 'off',
     'unicorn/prefer-date-now': 'off',
     'unicorn/prefer-dom-node-append': 'off',
     'unicorn/prefer-dom-node-dataset': 'off',
     'unicorn/prefer-dom-node-remove': 'off',
     'unicorn/prefer-dom-node-text-content': 'off',
+    'unicorn/prefer-export-from': 'off',
     'unicorn/prefer-includes': 'off',
     'unicorn/prefer-keyboard-event-key': 'off',
     'unicorn/prefer-math-trunc': 'off',
@@ -91,6 +95,7 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/string-content': 'off',
     'unicorn/switch': 'off',
     'unicorn/throw-new-error': 'off',
+    'unicorn/whitespace-insensitive': 'off',
   },
   onlyOn: {
     'unicorn/better-regex': 'warn',
@@ -104,6 +109,7 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/no-array-for-each': 'warn',
     'unicorn/no-array-method-this-argument': 'warn',
     'unicorn/no-array-push-push': 'warn',
+    'unicorn/no-await-expression-member': 'warn',
     'unicorn/no-document-cookie': 'warn',
     'unicorn/no-for-loop': 'warn',
     'unicorn/no-hex-escape': 'warn',
@@ -121,7 +127,9 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/prefer-array-flat-map': 'warn',
     'unicorn/prefer-array-index-of': 'warn',
     'unicorn/prefer-at': 'warn',
+    'unicorn/prefer-code-point': 'warn',
     'unicorn/prefer-date-now': 'warn',
+    'unicorn/prefer-export-from': ['warn', {ignoreUsedVariables: true}],
     'unicorn/prefer-includes': 'warn',
     'unicorn/prefer-keyboard-event-key': 'warn',
     'unicorn/prefer-object-has-own': 'warn',
@@ -141,6 +149,7 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/require-post-message-target-origin': 'warn',
     'unicorn/no-static-only-class': 'warn',
     'unicorn/throw-new-error': 'warn',
+    'unicorn/whitespace-insensitive': 'warn',
   },
 };
 

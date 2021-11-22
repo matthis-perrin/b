@@ -17,7 +17,7 @@ export function webConfig(): WebpackConfigFragment {
 
   return {
     dependencies: {
-      'webpack-dev-server': '4.4.x',
+      'webpack-dev-server': '4.5.x',
       ...base.dependencies,
       ...define.dependencies,
       ...html.dependencies,

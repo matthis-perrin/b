@@ -10,7 +10,7 @@ const forbiddenProps = [
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
-    'eslint-plugin-react': '7.25.x',
+    'eslint-plugin-react': '7.27.x',
   },
   settings: {
     react: {
@@ -69,6 +69,7 @@ export const eslintReact: EslintMetadata = {
     'react/no-access-state-in-setstate': 'off',
     'react/no-adjacent-inline-elements': 'off',
     'react/no-array-index-key': 'off',
+    'react/no-arrow-function-lifecycle': 'off',
     'react/no-children-prop': 'off',
     'react/no-danger-with-children': 'off',
     'react/no-danger': 'off',
@@ -79,6 +80,7 @@ export const eslintReact: EslintMetadata = {
     'react/no-find-dom-node': 'off',
     'react/no-is-mounted': 'off',
     'react/no-multi-comp': 'off',
+    'react/no-namespace': 'off',
     'react/no-redundant-should-component-update': 'off',
     'react/no-render-return-value': 'off',
     'react/no-set-state': 'off',
@@ -111,7 +113,7 @@ export const eslintReact: EslintMetadata = {
   onlyOn: {
     'react/button-has-type': 'warn',
     'react/destructuring-assignment': ['warn', 'always'],
-    'react/display-name': ['warn'],
+    'react/display-name': ['warn', {ignoreTranspilerName: true}],
     'react/forbid-component-props': ['warn', {forbid: forbiddenProps}],
     'react/forbid-dom-props': ['warn', {forbid: forbiddenProps}],
     'react/function-component-definition': [
@@ -139,6 +141,7 @@ export const eslintReact: EslintMetadata = {
     'react/jsx-uses-vars': 'warn',
     'react/no-access-state-in-setstate': 'warn',
     'react/no-array-index-key': 'warn',
+    'react/no-arrow-function-lifecycle': 'warn',
     'react/no-children-prop': 'warn',
     'react/no-danger-with-children': 'warn',
     'react/no-deprecated': 'warn',
@@ -148,6 +151,7 @@ export const eslintReact: EslintMetadata = {
     'react/no-find-dom-node': 'warn',
     'react/no-is-mounted': 'warn',
     'react/no-multi-comp': 'warn',
+    'react/no-namespace': 'warn',
     'react/no-redundant-should-component-update': 'warn',
     'react/no-render-return-value': 'warn',
     'react/no-string-refs': 'warn',

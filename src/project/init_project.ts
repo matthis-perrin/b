@@ -1,4 +1,3 @@
-import prompts from 'prompts';
 import {basename, dirname, join} from 'path';
 import {cwd} from 'process';
 import {readdir, readFile, stat, mkdir, writeFile} from 'fs/promises';
@@ -15,6 +14,7 @@ import {
 const templatesPath = join(__dirname, 'templates');
 
 export default async function initProject(): Promise<void> {
+  const prompts = require('prompts')
   let projectPath = cwd();
   let projectName = basename(projectPath);
 
@@ -26,7 +26,7 @@ export default async function initProject(): Promise<void> {
         type: 'text',
         name: 'projectName',
         message: 'Project name',
-        validate: v => v.length > 0,
+        validate: (v: string) => v.length > 0,
       })
     ).projectName;
     if (projectName === undefined) {

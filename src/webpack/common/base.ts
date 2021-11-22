@@ -6,7 +6,7 @@ export function baseConfig(opts: {hashOutput: boolean}): WebpackConfigFragment {
   const terserPluginConfig = terserPlugin();
   return {
     dependencies: {
-      webpack: '5.61.x',
+      webpack: '5.64.x',
       'webpack-cli': '4.9.x',
       ...terserPluginConfig.dependencies,
     },
@@ -30,6 +30,9 @@ export function baseConfig(opts: {hashOutput: boolean}): WebpackConfigFragment {
       optimization: {
         minimize: isProd(),
         minimizer: [terserPluginConfig.config()],
+      },
+      experiments: {
+        backCompat: true,
       },
     }),
   };

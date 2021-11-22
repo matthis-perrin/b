@@ -3,7 +3,7 @@ import {EslintMetadata} from '../models';
 export const eslintImport: EslintMetadata = {
   plugin: ['import'],
   dependencies: {
-    'eslint-plugin-import': '2.24.x',
+    'eslint-plugin-import': '2.25.x',
     'eslint-import-resolver-typescript': '2.5.x',
   },
   settings: {
