@@ -1,6 +1,6 @@
 {
   "name": "@matthis/eslint-config-lib",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "license": "UNLICENSED",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "5.4.x",

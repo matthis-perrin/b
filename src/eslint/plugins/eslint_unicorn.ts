@@ -96,7 +96,6 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/switch': 'off',
     'unicorn/template-indent': 'off',
     'unicorn/throw-new-error': 'off',
-    'unicorn/whitespace-insensitive': 'off',
   },
   onlyOn: {
     'unicorn/better-regex': 'warn',
@@ -151,7 +150,6 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/no-static-only-class': 'warn',
     'unicorn/template-indent': 'warn',
     'unicorn/throw-new-error': 'warn',
-    'unicorn/whitespace-insensitive': 'warn',
   },
 };
 

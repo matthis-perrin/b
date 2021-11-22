@@ -739,7 +739,6 @@ module.exports = {
     "unicorn/switch": "off",
     "unicorn/template-indent": "warn",
     "unicorn/throw-new-error": "warn",
-    "unicorn/whitespace-insensitive": "warn",
     "unicorn/prefer-array-flat": "warn",
     "node/callback-return": ["warn", ["callback", "cb", "next", "done"]],
     "node/exports-style": "off",
