@@ -2,7 +2,7 @@ import webpack from 'webpack';
 
 export async function compile(entry: string, dst: string): Promise<void> {
   const config: webpack.Configuration = {
-    mode: 'production',
+    mode: 'none',
     target: 'node',
     entry,
     output: {
