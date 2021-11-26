@@ -700,7 +700,7 @@ module.exports = {
     "unicorn/prefer-array-flat-map": "warn",
     "unicorn/prefer-array-index-of": "warn",
     "unicorn/prefer-at": "warn",
-    "unicorn/prefer-code-point": "warn",
+    "unicorn/prefer-code-point": "off",
     "unicorn/prefer-date-now": "warn",
     "unicorn/prefer-dom-node-append": "off",
     "unicorn/prefer-dom-node-dataset": "off",
