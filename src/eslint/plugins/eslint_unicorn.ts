@@ -127,7 +127,6 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/prefer-array-flat-map': 'warn',
     'unicorn/prefer-array-index-of': 'warn',
     'unicorn/prefer-at': 'warn',
-    'unicorn/prefer-code-point': 'warn',
     'unicorn/prefer-date-now': 'warn',
     'unicorn/prefer-export-from': ['warn', {ignoreUsedVariables: true}],
     'unicorn/prefer-includes': 'warn',
