@@ -1,6 +1,6 @@
 //   'source-map-loader': '3.0.x',
 
-import {WebpackConfigFragment} from './utils';
+import {isSelenium, WebpackConfigFragment} from './utils';
 
 export function babelLoaderWeb(): WebpackConfigFragment {
   return {
@@ -10,6 +10,7 @@ export function babelLoaderWeb(): WebpackConfigFragment {
       '@babel/preset-react': '7.16.x',
       '@babel/preset-typescript': '7.16.x',
       'babel-loader': '8.2.x',
+      'babel-plugin-react-remove-properties': '0.3.x',
     },
     config: () => ({
       test: /\.tsx?$/u,
@@ -29,6 +30,7 @@ export function babelLoaderWeb(): WebpackConfigFragment {
           ['@babel/preset-react'],
           ['@babel/preset-typescript'],
         ],
+        plugins: isSelenium() ? [] : [['react-remove-properties', {properties: ['data-test-id']}]],
       },
     }),
   };

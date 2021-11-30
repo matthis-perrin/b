@@ -1,6 +1,6 @@
 {
   "name": "@matthis/webpack-web",
-  "version": "1.0.12",
+  "version": "1.0.14",
   "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {
@@ -16,6 +16,7 @@
     "@babel/preset-react": "7.16.x",
     "@babel/preset-typescript": "7.16.x",
     "babel-loader": "8.2.x",
+    "babel-plugin-react-remove-properties": "0.3.x",
     "source-map-loader": "3.0.x"
   }
 }

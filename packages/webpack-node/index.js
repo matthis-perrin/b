@@ -218,12 +218,16 @@ exports.terserPlugin = terserPlugin;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDistDir = exports.getProjectDir = exports.getEnv = exports.isProd = void 0;
+exports.getDistDir = exports.getProjectDir = exports.getEnv = exports.isSelenium = exports.isProd = void 0;
 var path_1 = __webpack_require__(2);
 function isProd() {
     return process.env['NODE_ENV'] === 'production';
 }
 exports.isProd = isProd;
+function isSelenium() {
+    return process.env['IS_SELENIUM'] === '1';
+}
+exports.isSelenium = isSelenium;
 function getEnv() {
     return isProd() ? 'production' : 'development';
 }
@@ -270,12 +274,13 @@ module.exports = require("terser-webpack-plugin");
 
 /***/ }),
 /* 11 */
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 //   'source-map-loader': '3.0.x',
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sourceMapLoader = exports.babelLoaderNode = exports.babelLoaderWeb = void 0;
+var utils_1 = __webpack_require__(5);
 function babelLoaderWeb() {
     return {
         dependencies: {
@@ -284,6 +289,7 @@ function babelLoaderWeb() {
             '@babel/preset-react': '7.16.x',
             '@babel/preset-typescript': '7.16.x',
             'babel-loader': '8.2.x',
+            'babel-plugin-react-remove-properties': '0.3.x',
         },
         config: function () { return ({
             test: /\.tsx?$/u,
@@ -303,6 +309,7 @@ function babelLoaderWeb() {
                     ['@babel/preset-react'],
                     ['@babel/preset-typescript'],
                 ],
+                plugins: (0, utils_1.isSelenium)() ? [] : [['react-remove-properties', { properties: ['data-test-id'] }]],
             },
         }); },
     };
