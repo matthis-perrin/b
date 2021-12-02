@@ -96,6 +96,7 @@ function baseConfig(opts) {
                 path: (0, utils_1.getDistDir)(),
                 filename: "[name]" + (hashOutput ? '.[contenthash]' : '') + ".js",
                 clean: true,
+                publicPath: '/',
             },
             resolve: {
                 extensions: ['.js', '.jsx', '.ts', '.tsx'],

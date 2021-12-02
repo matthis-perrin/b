@@ -17,6 +17,7 @@ export function baseConfig(opts: {hashOutput: boolean}): WebpackConfigFragment {
         path: getDistDir(),
         filename: `[name]${hashOutput ? '.[contenthash]' : ''}.js`,
         clean: true,
+        publicPath: '/',
       },
 
       resolve: {
