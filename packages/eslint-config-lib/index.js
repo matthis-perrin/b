@@ -343,6 +343,7 @@ module.exports = {
     "prefer-message-ids": "off",
     "prefer-named-capture-group": "warn",
     "prefer-numeric-literals": "off",
+    "prefer-object-has-own": "off",
     "prefer-object-spread": "warn",
     "prefer-promise-reject-errors": "warn",
     "prefer-reflect": "off",

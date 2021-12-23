@@ -44,7 +44,7 @@ function webConfig() {
     var sourceMap = (0, loaders_1.sourceMapLoader)();
     var baseWebpackConfig = base.config();
     return {
-        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign({ 'webpack-dev-server': '4.5.x' }, base.dependencies), define.dependencies), html.dependencies), forkTsChecker.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
+        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign({ 'webpack-dev-server': '4.7.x' }, base.dependencies), define.dependencies), html.dependencies), forkTsChecker.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
         config: function () { return (__assign(__assign({}, baseWebpackConfig), { target: 'web', entry: {
                 main: (0, path_1.join)((0, utils_1.getProjectDir)(), "src/index.tsx"),
             }, module: {
@@ -100,7 +100,7 @@ function baseConfig(opts) {
     var hashOutput = opts.hashOutput;
     var terserPluginConfig = (0, plugins_1.terserPlugin)();
     return {
-        dependencies: __assign({ webpack: '5.64.x', 'webpack-cli': '4.9.x' }, terserPluginConfig.dependencies),
+        dependencies: __assign({ webpack: '5.65.x', 'webpack-cli': '4.9.x' }, terserPluginConfig.dependencies),
         config: function () { return ({
             mode: 'none',
             devtool: (0, utils_1.isProd)() ? 'source-map' : 'eval',
@@ -170,7 +170,7 @@ exports.htmlPlugin = htmlPlugin;
 function forkTsCheckerPlugin() {
     return {
         dependencies: {
-            'fork-ts-checker-webpack-plugin': '6.4.x',
+            'fork-ts-checker-webpack-plugin': '6.5.x',
         },
         config: function () {
             var ForkTsCheckerWebpackPlugin = __webpack_require__(8);
@@ -207,7 +207,7 @@ exports.cleanTerminalPlugin = cleanTerminalPlugin;
 function terserPlugin() {
     return {
         dependencies: {
-            'terser-webpack-plugin': '5.2.x',
+            'terser-webpack-plugin': '5.3.x',
         },
         config: function () {
             var TerserWebpackPlugin = __webpack_require__(10);

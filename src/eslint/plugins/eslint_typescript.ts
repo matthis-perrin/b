@@ -4,8 +4,8 @@ import {EslintMetadata} from '../models';
 export const eslintTypescript: EslintMetadata = {
   plugin: ['@typescript-eslint'],
   dependencies: {
-    '@typescript-eslint/eslint-plugin': '5.4.x',
-    '@typescript-eslint/parser': '5.4.x',
+    '@typescript-eslint/eslint-plugin': '5.8.x',
+    '@typescript-eslint/parser': '5.8.x',
     typescript: TYPESCRIPT_VERSION,
   },
   settings: {},

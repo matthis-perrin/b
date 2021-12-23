@@ -277,6 +277,7 @@ export const eslintCore: EslintMetadata = {
     'prefer-message-ids': 'off',
     'prefer-named-capture-group': 'off',
     'prefer-numeric-literals': 'off',
+    'prefer-object-has-own': 'off',
     'prefer-object-spread': 'off',
     'prefer-promise-reject-errors': 'off',
     'prefer-reflect': 'off',

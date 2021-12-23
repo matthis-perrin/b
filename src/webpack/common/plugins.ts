@@ -31,7 +31,7 @@ export function htmlPlugin(): WebpackConfigFragment {
 export function forkTsCheckerPlugin(): WebpackConfigFragment {
   return {
     dependencies: {
-      'fork-ts-checker-webpack-plugin': '6.4.x',
+      'fork-ts-checker-webpack-plugin': '6.5.x',
     },
     config: () => {
       const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -68,7 +68,7 @@ export function cleanTerminalPlugin(): WebpackConfigFragment {
 export function terserPlugin(): WebpackConfigFragment {
   return {
     dependencies: {
-      'terser-webpack-plugin': '5.2.x',
+      'terser-webpack-plugin': '5.3.x',
     },
     config: () => {
       const TerserWebpackPlugin = require('terser-webpack-plugin');

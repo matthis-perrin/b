@@ -6,7 +6,7 @@ export function baseConfig(opts: {hashOutput: boolean}): WebpackConfigFragment {
   const terserPluginConfig = terserPlugin();
   return {
     dependencies: {
-      webpack: '5.64.x',
+      webpack: '5.65.x',
       'webpack-cli': '4.9.x',
       ...terserPluginConfig.dependencies,
     },
