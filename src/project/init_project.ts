@@ -8,13 +8,14 @@ import {
   REACT_VERSION,
   STYLED_COMPONENTS_TYPES_VERSION,
   STYLED_COMPONENTS_VERSION,
-  NODE_TYPES_VERSION
+  NODE_TYPES_VERSION,
+  REACT_NATIVE_VERSION,
 } from '../versions';
 
 const templatesPath = join(__dirname, 'templates');
 
 export default async function initProject(): Promise<void> {
-  const prompts = require('prompts')
+  const prompts = require('prompts');
   let projectPath = cwd();
   let projectName = basename(projectPath);
 
@@ -45,6 +46,7 @@ export default async function initProject(): Promise<void> {
       {title: 'NodeJS', value: ProjectType.Node},
       {title: 'Web (React)', value: ProjectType.Web},
       {title: 'Lib', value: ProjectType.Lib},
+      {title: 'React Native', value: ProjectType.ReactNative},
     ],
   });
   if (projectType === undefined) {
@@ -55,12 +57,13 @@ export default async function initProject(): Promise<void> {
 }
 
 async function generateProject(dst: string, name: string, type: ProjectType): Promise<void> {
-  console.log(dst, name, type)
+  console.log(dst, name, type);
   const variables: Record<string, string> = {
     PROJECT_NAME: name,
     PROJECT_TYPE: type,
     REACT_ROUTER_VERSION,
     REACT_VERSION,
+    REACT_NATIVE_VERSION,
     STYLED_COMPONENTS_TYPES_VERSION,
     STYLED_COMPONENTS_VERSION,
     NODE_TYPES_VERSION,

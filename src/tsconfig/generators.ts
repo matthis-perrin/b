@@ -93,6 +93,15 @@ function generateTsConfig(type: ProjectType): Record<string, unknown> {
       //
       types: ['node'],
     };
+  } else if (type === ProjectType.ReactNative) {
+    additionalCompilerOptions = {
+      module: 'esnext',
+      moduleResolution: 'node',
+      lib: ['es2020', 'dom', 'dom.iterable'],
+      target: 'esnext',
+      //
+      jsx: 'react-native',
+    };
   } else {
     throw new Error(`Unknown project type ${type}`);
   }

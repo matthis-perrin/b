@@ -96,6 +96,7 @@ function initProject() {
                             { title: 'NodeJS', value: models_1.ProjectType.Node },
                             { title: 'Web (React)', value: models_1.ProjectType.Web },
                             { title: 'Lib', value: models_1.ProjectType.Lib },
+                            { title: 'React Native', value: models_1.ProjectType.ReactNative },
                         ],
                     })];
                 case 5:
@@ -125,6 +126,7 @@ function generateProject(dst, name, type) {
                         PROJECT_TYPE: type,
                         REACT_ROUTER_VERSION: versions_1.REACT_ROUTER_VERSION,
                         REACT_VERSION: versions_1.REACT_VERSION,
+                        REACT_NATIVE_VERSION: versions_1.REACT_NATIVE_VERSION,
                         STYLED_COMPONENTS_TYPES_VERSION: versions_1.STYLED_COMPONENTS_TYPES_VERSION,
                         STYLED_COMPONENTS_VERSION: versions_1.STYLED_COMPONENTS_VERSION,
                         NODE_TYPES_VERSION: versions_1.NODE_TYPES_VERSION,
@@ -229,8 +231,14 @@ var ProjectType;
     ProjectType["Web"] = "web";
     ProjectType["Node"] = "node";
     ProjectType["Lib"] = "lib";
+    ProjectType["ReactNative"] = "react-native";
 })(ProjectType = exports.ProjectType || (exports.ProjectType = {}));
-exports.ALL_TYPES = [ProjectType.Web, ProjectType.Node, ProjectType.Lib];
+exports.ALL_TYPES = [
+    ProjectType.Web,
+    ProjectType.Node,
+    ProjectType.Lib,
+    ProjectType.ReactNative,
+];
 
 
 /***/ }),
@@ -239,9 +247,9 @@ exports.ALL_TYPES = [ProjectType.Web, ProjectType.Node, ProjectType.Lib];
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
+exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.0.13',
+    project: '1.0.14',
     eslint: '1.0.20',
     prettier: '1.0.2',
     tsconfig: '1.0.5',
@@ -252,6 +260,7 @@ exports.PRETTIER_VERSION = '2.5.x';
 exports.TYPESCRIPT_VERSION = '4.5.x';
 exports.REACT_VERSION = '17.0.x';
 exports.REACT_ROUTER_VERSION = '5.2.x';
+exports.REACT_NATIVE_VERSION = '0.66.x';
 exports.STYLED_COMPONENTS_TYPES_VERSION = '5.1.x';
 exports.STYLED_COMPONENTS_VERSION = '5.1.x';
 exports.NODE_TYPES_VERSION = '16.11.x';

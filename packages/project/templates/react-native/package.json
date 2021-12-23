@@ -1,0 +1,38 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "license": "UNLICENSED",
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "lint": "eslint . --ext .ts,.tsx --fix"
+  },
+  "babel": {
+    "presets": [
+      "module:metro-react-native-babel-preset"
+    ],
+    "plugins": []
+  },
+  "prettier": "@matthis/prettier-config",
+  "eslintConfig": {
+    "extends": [
+      "@matthis/eslint-config-{{PROJECT_TYPE}}"
+    ]
+  },
+  "dependencies": {
+    "react": "{{REACT_VERSION}}",
+    "react-native": "{{REACT_NATIVE}}",
+    "styled-components": "{{STYLED_COMPONENTS_VERSION}}"
+  },
+  "devDependencies": {
+    "@babel/core": "7.12.x",
+    "@babel/runtime": "7.12.x",
+    "@matthis/eslint-config-{{PROJECT_TYPE}}": "latest",
+    "@matthis/prettier-config": "latest",
+    "@matthis/tsconfig-{{PROJECT_TYPE}}": "latest",
+    "@types/react": "{{REACT_VERSION}}",
+    "@types/react-native": "{{REACT_NATIVE_VERSION}}",
+    "@types/styled-components": "{{STYLED_COMPONENTS_TYPES_VERSION}}",
+    "metro-react-native-babel-preset": "0.66.x"
+  }
+}
