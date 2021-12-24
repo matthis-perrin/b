@@ -5,7 +5,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "lint": "eslint . --ext .ts,.tsx --fix"
+    "lint": "eslint src --ext .ts,.tsx --fix"
   },
   "babel": {
     "presets": [
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "react": "{{REACT_VERSION}}",
-    "react-native": "{{REACT_NATIVE}}",
+    "react-native": "{{REACT_NATIVE_VERSION}}",
     "styled-components": "{{STYLED_COMPONENTS_VERSION}}"
   },
   "devDependencies": {

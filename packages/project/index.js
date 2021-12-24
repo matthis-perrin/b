@@ -58,6 +58,7 @@ var process_1 = __webpack_require__(2);
 var promises_1 = __webpack_require__(3);
 var models_1 = __webpack_require__(4);
 var versions_1 = __webpack_require__(5);
+var child_process_1 = __webpack_require__(6);
 var templatesPath = (0, path_1.join)(__dirname, 'templates');
 function initProject() {
     return __awaiter(this, void 0, void 0, function () {
@@ -65,7 +66,7 @@ function initProject() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    prompts = __webpack_require__(6);
+                    prompts = __webpack_require__(7);
                     projectPath = (0, process_1.cwd)();
                     projectName = (0, path_1.basename)(projectPath);
                     return [4 /*yield*/, (0, promises_1.readdir)(projectPath)];
@@ -115,7 +116,7 @@ function initProject() {
 exports["default"] = initProject;
 function generateProject(dst, name, type) {
     return __awaiter(this, void 0, void 0, function () {
-        var variables, files;
+        var variables, files, commands;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -143,7 +144,7 @@ function generateProject(dst, name, type) {
                                         fileContent = _a.sent();
                                         compiledContent = fileContent
                                             .toString()
-                                            .replace(/\{\{([^\}]+)\}\}/gu, function (match, vName) { var _a; return (_a = variables[vName]) !== null && _a !== void 0 ? _a : ''; });
+                                            .replace(/\{\{([^\}]+)\}\}/gu, function (match, vName) { var _a; return (_a = variables[vName]) !== null && _a !== void 0 ? _a : match; });
                                         fPath = (0, path_1.join)(dst, f);
                                         return [4 /*yield*/, (0, promises_1.mkdir)((0, path_1.dirname)(fPath), { recursive: true })];
                                     case 2:
@@ -157,6 +158,19 @@ function generateProject(dst, name, type) {
                         }); }))];
                 case 2:
                     _a.sent();
+                    // Post generation script
+                    if (type === models_1.ProjectType.ReactNative) {
+                        console.log('Running post install script');
+                        commands = [
+                            "pushd " + dst,
+                            "npx --yes react-native init " + name,
+                            "mv " + name + "/ios .",
+                            "mv " + name + "/android .",
+                            "rm -rf " + name,
+                            "popd " + dst,
+                        ];
+                        (0, child_process_1.execSync)(commands.join(' && '));
+                    }
                     return [2 /*return*/];
             }
         });
@@ -249,7 +263,7 @@ exports.ALL_TYPES = [
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.0.14',
+    project: '1.0.21',
     eslint: '1.0.20',
     prettier: '1.0.2',
     tsconfig: '1.0.5',
@@ -268,6 +282,12 @@ exports.NODE_TYPES_VERSION = '16.11.x';
 
 /***/ }),
 /* 6 */
+/***/ ((module) => {
+
+module.exports = require("child_process");
+
+/***/ }),
+/* 7 */
 /***/ ((module) => {
 
 module.exports = require("prompts");
