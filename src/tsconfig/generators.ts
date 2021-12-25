@@ -97,7 +97,7 @@ function generateTsConfig(type: ProjectType): Record<string, unknown> {
     additionalCompilerOptions = {
       module: 'esnext',
       moduleResolution: 'node',
-      lib: ['es2020', 'dom', 'dom.iterable'],
+      lib: ['es2020'],
       target: 'esnext',
       //
       jsx: 'react-native',

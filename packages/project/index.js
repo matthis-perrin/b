@@ -266,7 +266,7 @@ exports.PACKAGE_VERSIONS = {
     project: '1.0.21',
     eslint: '1.0.20',
     prettier: '1.0.2',
-    tsconfig: '1.0.5',
+    tsconfig: '1.0.6',
     webpack: '1.0.16',
 };
 exports.ESLINT_VERSION = '8.5.x';
