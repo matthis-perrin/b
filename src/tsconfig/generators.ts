@@ -57,6 +57,8 @@ function generateTsConfig(type: ProjectType): Record<string, unknown> {
     strict: true,
     // File path where to store the incremental build info
     tsBuildInfoFile: 'tmp/.tsbuildinfo',
+    // Prevent all visible ”@types” packages to be included by default
+    types: [],
   };
 
   let additionalCompilerOptions:

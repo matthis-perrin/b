@@ -16,6 +16,7 @@
     "skipLibCheck": true,
     "strict": true,
     "tsBuildInfoFile": "tmp/.tsbuildinfo",
+    "types": [],
     "module": "none",
     "moduleResolution": "node",
     "lib": [

@@ -16,14 +16,14 @@
     "skipLibCheck": true,
     "strict": true,
     "tsBuildInfoFile": "tmp/.tsbuildinfo",
+    "types": [
+      "node"
+    ],
     "module": "commonjs",
     "moduleResolution": "node",
     "lib": [
       "es2021"
     ],
-    "target": "es2021",
-    "types": [
-      "node"
-    ]
+    "target": "es2021"
   }
 }
