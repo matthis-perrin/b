@@ -11,6 +11,7 @@ import {
   NODE_TYPES_VERSION,
   REACT_NATIVE_VERSION,
 } from '../versions';
+import {execSync} from 'child_process';
 
 const templatesPath = join(__dirname, 'templates');
 
@@ -74,12 +75,26 @@ async function generateProject(dst: string, name: string, type: ProjectType): Pr
       const fileContent = await readFile(join(templatesPath, type, f));
       const compiledContent = fileContent
         .toString()
-        .replace(/\{\{([^\}]+)\}\}/gu, (match, vName) => variables[vName] ?? '');
+        .replace(/\{\{([^\}]+)\}\}/gu, (match, vName) => variables[vName] ?? match);
       const fPath = join(dst, f);
       await mkdir(dirname(fPath), {recursive: true});
       await writeFile(fPath, compiledContent);
     })
   );
+
+  // Post generation script
+  if (type === ProjectType.ReactNative) {
+    console.log('Running post install script');
+    const commands = [
+      `pushd ${dst}`,
+      `npx --yes react-native init ${name}`,
+      `mv ${name}/ios .`,
+      `mv ${name}/android .`,
+      `rm -rf ${name}`,
+      `popd ${dst}`,
+    ];
+    execSync(commands.join(' && '));
+  }
 }
 
 async function getFiles(path: string): Promise<string[]> {
