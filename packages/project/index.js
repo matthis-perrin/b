@@ -95,6 +95,7 @@ function initProject() {
                         message: 'Project type',
                         choices: [
                             { title: 'NodeJS', value: models_1.ProjectType.Node },
+                            { title: 'Web App', value: models_1.WorkspaceType.WebApp },
                             { title: 'Web (React)', value: models_1.ProjectType.Web },
                             { title: 'Lib', value: models_1.ProjectType.Lib },
                             { title: 'React Native', value: models_1.ProjectType.ReactNative },
@@ -239,7 +240,7 @@ module.exports = require("fs/promises");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ALL_TYPES = exports.ProjectType = void 0;
+exports.WorkspaceType = exports.ALL_TYPES = exports.ProjectType = void 0;
 var ProjectType;
 (function (ProjectType) {
     ProjectType["Web"] = "web";
@@ -253,6 +254,10 @@ exports.ALL_TYPES = [
     ProjectType.Lib,
     ProjectType.ReactNative,
 ];
+var WorkspaceType;
+(function (WorkspaceType) {
+    WorkspaceType["WebApp"] = "web-app";
+})(WorkspaceType = exports.WorkspaceType || (exports.WorkspaceType = {}));
 
 
 /***/ }),

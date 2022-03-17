@@ -2,7 +2,7 @@ import {basename, dirname, join} from 'path';
 import {cwd} from 'process';
 import {readdir, readFile, stat, mkdir, writeFile} from 'fs/promises';
 
-import {ProjectType} from '../models';
+import {ProjectType, WorkspaceType} from '../models';
 import {
   REACT_ROUTER_VERSION,
   REACT_VERSION,
@@ -45,6 +45,7 @@ export default async function initProject(): Promise<void> {
     message: 'Project type',
     choices: [
       {title: 'NodeJS', value: ProjectType.Node},
+      {title: 'Web App', value: WorkspaceType.WebApp},
       {title: 'Web (React)', value: ProjectType.Web},
       {title: 'Lib', value: ProjectType.Lib},
       {title: 'React Native', value: ProjectType.ReactNative},
@@ -57,7 +58,11 @@ export default async function initProject(): Promise<void> {
   await generateProject(projectPath, projectName, projectType);
 }
 
-async function generateProject(dst: string, name: string, type: ProjectType): Promise<void> {
+async function generateProject(
+  dst: string,
+  name: string,
+  type: ProjectType | WorkspaceType
+): Promise<void> {
   console.log(dst, name, type);
   const variables: Record<string, string> = {
     PROJECT_NAME: name,
@@ -82,7 +87,7 @@ async function generateProject(dst: string, name: string, type: ProjectType): Pr
     })
   );
 
-  // Post generation script
+  // Post generation script for React Native project
   if (type === ProjectType.ReactNative) {
     console.log('Running post install script');
     const commands = [
@@ -93,6 +98,13 @@ async function generateProject(dst: string, name: string, type: ProjectType): Pr
       `rm -rf ${name}`,
       `popd ${dst}`,
     ];
+    execSync(commands.join(' && '));
+  }
+
+  // Initialization script for Web App project
+  if (type === WorkspaceType.WebApp) {
+    console.log('Running post install script');
+    const commands = [`pushd ${dst}`, `node setup.js`];
     execSync(commands.join(' && '));
   }
 }

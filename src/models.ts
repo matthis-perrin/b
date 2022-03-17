@@ -11,3 +11,7 @@ export const ALL_TYPES = [
   ProjectType.Lib,
   ProjectType.ReactNative,
 ];
+
+export enum WorkspaceType {
+  WebApp = 'web-app',
+}
