@@ -96,7 +96,7 @@ async function generateProject(
       `mv ${name}/ios .`,
       `mv ${name}/android .`,
       `rm -rf ${name}`,
-      `popd ${dst}`,
+      `popd`,
     ];
     execSync(commands.join(' && '));
   }
@@ -104,8 +104,8 @@ async function generateProject(
   // Initialization script for Web App project
   if (type === WorkspaceType.WebApp) {
     console.log('Running post install script');
-    const commands = [`pushd ${dst}`, `node setup.js`];
-    execSync(commands.join(' && '));
+    const commands = [`pushd ${dst}`, `node setup.js`, `popd`];
+    execSync(commands.join(' && '), {stdio: ['ignore', 'inherit', 'inherit']});
   }
 }
 

@@ -117,7 +117,7 @@ function initProject() {
 exports["default"] = initProject;
 function generateProject(dst, name, type) {
     return __awaiter(this, void 0, void 0, function () {
-        var variables, files, commands;
+        var variables, files, commands, commands;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -159,7 +159,7 @@ function generateProject(dst, name, type) {
                         }); }))];
                 case 2:
                     _a.sent();
-                    // Post generation script
+                    // Post generation script for React Native project
                     if (type === models_1.ProjectType.ReactNative) {
                         console.log('Running post install script');
                         commands = [
@@ -168,9 +168,15 @@ function generateProject(dst, name, type) {
                             "mv " + name + "/ios .",
                             "mv " + name + "/android .",
                             "rm -rf " + name,
-                            "popd " + dst,
+                            "popd",
                         ];
                         (0, child_process_1.execSync)(commands.join(' && '));
+                    }
+                    // Initialization script for Web App project
+                    if (type === models_1.WorkspaceType.WebApp) {
+                        console.log('Running post install script');
+                        commands = ["pushd " + dst, "node setup.js", "popd"];
+                        (0, child_process_1.execSync)(commands.join(' && '), { stdio: ['ignore', 'inherit', 'inherit'] });
                     }
                     return [2 /*return*/];
             }
