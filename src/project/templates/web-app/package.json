@@ -1,5 +1,7 @@
 {
   "name": "{{PROJECT_NAME}}",
   "license": "UNLICENSED",
-  "scripts": {}
+  "scripts": {
+    "deploy": "node ./deploy.js"
+  }
 }
