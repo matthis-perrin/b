@@ -52,6 +52,31 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var path_1 = __webpack_require__(1);
 var process_1 = __webpack_require__(2);
@@ -59,6 +84,7 @@ var promises_1 = __webpack_require__(3);
 var models_1 = __webpack_require__(4);
 var versions_1 = __webpack_require__(5);
 var child_process_1 = __webpack_require__(6);
+var all_1 = __webpack_require__(7);
 var templatesPath = (0, path_1.join)(__dirname, 'templates');
 function initProject() {
     return __awaiter(this, void 0, void 0, function () {
@@ -66,7 +92,7 @@ function initProject() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    prompts = __webpack_require__(7);
+                    prompts = __webpack_require__(14);
                     projectPath = (0, process_1.cwd)();
                     projectName = (0, path_1.basename)(projectPath);
                     return [4 /*yield*/, (0, promises_1.readdir)(projectPath)];
@@ -136,7 +162,7 @@ function generateProject(dst, name, type) {
                     return [4 /*yield*/, getFiles((0, path_1.join)(templatesPath, type))];
                 case 1:
                     files = _a.sent();
-                    return [4 /*yield*/, Promise.all(files.map(function (f) { return __awaiter(_this, void 0, void 0, function () {
+                    return [4 /*yield*/, Promise.all(__spreadArray(__spreadArray([], __read(files.map(function (f) { return __awaiter(_this, void 0, void 0, function () {
                             var fileContent, compiledContent, fPath;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
@@ -156,7 +182,29 @@ function generateProject(dst, name, type) {
                                         return [2 /*return*/];
                                 }
                             });
-                        }); }))];
+                        }); })), false), [
+                            type === models_1.WorkspaceType.WebApp
+                                ? (function () { return __awaiter(_this, void 0, void 0, function () {
+                                    var fPath, _a, _b;
+                                    return __generator(this, function (_c) {
+                                        switch (_c.label) {
+                                            case 0:
+                                                fPath = (0, path_1.join)(dst, 'terraform', 'terraform.tf');
+                                                return [4 /*yield*/, (0, promises_1.mkdir)((0, path_1.dirname)(fPath), { recursive: true })];
+                                            case 1:
+                                                _c.sent();
+                                                _a = promises_1.writeFile;
+                                                _b = [fPath];
+                                                return [4 /*yield*/, (0, all_1.generateTerraform)(name)];
+                                            case 2: return [4 /*yield*/, _a.apply(void 0, _b.concat([_c.sent()]))];
+                                            case 3:
+                                                _c.sent();
+                                                return [2 /*return*/];
+                                        }
+                                    });
+                                }); })()
+                                : Promise.resolve(),
+                        ], false))];
                 case 2:
                     _a.sent();
                     // Post generation script for React Native project
@@ -299,6 +347,118 @@ module.exports = require("child_process");
 
 /***/ }),
 /* 7 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateTerraform = void 0;
+var api_gateway_1 = __webpack_require__(8);
+var cloudfront_1 = __webpack_require__(9);
+var lambda_1 = __webpack_require__(10);
+var output_1 = __webpack_require__(11);
+var provider_1 = __webpack_require__(12);
+var s3_1 = __webpack_require__(13);
+function generateTerraform(projectName) {
+    return [
+        (0, provider_1.generateAwsProvider)(projectName),
+        (0, output_1.generateWebOutputs)(),
+        (0, output_1.generateLambdaApiOutputs)(),
+        (0, s3_1.generateS3Bucket)(projectName),
+        (0, cloudfront_1.generateCloudfrontDistribution)(projectName),
+        (0, lambda_1.generateLambda)(projectName),
+        (0, api_gateway_1.generateApiGateway)(projectName),
+    ].join('\n\n');
+}
+exports.generateTerraform = generateTerraform;
+
+
+/***/ }),
+/* 8 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateApiGateway = void 0;
+function generateApiGateway(projectName) {
+    return ("\n  resource \"aws_api_gateway_rest_api\" \"api\" {\n    name        = \"" + projectName + "-RestAPI\"\n    description = \"Rest API for the \\\"" + projectName + "\\\" app\"\n  }\n  \n  resource \"aws_api_gateway_resource\" \"api\" {\n    rest_api_id = aws_api_gateway_rest_api.api.id\n    parent_id   = aws_api_gateway_rest_api.api.root_resource_id\n    path_part   = \"{proxy+}\"\n  }\n   \n  resource \"aws_api_gateway_method\" \"api\" {\n    rest_api_id   = aws_api_gateway_rest_api.api.id\n    resource_id   = aws_api_gateway_resource.api.id\n    http_method   = \"ANY\"\n    authorization = \"NONE\"\n  }\n  \n  resource \"aws_api_gateway_method\" \"api_root\" {\n     rest_api_id   = aws_api_gateway_rest_api.api.id\n     resource_id   = aws_api_gateway_rest_api.api.root_resource_id\n     http_method   = \"ANY\"\n     authorization = \"NONE\"\n  }\n  \n  resource \"aws_api_gateway_integration\" \"api\" {\n    rest_api_id = aws_api_gateway_rest_api.api.id\n    resource_id = aws_api_gateway_method.api.resource_id\n    http_method = aws_api_gateway_method.api.http_method\n   \n    integration_http_method = \"POST\"\n    type                    = \"AWS_PROXY\"\n    uri                     = aws_lambda_function.api.invoke_arn\n  }\n  \n  resource \"aws_api_gateway_integration\" \"api_root\" {\n    rest_api_id = aws_api_gateway_rest_api.api.id\n    resource_id = aws_api_gateway_method.api_root.resource_id\n    http_method = aws_api_gateway_method.api_root.http_method\n  \n    integration_http_method = \"POST\"\n    type                    = \"AWS_PROXY\"\n    uri                     = aws_lambda_function.api.invoke_arn\n  }\n  \n  resource \"aws_api_gateway_deployment\" \"api\" {\n    depends_on = [\n      aws_api_gateway_integration.api,\n      aws_api_gateway_integration.api_root,\n    ]\n    rest_api_id = aws_api_gateway_rest_api.api.id\n    stage_name  = \"prod\"\n  \n    triggers = {\n      redeployment = sha1(jsonencode(aws_api_gateway_integration.api))\n    }\n  \n    lifecycle {\n      create_before_destroy = true\n    }\n  }\n  \n  resource \"aws_lambda_permission\" \"api\" {\n    statement_id  = \"AllowAPIGatewayInvoke\"\n    action        = \"lambda:InvokeFunction\"\n    function_name = aws_lambda_function.api.function_name\n    principal     = \"apigateway.amazonaws.com\"\n    source_arn    = \"${aws_api_gateway_rest_api.api.execution_arn}/*/*\"\n  }      \n").trim();
+}
+exports.generateApiGateway = generateApiGateway;
+
+
+/***/ }),
+/* 9 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateCloudfrontDistribution = void 0;
+function generateCloudfrontDistribution(projectName) {
+    var bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
+    var originId = bucketName + "-origin-id";
+    return ("\nresource \"aws_cloudfront_distribution\" \"s3\" {\n  origin {\n    domain_name = aws_s3_bucket.code.bucket_regional_domain_name\n    origin_id   = \"" + originId + "\"\n    origin_path = \"/frontend\"\n\n    s3_origin_config {\n      origin_access_identity = aws_cloudfront_origin_access_identity.s3.cloudfront_access_identity_path\n    }\n  }\n  \n  enabled             = true\n  is_ipv6_enabled     = true\n  default_root_object = \"index.html\"\n  price_class         = \"PriceClass_100\"\n\n  default_cache_behavior {\n    allowed_methods  = [\"HEAD\", \"GET\"]\n    cached_methods   = [\"HEAD\", \"GET\"]\n    compress         = true\n    target_origin_id = \"" + originId + "\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    \n    forwarded_values {\n      query_string = false\n      cookies {\n        forward = \"none\"\n      }\n    }\n  }\n\n  restrictions {\n    geo_restriction {\n      restriction_type = \"none\"\n    }\n  }\n\n  viewer_certificate {\n    cloudfront_default_certificate = true\n  }\n}\n\nresource \"aws_cloudfront_origin_access_identity\" \"s3\" {}\n  ").trim();
+}
+exports.generateCloudfrontDistribution = generateCloudfrontDistribution;
+
+
+/***/ }),
+/* 10 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateLambda = void 0;
+function generateLambda(projectName) {
+    return ("\nresource \"aws_lambda_function\" \"api\" {\n  function_name     = \"test-API\"\n  s3_bucket         = aws_s3_bucket.code.id\n  s3_key            = aws_s3_bucket_object.backend_archive.id\n  source_code_hash  = data.archive_file.backend_archive.output_sha\n  handler           = \"index.handler\"\n  runtime           = \"nodejs14.x\"\n  role              = aws_iam_role.lambda_api_exec.arn\n}\n\nresource \"aws_iam_role\" \"lambda_api_exec\" {\n    name = \"" + projectName + "-API-role\"\n\n    assume_role_policy = <<EOF\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"lambda.amazonaws.com\"\n      },\n      \"Effect\": \"Allow\",\n      \"Sid\": \"\"\n    }\n  ]\n}\n EOF\n\n }\n  ").trim();
+}
+exports.generateLambda = generateLambda;
+
+
+/***/ }),
+/* 11 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateLambdaApiOutputs = exports.generateWebOutputs = void 0;
+function generateWebOutputs() {
+    return "\noutput \"s3_bucket_id\" {\n  value       = aws_s3_bucket.code.id\n  description = \"Bucket id where the code lives. Used during s3-sync.\"\n}\noutput \"cloudfront_distribution_id\" {\n  value       = aws_cloudfront_distribution.s3.id\n  description = \"Cloudfront distribution id serving the frontend assets. Used during s3-sync.\"\n}\noutput \"cloudfront_domain_name\" {\n  value       = aws_cloudfront_distribution.s3.domain_name\n  description = \"Domain (from cloudfront) where the frontend is available.\"\n}\n  ".trim();
+}
+exports.generateWebOutputs = generateWebOutputs;
+function generateLambdaApiOutputs() {
+    return "\noutput \"api_url\" {\n  value = aws_api_gateway_deployment.api.invoke_url\n  description = \"URL where the lambda api can be called.\"\n}\n  ".trim();
+}
+exports.generateLambdaApiOutputs = generateLambdaApiOutputs;
+
+
+/***/ }),
+/* 12 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateAwsProvider = void 0;
+function generateAwsProvider(projectName) {
+    return ("\nterraform {\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 3.0\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region  = \"eu-west-3\"\n  shared_credentials_file = \"./.aws-credentials\"\n  default_tags {\n    tags = {\n      Project = \"" + projectName + "\"\n    }\n  }\n}\n").trim();
+}
+exports.generateAwsProvider = generateAwsProvider;
+
+
+/***/ }),
+/* 13 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateS3Bucket = void 0;
+function generateS3Bucket(projectName) {
+    var bucketName = projectName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
+    return ("\nresource \"aws_s3_bucket\" \"code\" {\n  bucket_prefix = \"" + bucketName + "-\"\n}\n\nresource \"aws_s3_bucket_acl\" \"code_bucket_acl\" {\n  bucket = aws_s3_bucket.code.id\n  acl    = \"private\"\n}\n\ndata \"aws_iam_policy_document\" \"code\" {\n  statement {\n    actions   = [\"s3:GetObject\"]\n    resources = [\"${aws_s3_bucket.code.arn}/frontend/*\"]\n\n    principals {\n      type        = \"AWS\"\n      identifiers = [aws_cloudfront_origin_access_identity.s3.iam_arn]\n    }\n  }\n}\n\nresource \"aws_s3_bucket_policy\" \"code\" {\n  bucket = aws_s3_bucket.code.id\n  policy = data.aws_iam_policy_document.code.json\n}\n\n\n# [START] UPLOAD FRONTEND AND BACKEND\n\nmodule \"template_files\" {\n  source = \"hashicorp/dir/template\"\n  base_dir = \"../frontend/dist\"\n}\n\nresource \"aws_s3_bucket_object\" \"frontend_files\" {\n  for_each     = module.template_files.files\n  bucket       = aws_s3_bucket.code.id\n  key          = \"frontend/${each.key}\"\n  content_type = each.value.content_type\n  source       = each.value.source_path\n  content      = each.value.content\n  etag         = each.value.digests.md5\n}\n\ndata \"archive_file\" \"backend_archive\" {\n  type        = \"zip\"\n  source_dir  = \"../backend/dist\"\n  output_path = \"./backend.zip\"\n}\n\nresource \"aws_s3_bucket_object\" \"backend_archive\" {\n  bucket       = aws_s3_bucket.code.id\n  key          = \"backend/dist.zip\"\n  source       = data.archive_file.backend_archive.output_path\n  etag         = data.archive_file.backend_archive.output_sha\n}\n\n# [END] UPLOAD FRONTEND AND BACKEND\n\n").trim();
+}
+exports.generateS3Bucket = generateS3Bucket;
+
+
+/***/ }),
+/* 14 */
 /***/ ((module) => {
 
 module.exports = require("prompts");

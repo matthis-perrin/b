@@ -1,3 +1,8 @@
 {
-  "extends": "@matthis/tsconfig-node/tsconfig"
+  "extends": "@matthis/tsconfig-node/tsconfig",
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist"
+  }
 }

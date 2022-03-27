@@ -12,6 +12,7 @@ import {
   REACT_NATIVE_VERSION,
 } from '../versions';
 import {execSync} from 'child_process';
+import {generateTerraform} from '../terraform/all';
 
 const templatesPath = join(__dirname, 'templates');
 
@@ -75,8 +76,8 @@ async function generateProject(
     NODE_TYPES_VERSION,
   };
   const files = await getFiles(join(templatesPath, type));
-  await Promise.all(
-    files.map(async f => {
+  await Promise.all([
+    ...files.map(async f => {
       const fileContent = await readFile(join(templatesPath, type, f));
       const compiledContent = fileContent
         .toString()
@@ -84,8 +85,15 @@ async function generateProject(
       const fPath = join(dst, f);
       await mkdir(dirname(fPath), {recursive: true});
       await writeFile(fPath, compiledContent);
-    })
-  );
+    }),
+    type === WorkspaceType.WebApp
+      ? (async () => {
+          const fPath = join(dst, 'terraform', 'terraform.tf');
+          await mkdir(dirname(fPath), {recursive: true});
+          await writeFile(fPath, await generateTerraform(name));
+        })()
+      : Promise.resolve(),
+  ]);
 
   // Post generation script for React Native project
   if (type === ProjectType.ReactNative) {
