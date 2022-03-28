@@ -5,7 +5,7 @@ resource "aws_lambda_function" "api" {
   s3_bucket         = aws_s3_bucket.code.id
   s3_key            = aws_s3_bucket_object.backend_archive.id
   source_code_hash  = data.archive_file.backend_archive.output_sha
-  handler           = "index.handler"
+  handler           = "main.handler"
   runtime           = "nodejs14.x"
   role              = aws_iam_role.lambda_api_exec.arn
 }

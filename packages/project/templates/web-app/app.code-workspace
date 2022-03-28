@@ -1,10 +1,10 @@
 {
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
+  "folders": [{"path": "frontend"}, {"path": "backend"}, {"path": "."}],
   "settings": {
+    "files.exclude": {
+      "backend/": true,
+      "frontend/": true
+    },
     "editor.acceptSuggestionOnCommitCharacter": false,
     "editor.suggestSelection": "first",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",

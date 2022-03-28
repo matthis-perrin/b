@@ -35,7 +35,7 @@ var loaders_1 = __webpack_require__(11);
 var plugins_1 = __webpack_require__(4);
 var utils_1 = __webpack_require__(5);
 function nodeConfig() {
-    var base = (0, base_1.baseConfig)({ hashOutput: false });
+    var base = (0, base_1.baseConfig)({ hashOutput: false, libraryExportName: 'handler' });
     var define = (0, plugins_1.definePlugin)();
     var forkTsChecker = (0, plugins_1.forkTsCheckerPlugin)();
     var cleanTerminal = (0, plugins_1.cleanTerminalPlugin)();
@@ -85,19 +85,14 @@ exports.baseConfig = void 0;
 var plugins_1 = __webpack_require__(4);
 var utils_1 = __webpack_require__(5);
 function baseConfig(opts) {
-    var hashOutput = opts.hashOutput;
+    var hashOutput = opts.hashOutput, libraryExportName = opts.libraryExportName;
     var terserPluginConfig = (0, plugins_1.terserPlugin)();
     return {
         dependencies: __assign({ webpack: '5.65.x', 'webpack-cli': '4.9.x' }, terserPluginConfig.dependencies),
         config: function () { return ({
             mode: 'none',
             devtool: (0, utils_1.isProd)() ? 'source-map' : 'eval',
-            output: {
-                path: (0, utils_1.getDistDir)(),
-                filename: "[name]" + (hashOutput ? '.[contenthash]' : '') + ".js",
-                clean: true,
-                publicPath: '/',
-            },
+            output: __assign({ path: (0, utils_1.getDistDir)(), filename: "[name]" + (hashOutput ? '.[contenthash]' : '') + ".js", clean: true, publicPath: '/' }, (libraryExportName === undefined ? {} : { library: 'handler', libraryTarget: 'umd' })),
             resolve: {
                 extensions: ['.js', '.jsx', '.ts', '.tsx'],
             },

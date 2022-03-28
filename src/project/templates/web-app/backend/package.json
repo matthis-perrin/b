@@ -3,7 +3,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "lint": "eslint --ext ts,tsx src",
-    "build": "rm -rf dist && tsc -p tsconfig.json --incremental false --tsBuildInfoFile null",
+    "build": "NODE_ENV=production webpack build",
     "watch": "NODE_ENV=development webpack watch",
     "start": "node dist/main.js"
   },

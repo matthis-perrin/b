@@ -322,11 +322,11 @@ var WorkspaceType;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.0.21',
+    project: '1.1.2',
     eslint: '1.0.20',
     prettier: '1.0.2',
     tsconfig: '1.0.7',
-    webpack: '1.0.16',
+    webpack: '1.0.17',
 };
 exports.ESLINT_VERSION = '8.5.x';
 exports.PRETTIER_VERSION = '2.5.x';
@@ -408,7 +408,7 @@ exports.generateCloudfrontDistribution = generateCloudfrontDistribution;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateLambda = void 0;
 function generateLambda(projectName) {
-    return ("\nresource \"aws_lambda_function\" \"api\" {\n  function_name     = \"test-API\"\n  s3_bucket         = aws_s3_bucket.code.id\n  s3_key            = aws_s3_bucket_object.backend_archive.id\n  source_code_hash  = data.archive_file.backend_archive.output_sha\n  handler           = \"index.handler\"\n  runtime           = \"nodejs14.x\"\n  role              = aws_iam_role.lambda_api_exec.arn\n}\n\nresource \"aws_iam_role\" \"lambda_api_exec\" {\n    name = \"" + projectName + "-API-role\"\n\n    assume_role_policy = <<EOF\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"lambda.amazonaws.com\"\n      },\n      \"Effect\": \"Allow\",\n      \"Sid\": \"\"\n    }\n  ]\n}\n EOF\n\n }\n  ").trim();
+    return ("\nresource \"aws_lambda_function\" \"api\" {\n  function_name     = \"test-API\"\n  s3_bucket         = aws_s3_bucket.code.id\n  s3_key            = aws_s3_bucket_object.backend_archive.id\n  source_code_hash  = data.archive_file.backend_archive.output_sha\n  handler           = \"main.handler\"\n  runtime           = \"nodejs14.x\"\n  role              = aws_iam_role.lambda_api_exec.arn\n}\n\nresource \"aws_iam_role\" \"lambda_api_exec\" {\n    name = \"" + projectName + "-API-role\"\n\n    assume_role_policy = <<EOF\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"lambda.amazonaws.com\"\n      },\n      \"Effect\": \"Allow\",\n      \"Sid\": \"\"\n    }\n  ]\n}\n EOF\n\n }\n  ").trim();
 }
 exports.generateLambda = generateLambda;
 

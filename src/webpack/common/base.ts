@@ -1,8 +1,11 @@
 import {terserPlugin} from './plugins';
 import {getDistDir, isProd, WebpackConfigFragment} from './utils';
 
-export function baseConfig(opts: {hashOutput: boolean}): WebpackConfigFragment {
-  const {hashOutput} = opts;
+export function baseConfig(opts: {
+  hashOutput: boolean;
+  libraryExportName?: string;
+}): WebpackConfigFragment {
+  const {hashOutput, libraryExportName} = opts;
   const terserPluginConfig = terserPlugin();
   return {
     dependencies: {
@@ -18,6 +21,7 @@ export function baseConfig(opts: {hashOutput: boolean}): WebpackConfigFragment {
         filename: `[name]${hashOutput ? '.[contenthash]' : ''}.js`,
         clean: true,
         publicPath: '/',
+        ...(libraryExportName === undefined ? {} : {library: 'handler', libraryTarget: 'umd'}),
       },
 
       resolve: {

@@ -5,7 +5,7 @@ import {definePlugin, forkTsCheckerPlugin, cleanTerminalPlugin} from './common/p
 import {getProjectDir, WebpackConfigFragment} from './common/utils';
 
 export function nodeConfig(): WebpackConfigFragment {
-  const base = baseConfig({hashOutput: false});
+  const base = baseConfig({hashOutput: false, libraryExportName: 'handler'});
   const define = definePlugin();
   const forkTsChecker = forkTsCheckerPlugin();
   const cleanTerminal = cleanTerminalPlugin();
