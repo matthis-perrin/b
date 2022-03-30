@@ -17,7 +17,7 @@
     "@matthis/eslint-config-node": "latest",
     "@matthis/prettier-config": "latest",
     "@matthis/tsconfig-node": "latest",
-    "@matthis/webpack-node": "latest",
+    "@matthis/webpack-lambda": "latest",
     "@types/node": "{{NODE_TYPES_VERSION}}"
   },
   "dependencies": {

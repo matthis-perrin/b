@@ -26,6 +26,7 @@ const BASE_PLUGINS = [
 export const PLUGINS_FOR_TYPE: Record<ProjectType, EslintMetadata[]> = {
   [ProjectType.Web]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
   [ProjectType.Node]: [...BASE_PLUGINS, eslintNode],
+  [ProjectType.Lambda]: [...BASE_PLUGINS, eslintNode],
   [ProjectType.Lib]: [...BASE_PLUGINS],
   [ProjectType.ReactNative]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
 };

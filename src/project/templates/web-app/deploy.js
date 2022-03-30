@@ -11,7 +11,7 @@ async function buildAtPath(path) {
       if (!error) {
         resolve();
       } else {
-        console.error(`Failure to run ``yarn build`` at "${path}"`);
+        console.error(`Failure to run \`yarn build\` at "${path}"`);
         reject();
       }
     });

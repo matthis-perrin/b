@@ -300,12 +300,14 @@ var ProjectType;
     ProjectType["Web"] = "web";
     ProjectType["Node"] = "node";
     ProjectType["Lib"] = "lib";
+    ProjectType["Lambda"] = "lambda";
     ProjectType["ReactNative"] = "react-native";
 })(ProjectType = exports.ProjectType || (exports.ProjectType = {}));
 exports.ALL_TYPES = [
     ProjectType.Web,
     ProjectType.Node,
     ProjectType.Lib,
+    ProjectType.Lambda,
     ProjectType.ReactNative,
 ];
 var WorkspaceType;
@@ -322,11 +324,11 @@ var WorkspaceType;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.1.2',
+    project: '1.1.3',
     eslint: '1.0.20',
     prettier: '1.0.2',
     tsconfig: '1.0.7',
-    webpack: '1.0.17',
+    webpack: '1.0.18',
 };
 exports.ESLINT_VERSION = '8.5.x';
 exports.PRETTIER_VERSION = '2.5.x';

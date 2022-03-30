@@ -34,8 +34,10 @@ var base_1 = __webpack_require__(3);
 var loaders_1 = __webpack_require__(11);
 var plugins_1 = __webpack_require__(4);
 var utils_1 = __webpack_require__(5);
-function nodeConfig() {
-    var base = (0, base_1.baseConfig)({ hashOutput: false, libraryExportName: 'handler' });
+var lambda_server_plugin_1 = __webpack_require__(12);
+function nodeConfig(opts) {
+    var isLambda = opts.isLambda;
+    var base = (0, base_1.baseConfig)({ hashOutput: false, libraryExportName: isLambda ? 'handler' : undefined });
     var define = (0, plugins_1.definePlugin)();
     var forkTsChecker = (0, plugins_1.forkTsCheckerPlugin)();
     var cleanTerminal = (0, plugins_1.cleanTerminalPlugin)();
@@ -44,15 +46,23 @@ function nodeConfig() {
     var entry = (0, path_1.join)((0, utils_1.getProjectDir)(), "src/index.ts");
     return {
         dependencies: __assign(__assign(__assign(__assign(__assign(__assign({}, base.dependencies), define.dependencies), forkTsChecker.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
-        config: function () { return (__assign(__assign({}, base.config()), { target: 'node', entry: { main: entry }, module: {
-                rules: [babel.config(), sourceMap.config()],
-            }, plugins: [define.config(), forkTsChecker.config(), cleanTerminal.config()], externals: function (ctx, cb) {
-                var request = ctx.request, context = ctx.context;
-                if ((request.startsWith('.') && !context.includes('node_modules')) || request === entry) {
-                    return cb();
-                }
-                return cb(null, 'commonjs ' + request);
-            } })); },
+        config: function () {
+            var plugins = [
+                define.config(),
+                forkTsChecker.config(),
+                cleanTerminal.config(),
+                new lambda_server_plugin_1.LambdaServerPlugin(),
+            ];
+            return __assign(__assign({}, base.config()), { target: 'node', entry: { main: entry }, module: {
+                    rules: [babel.config(), sourceMap.config()],
+                }, plugins: plugins, externals: function (ctx, cb) {
+                    var request = ctx.request, context = ctx.context;
+                    if ((request.startsWith('.') && !context.includes('node_modules')) || request === entry) {
+                        return cb();
+                    }
+                    return cb(null, 'commonjs ' + request);
+                } });
+        },
     };
 }
 exports.nodeConfig = nodeConfig;
@@ -355,6 +365,145 @@ function sourceMapLoader() {
 exports.sourceMapLoader = sourceMapLoader;
 
 
+/***/ }),
+/* 12 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.LambdaServerPlugin = void 0;
+var child_process_1 = __webpack_require__(13);
+var http_1 = __webpack_require__(14);
+var LambdaServerPlugin = /** @class */ (function () {
+    function LambdaServerPlugin() {
+    }
+    LambdaServerPlugin.prototype.apply = function (compiler) {
+        var server;
+        compiler.hooks.initialize.tap('LambdaServerPlugin', function () {
+            if (!compiler.options.watch) {
+                return;
+            }
+            // [START] SETUP CODE
+            server = (0, http_1.createServer)(function (req, res) {
+                var url = req.url;
+                var method = req.method;
+                // Parse body
+                var body = '';
+                req.on('data', function (chunk) {
+                    body += chunk;
+                });
+                // Parse headers
+                var headers = {};
+                while (true) {
+                    var key = req.rawHeaders.shift();
+                    var value = req.rawHeaders.shift();
+                    if (key === undefined || value === undefined) {
+                        break;
+                    }
+                    if (['HOST', 'CONNECTION', 'CONTENT-LENGTH'].includes(key.toUpperCase())) {
+                        continue;
+                    }
+                    headers[key] = value;
+                }
+                req.on('end', function () {
+                    var command = "node -e \"require('./dist/main').handler({httpMethod: '" + method + "', path: '" + url + "', body: " + (body === '' ? 'null' : "atob('" + btoa(body) + "')") + ", headers: " + ("JSON.parse(atob('" + btoa(JSON.stringify(headers)) + "'))") + "}).then(json => console.log(JSON.stringify(json))).catch(console.error);\"";
+                    (0, child_process_1.exec)(command, function (error, stdout, stderr) {
+                        var err = error ? String(error) : stderr;
+                        if (err.length > 0) {
+                            var output = JSON.stringify({ err: 'Failure to run lambda', message: err });
+                            console.error(output);
+                            res.statusCode = 500;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.write(output);
+                            res.end();
+                        }
+                        else {
+                            try {
+                                var _a = JSON.parse(stdout), statusCode = _a.statusCode, body_1 = _a.body;
+                                res.statusCode = statusCode;
+                                res.setHeader('Content-Type', 'application/json');
+                                res.write(body_1);
+                                res.end();
+                            }
+                            catch (err) {
+                                var output = JSON.stringify({
+                                    err: 'Invalid lambda response',
+                                    message: String(err),
+                                    response: stdout,
+                                });
+                                console.error(output);
+                                res.statusCode = 500;
+                                res.setHeader('Content-Type', 'application/json');
+                                res.write(output);
+                                res.end();
+                            }
+                        }
+                    });
+                    //
+                    // TODO: Add those headers
+                    //
+                    // "CloudFront-Forwarded-Proto": "https",
+                    // "CloudFront-Is-Desktop-Viewer": "true",
+                    // "CloudFront-Is-Mobile-Viewer": "false",
+                    // "CloudFront-Is-SmartTV-Viewer": "false",
+                    // "CloudFront-Is-Tablet-Viewer": "false",
+                    // "CloudFront-Viewer-Country": "FR",
+                    // "Via": "2.0 c06f5d2130689f511352f5187fabf420.cloudfront.net (CloudFront)",
+                    // "X-Amz-Cf-Id": "AuD_VLlE0k9_Di4k3sbzvJsvqMvX1KB6Hrko2oML94_l5oAE26QQaA==",
+                    // "X-Amzn-Trace-Id": "Root=1-62430173-334e883b77b37ba6721ccc09",
+                    // "X-Forwarded-For": "82.65.31.41, 130.176.183.40",
+                    // "X-Forwarded-Port": "443",
+                    // "X-Forwarded-Proto": "https"
+                });
+            })
+                .listen(7777);
+            // [END] SETUP CODE
+        });
+        var hasExited = false;
+        function exitHandler() {
+            if (hasExited) {
+                return;
+            }
+            hasExited = true;
+            if (!compiler.options.watch || !server) {
+                return;
+            }
+            // [START] TEARDOWN CODE
+            server.close();
+            // [END] TEARDOWN CODE
+        }
+        process.on('beforeExit', exitHandler);
+        process.on('exit', exitHandler);
+        process.on('SIGTERM', function () {
+            exitHandler();
+            process.exit(0);
+        });
+        process.on('SIGINT', function () {
+            exitHandler();
+            process.exit(0);
+        });
+        process.on('uncaughtException', function () {
+            exitHandler();
+            process.exit(1);
+        });
+    };
+    return LambdaServerPlugin;
+}());
+exports.LambdaServerPlugin = LambdaServerPlugin;
+
+
+/***/ }),
+/* 13 */
+/***/ ((module) => {
+
+module.exports = require("child_process");
+
+/***/ }),
+/* 14 */
+/***/ ((module) => {
+
+module.exports = require("http");
+
 /***/ })
 /******/ 	]);
 /************************************************************************/
@@ -390,7 +539,7 @@ var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var node_1 = __webpack_require__(1);
-exports["default"] = (0, node_1.nodeConfig)().config();
+exports["default"] = (0, node_1.nodeConfig)({ isLambda: false }).config();
 
 })();
 

@@ -1,11 +1,11 @@
 import {join, resolve} from 'path';
 
 import {generateForType} from './generators';
-import {ALL_TYPES} from '../models';
+import {ALL_TYPES, ProjectType} from '../models';
 
-export async function eslintPackages(): Promise<void> {
+export async function eslintPackages(types: ProjectType[]): Promise<void> {
   await Promise.all(
-    ALL_TYPES.map(type =>
+    types.map(type =>
       generateForType(join(resolve('.'), 'packages', `eslint-config-${type}`), type)
     )
   );

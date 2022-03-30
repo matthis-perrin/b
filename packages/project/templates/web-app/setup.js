@@ -44,7 +44,7 @@ async function installNodeModulesAtPath(path) {
       if (!error) {
         resolve();
       } else {
-        console.error(`Failure to run ``yarn install`` at "${path}"`);
+        console.error(`Failure to run \`yarn install\` at "${path}"`);
         reject();
       }
     });

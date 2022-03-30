@@ -1,1 +1,1 @@
-module.exports = require('@matthis/webpack-node');
+module.exports = require('@matthis/webpack-lambda');

@@ -13,8 +13,6 @@ export function webConfig(): WebpackConfigFragment {
   const babel = babelLoaderWeb();
   const sourceMap = sourceMapLoader();
 
-  const baseWebpackConfig = base.config();
-
   return {
     dependencies: {
       'webpack-dev-server': '4.7.x',
@@ -26,36 +24,39 @@ export function webConfig(): WebpackConfigFragment {
       ...babel.dependencies,
       ...sourceMap.dependencies,
     },
-    config: () => ({
-      ...baseWebpackConfig,
-      target: 'web',
-      entry: {
-        main: join(getProjectDir(), `src/index.tsx`),
-      },
-      module: {
-        rules: [babel.config(), sourceMap.config()],
-      },
-      plugins: [define.config(), html.config(), forkTsChecker.config(), cleanTerminal.config()],
-      devServer: !isProd()
-        ? {
-            static: getDistDir(),
-            compress: true,
-            hot: true,
-          }
-        : undefined,
-      optimization: {
-        ...baseWebpackConfig.optimization,
-        splitChunks: {
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              chunks: 'initial',
-              name: 'vendor',
-              enforce: true,
+    config: () => {
+      const baseWebpackConfig = base.config();
+      return {
+        ...baseWebpackConfig,
+        target: 'web',
+        entry: {
+          main: join(getProjectDir(), `src/index.tsx`),
+        },
+        module: {
+          rules: [babel.config(), sourceMap.config()],
+        },
+        plugins: [define.config(), html.config(), forkTsChecker.config(), cleanTerminal.config()],
+        devServer: !isProd()
+          ? {
+              static: getDistDir(),
+              compress: true,
+              hot: true,
+            }
+          : undefined,
+        optimization: {
+          ...baseWebpackConfig.optimization,
+          splitChunks: {
+            cacheGroups: {
+              vendor: {
+                test: /[\\/]node_modules[\\/]/,
+                chunks: 'initial',
+                name: 'vendor',
+                enforce: true,
+              },
             },
           },
         },
-      },
-    }),
+      };
+    },
   };
 }

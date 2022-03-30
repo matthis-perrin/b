@@ -1,3 +1,3 @@
 import {nodeConfig} from './node';
 
-export default nodeConfig().config();
+export default nodeConfig({isLambda: false}).config();

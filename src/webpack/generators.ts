@@ -15,7 +15,7 @@ export async function generateForType(path: string, type: ProjectType): Promise<
 }
 
 function generatePackageJson(type: ProjectType): Record<string, unknown> {
-  const {dependencies} = type === ProjectType.Web ? webConfig() : nodeConfig();
+  const {dependencies} = type === ProjectType.Web ? webConfig() : nodeConfig({isLambda: type === ProjectType.Lambda});
   return {
     name: `@matthis/webpack-${type}`,
     version: PACKAGE_VERSIONS.webpack,
