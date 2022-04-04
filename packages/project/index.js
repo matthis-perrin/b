@@ -85,6 +85,7 @@ var models_1 = __webpack_require__(4);
 var versions_1 = __webpack_require__(5);
 var child_process_1 = __webpack_require__(6);
 var all_1 = __webpack_require__(7);
+var custom_1 = __webpack_require__(14);
 var templatesPath = (0, path_1.join)(__dirname, 'templates');
 function initProject() {
     return __awaiter(this, void 0, void 0, function () {
@@ -92,7 +93,7 @@ function initProject() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    prompts = __webpack_require__(14);
+                    prompts = __webpack_require__(15);
                     projectPath = (0, process_1.cwd)();
                     projectName = (0, path_1.basename)(projectPath);
                     return [4 /*yield*/, (0, promises_1.readdir)(projectPath)];
@@ -185,20 +186,27 @@ function generateProject(dst, name, type) {
                         }); })), false), [
                             type === models_1.WorkspaceType.WebApp
                                 ? (function () { return __awaiter(_this, void 0, void 0, function () {
-                                    var fPath, _a, _b;
-                                    return __generator(this, function (_c) {
-                                        switch (_c.label) {
+                                    var terraformBasePath, terraformCustomPath, _a, _b, _c, _d;
+                                    return __generator(this, function (_e) {
+                                        switch (_e.label) {
                                             case 0:
-                                                fPath = (0, path_1.join)(dst, 'terraform', 'terraform.tf');
-                                                return [4 /*yield*/, (0, promises_1.mkdir)((0, path_1.dirname)(fPath), { recursive: true })];
+                                                terraformBasePath = (0, path_1.join)(dst, 'terraform', 'terraform.tf');
+                                                terraformCustomPath = (0, path_1.join)(dst, 'terraform', 'custom.tf');
+                                                return [4 /*yield*/, (0, promises_1.mkdir)((0, path_1.dirname)(terraformBasePath), { recursive: true })];
                                             case 1:
-                                                _c.sent();
+                                                _e.sent();
                                                 _a = promises_1.writeFile;
-                                                _b = [fPath];
+                                                _b = [terraformBasePath];
                                                 return [4 /*yield*/, (0, all_1.generateTerraform)(name)];
-                                            case 2: return [4 /*yield*/, _a.apply(void 0, _b.concat([_c.sent()]))];
+                                            case 2: return [4 /*yield*/, _a.apply(void 0, _b.concat([_e.sent()]))];
                                             case 3:
-                                                _c.sent();
+                                                _e.sent();
+                                                _c = promises_1.writeFile;
+                                                _d = [terraformCustomPath];
+                                                return [4 /*yield*/, (0, custom_1.generateCustomTerraform)(name)];
+                                            case 4: return [4 /*yield*/, _c.apply(void 0, _d.concat([_e.sent()]))];
+                                            case 5:
+                                                _e.sent();
                                                 return [2 /*return*/];
                                         }
                                     });
@@ -324,7 +332,7 @@ var WorkspaceType;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.1.5',
+    project: '1.1.6',
     eslint: '1.0.20',
     prettier: '1.0.2',
     tsconfig: '1.0.7',
@@ -410,7 +418,7 @@ exports.generateCloudfrontDistribution = generateCloudfrontDistribution;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateLambda = void 0;
 function generateLambda(projectName) {
-    return "\nresource \"aws_lambda_function\" \"api\" {\n  function_name     = \"test-API\"\n  s3_bucket         = aws_s3_bucket.code.id\n  s3_key            = aws_s3_bucket_object.backend_archive.id\n  source_code_hash  = data.archive_file.backend_archive.output_sha\n  handler           = \"main.handler\"\n  runtime           = \"nodejs14.x\"\n  role              = aws_iam_role.lambda_api_exec.arn\n}\n\nresource \"aws_iam_role\" \"lambda_api_exec\" {\n  name = \"test-web-app-API-assume-role\"\n  assume_role_policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [\n      {\n        Action    = \"sts:AssumeRole\"\n        Principal = {\n          Service = \"lambda.amazonaws.com\"\n        }\n        Effect    = \"Allow\"\n        Sid       = \"\"\n      },\n    ]\n  })\n\n  inline_policy {\n    name = \"test-web-app-API-role\"\n    policy = jsonencode({\n      Version = \"2012-10-17\"\n      Statement = [\n        {\n          Action   = [\n            \"logs:CreateLogGroup\",\n            \"logs:CreateLogStream\",\n            \"logs:PutLogEvents\"\n          ]\n          Effect   = \"Allow\"\n          Resource = \"arn:aws:logs:*:*:*\"\n        },\n      ]\n    })\n  }\n}\n".trim();
+    return ("\nresource \"aws_lambda_function\" \"api\" {\n  function_name     = \"" + projectName + "-API\"\n  s3_bucket         = aws_s3_bucket.code.id\n  s3_key            = aws_s3_bucket_object.backend_archive.id\n  source_code_hash  = data.archive_file.backend_archive.output_sha\n  handler           = \"main.handler\"\n  runtime           = \"nodejs14.x\"\n  role              = aws_iam_role.lambda_api_exec.arn\n}\n\nresource \"aws_iam_role\" \"lambda_api_exec\" {\n  name = \"" + projectName + "-API-assume-role\"\n  assume_role_policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [\n      {\n        Action    = \"sts:AssumeRole\"\n        Principal = {\n          Service = \"lambda.amazonaws.com\"\n        }\n        Effect    = \"Allow\"\n        Sid       = \"\"\n      },\n    ]\n  })\n\n  inline_policy {\n    name = \"" + projectName + "-API-cloudwatch-role\"\n    policy = jsonencode({\n      Version = \"2012-10-17\"\n      Statement = [\n        {\n          Action   = [\n            \"logs:CreateLogGroup\",\n            \"logs:CreateLogStream\",\n            \"logs:PutLogEvents\"\n          ]\n          Effect   = \"Allow\"\n          Resource = \"arn:aws:logs:*:*:*\"\n        },\n      ]\n    })\n  }\n  \n  inline_policy {\n    name = \"" + projectName + "-API-extra-role\"\n    policy = data.aws_iam_policy_document.lambda_extra_role.json\n  }\n}\n").trim();
 }
 exports.generateLambda = generateLambda;
 
@@ -461,6 +469,19 @@ exports.generateS3Bucket = generateS3Bucket;
 
 /***/ }),
 /* 14 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateCustomTerraform = void 0;
+function generateCustomTerraform(projectName) {
+    return "\ndata \"aws_iam_policy_document\" \"lambda_extra_role\" {\n  statement {\n    actions   = [\"s3:ListAllMyBuckets\"]\n    resources = [\"*\"]\n  }\n}\n".trim();
+}
+exports.generateCustomTerraform = generateCustomTerraform;
+
+
+/***/ }),
+/* 15 */
 /***/ ((module) => {
 
 module.exports = require("prompts");

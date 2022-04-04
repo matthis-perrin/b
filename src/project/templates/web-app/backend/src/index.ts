@@ -1,3 +1,5 @@
+import {ListBucketsCommand, S3Client} from '@aws-sdk/client-s3';
+
 interface LambdaEvent {
   path: string;
   headers: Record<string, string>;
@@ -38,11 +40,20 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
     return Promise.resolve({
       statusCode: 200,
       headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         'Content-Type': 'text/html',
       },
+      // eslint-disable-next-line node/no-process-env
       body: process.env.INDEX_HTML ?? '',
     });
   }
 
-  return Promise.resolve({statusCode: 200, body: JSON.stringify({method, path, body})});
+  const client = new S3Client({});
+  const command = new ListBucketsCommand({});
+  const response = await client.send(command);
+
+  return Promise.resolve({
+    statusCode: 200,
+    body: JSON.stringify({method, path, body, buckets: response.Buckets?.map(b => b.Name)}),
+  });
 }

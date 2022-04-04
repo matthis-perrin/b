@@ -1,7 +1,7 @@
 export function generateLambda(projectName: string): string {
   return `
 resource "aws_lambda_function" "api" {
-  function_name     = "test-API"
+  function_name     = "${projectName}-API"
   s3_bucket         = aws_s3_bucket.code.id
   s3_key            = aws_s3_bucket_object.backend_archive.id
   source_code_hash  = data.archive_file.backend_archive.output_sha
@@ -11,7 +11,7 @@ resource "aws_lambda_function" "api" {
 }
 
 resource "aws_iam_role" "lambda_api_exec" {
-  name = "test-web-app-API-assume-role"
+  name = "${projectName}-API-assume-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -27,7 +27,7 @@ resource "aws_iam_role" "lambda_api_exec" {
   })
 
   inline_policy {
-    name = "test-web-app-API-role"
+    name = "${projectName}-API-cloudwatch-role"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
@@ -42,6 +42,11 @@ resource "aws_iam_role" "lambda_api_exec" {
         },
       ]
     })
+  }
+  
+  inline_policy {
+    name = "${projectName}-API-extra-role"
+    policy = data.aws_iam_policy_document.lambda_extra_role.json
   }
 }
 `.trim();

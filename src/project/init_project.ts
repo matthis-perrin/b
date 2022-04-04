@@ -13,6 +13,7 @@ import {
 } from '../versions';
 import {execSync} from 'child_process';
 import {generateTerraform} from '../terraform/all';
+import {generateCustomTerraform} from '../terraform/custom';
 
 const templatesPath = join(__dirname, 'templates');
 
@@ -88,9 +89,11 @@ async function generateProject(
     }),
     type === WorkspaceType.WebApp
       ? (async () => {
-          const fPath = join(dst, 'terraform', 'terraform.tf');
-          await mkdir(dirname(fPath), {recursive: true});
-          await writeFile(fPath, await generateTerraform(name));
+          const terraformBasePath = join(dst, 'terraform', 'terraform.tf');
+          const terraformCustomPath = join(dst, 'terraform', 'custom.tf');
+          await mkdir(dirname(terraformBasePath), {recursive: true});
+          await writeFile(terraformBasePath, await generateTerraform(name));
+          await writeFile(terraformCustomPath, await generateCustomTerraform(name));
         })()
       : Promise.resolve(),
   ]);
