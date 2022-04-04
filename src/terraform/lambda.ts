@@ -11,24 +11,38 @@ resource "aws_lambda_function" "api" {
 }
 
 resource "aws_iam_role" "lambda_api_exec" {
-    name = "${projectName}-API-role"
-
-    assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
+  name = "test-web-app-API-assume-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action    = "sts:AssumeRole"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Effect    = "Allow"
+        Sid       = ""
       },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
- EOF
+    ]
+  })
 
- }
-  `.trim();
+  inline_policy {
+    name = "test-web-app-API-role"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action   = [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ]
+          Effect   = "Allow"
+          Resource = "arn:aws:logs:*:*:*"
+        },
+      ]
+    })
+  }
+}
+`.trim();
 }
