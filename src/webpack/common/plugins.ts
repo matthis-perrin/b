@@ -6,8 +6,15 @@ export function definePlugin(): WebpackConfigFragment {
     dependencies: {},
     config: () => {
       const {DefinePlugin} = require('webpack');
+      const envPrefix = 'MATTHIS_';
+      const extraEnv = Object.fromEntries(
+        Object.entries(process.env)
+          .filter(([name]) => name.startsWith(envPrefix))
+          .map(([name, value]) => [`process.env.${name.slice(envPrefix.length)}`, value])
+      );
       return new DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(getEnv()),
+        ...extraEnv,
       });
     },
   };

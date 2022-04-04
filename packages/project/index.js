@@ -324,11 +324,11 @@ var WorkspaceType;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.1.3',
+    project: '1.1.4',
     eslint: '1.0.20',
     prettier: '1.0.2',
     tsconfig: '1.0.7',
-    webpack: '1.0.18',
+    webpack: '1.0.19',
 };
 exports.ESLINT_VERSION = '8.5.x';
 exports.PRETTIER_VERSION = '2.5.x';

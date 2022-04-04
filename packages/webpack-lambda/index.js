@@ -99,26 +99,29 @@ function baseConfig(opts) {
     var terserPluginConfig = (0, plugins_1.terserPlugin)();
     return {
         dependencies: __assign({ webpack: '5.65.x', 'webpack-cli': '4.9.x' }, terserPluginConfig.dependencies),
-        config: function () { return ({
-            mode: 'none',
-            devtool: (0, utils_1.isProd)() ? 'source-map' : 'eval',
-            output: __assign({ path: (0, utils_1.getDistDir)(), filename: "[name]" + (hashOutput ? '.[contenthash]' : '') + ".js", clean: true, publicPath: '/' }, (libraryExportName === undefined ? {} : { library: 'handler', libraryTarget: 'umd' })),
-            resolve: {
-                extensions: ['.js', '.jsx', '.ts', '.tsx'],
-            },
-            stats: {
-                preset: 'errors-warnings',
-                assets: true,
-                timings: true,
-            },
-            optimization: {
-                minimize: (0, utils_1.isProd)(),
-                minimizer: [terserPluginConfig.config()],
-            },
-            experiments: {
-                backCompat: true,
-            },
-        }); },
+        config: function () {
+            var _a;
+            return ({
+                mode: 'none',
+                devtool: (0, utils_1.isProd)() ? 'source-map' : 'eval',
+                output: __assign({ path: (0, utils_1.getDistDir)(), filename: "[name]" + (hashOutput ? '.[contenthash]' : '') + ".js", clean: true, publicPath: (_a = process.env['PUBLIC_PATH']) !== null && _a !== void 0 ? _a : '/' }, (libraryExportName === undefined ? {} : { library: 'handler', libraryTarget: 'umd' })),
+                resolve: {
+                    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+                },
+                stats: {
+                    preset: 'errors-warnings',
+                    assets: true,
+                    timings: true,
+                },
+                optimization: {
+                    minimize: (0, utils_1.isProd)(),
+                    minimizer: [terserPluginConfig.config()],
+                },
+                experiments: {
+                    backCompat: true,
+                },
+            });
+        },
     };
 }
 exports.baseConfig = baseConfig;
@@ -126,9 +129,36 @@ exports.baseConfig = baseConfig;
 
 /***/ }),
 /* 4 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.terserPlugin = exports.cleanTerminalPlugin = exports.forkTsCheckerPlugin = exports.htmlPlugin = exports.definePlugin = void 0;
 var path_1 = __webpack_require__(2);
@@ -138,9 +168,17 @@ function definePlugin() {
         dependencies: {},
         config: function () {
             var DefinePlugin = __webpack_require__(6).DefinePlugin;
-            return new DefinePlugin({
-                'process.env.NODE_ENV': JSON.stringify((0, utils_1.getEnv)()),
-            });
+            var envPrefix = 'MATTHIS_';
+            var extraEnv = Object.fromEntries(Object.entries(process.env)
+                .filter(function (_a) {
+                var _b = __read(_a, 1), name = _b[0];
+                return name.startsWith(envPrefix);
+            })
+                .map(function (_a) {
+                var _b = __read(_a, 2), name = _b[0], value = _b[1];
+                return ["process.env." + name.slice(envPrefix.length), value];
+            }));
+            return new DefinePlugin(__assign({ 'process.env.NODE_ENV': JSON.stringify((0, utils_1.getEnv)()) }, extraEnv));
         },
     };
 }

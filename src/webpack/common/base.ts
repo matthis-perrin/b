@@ -20,7 +20,7 @@ export function baseConfig(opts: {
         path: getDistDir(),
         filename: `[name]${hashOutput ? '.[contenthash]' : ''}.js`,
         clean: true,
-        publicPath: '/',
+        publicPath: process.env['PUBLIC_PATH'] ?? '/',
         ...(libraryExportName === undefined ? {} : {library: 'handler', libraryTarget: 'umd'}),
       },
 

@@ -33,5 +33,16 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   const method = event.httpMethod.toUpperCase();
   const path = normalizePath(event.path);
   const body = parseBody(event.body);
+
+  if (method === 'GET' && (path === '' || path === '/' || path === '/index.html')) {
+    return Promise.resolve({
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'text/html',
+      },
+      body: process.env.INDEX_HTML ?? '',
+    });
+  }
+
   return Promise.resolve({statusCode: 200, body: JSON.stringify({method, path, body})});
 }
