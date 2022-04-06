@@ -47,8 +47,8 @@ function terraformOutputs() {
 }
 
 async function run() {
+  // Initialize if needed and get terraform outputs
   ensureDistFolders();
-
   let outputs = terraformOutputs();
   if (Object.keys(outputs).length === 0) {
     checkTerraformCredentials();

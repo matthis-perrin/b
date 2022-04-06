@@ -10,7 +10,7 @@ const forbiddenProps = [
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
-    'eslint-plugin-react': '7.28.x',
+    'eslint-plugin-react': '7.29.x',
   },
   settings: {
     react: {
@@ -29,6 +29,8 @@ export const eslintReact: EslintMetadata = {
     'react/forbid-foreign-prop-types': 'off',
     'react/forbid-prop-types': 'off',
     'react/function-component-definition': 'off',
+    'react/hook-use-state': 'off',
+    'react/iframe-missing-sandbox': 'off',
     'react/jsx-boolean-value': 'off',
     'react/jsx-child-element-spacing': 'off',
     'react/jsx-closing-bracket-location': 'off',
@@ -74,8 +76,6 @@ export const eslintReact: EslintMetadata = {
     'react/no-danger-with-children': 'off',
     'react/no-danger': 'off',
     'react/no-deprecated': 'off',
-    'react/no-did-mount-set-state': 'off',
-    'react/no-did-update-set-state': 'off',
     'react/no-direct-mutation-state': 'off',
     'react/no-find-dom-node': 'off',
     'react/no-is-mounted': 'off',
@@ -120,6 +120,8 @@ export const eslintReact: EslintMetadata = {
       'warn',
       {namedComponents: 'arrow-function', unnamedComponents: 'arrow-function'},
     ],
+    'react/iframe-missing-sandbox': 'warn',
+    'react/hook-use-state': 'warn',
     'react/jsx-boolean-value': 'warn',
     'react/jsx-fragments': ['warn', 'element'],
     'react/jsx-handler-names': [
@@ -130,7 +132,7 @@ export const eslintReact: EslintMetadata = {
         checkLocalVariables: true,
       },
     ],
-    'react/jsx-key': ['warn', {checkFragmentShorthand: true, checkKeyMustBeforeSpread: true}],
+    'react/jsx-key': ['warn', {checkFragmentShorthand: true, checkKeyMustBeforeSpread: true, warnOnDuplicates: true}],
     'react/jsx-no-comment-textnodes': 'warn',
     'react/jsx-no-bind': 'warn',
     'react/jsx-no-constructed-context-values': 'warn',
@@ -145,8 +147,6 @@ export const eslintReact: EslintMetadata = {
     'react/no-children-prop': 'warn',
     'react/no-danger-with-children': 'warn',
     'react/no-deprecated': 'warn',
-    'react/no-did-mount-set-state': 'warn',
-    'react/no-did-update-set-state': 'warn',
     'react/no-direct-mutation-state': 'warn',
     'react/no-find-dom-node': 'warn',
     'react/no-is-mounted': 'warn',

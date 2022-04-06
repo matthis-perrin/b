@@ -2,14 +2,18 @@
 
 import {isSelenium, WebpackConfigFragment} from './utils';
 
+const babelBaseDependencies = {
+  '@babel/core': '7.17.x',
+  '@babel/preset-env': '7.16.x',
+  '@babel/preset-typescript': '7.16.x',
+  'babel-loader': '8.2.x',
+}
+
 export function babelLoaderWeb(): WebpackConfigFragment {
   return {
     dependencies: {
-      '@babel/core': '7.16.x',
-      '@babel/preset-env': '7.16.x',
+      ...babelBaseDependencies,
       '@babel/preset-react': '7.16.x',
-      '@babel/preset-typescript': '7.16.x',
-      'babel-loader': '8.2.x',
       'babel-plugin-react-remove-properties': '0.3.x',
     },
     config: () => ({
@@ -39,10 +43,7 @@ export function babelLoaderWeb(): WebpackConfigFragment {
 export function babelLoaderNode(): WebpackConfigFragment {
   return {
     dependencies: {
-      '@babel/core': '7.16.x',
-      '@babel/preset-env': '7.16.x',
-      '@babel/preset-typescript': '7.16.x',
-      'babel-loader': '8.2.x',
+      ...babelBaseDependencies,
     },
     config: () => ({
       test: /\.tsx?$/u,

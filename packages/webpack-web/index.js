@@ -43,7 +43,7 @@ function webConfig() {
     var babel = (0, loaders_1.babelLoaderWeb)();
     var sourceMap = (0, loaders_1.sourceMapLoader)();
     return {
-        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign({ 'webpack-dev-server': '4.7.x' }, base.dependencies), define.dependencies), html.dependencies), forkTsChecker.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
+        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign({ 'webpack-dev-server': '4.8.x' }, base.dependencies), define.dependencies), html.dependencies), forkTsChecker.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
         config: function () {
             var baseWebpackConfig = base.config();
             return __assign(__assign({}, baseWebpackConfig), { target: 'web', entry: {
@@ -102,7 +102,7 @@ function baseConfig(opts) {
     var hashOutput = opts.hashOutput, libraryExportName = opts.libraryExportName;
     var terserPluginConfig = (0, plugins_1.terserPlugin)();
     return {
-        dependencies: __assign({ webpack: '5.65.x', 'webpack-cli': '4.9.x' }, terserPluginConfig.dependencies),
+        dependencies: __assign({ webpack: '5.71.x', 'webpack-cli': '4.9.x' }, terserPluginConfig.dependencies),
         config: function () {
             var _a;
             return ({
@@ -322,23 +322,33 @@ module.exports = require("terser-webpack-plugin");
 
 /***/ }),
 /* 11 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 //   'source-map-loader': '3.0.x',
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sourceMapLoader = exports.babelLoaderNode = exports.babelLoaderWeb = void 0;
 var utils_1 = __webpack_require__(5);
+var babelBaseDependencies = {
+    '@babel/core': '7.17.x',
+    '@babel/preset-env': '7.16.x',
+    '@babel/preset-typescript': '7.16.x',
+    'babel-loader': '8.2.x',
+};
 function babelLoaderWeb() {
     return {
-        dependencies: {
-            '@babel/core': '7.16.x',
-            '@babel/preset-env': '7.16.x',
-            '@babel/preset-react': '7.16.x',
-            '@babel/preset-typescript': '7.16.x',
-            'babel-loader': '8.2.x',
-            'babel-plugin-react-remove-properties': '0.3.x',
-        },
+        dependencies: __assign(__assign({}, babelBaseDependencies), { '@babel/preset-react': '7.16.x', 'babel-plugin-react-remove-properties': '0.3.x' }),
         config: function () { return ({
             test: /\.tsx?$/u,
             exclude: /\/node_modules\//u,
@@ -365,12 +375,7 @@ function babelLoaderWeb() {
 exports.babelLoaderWeb = babelLoaderWeb;
 function babelLoaderNode() {
     return {
-        dependencies: {
-            '@babel/core': '7.16.x',
-            '@babel/preset-env': '7.16.x',
-            '@babel/preset-typescript': '7.16.x',
-            'babel-loader': '8.2.x',
-        },
+        dependencies: __assign({}, babelBaseDependencies),
         config: function () { return ({
             test: /\.tsx?$/u,
             exclude: /\/node_modules\//u,

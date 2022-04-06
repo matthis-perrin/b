@@ -1,15 +1,15 @@
 {
   "name": "@matthis/webpack-node",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {
-    "webpack": "5.65.x",
+    "webpack": "5.71.x",
     "webpack-cli": "4.9.x",
     "terser-webpack-plugin": "5.3.x",
     "fork-ts-checker-webpack-plugin": "6.5.x",
     "clean-terminal-webpack-plugin": "3.0.x",
-    "@babel/core": "7.16.x",
+    "@babel/core": "7.17.x",
     "@babel/preset-env": "7.16.x",
     "@babel/preset-typescript": "7.16.x",
     "babel-loader": "8.2.x",
