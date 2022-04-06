@@ -37,7 +37,7 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   const body = parseBody(event.body);
 
   if (method === 'GET' && (path === '' || path === '/' || path === '/index.html')) {
-    return Promise.resolve({
+    return {
       statusCode: 200,
       headers: {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -45,15 +45,15 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
       },
       // eslint-disable-next-line node/no-process-env
       body: process.env.INDEX_HTML ?? '',
-    });
+    };
   }
 
   const client = new S3Client({});
   const command = new ListBucketsCommand({});
   const response = await client.send(command);
 
-  return Promise.resolve({
+  return {
     statusCode: 200,
     body: JSON.stringify({method, path, body, buckets: response.Buckets?.map(b => b.Name)}),
-  });
+  };
 }

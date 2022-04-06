@@ -31,25 +31,27 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.nodeConfig = void 0;
 var path_1 = __webpack_require__(2);
 var base_1 = __webpack_require__(3);
-var loaders_1 = __webpack_require__(11);
+var loaders_1 = __webpack_require__(12);
 var plugins_1 = __webpack_require__(4);
 var utils_1 = __webpack_require__(5);
-var lambda_server_plugin_1 = __webpack_require__(12);
+var lambda_server_plugin_1 = __webpack_require__(13);
 function nodeConfig(opts) {
     var isLambda = opts.isLambda;
     var base = (0, base_1.baseConfig)({ hashOutput: false, libraryExportName: isLambda ? 'handler' : undefined });
     var define = (0, plugins_1.definePlugin)();
     var forkTsChecker = (0, plugins_1.forkTsCheckerPlugin)();
+    var eslint = (0, plugins_1.eslintPlugin)();
     var cleanTerminal = (0, plugins_1.cleanTerminalPlugin)();
     var babel = (0, loaders_1.babelLoaderNode)();
     var sourceMap = (0, loaders_1.sourceMapLoader)();
     var entry = (0, path_1.join)((0, utils_1.getProjectDir)(), "src/index.ts");
     return {
-        dependencies: __assign(__assign(__assign(__assign(__assign(__assign({}, base.dependencies), define.dependencies), forkTsChecker.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
+        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign({}, base.dependencies), define.dependencies), forkTsChecker.dependencies), eslint.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
         config: function () {
             var plugins = [
                 define.config(),
                 forkTsChecker.config(),
+                eslint.config(),
                 cleanTerminal.config(),
                 new lambda_server_plugin_1.LambdaServerPlugin(),
             ];
@@ -160,7 +162,7 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.terserPlugin = exports.cleanTerminalPlugin = exports.forkTsCheckerPlugin = exports.htmlPlugin = exports.definePlugin = void 0;
+exports.terserPlugin = exports.cleanTerminalPlugin = exports.eslintPlugin = exports.forkTsCheckerPlugin = exports.htmlPlugin = exports.definePlugin = void 0;
 var path_1 = __webpack_require__(2);
 var utils_1 = __webpack_require__(5);
 function definePlugin() {
@@ -201,7 +203,7 @@ exports.htmlPlugin = htmlPlugin;
 function forkTsCheckerPlugin() {
     return {
         dependencies: {
-            'fork-ts-checker-webpack-plugin': '6.5.x',
+            'fork-ts-checker-webpack-plugin': '7.2.x',
         },
         config: function () {
             var ForkTsCheckerWebpackPlugin = __webpack_require__(8);
@@ -214,22 +216,34 @@ function forkTsCheckerPlugin() {
                     mode: 'write-references',
                     configFile: (0, path_1.join)((0, utils_1.getProjectDir)(), 'tsconfig.json'),
                 },
-                eslint: {
-                    enabled: true,
-                    files: [(0, path_1.join)((0, utils_1.getProjectDir)(), 'src/**/*.ts*')],
-                },
             });
         },
     };
 }
 exports.forkTsCheckerPlugin = forkTsCheckerPlugin;
+function eslintPlugin() {
+    return {
+        dependencies: {
+            'eslint-webpack-plugin': '3.1.x',
+        },
+        config: function () {
+            var EslintWebpackPlugin = __webpack_require__(9);
+            return new EslintWebpackPlugin({
+                extensions: ['ts', 'tsx'],
+                files: [(0, path_1.join)((0, utils_1.getProjectDir)(), 'src/**/*.ts*')],
+                threads: true,
+            });
+        },
+    };
+}
+exports.eslintPlugin = eslintPlugin;
 function cleanTerminalPlugin() {
     return {
         dependencies: {
             'clean-terminal-webpack-plugin': '3.0.x',
         },
         config: function () {
-            var CleanTerminalPlugin = __webpack_require__(9);
+            var CleanTerminalPlugin = __webpack_require__(10);
             return new CleanTerminalPlugin();
         },
     };
@@ -241,7 +255,7 @@ function terserPlugin() {
             'terser-webpack-plugin': '5.3.x',
         },
         config: function () {
-            var TerserWebpackPlugin = __webpack_require__(10);
+            var TerserWebpackPlugin = __webpack_require__(11);
             return new TerserWebpackPlugin({
                 terserOptions: {
                     format: {
@@ -308,16 +322,22 @@ module.exports = require("fork-ts-checker-webpack-plugin");
 /* 9 */
 /***/ ((module) => {
 
-module.exports = require("clean-terminal-webpack-plugin");
+module.exports = require("eslint-webpack-plugin");
 
 /***/ }),
 /* 10 */
 /***/ ((module) => {
 
-module.exports = require("terser-webpack-plugin");
+module.exports = require("clean-terminal-webpack-plugin");
 
 /***/ }),
 /* 11 */
+/***/ ((module) => {
+
+module.exports = require("terser-webpack-plugin");
+
+/***/ }),
+/* 12 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -409,14 +429,14 @@ exports.sourceMapLoader = sourceMapLoader;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LambdaServerPlugin = void 0;
-var child_process_1 = __webpack_require__(13);
-var http_1 = __webpack_require__(14);
+var child_process_1 = __webpack_require__(14);
+var http_1 = __webpack_require__(15);
 var LambdaServerPlugin = /** @class */ (function () {
     function LambdaServerPlugin() {
     }
@@ -536,13 +556,13 @@ exports.LambdaServerPlugin = LambdaServerPlugin;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ ((module) => {
 
 module.exports = require("child_process");
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ ((module) => {
 
 module.exports = require("http");

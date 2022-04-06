@@ -1,7 +1,12 @@
 import {join} from 'path';
 import {baseConfig} from './common/base';
 import {babelLoaderNode, sourceMapLoader} from './common/loaders';
-import {definePlugin, forkTsCheckerPlugin, cleanTerminalPlugin} from './common/plugins';
+import {
+  definePlugin,
+  forkTsCheckerPlugin,
+  cleanTerminalPlugin,
+  eslintPlugin,
+} from './common/plugins';
 import {getProjectDir, WebpackConfigFragment} from './common/utils';
 import {LambdaServerPlugin} from './lambda_server_plugin';
 
@@ -10,6 +15,7 @@ export function nodeConfig(opts: {isLambda: boolean}): WebpackConfigFragment {
   const base = baseConfig({hashOutput: false, libraryExportName: isLambda ? 'handler' : undefined});
   const define = definePlugin();
   const forkTsChecker = forkTsCheckerPlugin();
+  const eslint = eslintPlugin();
   const cleanTerminal = cleanTerminalPlugin();
   const babel = babelLoaderNode();
   const sourceMap = sourceMapLoader();
@@ -21,6 +27,7 @@ export function nodeConfig(opts: {isLambda: boolean}): WebpackConfigFragment {
       ...base.dependencies,
       ...define.dependencies,
       ...forkTsChecker.dependencies,
+      ...eslint.dependencies,
       ...cleanTerminal.dependencies,
       ...babel.dependencies,
       ...sourceMap.dependencies,
@@ -29,6 +36,7 @@ export function nodeConfig(opts: {isLambda: boolean}): WebpackConfigFragment {
       const plugins = [
         define.config(),
         forkTsChecker.config(),
+        eslint.config(),
         cleanTerminal.config(),
         new LambdaServerPlugin(),
       ];

@@ -1,9 +1,9 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.1.7',
+  project: '1.1.8',
   eslint: '1.0.21',
   prettier: '1.0.3',
   tsconfig: '1.0.8',
-  webpack: '1.0.20',
+  webpack: '1.0.21',
 };
 
 export const ESLINT_VERSION = '8.12.x';

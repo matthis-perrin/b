@@ -26,7 +26,7 @@
       "dbaeumer.vscode-eslint",
       "esbenp.prettier-vscode",
       "VisualStudioExptTeam.vscodeintellicode",
-      "jpoissonnier.vscode-styled-components",
+      "styled-components.vscode-styled-components",
       "naumovs.color-highlight",
       "eamodio.gitlens"
     ]

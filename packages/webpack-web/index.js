@@ -31,7 +31,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.webConfig = void 0;
 var path_1 = __webpack_require__(2);
 var base_1 = __webpack_require__(3);
-var loaders_1 = __webpack_require__(11);
+var loaders_1 = __webpack_require__(12);
 var plugins_1 = __webpack_require__(4);
 var utils_1 = __webpack_require__(5);
 function webConfig() {
@@ -39,18 +39,25 @@ function webConfig() {
     var define = (0, plugins_1.definePlugin)();
     var html = (0, plugins_1.htmlPlugin)();
     var forkTsChecker = (0, plugins_1.forkTsCheckerPlugin)();
+    var eslint = (0, plugins_1.eslintPlugin)();
     var cleanTerminal = (0, plugins_1.cleanTerminalPlugin)();
     var babel = (0, loaders_1.babelLoaderWeb)();
     var sourceMap = (0, loaders_1.sourceMapLoader)();
     return {
-        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign({ 'webpack-dev-server': '4.8.x' }, base.dependencies), define.dependencies), html.dependencies), forkTsChecker.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
+        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({ 'webpack-dev-server': '4.8.x' }, base.dependencies), define.dependencies), html.dependencies), forkTsChecker.dependencies), eslint.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
         config: function () {
             var baseWebpackConfig = base.config();
             return __assign(__assign({}, baseWebpackConfig), { target: 'web', entry: {
                     main: (0, path_1.join)((0, utils_1.getProjectDir)(), "src/index.tsx"),
                 }, module: {
                     rules: [babel.config(), sourceMap.config()],
-                }, plugins: [define.config(), html.config(), forkTsChecker.config(), cleanTerminal.config()], devServer: !(0, utils_1.isProd)()
+                }, plugins: [
+                    define.config(),
+                    html.config(),
+                    forkTsChecker.config(),
+                    eslint.config(),
+                    cleanTerminal.config(),
+                ], devServer: !(0, utils_1.isProd)()
                     ? {
                         static: (0, utils_1.getDistDir)(),
                         compress: true,
@@ -164,7 +171,7 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.terserPlugin = exports.cleanTerminalPlugin = exports.forkTsCheckerPlugin = exports.htmlPlugin = exports.definePlugin = void 0;
+exports.terserPlugin = exports.cleanTerminalPlugin = exports.eslintPlugin = exports.forkTsCheckerPlugin = exports.htmlPlugin = exports.definePlugin = void 0;
 var path_1 = __webpack_require__(2);
 var utils_1 = __webpack_require__(5);
 function definePlugin() {
@@ -205,7 +212,7 @@ exports.htmlPlugin = htmlPlugin;
 function forkTsCheckerPlugin() {
     return {
         dependencies: {
-            'fork-ts-checker-webpack-plugin': '6.5.x',
+            'fork-ts-checker-webpack-plugin': '7.2.x',
         },
         config: function () {
             var ForkTsCheckerWebpackPlugin = __webpack_require__(8);
@@ -218,22 +225,34 @@ function forkTsCheckerPlugin() {
                     mode: 'write-references',
                     configFile: (0, path_1.join)((0, utils_1.getProjectDir)(), 'tsconfig.json'),
                 },
-                eslint: {
-                    enabled: true,
-                    files: [(0, path_1.join)((0, utils_1.getProjectDir)(), 'src/**/*.ts*')],
-                },
             });
         },
     };
 }
 exports.forkTsCheckerPlugin = forkTsCheckerPlugin;
+function eslintPlugin() {
+    return {
+        dependencies: {
+            'eslint-webpack-plugin': '3.1.x',
+        },
+        config: function () {
+            var EslintWebpackPlugin = __webpack_require__(9);
+            return new EslintWebpackPlugin({
+                extensions: ['ts', 'tsx'],
+                files: [(0, path_1.join)((0, utils_1.getProjectDir)(), 'src/**/*.ts*')],
+                threads: true,
+            });
+        },
+    };
+}
+exports.eslintPlugin = eslintPlugin;
 function cleanTerminalPlugin() {
     return {
         dependencies: {
             'clean-terminal-webpack-plugin': '3.0.x',
         },
         config: function () {
-            var CleanTerminalPlugin = __webpack_require__(9);
+            var CleanTerminalPlugin = __webpack_require__(10);
             return new CleanTerminalPlugin();
         },
     };
@@ -245,7 +264,7 @@ function terserPlugin() {
             'terser-webpack-plugin': '5.3.x',
         },
         config: function () {
-            var TerserWebpackPlugin = __webpack_require__(10);
+            var TerserWebpackPlugin = __webpack_require__(11);
             return new TerserWebpackPlugin({
                 terserOptions: {
                     format: {
@@ -312,16 +331,22 @@ module.exports = require("fork-ts-checker-webpack-plugin");
 /* 9 */
 /***/ ((module) => {
 
-module.exports = require("clean-terminal-webpack-plugin");
+module.exports = require("eslint-webpack-plugin");
 
 /***/ }),
 /* 10 */
 /***/ ((module) => {
 
-module.exports = require("terser-webpack-plugin");
+module.exports = require("clean-terminal-webpack-plugin");
 
 /***/ }),
 /* 11 */
+/***/ ((module) => {
+
+module.exports = require("terser-webpack-plugin");
+
+/***/ }),
+/* 12 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 

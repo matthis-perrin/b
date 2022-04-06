@@ -1,13 +1,14 @@
 {
   "name": "@matthis/webpack-lambda",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {
     "webpack": "5.71.x",
     "webpack-cli": "4.9.x",
     "terser-webpack-plugin": "5.3.x",
-    "fork-ts-checker-webpack-plugin": "6.5.x",
+    "fork-ts-checker-webpack-plugin": "7.2.x",
+    "eslint-webpack-plugin": "3.1.x",
     "clean-terminal-webpack-plugin": "3.0.x",
     "@babel/core": "7.17.x",
     "@babel/preset-env": "7.16.x",

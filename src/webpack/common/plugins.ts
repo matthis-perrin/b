@@ -38,7 +38,7 @@ export function htmlPlugin(): WebpackConfigFragment {
 export function forkTsCheckerPlugin(): WebpackConfigFragment {
   return {
     dependencies: {
-      'fork-ts-checker-webpack-plugin': '6.5.x',
+      'fork-ts-checker-webpack-plugin': '7.2.x',
     },
     config: () => {
       const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -51,10 +51,22 @@ export function forkTsCheckerPlugin(): WebpackConfigFragment {
           mode: 'write-references',
           configFile: join(getProjectDir(), 'tsconfig.json'),
         },
-        eslint: {
-          enabled: true,
-          files: [join(getProjectDir(), 'src/**/*.ts*')],
-        },
+      });
+    },
+  };
+}
+
+export function eslintPlugin(): WebpackConfigFragment {
+  return {
+    dependencies: {
+      'eslint-webpack-plugin': '3.1.x',
+    },
+    config: () => {
+      const EslintWebpackPlugin = require('eslint-webpack-plugin');
+      return new EslintWebpackPlugin({
+        extensions: ['ts', 'tsx'],
+        files: [join(getProjectDir(), 'src/**/*.ts*')],
+        threads: true,
       });
     },
   };

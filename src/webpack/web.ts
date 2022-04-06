@@ -1,7 +1,13 @@
 import {join} from 'path';
 import {baseConfig} from './common/base';
 import {babelLoaderWeb, sourceMapLoader} from './common/loaders';
-import {definePlugin, htmlPlugin, forkTsCheckerPlugin, cleanTerminalPlugin} from './common/plugins';
+import {
+  definePlugin,
+  htmlPlugin,
+  forkTsCheckerPlugin,
+  cleanTerminalPlugin,
+  eslintPlugin,
+} from './common/plugins';
 import {getDistDir, getProjectDir, isProd, WebpackConfigFragment} from './common/utils';
 
 export function webConfig(): WebpackConfigFragment {
@@ -9,6 +15,7 @@ export function webConfig(): WebpackConfigFragment {
   const define = definePlugin();
   const html = htmlPlugin();
   const forkTsChecker = forkTsCheckerPlugin();
+  const eslint = eslintPlugin();
   const cleanTerminal = cleanTerminalPlugin();
   const babel = babelLoaderWeb();
   const sourceMap = sourceMapLoader();
@@ -20,6 +27,7 @@ export function webConfig(): WebpackConfigFragment {
       ...define.dependencies,
       ...html.dependencies,
       ...forkTsChecker.dependencies,
+      ...eslint.dependencies,
       ...cleanTerminal.dependencies,
       ...babel.dependencies,
       ...sourceMap.dependencies,
@@ -35,7 +43,13 @@ export function webConfig(): WebpackConfigFragment {
         module: {
           rules: [babel.config(), sourceMap.config()],
         },
-        plugins: [define.config(), html.config(), forkTsChecker.config(), cleanTerminal.config()],
+        plugins: [
+          define.config(),
+          html.config(),
+          forkTsChecker.config(),
+          eslint.config(),
+          cleanTerminal.config(),
+        ],
         devServer: !isProd()
           ? {
               static: getDistDir(),
