@@ -27,38 +27,41 @@ resource "aws_s3_bucket_policy" "code" {
   policy = data.aws_iam_policy_document.code.json
 }
 
-
-# [START] UPLOAD FRONTEND AND BACKEND
-
-module "template_files" {
-  source = "hashicorp/dir/template"
-  base_dir = "../frontend/dist"
+`.trim();
 }
 
-resource "aws_s3_bucket_object" "frontend_files" {
-  for_each     = module.template_files.files
-  bucket       = aws_s3_bucket.code.id
-  key          = "frontend/\${each.key}"
-  content_type = each.value.content_type
-  source       = each.value.source_path
-  content      = each.value.content
-  etag         = each.value.digests.md5
+export function generateFrontendFileUpload(): string {
+  return `
+  module "template_files" {
+    source = "hashicorp/dir/template"
+    base_dir = "../frontend/dist"
+  }
+  
+  resource "aws_s3_bucket_object" "frontend_files" {
+    for_each     = module.template_files.files
+    bucket       = aws_s3_bucket.code.id
+    key          = "frontend/\${each.key}"
+    content_type = each.value.content_type
+    source       = each.value.source_path
+    content      = each.value.content
+    etag         = each.value.digests.md5
+  }
+`.trim();
 }
 
-data "archive_file" "backend_archive" {
-  type        = "zip"
-  source_dir  = "../backend/dist"
-  output_path = "./backend.zip"
-}
-
-resource "aws_s3_bucket_object" "backend_archive" {
-  bucket       = aws_s3_bucket.code.id
-  key          = "backend/dist.zip"
-  source       = data.archive_file.backend_archive.output_path
-  etag         = data.archive_file.backend_archive.output_sha
-}
-
-# [END] UPLOAD FRONTEND AND BACKEND
-
+export function generateBackendFileUpload(): string {
+  return `
+  data "archive_file" "backend_archive" {
+    type        = "zip"
+    source_dir  = "../backend/dist"
+    output_path = "./backend.zip"
+  }
+  
+  resource "aws_s3_bucket_object" "backend_archive" {
+    bucket       = aws_s3_bucket.code.id
+    key          = "backend/dist.zip"
+    source       = data.archive_file.backend_archive.output_path
+    etag         = data.archive_file.backend_archive.output_sha
+  }
 `.trim();
 }

@@ -2,10 +2,8 @@
   "name": "{{PROJECT_NAME}}-backend",
   "license": "UNLICENSED",
   "scripts": {
-    "lint": "eslint --ext ts,tsx src",
     "build": "NODE_ENV=production webpack build",
     "watch": "NODE_ENV=development webpack watch",
-    "start": "node dist/main.js"
   },
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {

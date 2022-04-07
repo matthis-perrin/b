@@ -12,7 +12,7 @@ import {
   REACT_NATIVE_VERSION,
 } from '../versions';
 import {execSync} from 'child_process';
-import {generateTerraform} from '../terraform/all';
+import {generateWebAppTerraform, generateWebTerraform} from '../terraform/all';
 import {generateCustomTerraform} from '../terraform/custom';
 
 const templatesPath = join(__dirname, 'templates');
@@ -92,10 +92,15 @@ async function generateProject(
           const terraformBasePath = join(dst, 'terraform', 'terraform.tf');
           const terraformCustomPath = join(dst, 'terraform', 'custom.tf');
           await mkdir(dirname(terraformBasePath), {recursive: true});
-          await writeFile(terraformBasePath, await generateTerraform(name));
+          await writeFile(terraformBasePath, await generateWebAppTerraform(name));
           await writeFile(terraformCustomPath, await generateCustomTerraform(name));
         })()
-      : Promise.resolve(),
+      : type === ProjectType.Web
+      ? (async () => {
+          const terraformBasePath = join(dst, 'terraform', 'terraform.tf');
+          await mkdir(dirname(terraformBasePath), {recursive: true});
+          await writeFile(terraformBasePath, await generateWebTerraform(name));
+        })() : Promise.resolve(),
   ]);
 
   // Post generation script for React Native project
@@ -113,7 +118,7 @@ async function generateProject(
   }
 
   // Initialization script for Web App project
-  if (type === WorkspaceType.WebApp) {
+  if (type === WorkspaceType.WebApp || type === ProjectType.Web) {
     console.log('Running post install script');
     const commands = [`pushd ${dst}`, `node setup.js`, `popd`];
     execSync(commands.join(' && '), {stdio: ['ignore', 'inherit', 'inherit']});

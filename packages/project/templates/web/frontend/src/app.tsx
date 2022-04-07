@@ -15,6 +15,7 @@ export const App: React.FC = () => {
 
   return <Wrapper onClick={handleClick}>{`App ${counter}`}</Wrapper>;
 };
+App.displayName = 'App';
 
 const Wrapper = styled.div`
   width: 200px;

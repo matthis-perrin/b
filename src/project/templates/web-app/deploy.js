@@ -1,5 +1,5 @@
 const path = require('path');
-const {exec, execSync} = require('child_process');
+const {execSync} = require('child_process');
 const {accessSync, mkdirSync, readdirSync, writeFileSync, readFileSync} = require('fs');
 
 const backendPath = path.join(process.cwd(), 'backend');

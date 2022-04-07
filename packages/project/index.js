@@ -197,7 +197,7 @@ function generateProject(dst, name, type) {
                                                 _e.sent();
                                                 _a = promises_1.writeFile;
                                                 _b = [terraformBasePath];
-                                                return [4 /*yield*/, (0, all_1.generateTerraform)(name)];
+                                                return [4 /*yield*/, (0, all_1.generateWebAppTerraform)(name)];
                                             case 2: return [4 /*yield*/, _a.apply(void 0, _b.concat([_e.sent()]))];
                                             case 3:
                                                 _e.sent();
@@ -211,7 +211,26 @@ function generateProject(dst, name, type) {
                                         }
                                     });
                                 }); })()
-                                : Promise.resolve(),
+                                : type === models_1.ProjectType.Web
+                                    ? (function () { return __awaiter(_this, void 0, void 0, function () {
+                                        var terraformBasePath, _a, _b;
+                                        return __generator(this, function (_c) {
+                                            switch (_c.label) {
+                                                case 0:
+                                                    terraformBasePath = (0, path_1.join)(dst, 'terraform', 'terraform.tf');
+                                                    return [4 /*yield*/, (0, promises_1.mkdir)((0, path_1.dirname)(terraformBasePath), { recursive: true })];
+                                                case 1:
+                                                    _c.sent();
+                                                    _a = promises_1.writeFile;
+                                                    _b = [terraformBasePath];
+                                                    return [4 /*yield*/, (0, all_1.generateWebTerraform)(name)];
+                                                case 2: return [4 /*yield*/, _a.apply(void 0, _b.concat([_c.sent()]))];
+                                                case 3:
+                                                    _c.sent();
+                                                    return [2 /*return*/];
+                                            }
+                                        });
+                                    }); })() : Promise.resolve(),
                         ], false))];
                 case 2:
                     _a.sent();
@@ -229,7 +248,7 @@ function generateProject(dst, name, type) {
                         (0, child_process_1.execSync)(commands.join(' && '));
                     }
                     // Initialization script for Web App project
-                    if (type === models_1.WorkspaceType.WebApp) {
+                    if (type === models_1.WorkspaceType.WebApp || type === models_1.ProjectType.Web) {
                         console.log('Running post install script');
                         commands = ["pushd " + dst, "node setup.js", "popd"];
                         (0, child_process_1.execSync)(commands.join(' && '), { stdio: ['ignore', 'inherit', 'inherit'] });
@@ -361,25 +380,37 @@ module.exports = require("child_process");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.generateTerraform = void 0;
+exports.generateWebTerraform = exports.generateWebAppTerraform = void 0;
 var api_gateway_1 = __webpack_require__(8);
 var cloudfront_1 = __webpack_require__(9);
 var lambda_1 = __webpack_require__(10);
 var output_1 = __webpack_require__(11);
 var provider_1 = __webpack_require__(12);
 var s3_1 = __webpack_require__(13);
-function generateTerraform(projectName) {
+function generateWebAppTerraform(projectName) {
     return [
         (0, provider_1.generateAwsProvider)(projectName),
         (0, output_1.generateWebOutputs)(),
         (0, output_1.generateLambdaApiOutputs)(),
         (0, s3_1.generateS3Bucket)(projectName),
+        (0, s3_1.generateFrontendFileUpload)(),
+        (0, s3_1.generateBackendFileUpload)(),
         (0, cloudfront_1.generateCloudfrontDistribution)(projectName),
         (0, lambda_1.generateLambda)(projectName),
         (0, api_gateway_1.generateApiGateway)(projectName),
     ].join('\n\n');
 }
-exports.generateTerraform = generateTerraform;
+exports.generateWebAppTerraform = generateWebAppTerraform;
+function generateWebTerraform(projectName) {
+    return [
+        (0, provider_1.generateAwsProvider)(projectName),
+        (0, output_1.generateWebOutputs)(),
+        (0, s3_1.generateS3Bucket)(projectName),
+        (0, s3_1.generateFrontendFileUpload)(),
+        (0, cloudfront_1.generateCloudfrontDistribution)(projectName),
+    ].join('\n\n');
+}
+exports.generateWebTerraform = generateWebTerraform;
 
 
 /***/ }),
@@ -459,12 +490,20 @@ exports.generateAwsProvider = generateAwsProvider;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.generateS3Bucket = void 0;
+exports.generateBackendFileUpload = exports.generateFrontendFileUpload = exports.generateS3Bucket = void 0;
 function generateS3Bucket(projectName) {
     var bucketName = projectName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
-    return ("\nresource \"aws_s3_bucket\" \"code\" {\n  bucket_prefix = \"" + bucketName + "-\"\n}\n\nresource \"aws_s3_bucket_acl\" \"code_bucket_acl\" {\n  bucket = aws_s3_bucket.code.id\n  acl    = \"private\"\n}\n\ndata \"aws_iam_policy_document\" \"code\" {\n  statement {\n    actions   = [\"s3:GetObject\"]\n    resources = [\"${aws_s3_bucket.code.arn}/frontend/*\"]\n\n    principals {\n      type        = \"AWS\"\n      identifiers = [aws_cloudfront_origin_access_identity.s3.iam_arn]\n    }\n  }\n}\n\nresource \"aws_s3_bucket_policy\" \"code\" {\n  bucket = aws_s3_bucket.code.id\n  policy = data.aws_iam_policy_document.code.json\n}\n\n\n# [START] UPLOAD FRONTEND AND BACKEND\n\nmodule \"template_files\" {\n  source = \"hashicorp/dir/template\"\n  base_dir = \"../frontend/dist\"\n}\n\nresource \"aws_s3_bucket_object\" \"frontend_files\" {\n  for_each     = module.template_files.files\n  bucket       = aws_s3_bucket.code.id\n  key          = \"frontend/${each.key}\"\n  content_type = each.value.content_type\n  source       = each.value.source_path\n  content      = each.value.content\n  etag         = each.value.digests.md5\n}\n\ndata \"archive_file\" \"backend_archive\" {\n  type        = \"zip\"\n  source_dir  = \"../backend/dist\"\n  output_path = \"./backend.zip\"\n}\n\nresource \"aws_s3_bucket_object\" \"backend_archive\" {\n  bucket       = aws_s3_bucket.code.id\n  key          = \"backend/dist.zip\"\n  source       = data.archive_file.backend_archive.output_path\n  etag         = data.archive_file.backend_archive.output_sha\n}\n\n# [END] UPLOAD FRONTEND AND BACKEND\n\n").trim();
+    return ("\nresource \"aws_s3_bucket\" \"code\" {\n  bucket_prefix = \"" + bucketName + "-\"\n}\n\nresource \"aws_s3_bucket_acl\" \"code_bucket_acl\" {\n  bucket = aws_s3_bucket.code.id\n  acl    = \"private\"\n}\n\ndata \"aws_iam_policy_document\" \"code\" {\n  statement {\n    actions   = [\"s3:GetObject\"]\n    resources = [\"${aws_s3_bucket.code.arn}/frontend/*\"]\n\n    principals {\n      type        = \"AWS\"\n      identifiers = [aws_cloudfront_origin_access_identity.s3.iam_arn]\n    }\n  }\n}\n\nresource \"aws_s3_bucket_policy\" \"code\" {\n  bucket = aws_s3_bucket.code.id\n  policy = data.aws_iam_policy_document.code.json\n}\n\n").trim();
 }
 exports.generateS3Bucket = generateS3Bucket;
+function generateFrontendFileUpload() {
+    return "\n  module \"template_files\" {\n    source = \"hashicorp/dir/template\"\n    base_dir = \"../frontend/dist\"\n  }\n  \n  resource \"aws_s3_bucket_object\" \"frontend_files\" {\n    for_each     = module.template_files.files\n    bucket       = aws_s3_bucket.code.id\n    key          = \"frontend/${each.key}\"\n    content_type = each.value.content_type\n    source       = each.value.source_path\n    content      = each.value.content\n    etag         = each.value.digests.md5\n  }\n".trim();
+}
+exports.generateFrontendFileUpload = generateFrontendFileUpload;
+function generateBackendFileUpload() {
+    return "\n  data \"archive_file\" \"backend_archive\" {\n    type        = \"zip\"\n    source_dir  = \"../backend/dist\"\n    output_path = \"./backend.zip\"\n  }\n  \n  resource \"aws_s3_bucket_object\" \"backend_archive\" {\n    bucket       = aws_s3_bucket.code.id\n    key          = \"backend/dist.zip\"\n    source       = data.archive_file.backend_archive.output_path\n    etag         = data.archive_file.backend_archive.output_sha\n  }\n".trim();
+}
+exports.generateBackendFileUpload = generateBackendFileUpload;
 
 
 /***/ }),

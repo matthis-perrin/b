@@ -2,8 +2,6 @@
   "name": "{{PROJECT_NAME}}-frontend",
   "license": "UNLICENSED",
   "scripts": {
-    "lint": "eslint --ext ts,tsx src",
-    "tsc": "tsc -p tsconfig.json",
     "build": "NODE_ENV=production webpack build",
     "start": "NODE_ENV=development webpack serve"
   },
