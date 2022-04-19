@@ -2,23 +2,20 @@
   "name": "{{PROJECT_NAME}}",
   "license": "UNLICENSED",
   "scripts": {
-    "lint": "eslint --ext ts,tsx src",
-    "tsc": "tsc -p tsconfig.json",
     "build": "NODE_ENV=production webpack build",
-    "watch": "NODE_ENV=development webpack watch",
-    "start": "node dist/main.js"
+    "watch": "NODE_ENV=development webpack watch"
   },
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
     "extends": [
-      "@matthis/eslint-config-{{PROJECT_TYPE}}"
+      "@matthis/eslint-config-node"
     ]
   },
   "devDependencies": {
-    "@matthis/eslint-config-{{PROJECT_TYPE}}": "latest",
+    "@matthis/eslint-config-node": "latest",
     "@matthis/prettier-config": "latest",
-    "@matthis/tsconfig-{{PROJECT_TYPE}}": "latest",
-    "@matthis/webpack-{{PROJECT_TYPE}}": "latest",
+    "@matthis/tsconfig-node": "latest",
+    "@matthis/webpack-node": "latest",
     "@types/node": "{{NODE_TYPES_VERSION}}"
   },
   "dependencies": {

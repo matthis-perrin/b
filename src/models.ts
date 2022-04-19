@@ -15,5 +15,7 @@ export const ALL_TYPES = [
 ];
 
 export enum WorkspaceType {
+  StaticWebsite = 'static-website',
+  StandaloneLambda = 'standalone-lambda',
   WebApp = 'web-app',
 }

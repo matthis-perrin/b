@@ -1,1 +1,1 @@
-module.exports = require('@matthis/webpack-{{PROJECT_TYPE}}');
+module.exports = require('@matthis/webpack-lib');

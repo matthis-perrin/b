@@ -55,6 +55,7 @@ export function webConfig(): WebpackConfigFragment {
               static: getDistDir(),
               compress: true,
               hot: true,
+              open: true,
             }
           : undefined,
         optimization: {

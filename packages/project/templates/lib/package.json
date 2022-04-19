@@ -8,13 +8,13 @@
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
     "extends": [
-      "@matthis/eslint-config-{{PROJECT_TYPE}}"
+      "@matthis/eslint-config-lib"
     ]
   },
   "devDependencies": {
-    "@matthis/eslint-config-{{PROJECT_TYPE}}": "latest",
+    "@matthis/eslint-config-lib": "latest",
     "@matthis/prettier-config": "latest",
-    "@matthis/tsconfig-{{PROJECT_TYPE}}": "latest"
+    "@matthis/tsconfig-lib": "latest"
   },
   "dependencies": {
   }

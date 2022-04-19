@@ -62,6 +62,7 @@ function webConfig() {
                         static: (0, utils_1.getDistDir)(),
                         compress: true,
                         hot: true,
+                        open: true,
                     }
                     : undefined, optimization: __assign(__assign({}, baseWebpackConfig.optimization), { splitChunks: {
                         cacheGroups: {

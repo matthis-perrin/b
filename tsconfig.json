@@ -22,5 +22,5 @@
     "strict": true
   },
   "include": ["src"],
-  "exclude": ["src/project/templates/*"]
+  "exclude": ["src/project/templates/*", "src/project/templates/*", "src/project/old_templates/*"]
 }

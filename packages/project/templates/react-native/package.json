@@ -16,7 +16,7 @@
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
     "extends": [
-      "@matthis/eslint-config-{{PROJECT_TYPE}}"
+      "@matthis/eslint-config-react-native"
     ]
   },
   "dependencies": {
@@ -27,9 +27,9 @@
   "devDependencies": {
     "@babel/core": "7.12.x",
     "@babel/runtime": "7.12.x",
-    "@matthis/eslint-config-{{PROJECT_TYPE}}": "latest",
+    "@matthis/eslint-config-react-native": "latest",
     "@matthis/prettier-config": "latest",
-    "@matthis/tsconfig-{{PROJECT_TYPE}}": "latest",
+    "@matthis/tsconfig-react-native": "latest",
     "@types/react": "{{REACT_VERSION}}",
     "@types/react-native": "{{REACT_NATIVE_VERSION}}",
     "@types/styled-components": "{{STYLED_COMPONENTS_TYPES_VERSION}}",
