@@ -1,10 +1,10 @@
 {
   "name": "@matthis/webpack-lambda",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {
-    "webpack": "5.71.x",
+    "webpack": "5.72.x",
     "webpack-cli": "4.9.x",
     "terser-webpack-plugin": "5.3.x",
     "fork-ts-checker-webpack-plugin": "7.2.x",

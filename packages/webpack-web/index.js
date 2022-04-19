@@ -110,7 +110,7 @@ function baseConfig(opts) {
     var hashOutput = opts.hashOutput, libraryExportName = opts.libraryExportName;
     var terserPluginConfig = (0, plugins_1.terserPlugin)();
     return {
-        dependencies: __assign({ webpack: '5.71.x', 'webpack-cli': '4.9.x' }, terserPluginConfig.dependencies),
+        dependencies: __assign({ webpack: '5.72.x', 'webpack-cli': '4.9.x' }, terserPluginConfig.dependencies),
         config: function () {
             var _a;
             return ({

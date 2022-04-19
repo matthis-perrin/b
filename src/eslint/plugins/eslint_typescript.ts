@@ -4,8 +4,8 @@ import {EslintMetadata} from '../models';
 export const eslintTypescript: EslintMetadata = {
   plugin: ['@typescript-eslint'],
   dependencies: {
-    '@typescript-eslint/eslint-plugin': '5.18.x',
-    '@typescript-eslint/parser': '5.18.x',
+    '@typescript-eslint/eslint-plugin': '5.20.x',
+    '@typescript-eslint/parser': '5.20.x',
     typescript: TYPESCRIPT_VERSION,
   },
   settings: {},
@@ -199,6 +199,7 @@ export const eslintTypescript: EslintMetadata = {
         ignoreNumericLiteralTypes: true,
         ignoreReadonlyClassProperties: true,
         ignoreEnums: true,
+        ignoreTypeIndexes: true,
       },
     ],
     '@typescript-eslint/no-meaningless-void-operator': 'warn',
@@ -240,7 +241,7 @@ export const eslintTypescript: EslintMetadata = {
         args: 'after-used',
         ignoreRestSiblings: true,
         caughtErrors: 'all',
-        destructuredArrayIgnorePattern: '^_'
+        destructuredArrayIgnorePattern: '^_',
       },
     ],
     '@typescript-eslint/no-use-before-define': ['warn', {functions: false, variables: false}],
@@ -281,7 +282,7 @@ export const eslintTypescript: EslintMetadata = {
     ],
     '@typescript-eslint/switch-exhaustiveness-check': 'warn',
     '@typescript-eslint/triple-slash-reference': 'warn',
-    '@typescript-eslint/unified-signatures': 'warn',
+    '@typescript-eslint/unified-signatures': ['warn', {ignoreDifferentlyNamedParameters: true}],
   },
 };
 

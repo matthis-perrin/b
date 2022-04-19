@@ -1,11 +1,11 @@
 {
   "name": "@matthis/eslint-config-node",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "license": "UNLICENSED",
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "5.18.x",
-    "@typescript-eslint/parser": "5.18.x",
-    "eslint": "8.12.x",
+    "@typescript-eslint/eslint-plugin": "5.20.x",
+    "@typescript-eslint/parser": "5.20.x",
+    "eslint": "8.13.x",
     "eslint-import-resolver-typescript": "2.7.x",
     "eslint-plugin-eslint-comments": "3.2.x",
     "eslint-plugin-import": "2.26.x",

@@ -695,12 +695,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
     project: '1.1.9',
-    eslint: '1.0.21',
+    eslint: '1.0.22',
     prettier: '1.0.3',
     tsconfig: '1.0.8',
-    webpack: '1.0.22',
+    webpack: '1.0.23',
 };
-exports.ESLINT_VERSION = '8.12.x';
+exports.ESLINT_VERSION = '8.13.x';
 exports.PRETTIER_VERSION = '2.6.x';
 exports.TYPESCRIPT_VERSION = '4.6.x';
 exports.REACT_VERSION = '17.0.x';
