@@ -1,4 +1,6 @@
-export function generateAwsProviderTerraform(projectName: string): string {
+import {WorkspaceName} from '../../models';
+
+export function generateAwsProviderTerraform(workspaceName: WorkspaceName): string {
   return `
 terraform {
   required_providers {
@@ -14,7 +16,7 @@ provider "aws" {
   shared_credentials_file = "./.aws-credentials"
   default_tags {
     tags = {
-      Project = "${projectName}"
+      Project = "${workspaceName}"
     }
   }
 }

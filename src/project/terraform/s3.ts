@@ -1,5 +1,10 @@
-export function generateS3BucketTerraform(projectName: string): string {
-  const bucketName = projectName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
+import {ProjectName, WorkspaceName} from '../../models';
+
+export function generateS3BucketTerraform(
+  workspaceName: WorkspaceName,
+  webProjectNames: ProjectName[]
+): string {
+  const bucketName = workspaceName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
   return `
 resource "aws_s3_bucket" "code" {
   bucket_prefix = "${bucketName}-"
@@ -10,58 +15,65 @@ resource "aws_s3_bucket_acl" "code_bucket_acl" {
   acl    = "private"
 }
 
-data "aws_iam_policy_document" "code" {
+data "aws_iam_policy_document" "cloudfront_access_to_code" {
+  ${webProjectNames
+    .map(p =>
+      `
   statement {
     actions   = ["s3:GetObject"]
-    resources = ["\${aws_s3_bucket.code.arn}/frontend/*"]
-
+    resources = [
+      "\${aws_s3_bucket.code.arn}/${p}/*",
+    ]
     principals {
       type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.s3.iam_arn]
+      identifiers = [aws_cloudfront_origin_access_identity.${p}.iam_arn]
     }
   }
+`.trim()
+    )
+    .join('\n\n')}
 }
 
 resource "aws_s3_bucket_policy" "code" {
   bucket = aws_s3_bucket.code.id
-  policy = data.aws_iam_policy_document.code.json
+  policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
 }
 
 `.trim();
 }
 
-export function generateFrontendFileUploadTerraform(): string {
+export function generateWebFileUploadTerraform(projectName: ProjectName): string {
   return `
-  module "template_files" {
-    source = "hashicorp/dir/template"
-    base_dir = "../frontend/dist"
-  }
-  
-  resource "aws_s3_bucket_object" "frontend_files" {
-    for_each     = module.template_files.files
-    bucket       = aws_s3_bucket.code.id
-    key          = "frontend/\${each.key}"
-    content_type = each.value.content_type
-    source       = each.value.source_path
-    content      = each.value.content
-    etag         = each.value.digests.md5
-  }
+module "${projectName}_template_files" {
+  source = "hashicorp/dir/template"
+  base_dir = "../${projectName}/dist"
+}
+
+resource "aws_s3_bucket_object" "${projectName}_files" {
+  for_each     = module.${projectName}_template_files.files
+  bucket       = aws_s3_bucket.code.id
+  key          = "${projectName}/\${each.key}"
+  content_type = each.value.content_type
+  source       = each.value.source_path
+  content      = each.value.content
+  etag         = each.value.digests.md5
+}
 `.trim();
 }
 
-export function generateBackendFileUploadTerraform(): string {
+export function generateLambdaFileUploadTerraform(projectName: ProjectName): string {
   return `
-  data "archive_file" "backend_archive" {
-    type        = "zip"
-    source_dir  = "../backend/dist"
-    output_path = "./backend.zip"
-  }
-  
-  resource "aws_s3_bucket_object" "backend_archive" {
-    bucket       = aws_s3_bucket.code.id
-    key          = "backend/dist.zip"
-    source       = data.archive_file.backend_archive.output_path
-    etag         = data.archive_file.backend_archive.output_sha
-  }
+data "archive_file" "${projectName}_archive" {
+  type        = "zip"
+  source_dir  = "../${projectName}/dist"
+  output_path = "./archives/${projectName}.zip"
+}
+
+resource "aws_s3_bucket_object" "${projectName}_archive" {
+  bucket       = aws_s3_bucket.code.id
+  key          = "${projectName}/dist.zip"
+  source       = data.archive_file.${projectName}_archive.output_path
+  etag         = data.archive_file.${projectName}_archive.output_sha
+}
 `.trim();
 }

@@ -2,9 +2,9 @@ import {join} from 'path';
 import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '../versions';
 
 import {cleanDir, writeJsonFile} from '../fs';
-import {ProjectType} from '../models';
+import {RuntimeType} from '../models';
 
-export async function generateForType(path: string, type: ProjectType): Promise<void> {
+export async function generateForType(path: string, type: RuntimeType): Promise<void> {
   await cleanDir(path);
   await Promise.all([
     writeJsonFile(join(path, 'package.json'), generatePackageJson(type)),
@@ -12,7 +12,7 @@ export async function generateForType(path: string, type: ProjectType): Promise<
   ]);
 }
 
-function generateTsConfig(type: ProjectType): Record<string, unknown> {
+function generateTsConfig(type: RuntimeType): Record<string, unknown> {
   const baseCompilerOptions = {
     allowSyntheticDefaultImports: true,
     // Emit __importStar and __importDefault helpers for runtime babel ecosystem compatibility
@@ -70,14 +70,14 @@ function generateTsConfig(type: ProjectType): Record<string, unknown> {
       })
     | undefined;
 
-  if (type === ProjectType.Lib) {
+  if (type === RuntimeType.Lib) {
     additionalCompilerOptions = {
       module: 'none',
       moduleResolution: 'node',
       lib: ['es2020'],
       target: 'es2020',
     };
-  } else if (type === ProjectType.Web) {
+  } else if (type === RuntimeType.Web) {
     additionalCompilerOptions = {
       module: 'esnext',
       moduleResolution: 'node',
@@ -86,7 +86,7 @@ function generateTsConfig(type: ProjectType): Record<string, unknown> {
       //
       jsx: 'react',
     };
-  } else if (type === ProjectType.Node) {
+  } else if (type === RuntimeType.Node) {
     additionalCompilerOptions = {
       module: 'commonjs',
       moduleResolution: 'node',
@@ -95,7 +95,7 @@ function generateTsConfig(type: ProjectType): Record<string, unknown> {
       //
       types: ['node'],
     };
-  } else if (type === ProjectType.ReactNative) {
+  } else if (type === RuntimeType.ReactNative) {
     additionalCompilerOptions = {
       module: 'esnext',
       moduleResolution: 'node',
@@ -111,7 +111,7 @@ function generateTsConfig(type: ProjectType): Record<string, unknown> {
   return {compilerOptions: {...baseCompilerOptions, ...additionalCompilerOptions}};
 }
 
-function generatePackageJson(type: ProjectType): Record<string, unknown> {
+function generatePackageJson(type: RuntimeType): Record<string, unknown> {
   return {
     name: `@matthis/tsconfig-${type}`,
     version: PACKAGE_VERSIONS.tsconfig,

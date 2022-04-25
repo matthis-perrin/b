@@ -1,5 +1,5 @@
 import {eslintPackages} from './eslint';
-import { ProjectType } from './models';
+import {RuntimeType} from './models';
 import {prettierPackage} from './prettier';
 import {projectPackage} from './project';
 import {tsconfigPackages} from './tsconfig';
@@ -11,42 +11,48 @@ interface PackagesToGenerate {
   webpack: boolean;
 }
 
-const toGenerate: Record<ProjectType, PackagesToGenerate> = {
-  [ProjectType.Web]: {
+const toGenerate: Record<RuntimeType, PackagesToGenerate> = {
+  [RuntimeType.Web]: {
     eslint: true,
     tsconfig: true,
     webpack: true,
   },
-  [ProjectType.Node]: {
+  [RuntimeType.Node]: {
     eslint: true,
     tsconfig: true,
     webpack: true,
   },
-  [ProjectType.Lib]: {
+  [RuntimeType.Lib]: {
     eslint: true,
     tsconfig: true,
     webpack: false,
   },
-  [ProjectType.Lambda]: {
+  [RuntimeType.Lambda]: {
     eslint: false,
     tsconfig: false,
     webpack: true,
   },
-  [ProjectType.ReactNative]: {
+  [RuntimeType.ReactNative]: {
     eslint: true,
     tsconfig: true,
     webpack: false,
   },
 };
 
-const generationEntries = Object.entries(toGenerate) as [ProjectType, PackagesToGenerate][];
+const generationEntries = Object.entries(toGenerate) as [RuntimeType, PackagesToGenerate][];
 
 (async () => {
   await Promise.all([
     projectPackage(),
-    eslintPackages(generationEntries.filter(([type, config]) => config.eslint).map(([type]) => type)),
+    eslintPackages(
+      generationEntries.filter(([type, config]) => config.eslint).map(([type]) => type)
+    ),
     prettierPackage(),
-    tsconfigPackages(generationEntries.filter(([type, config]) => config.tsconfig).map(([type]) => type)),
-    webpackPackages(generationEntries.filter(([type, config]) => config.webpack).map(([type]) => type)),
+    tsconfigPackages(
+      generationEntries.filter(([type, config]) => config.tsconfig).map(([type]) => type)
+    ),
+    webpackPackages(
+      generationEntries.filter(([type, config]) => config.webpack).map(([type]) => type)
+    ),
   ]);
 })().catch(console.error);

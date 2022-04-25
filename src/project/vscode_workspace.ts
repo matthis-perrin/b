@@ -1,4 +1,6 @@
-export function generateCodeWorkspace(projects: string[]): Record<string, unknown> {
+import {ProjectName} from '../models';
+
+export function generateCodeWorkspace(projects: ProjectName[]): Record<string, unknown> {
   return {
     folders: [...projects.map(p => ({path: p})), {path: 'terraform'}, {path: '.', name: 'root'}],
     settings: {

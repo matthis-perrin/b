@@ -1,6 +1,10 @@
-export function generateWorkspacePackageJson(projectName: string): Record<string, unknown> {
+import {WorkspaceName} from '../models';
+
+export function generateWorkspacePackageJson(
+  workspaceName: WorkspaceName
+): Record<string, unknown> {
   return {
-    name: projectName,
+    name: workspaceName,
     license: 'UNLICENSED',
     scripts: {
       setup: 'node ./setup.js',

@@ -1,19 +1,22 @@
-export function generateCloudfrontDistributionTerraform(projectName: string): string {
+import {ProjectName} from '../../models';
+
+export function generateCloudfrontDistributionTerraform(projectName: ProjectName): string {
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
   const originId = `${bucketName}-origin-id`;
   return `
-resource "aws_cloudfront_distribution" "s3" {
+resource "aws_cloudfront_distribution" "${projectName}" {
   origin {
     domain_name = aws_s3_bucket.code.bucket_regional_domain_name
     origin_id   = "${originId}"
-    origin_path = "/frontend"
+    origin_path = "/${projectName}"
 
     s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.s3.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.${projectName}.cloudfront_access_identity_path
     }
   }
   
   enabled             = true
+  wait_for_deployment = false
   is_ipv6_enabled     = true
   default_root_object = "index.html"
   price_class         = "PriceClass_100"
@@ -44,6 +47,6 @@ resource "aws_cloudfront_distribution" "s3" {
   }
 }
 
-resource "aws_cloudfront_origin_access_identity" "s3" {}
+resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
   `.trim();
 }

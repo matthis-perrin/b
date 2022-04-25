@@ -1,7 +1,7 @@
 import {execSync} from 'child_process';
-import {join, dirname} from 'path';
-import {readFile, mkdir, writeFile, readdir, stat} from '../fs';
-import {ProjectType} from '../models';
+import {join} from 'path';
+import {readFile, readdir, stat, writeRawFile} from '../fs';
+import {PROJECT_TYPE_TO_METADATA, RuntimeType} from '../models';
 import {
   REACT_ROUTER_VERSION,
   REACT_VERSION,
@@ -10,14 +10,15 @@ import {
   STYLED_COMPONENTS_VERSION,
   NODE_TYPES_VERSION,
 } from '../versions';
+import {WorkspaceProject} from './generate_workspace';
 
 const TEMPLATES_PATH = join(__dirname, 'templates');
 
-export async function generateProject(dst: string, name: string, type: ProjectType): Promise<void> {
+export async function generateProject(dst: string, project: WorkspaceProject): Promise<void> {
+  const {projectName, type} = project;
   // Generate project files based on template
   const variables: Record<string, string> = {
-    PROJECT_NAME: name,
-    PROJECT_TYPE: type,
+    PROJECT_NAME: projectName,
     REACT_ROUTER_VERSION,
     REACT_VERSION,
     REACT_NATIVE_VERSION,
@@ -33,20 +34,19 @@ export async function generateProject(dst: string, name: string, type: ProjectTy
         .toString()
         .replace(/\{\{([^\}]+)\}\}/gu, (match, vName) => variables[vName] ?? match);
       const fPath = join(dst, f);
-      await mkdir(dirname(fPath), {recursive: true});
-      await writeFile(fPath, compiledContent);
+      await writeRawFile(fPath, compiledContent);
     }),
   ]);
 
   // Post generation script for React Native project
-  if (type === ProjectType.ReactNative) {
+  if (PROJECT_TYPE_TO_METADATA[type].runtimeType === RuntimeType.ReactNative) {
     console.log('Running post install script');
     const commands = [
       `pushd ${dst}`,
-      `npx --yes react-native init ${name}`,
-      `mv ${name}/ios .`,
-      `mv ${name}/android .`,
-      `rm -rf ${name}`,
+      `npx --yes react-native init ${projectName}`,
+      `mv ${projectName}/ios .`,
+      `mv ${projectName}/android .`,
+      `rm -rf ${projectName}`,
       `popd`,
     ];
     execSync(commands.join(' && '));

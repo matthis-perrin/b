@@ -1,12 +1,12 @@
 import {join, resolve} from 'path';
 
 import {generateForType} from './generators';
-import {ALL_TYPES, ProjectType} from '../models';
+import {ALL_RUNTIME_TYPES, RuntimeType} from '../models';
 
-export async function webpackPackages(types: ProjectType[]): Promise<void> {
+export async function webpackPackages(types: RuntimeType[]): Promise<void> {
   await Promise.all(
-    ALL_TYPES.filter(t => t === ProjectType.Node || t === ProjectType.Lambda || t === ProjectType.Web).map(type =>
-      generateForType(join(resolve('.'), 'packages', `webpack-${type}`), type)
-    )
+    ALL_RUNTIME_TYPES.filter(
+      t => t === RuntimeType.Node || t === RuntimeType.Lambda || t === RuntimeType.Web
+    ).map(type => generateForType(join(resolve('.'), 'packages', `webpack-${type}`), type))
   );
 }

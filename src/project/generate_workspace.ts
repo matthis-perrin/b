@@ -1,40 +1,77 @@
 import {execSync} from 'child_process';
-import {join, dirname} from 'path';
-import {mkdir, writeFile, writeJsFile, writeJsonFile} from '../fs';
-import {WorkspaceType, ProjectType} from '../models';
+import {join} from 'path';
+import {writeJsFile, writeJsonFile, writeRawFile} from '../fs';
+import {
+  WorkspaceName,
+  WorkspaceFragment,
+  ProjectName,
+  WorkspaceFragmentType,
+  ProjectType,
+} from '../models';
 import {generateCodeWorkspace} from './vscode_workspace';
-import {generateWebAppDeployScript} from './deploy_script';
 import {generateProject} from './generate_project';
 import {generateGitIgnore} from './gitignore';
 import {generateWorkspacePackageJson} from './package_json';
 import {generateSetupScript} from './setup_script';
-import {generateTerraformForWorkspace} from './terraform/all';
+import {generateDeployScript} from './deploy_script';
+import {generateCommonTerraform, generateWorkspaceProjectTerraform} from './terraform/all';
+import {neverHappens} from '../type_utils';
 
-interface WorkspaceProject {
+export interface WorkspaceProject {
+  projectName: ProjectName;
   type: ProjectType;
-  name: string;
+}
+
+export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): WorkspaceProject[] {
+  const {type} = fragment;
+  if (type === WorkspaceFragmentType.StaticWebsite) {
+    return [
+      {
+        projectName: fragment.websiteName,
+        type: ProjectType.Web,
+      },
+    ];
+  } else if (type === WorkspaceFragmentType.StandaloneLambda) {
+    return [
+      {
+        projectName: fragment.lambdaName,
+        type: ProjectType.LambdaApi,
+      },
+    ];
+  } else if (type === WorkspaceFragmentType.WebApp) {
+    return [
+      {
+        projectName: fragment.websiteName,
+        type: ProjectType.Web,
+      },
+      {
+        projectName: fragment.lambdaName,
+        type: ProjectType.LambdaApi,
+      },
+    ];
+  } else {
+    neverHappens(type, 'ProjectType');
+  }
 }
 
 export async function generateWorkspace(
   dst: string,
-  workspaceName: string,
-  type: WorkspaceType,
-  projects: WorkspaceProject[]
+  workspaceName: WorkspaceName,
+  workspaceFragments: WorkspaceFragment[]
 ): Promise<void> {
-  const projectNames = projects.map(p => p.name);
+  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
+  const projectNames = projects.map(p => p.projectName);
 
   // Create projects files from templates
   await Promise.all(
-    projects.map(project =>
-      generateProject(join(dst, project.name), `${workspaceName}-${project.name}`, project.type)
-    )
+    projects.map(project => generateProject(join(dst, project.projectName), project))
   );
 
   // package.json
   await writeJsonFile(join(dst, 'package.json'), generateWorkspacePackageJson(workspaceName));
 
   // .gitignore
-  await writeFile(join(dst, '.gitignore'), generateGitIgnore());
+  await writeRawFile(join(dst, '.gitignore'), generateGitIgnore());
 
   // app.code-workspace
   await writeJsonFile(join(dst, 'app.code-workspace'), generateCodeWorkspace(projectNames));
@@ -43,15 +80,18 @@ export async function generateWorkspace(
   await writeJsFile(join(dst, 'setup.js'), generateSetupScript(projectNames));
 
   // deploy.js
-  if (type === WorkspaceType.WebApp) {
-    await writeJsFile(join(dst, 'deploy.js'), generateWebAppDeployScript());
-  }
+  await writeJsFile(join(dst, 'deploy.js'), generateDeployScript(workspaceFragments));
 
   // Terraform folder generation
   const terraformPath = join(dst, 'terraform');
-  await mkdir(terraformPath, {recursive: true});
-  const terraformFiles = generateTerraformForWorkspace(workspaceName, type);
-  await Promise.all(terraformFiles.map(f => writeFile(join(terraformPath, f.fileName), f.content)));
+  writeRawFile(join(terraformPath, 'base.tf'), generateCommonTerraform(workspaceName, projects));
+  await Promise.all(
+    projects.map(async p => {
+      const content = generateWorkspaceProjectTerraform(p);
+      const name = `${p.projectName}_terraform`;
+      await writeRawFile(join(terraformPath, `${name}.tf`), content);
+    })
+  );
 
   // Run setup.js
   console.log('Running post install script');

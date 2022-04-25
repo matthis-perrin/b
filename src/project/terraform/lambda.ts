@@ -1,16 +1,26 @@
-export function generateLambdaTerraform(projectName: string): string {
+import {ProjectName} from '../../models';
+
+export function generateLambdaTerraform(projectName: ProjectName): string {
   return `
-resource "aws_lambda_function" "api" {
-  function_name     = "${projectName}-API"
-  s3_bucket         = aws_s3_bucket.code.id
-  s3_key            = aws_s3_bucket_object.backend_archive.id
-  source_code_hash  = data.archive_file.backend_archive.output_sha
-  handler           = "main.handler"
-  runtime           = "nodejs14.x"
-  role              = aws_iam_role.lambda_api_exec.arn
+# Define any extra role for the lambda here
+data "aws_iam_policy_document" "lambda_${projectName}_extra_role" {
+  statement {
+    actions   = ["s3:ListAllMyBuckets"]
+    resources = ["*"]
+  }
 }
 
-resource "aws_iam_role" "lambda_api_exec" {
+resource "aws_lambda_function" "${projectName}" {
+  function_name     = "${projectName}-API"
+  s3_bucket         = aws_s3_bucket.code.id
+  s3_key            = aws_s3_bucket_object.${projectName}_archive.id
+  source_code_hash  = data.archive_file.${projectName}_archive.output_sha
+  handler           = "main.handler"
+  runtime           = "nodejs14.x"
+  role              = aws_iam_role.lambda_${projectName}_exec.arn
+}
+
+resource "aws_iam_role" "lambda_${projectName}_exec" {
   name = "${projectName}-API-assume-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -46,18 +56,7 @@ resource "aws_iam_role" "lambda_api_exec" {
   
   inline_policy {
     name = "${projectName}-API-extra-role"
-    policy = data.aws_iam_policy_document.lambda_extra_role.json
-  }
-}
-`.trim();
-}
-
-export function generateExtraLambdaTerraform(projectName: string): string {
-  return `
-data "aws_iam_policy_document" "lambda_extra_role" {
-  statement {
-    actions   = ["s3:ListAllMyBuckets"]
-    resources = ["*"]
+    policy = data.aws_iam_policy_document.lambda_${projectName}_extra_role.json
   }
 }
 `.trim();

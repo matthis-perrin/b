@@ -1,4 +1,6 @@
-export function generateSetupScript(projects: string[]): string {
+import {ProjectName} from '../models';
+
+export function generateSetupScript(projects: ProjectName[]): string {
   return `
 const path = require('path');
 const {execSync, exec} = require('child_process');

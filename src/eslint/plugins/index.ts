@@ -10,7 +10,7 @@ import {eslintSimpleImportSort} from './eslint_simple_import_sort';
 import {eslintTypescript} from './eslint_typescript';
 import {eslintUnicorn} from './eslint_unicorn';
 import {EslintMetadata} from '../models';
-import {ProjectType} from '../../models';
+import {RuntimeType} from '../../models';
 
 const BASE_PLUGINS = [
   eslintComments,
@@ -23,10 +23,10 @@ const BASE_PLUGINS = [
   eslintUnicorn,
 ];
 
-export const PLUGINS_FOR_TYPE: Record<ProjectType, EslintMetadata[]> = {
-  [ProjectType.Web]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
-  [ProjectType.Node]: [...BASE_PLUGINS, eslintNode],
-  [ProjectType.Lambda]: [...BASE_PLUGINS, eslintNode],
-  [ProjectType.Lib]: [...BASE_PLUGINS],
-  [ProjectType.ReactNative]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
+export const PLUGINS_FOR_TYPE: Record<RuntimeType, EslintMetadata[]> = {
+  [RuntimeType.Web]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
+  [RuntimeType.Node]: [...BASE_PLUGINS, eslintNode],
+  [RuntimeType.Lambda]: [...BASE_PLUGINS, eslintNode],
+  [RuntimeType.Lib]: [...BASE_PLUGINS],
+  [RuntimeType.ReactNative]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
 };

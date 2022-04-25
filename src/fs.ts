@@ -3,14 +3,26 @@ import {promises} from 'fs';
 import {dirname} from 'path';
 import {format} from 'prettier';
 
-export const {writeFile, access, mkdir, rm, readFile, readdir, stat} = promises;
+export const {access, readFile, readdir, stat} = promises;
+const {writeFile, mkdir, rm} = promises;
 
 export async function writeJsonFile(path: string, json: unknown): Promise<void> {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
 
 export async function writeJsFile(path: string, js: string): Promise<void> {
-  await writeRawFile(path, `${format(js, {parser: 'babel'})}\n`);
+  await writeRawFile(
+    path,
+    `${format(js, {
+      parser: 'babel',
+      printWidth: 100,
+      singleQuote: true,
+      trailingComma: 'es5',
+      bracketSpacing: false,
+      arrowParens: 'avoid',
+      endOfLine: 'auto',
+    })}\n`
+  );
 }
 
 export async function writeRawFile(path: string, content: string): Promise<void> {
@@ -19,10 +31,14 @@ export async function writeRawFile(path: string, content: string): Promise<void>
   await writeFile(path, content);
 }
 
+export async function rmDir(dirPath: string): Promise<void> {
+  await rm(dirPath, {recursive: true, force: true});
+}
+
 export async function cleanDir(dirPath: string): Promise<void> {
   console.log('clean', dirPath);
   try {
-    await rm(dirPath, {recursive: true, force: true});
+    await rmDir(dirPath);
   } finally {
     await mkdir(dirPath, {recursive: true});
   }

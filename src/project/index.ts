@@ -1,5 +1,5 @@
 import {join, resolve} from 'path';
-import {cleanDir, cp, readFile, writeFile, writeJsonFile, writeRawFile} from '../fs';
+import {cleanDir, cp, readFile, writeRawFile, writeJsonFile} from '../fs';
 import {compile} from '../packager';
 import {PACKAGE_VERSIONS} from '../versions';
 
@@ -13,7 +13,7 @@ export async function projectPackage(): Promise<void> {
   const indexPath = join(path, 'index.js');
   await Promise.all([
     cp(join(__dirname, 'templates'), join(path)),
-    writeFile(indexPath, `#!/usr/bin/env node\n${await readFile(indexPath)}`),
+    writeRawFile(indexPath, `#!/usr/bin/env node\n${await readFile(indexPath)}`),
   ]);
 }
 
