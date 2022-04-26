@@ -905,8 +905,8 @@ function getFiles(path) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.1.10',
-    eslint: '1.0.22',
+    project: '1.1.11',
+    eslint: '1.0.23',
     prettier: '1.0.3',
     tsconfig: '1.0.8',
     webpack: '1.0.23',
@@ -1169,7 +1169,7 @@ exports.generateCloudfrontDistributionTerraform = void 0;
 function generateCloudfrontDistributionTerraform(projectName) {
     var bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
     var originId = bucketName + "-origin-id";
-    return ("\nresource \"aws_cloudfront_distribution\" \"" + projectName + "\" {\n  origin {\n    domain_name = aws_s3_bucket.code.bucket_regional_domain_name\n    origin_id   = \"" + originId + "\"\n    origin_path = \"/" + projectName + "\"\n\n    s3_origin_config {\n      origin_access_identity = aws_cloudfront_origin_access_identity." + projectName + ".cloudfront_access_identity_path\n    }\n  }\n  \n  enabled             = true\n  wait_for_deployment = false\n  is_ipv6_enabled     = true\n  default_root_object = \"index.html\"\n  price_class         = \"PriceClass_100\"\n\n  default_cache_behavior {\n    allowed_methods  = [\"HEAD\", \"GET\"]\n    cached_methods   = [\"HEAD\", \"GET\"]\n    compress         = true\n    target_origin_id = \"" + originId + "\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    \n    forwarded_values {\n      query_string = false\n      cookies {\n        forward = \"none\"\n      }\n    }\n  }\n\n  restrictions {\n    geo_restriction {\n      restriction_type = \"none\"\n    }\n  }\n\n  viewer_certificate {\n    cloudfront_default_certificate = true\n  }\n}\n\nresource \"aws_cloudfront_origin_access_identity\" \"" + projectName + "\" {}\n  ").trim();
+    return ("\nresource \"aws_cloudfront_distribution\" \"" + projectName + "\" {\n  origin {\n    domain_name = aws_s3_bucket.code.bucket_regional_domain_name\n    origin_id   = \"" + originId + "\"\n    origin_path = \"/" + projectName + "\"\n\n    s3_origin_config {\n      origin_access_identity = aws_cloudfront_origin_access_identity." + projectName + ".cloudfront_access_identity_path\n    }\n  }\n  \n  enabled             = true\n  wait_for_deployment = false\n  is_ipv6_enabled     = true\n  price_class         = \"PriceClass_100\"\n  \n  default_root_object   = \"/index.html\"\n  custom_error_response {\n    error_code         = 400\n    response_code      = 200\n    response_page_path = \"/index.html\"\n  }\n  custom_error_response {\n    error_code         = 403\n    response_code      = 200\n    response_page_path = \"/index.html\"\n  }\n  custom_error_response {\n    error_code         = 404\n    response_code      = 200\n    response_page_path = \"/index.html\"\n  }\n\n  default_cache_behavior {\n    allowed_methods  = [\"HEAD\", \"GET\"]\n    cached_methods   = [\"HEAD\", \"GET\"]\n    compress         = true\n    target_origin_id = \"" + originId + "\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    \n    forwarded_values {\n      query_string = false\n      cookies {\n        forward = \"none\"\n      }\n    }\n  }\n\n  restrictions {\n    geo_restriction {\n      restriction_type = \"none\"\n    }\n  }\n\n  viewer_certificate {\n    cloudfront_default_certificate = true\n  }\n}\n\nresource \"aws_cloudfront_origin_access_identity\" \"" + projectName + "\" {}\n  ").trim();
 }
 exports.generateCloudfrontDistributionTerraform = generateCloudfrontDistributionTerraform;
 

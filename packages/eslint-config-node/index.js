@@ -476,6 +476,11 @@ module.exports = {
       {
         selector: 'property',
         format: null,
+        filter: {regex: '^Content-Type|__html|__brand$', match: true},
+      },
+      {
+        selector: 'property',
+        format: null,
         custom: {regex: '^([a-zA-Z]([a-z]+)?((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?)$', match: true},
       },
       {

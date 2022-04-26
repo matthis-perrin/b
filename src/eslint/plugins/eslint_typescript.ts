@@ -159,6 +159,14 @@ export const eslintTypescript: EslintMetadata = {
       {selector: 'variable', format: ['strictCamelCase', 'StrictPascalCase', 'UPPER_CASE']},
       {
         selector: 'property',
+        format: null,
+        filter: {
+          regex: '^Content-Type|__html|__brand$',
+          match: true,
+        },
+      },
+      {
+        selector: 'property',
         // eslint-disable-next-line no-null/no-null
         format: null,
         custom: {

@@ -18,8 +18,24 @@ resource "aws_cloudfront_distribution" "${projectName}" {
   enabled             = true
   wait_for_deployment = false
   is_ipv6_enabled     = true
-  default_root_object = "index.html"
   price_class         = "PriceClass_100"
+  
+  default_root_object   = "/index.html"
+  custom_error_response {
+    error_code         = 400
+    response_code      = 200
+    response_page_path = "/index.html"
+  }
+  custom_error_response {
+    error_code         = 403
+    response_code      = 200
+    response_page_path = "/index.html"
+  }
+  custom_error_response {
+    error_code         = 404
+    response_code      = 200
+    response_page_path = "/index.html"
+  }
 
   default_cache_behavior {
     allowed_methods  = ["HEAD", "GET"]
