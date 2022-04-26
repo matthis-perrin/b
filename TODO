@@ -1,0 +1,5 @@
+- Ability to generate a "flat" workspace (no dependencies to @matthis/*)
+- Finish Lambda API typings
+- API typing and routing
+- Add cloudwatch trigger option for the Lambda function
+- Ensure Lambda API work by itself (not in a web-app)
