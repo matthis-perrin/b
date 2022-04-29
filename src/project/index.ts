@@ -26,6 +26,7 @@ function generatePackageJson(): Record<string, unknown> {
       main: './index.js',
     },
     dependencies: {
+      prettier: '2.6.x',
       prompts: '2.4.x',
     },
   };

@@ -1,11 +1,12 @@
 {
   "name": "@matthis/project",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "license": "UNLICENSED",
   "bin": {
     "main": "./index.js"
   },
   "dependencies": {
+    "prettier": "2.6.x",
     "prompts": "2.4.x"
   }
 }
