@@ -161,7 +161,7 @@ export const eslintTypescript: EslintMetadata = {
         selector: 'property',
         format: null,
         filter: {
-          regex: '^Content-Type|__html|__brand$',
+          regex: '^Content-Type|User-Agent|__html|__brand$',
           match: true,
         },
       },
@@ -196,7 +196,6 @@ export const eslintTypescript: EslintMetadata = {
     '@typescript-eslint/no-implicit-any-catch': 'warn',
     '@typescript-eslint/no-implied-eval': 'warn',
     '@typescript-eslint/no-inferrable-types': 'warn',
-    '@typescript-eslint/no-invalid-this': 'warn',
     '@typescript-eslint/no-invalid-void-type': 'warn',
     '@typescript-eslint/no-loop-func': 'warn',
     '@typescript-eslint/no-loss-of-precision': 'warn',

@@ -371,7 +371,6 @@ export const eslintCore: EslintMetadata = {
     'no-implicit-globals': 'warn',
     'no-import-assign': 'warn',
     'no-invalid-regexp': 'warn',
-    'no-invalid-this': 'warn', // should warn to turn off this rule
     'no-iterator': 'warn',
     'no-label-var': 'warn',
     'no-labels': ['warn', {allowLoop: true, allowSwitch: false}],

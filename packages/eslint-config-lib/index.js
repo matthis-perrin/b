@@ -166,7 +166,7 @@ module.exports = {
     'no-inline-comments': 'off',
     'no-inner-declarations': 'off',
     'no-invalid-regexp': 'warn',
-    'no-invalid-this': 'warn',
+    'no-invalid-this': 'off',
     'no-irregular-whitespace': 'off',
     'no-iterator': 'warn',
     'no-label-var': 'warn',
@@ -475,7 +475,7 @@ module.exports = {
       {
         selector: 'property',
         format: null,
-        filter: {regex: '^Content-Type|__html|__brand$', match: true},
+        filter: {regex: '^Content-Type|User-Agent|__html|__brand$', match: true},
       },
       {
         selector: 'property',
@@ -510,7 +510,7 @@ module.exports = {
     '@typescript-eslint/no-implicit-any-catch': 'warn',
     '@typescript-eslint/no-implied-eval': 'warn',
     '@typescript-eslint/no-inferrable-types': 'warn',
-    '@typescript-eslint/no-invalid-this': 'warn',
+    '@typescript-eslint/no-invalid-this': 'off',
     '@typescript-eslint/no-invalid-void-type': 'warn',
     '@typescript-eslint/no-loop-func': 'warn',
     '@typescript-eslint/no-loss-of-precision': 'warn',
