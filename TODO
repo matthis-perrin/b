@@ -1,4 +1,4 @@
-- Ability to generate a "flat" workspace (no dependencies to @matthis/*)
+- Ability to generate a "flat" workspace (no dependencies to @matthis/\*)
 - Finish Lambda API typings
 - API typing and routing
 - Add cloudwatch trigger option for the Lambda function
@@ -8,3 +8,12 @@
 - Server side rendering
 - Pre-connected user in index.html
 - Favicon generation
+- Add instructions/commands after creating workspace (ie: code project/app.code-workspace, yarn deploy, etc)
+- Remove API gateway terraform for standalone lambda
+- Different template for different lambda trigger (API gateway proxy vs Cloudwatch trigger vs SQS trigger)
+- Use @types/aws-lambda
+- Centralize build lib and code
+- shared-node, shared-web and shared directory with lib sharing
+- allow multiple yarn watch of lamda projects in parallele (conflict with port)
+- Increase default lambda timeout
+- Add lambda alerts, better logging, dead letter queue, etc
