@@ -1,10 +1,23 @@
-import {ProjectName} from '../models';
+import {WorkspaceFragment} from '../models';
+import {getProjectsFromWorkspaceFragment} from './generate_workspace';
 
-export function generateCodeWorkspace(projects: ProjectName[]): Record<string, unknown> {
+export function generateCodeWorkspace(
+  workspaceFragments: WorkspaceFragment[]
+): Record<string, unknown> {
+  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
+  const projectNames = projects.map(p => p.projectName);
   return {
-    folders: [...projects.map(p => ({path: p})), {path: 'terraform'}, {path: '.', name: 'root'}],
+    projects: workspaceFragments,
+    folders: [
+      ...projectNames.map(p => ({path: p})),
+      {path: 'terraform'},
+      {path: '.', name: 'root'},
+    ],
     settings: {
-      'files.exclude': Object.fromEntries([...projects.map(p => [p, true]), ['terraform', true]]),
+      'files.exclude': Object.fromEntries([
+        ...projectNames.map(p => [p, true]),
+        ['terraform', true],
+      ]),
       'editor.acceptSuggestionOnCommitCharacter': false,
       'editor.suggestSelection': 'first',
       'vsintellicode.modify.editor.suggestSelection': 'automaticallyOverrodeDefaultValue',

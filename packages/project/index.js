@@ -52,6 +52,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -105,68 +116,93 @@ function cancel(workspacePath) {
 }
 function initProject() {
     return __awaiter(this, void 0, void 0, function () {
-        var prompts, workspacePath, workspaceName, frags, takenNames, frag, err_1, name_1, err_2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var prompts, workspaceName, workspacePath, frags, takenNames, alreadyGenerated, workspaceContent, _a, _b, project, projectNames, frag, err_1, name_1, err_2;
+        var e_1, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0:
                     prompts = __webpack_require__(25);
                     workspacePath = (0, process_1.cwd)();
-                    return [4 /*yield*/, prompts({
-                            type: 'text',
-                            name: 'workspaceName',
-                            message: 'Workspace name',
-                            validate: function (v) { return v.length > 0; },
-                        })];
+                    frags = [];
+                    takenNames = ['terraform'];
+                    alreadyGenerated = [];
+                    return [4 /*yield*/, (0, fs_1.maybeReadFile)((0, path_1.join)(workspacePath, 'app.code-workspace'))];
                 case 1:
-                    workspaceName = (_a.sent()).workspaceName;
+                    workspaceContent = _d.sent();
+                    if (!(workspaceContent !== undefined)) return [3 /*break*/, 2];
+                    workspaceName = (0, path_1.basename)(workspacePath);
+                    try {
+                        for (_a = __values(JSON.parse(workspaceContent).projects), _b = _a.next(); !_b.done; _b = _a.next()) {
+                            project = _b.value;
+                            frags.push(project);
+                            projectNames = (0, generate_workspace_1.getProjectsFromWorkspaceFragment)(project).map(function (p) { return p.projectName; });
+                            takenNames.push.apply(takenNames, __spreadArray([], __read(projectNames), false));
+                            alreadyGenerated.push.apply(alreadyGenerated, __spreadArray([], __read(projectNames), false));
+                        }
+                    }
+                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                    finally {
+                        try {
+                            if (_b && !_b.done && (_c = _a.return)) _c.call(_a);
+                        }
+                        finally { if (e_1) throw e_1.error; }
+                    }
+                    return [3 /*break*/, 5];
+                case 2: return [4 /*yield*/, prompts({
+                        type: 'text',
+                        name: 'workspaceName',
+                        message: 'Workspace name',
+                        validate: function (v) { return v.length > 0; },
+                    })];
+                case 3:
+                    // Ask for workspace name
+                    workspaceName = (_d.sent()).workspaceName;
                     if (typeof workspaceName !== 'string') {
                         cancel();
                     }
                     workspacePath = (0, path_1.join)(workspacePath, workspaceName);
                     return [4 /*yield*/, (0, promises_1.mkdir)(workspacePath)];
-                case 2:
-                    _a.sent();
-                    _a.label = 3;
-                case 3:
-                    _a.trys.push([3, 11, , 12]);
-                    frags = [];
-                    takenNames = ['terraform'];
-                    _a.label = 4;
                 case 4:
+                    _d.sent();
+                    _d.label = 5;
+                case 5:
+                    _d.trys.push([5, 13, , 14]);
+                    _d.label = 6;
+                case 6:
                     if (false) {}
                     frag = void 0;
-                    _a.label = 5;
-                case 5:
-                    _a.trys.push([5, 7, , 8]);
-                    return [4 /*yield*/, askForWorkspaceFragment(takenNames)];
-                case 6:
-                    frag = _a.sent();
-                    return [3 /*break*/, 8];
+                    _d.label = 7;
                 case 7:
-                    err_1 = _a.sent();
-                    console.error(String(err_1));
-                    return [3 /*break*/, 4];
+                    _d.trys.push([7, 9, , 10]);
+                    return [4 /*yield*/, askForWorkspaceFragment(takenNames)];
                 case 8:
+                    frag = _d.sent();
+                    return [3 /*break*/, 10];
+                case 9:
+                    err_1 = _d.sent();
+                    console.error(String(err_1));
+                    return [3 /*break*/, 6];
+                case 10:
                     if (frag) {
                         frags.push(frag);
                         takenNames.push.apply(takenNames, __spreadArray([], __read((0, generate_workspace_1.getProjectsFromWorkspaceFragment)(frag).map(function (p) { return p.projectName; })), false));
                     }
                     else {
-                        return [3 /*break*/, 9];
+                        return [3 /*break*/, 11];
                     }
-                    return [3 /*break*/, 4];
-                case 9:
-                    name_1 = workspaceName;
-                    return [4 /*yield*/, (0, generate_workspace_1.generateWorkspace)(workspacePath, name_1, frags)];
-                case 10:
-                    _a.sent();
-                    return [3 /*break*/, 12];
+                    return [3 /*break*/, 6];
                 case 11:
-                    err_2 = _a.sent();
+                    name_1 = workspaceName;
+                    return [4 /*yield*/, (0, generate_workspace_1.generateWorkspace)(workspacePath, name_1, frags, alreadyGenerated)];
+                case 12:
+                    _d.sent();
+                    return [3 /*break*/, 14];
+                case 13:
+                    err_2 = _d.sent();
                     console.error(String(err_2));
                     cancel(workspaceName);
-                    return [3 /*break*/, 12];
-                case 12: return [2 /*return*/];
+                    return [3 /*break*/, 14];
+                case 14: return [2 /*return*/];
             }
         });
     });
@@ -421,7 +457,7 @@ function getProjectsFromWorkspaceFragment(fragment) {
     }
 }
 exports.getProjectsFromWorkspaceFragment = getProjectsFromWorkspaceFragment;
-function generateWorkspace(dst, workspaceName, workspaceFragments) {
+function generateWorkspace(dst, workspaceName, workspaceFragments, alreadyGenerated) {
     return __awaiter(this, void 0, void 0, function () {
         var projects, projectNames, terraformPath, commands;
         var _this = this;
@@ -431,7 +467,9 @@ function generateWorkspace(dst, workspaceName, workspaceFragments) {
                     projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
                     projectNames = projects.map(function (p) { return p.projectName; });
                     // Create projects files from templates
-                    return [4 /*yield*/, Promise.all(projects.map(function (project) { return (0, generate_project_1.generateProject)((0, path_1.join)(dst, project.projectName), project); }))];
+                    return [4 /*yield*/, Promise.all(projects
+                            .filter(function (p) { return !alreadyGenerated.includes(p.projectName); })
+                            .map(function (project) { return (0, generate_project_1.generateProject)((0, path_1.join)(dst, project.projectName), project); }))];
                 case 1:
                     // Create projects files from templates
                     _a.sent();
@@ -446,7 +484,7 @@ function generateWorkspace(dst, workspaceName, workspaceFragments) {
                     // .gitignore
                     _a.sent();
                     // app.code-workspace
-                    return [4 /*yield*/, (0, fs_1.writeJsonFile)((0, path_1.join)(dst, 'app.code-workspace'), (0, vscode_workspace_1.generateCodeWorkspace)(projectNames))];
+                    return [4 /*yield*/, (0, fs_1.writeJsonFile)((0, path_1.join)(dst, 'app.code-workspace'), (0, vscode_workspace_1.generateCodeWorkspace)(workspaceFragments))];
                 case 4:
                     // app.code-workspace
                     _a.sent();
@@ -462,7 +500,9 @@ function generateWorkspace(dst, workspaceName, workspaceFragments) {
                     _a.sent();
                     terraformPath = (0, path_1.join)(dst, 'terraform');
                     (0, fs_1.writeRawFile)((0, path_1.join)(terraformPath, 'base.tf'), (0, all_1.generateCommonTerraform)(workspaceName, projects));
-                    return [4 /*yield*/, Promise.all(projects.map(function (p) { return __awaiter(_this, void 0, void 0, function () {
+                    return [4 /*yield*/, Promise.all(projects
+                            .filter(function (p) { return !alreadyGenerated.includes(p.projectName); })
+                            .map(function (p) { return __awaiter(_this, void 0, void 0, function () {
                             var content, name;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
@@ -538,7 +578,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.cp = exports.cleanDir = exports.rmDir = exports.writeRawFile = exports.writeJsFile = exports.writeJsonFile = exports.stat = exports.readdir = exports.readFile = exports.access = void 0;
+exports.maybeReadFile = exports.exists = exports.cp = exports.cleanDir = exports.rmDir = exports.writeRawFile = exports.writeJsFile = exports.writeJsonFile = exports.stat = exports.readdir = exports.readFile = exports.access = void 0;
 var child_process_1 = __webpack_require__(6);
 var fs_1 = __webpack_require__(8);
 var path_1 = __webpack_require__(1);
@@ -644,6 +684,44 @@ function cp(from, to) {
     });
 }
 exports.cp = cp;
+function exists(path) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _b.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, (0, exports.access)(path)];
+                case 1:
+                    _b.sent();
+                    return [2 /*return*/, true];
+                case 2:
+                    _a = _b.sent();
+                    return [2 /*return*/, false];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.exists = exists;
+function maybeReadFile(path) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _b.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, (0, exports.readFile)(path)];
+                case 1: return [2 /*return*/, (_b.sent()).toString()];
+                case 2:
+                    _a = _b.sent();
+                    return [2 /*return*/, undefined];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.maybeReadFile = maybeReadFile;
 
 
 /***/ }),
@@ -660,7 +738,7 @@ module.exports = require("prettier");
 
 /***/ }),
 /* 10 */
-/***/ (function(__unused_webpack_module, exports) {
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __read = (this && this.__read) || function (o, n) {
@@ -690,11 +768,20 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateCodeWorkspace = void 0;
-function generateCodeWorkspace(projects) {
+var generate_workspace_1 = __webpack_require__(5);
+function generateCodeWorkspace(workspaceFragments) {
+    var projects = workspaceFragments.flatMap(generate_workspace_1.getProjectsFromWorkspaceFragment);
+    var projectNames = projects.map(function (p) { return p.projectName; });
     return {
-        folders: __spreadArray(__spreadArray([], __read(projects.map(function (p) { return ({ path: p }); })), false), [{ path: 'terraform' }, { path: '.', name: 'root' }], false),
+        projects: workspaceFragments,
+        folders: __spreadArray(__spreadArray([], __read(projectNames.map(function (p) { return ({ path: p }); })), false), [
+            { path: 'terraform' },
+            { path: '.', name: 'root' },
+        ], false),
         settings: {
-            'files.exclude': Object.fromEntries(__spreadArray(__spreadArray([], __read(projects.map(function (p) { return [p, true]; })), false), [['terraform', true]], false)),
+            'files.exclude': Object.fromEntries(__spreadArray(__spreadArray([], __read(projectNames.map(function (p) { return [p, true]; })), false), [
+                ['terraform', true],
+            ], false)),
             'editor.acceptSuggestionOnCommitCharacter': false,
             'editor.suggestSelection': 'first',
             'vsintellicode.modify.editor.suggestSelection': 'automaticallyOverrodeDefaultValue',
@@ -930,7 +1017,7 @@ exports.NODE_TYPES_VERSION = '16.11.x';
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.generateGitIgnore = void 0;
 function generateGitIgnore() {
-    return "\n.DS_Store\nnode_modules\nbuild\ndist\ntmp\n    ".trim();
+    return "\n.DS_Store\nnode_modules\nbuild\ndist\ntmp\nyarn-error.log\nyarn.lock\nterraform/.terraform\nterraform/.terraform*\nterraform/*.tfstate.backup\nterraform/.aws-credentials\nterraform/archives\n    ".trim();
 }
 exports.generateGitIgnore = generateGitIgnore;
 

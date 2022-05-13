@@ -50,3 +50,20 @@ export async function cp(from: string, to: string): Promise<void> {
     exec(`cp -R ${from} ${to}`, err => (err ? reject(err) : resolve()))
   );
 }
+
+export async function exists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function maybeReadFile(path: string): Promise<string | undefined> {
+  try {
+    return (await readFile(path)).toString();
+  } catch {
+    return undefined;
+  }
+}

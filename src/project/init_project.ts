@@ -1,11 +1,11 @@
-import {join} from 'path';
+import {basename, join} from 'path';
 import {cwd} from 'process';
 import {mkdir} from 'fs/promises';
 
 import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '../models';
 import {generateWorkspace, getProjectsFromWorkspaceFragment} from './generate_workspace';
 import {neverHappens} from '../type_utils';
-import {rmDir} from '../fs';
+import {maybeReadFile, rmDir} from '../fs';
 
 async function cancel(workspacePath?: string): Promise<never> {
   console.log('Cancelling...');
@@ -17,26 +17,41 @@ async function cancel(workspacePath?: string): Promise<never> {
 
 async function initProject(): Promise<void> {
   const prompts = require('prompts');
-  let workspacePath = cwd();
 
-  // Ask for workspace name and create folder if directory is not empty
-  const workspaceName = (
-    await prompts({
-      type: 'text',
-      name: 'workspaceName',
-      message: 'Workspace name',
-      validate: (v: string) => v.length > 0,
-    })
-  ).workspaceName;
-  if (typeof workspaceName !== 'string') {
-    cancel();
+  let workspaceName: string;
+  let workspacePath = cwd();
+  const frags: WorkspaceFragment[] = [];
+  const takenNames = ['terraform'];
+  const alreadyGenerated: ProjectName[] = [];
+
+  // Check if we are already in a workspace
+  const workspaceContent = await maybeReadFile(join(workspacePath, 'app.code-workspace'));
+  if (workspaceContent !== undefined) {
+    workspaceName = basename(workspacePath);
+    for (const project of JSON.parse(workspaceContent).projects as WorkspaceFragment[]) {
+      frags.push(project);
+      const projectNames = getProjectsFromWorkspaceFragment(project).map(p => p.projectName);
+      takenNames.push(...projectNames);
+      alreadyGenerated.push(...projectNames);
+    }
+  } else {
+    // Ask for workspace name
+    workspaceName = (
+      await prompts({
+        type: 'text',
+        name: 'workspaceName',
+        message: 'Workspace name',
+        validate: (v: string) => v.length > 0,
+      })
+    ).workspaceName;
+    if (typeof workspaceName !== 'string') {
+      cancel();
+    }
+    workspacePath = join(workspacePath, workspaceName);
+    await mkdir(workspacePath);
   }
-  workspacePath = join(workspacePath, workspaceName);
-  await mkdir(workspacePath);
 
   try {
-    const frags: WorkspaceFragment[] = [];
-    const takenNames = ['terraform'];
     while (true) {
       let frag;
       try {
@@ -54,7 +69,8 @@ async function initProject(): Promise<void> {
     }
 
     const name = workspaceName as WorkspaceName;
-    await generateWorkspace(workspacePath, name, frags);
+
+    await generateWorkspace(workspacePath, name, frags, alreadyGenerated);
   } catch (err) {
     console.error(String(err));
     cancel(workspaceName);
