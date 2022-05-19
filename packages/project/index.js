@@ -992,7 +992,7 @@ function getFiles(path) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.1.12',
+    project: '1.1.13',
     eslint: '1.0.24',
     prettier: '1.0.3',
     tsconfig: '1.0.8',
