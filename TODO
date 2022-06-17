@@ -17,3 +17,4 @@
 - allow multiple yarn watch of lamda projects in parallele (conflict with port)
 - Increase default lambda timeout
 - Add lambda alerts, better logging, dead letter queue, etc
+- Warn when overriding files (show changes?) when add project to workspace
