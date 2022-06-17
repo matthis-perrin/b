@@ -1,11 +1,11 @@
 {
   "name": "@matthis/webpack-node",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "license": "UNLICENSED",
   "main": "index.js",
   "dependencies": {
-    "webpack": "5.72.x",
-    "webpack-cli": "4.9.x",
+    "webpack": "5.73.x",
+    "webpack-cli": "4.10.x",
     "terser-webpack-plugin": "5.3.x",
     "fork-ts-checker-webpack-plugin": "7.2.x",
     "eslint-webpack-plugin": "3.1.x",

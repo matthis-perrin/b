@@ -9,8 +9,8 @@ export function baseConfig(opts: {
   const terserPluginConfig = terserPlugin();
   return {
     dependencies: {
-      webpack: '5.72.x',
-      'webpack-cli': '4.9.x',
+      webpack: '5.73.x',
+      'webpack-cli': '4.10.x',
       ...terserPluginConfig.dependencies,
     },
     config: () => ({

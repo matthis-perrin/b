@@ -22,7 +22,7 @@ export function webConfig(): WebpackConfigFragment {
 
   return {
     dependencies: {
-      'webpack-dev-server': '4.10.x',
+      'webpack-dev-server': '4.9.x',
       ...base.dependencies,
       ...define.dependencies,
       ...html.dependencies,

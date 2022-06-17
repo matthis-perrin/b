@@ -44,7 +44,7 @@ function webConfig() {
     var babel = (0, loaders_1.babelLoaderWeb)();
     var sourceMap = (0, loaders_1.sourceMapLoader)();
     return {
-        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({ 'webpack-dev-server': '4.10.x' }, base.dependencies), define.dependencies), html.dependencies), forkTsChecker.dependencies), eslint.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
+        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({ 'webpack-dev-server': '4.9.x' }, base.dependencies), define.dependencies), html.dependencies), forkTsChecker.dependencies), eslint.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
         config: function () {
             var baseWebpackConfig = base.config();
             return __assign(__assign({}, baseWebpackConfig), { target: 'web', entry: {
@@ -110,7 +110,7 @@ function baseConfig(opts) {
     var hashOutput = opts.hashOutput, libraryExportName = opts.libraryExportName;
     var terserPluginConfig = (0, plugins_1.terserPlugin)();
     return {
-        dependencies: __assign({ webpack: '5.72.x', 'webpack-cli': '4.9.x' }, terserPluginConfig.dependencies),
+        dependencies: __assign({ webpack: '5.73.x', 'webpack-cli': '4.10.x' }, terserPluginConfig.dependencies),
         config: function () {
             var _a;
             return ({
