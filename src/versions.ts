@@ -6,7 +6,7 @@ export const PACKAGE_VERSIONS = {
   webpack: '1.0.25',
 };
 
-export const ESLINT_VERSION = '8.13.x';
+export const ESLINT_VERSION = '8.23.x';
 export const PRETTIER_VERSION = '2.6.x';
 export const TYPESCRIPT_VERSION = '4.6.x';
 

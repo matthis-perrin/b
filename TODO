@@ -18,3 +18,6 @@
 - Increase default lambda timeout
 - Add lambda alerts, better logging, dead letter queue, etc
 - Warn when overriding files (show changes?) when add project to workspace
+- Handle CORS in backend/frontend when in dev
+- Proxy lambda response headers in webpack lambda plugin
+- Auto lambda monitoring and error logging
