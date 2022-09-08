@@ -36,7 +36,6 @@ export const eslintImport: EslintMetadata = {
     'import/no-cycle': 'off',
     'import/no-default-export': 'off',
     'import/no-deprecated': 'off',
-    // use @typescript-eslint/no-duplicate-imports
     'import/no-duplicates': 'off',
     'import/no-dynamic-require': 'off',
     'import/no-extraneous-dependencies': 'off',
@@ -72,6 +71,7 @@ export const eslintImport: EslintMetadata = {
     'import/no-anonymous-default-export': 'warn',
     'import/no-default-export': 'warn',
     'import/no-deprecated': 'warn',
+    'import/no-duplicates': 'warn',
     'import/no-import-module-exports': 'warn',
     'import/no-mutable-exports': 'warn',
     'import/no-named-as-default-member': 'warn',

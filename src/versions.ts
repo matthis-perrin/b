@@ -7,7 +7,7 @@ export const PACKAGE_VERSIONS = {
 };
 
 export const ESLINT_VERSION = '8.23.x';
-export const PRETTIER_VERSION = '2.6.x';
+export const PRETTIER_VERSION = '2.7.x';
 export const TYPESCRIPT_VERSION = '4.6.x';
 
 export const REACT_VERSION = '17.0.x';
