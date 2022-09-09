@@ -12,10 +12,10 @@
     ]
   },
   "devDependencies": {
-    "@matthis/eslint-config-node": "latest",
-    "@matthis/prettier-config": "latest",
-    "@matthis/tsconfig-node": "latest",
-    "@matthis/webpack-node": "latest",
+    "@matthis/eslint-config-node": "{{ESLINT_CONFIG_VERSION}}",
+    "@matthis/prettier-config": "{{PRETTIER_CONFIG_VERSION}}",
+    "@matthis/tsconfig-node": "{{TSCONFIG_VERSION}}",
+    "@matthis/webpack-node": "{{WEBPACK_VERSION}}",
     "@types/node": "{{NODE_TYPES_VERSION}}"
   },
   "dependencies": {

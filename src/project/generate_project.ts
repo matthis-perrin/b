@@ -9,6 +9,7 @@ import {
   STYLED_COMPONENTS_TYPES_VERSION,
   STYLED_COMPONENTS_VERSION,
   NODE_TYPES_VERSION,
+  PACKAGE_VERSIONS,
 } from '../versions';
 import {WorkspaceProject} from './generate_workspace';
 
@@ -25,6 +26,10 @@ export async function generateProject(dst: string, project: WorkspaceProject): P
     STYLED_COMPONENTS_TYPES_VERSION,
     STYLED_COMPONENTS_VERSION,
     NODE_TYPES_VERSION,
+    ESLINT_CONFIG_VERSION: PACKAGE_VERSIONS.eslint,
+    PRETTIER_CONFIG_VERSION: PACKAGE_VERSIONS.prettier,
+    TSCONFIG_VERSION: PACKAGE_VERSIONS.tsconfig,
+    WEBPACK_VERSION: PACKAGE_VERSIONS.webpack,
   };
   const files = await getFiles(join(TEMPLATES_PATH, type));
   await Promise.all([

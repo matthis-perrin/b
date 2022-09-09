@@ -907,6 +907,10 @@ function generateProject(dst, project) {
                         STYLED_COMPONENTS_TYPES_VERSION: versions_1.STYLED_COMPONENTS_TYPES_VERSION,
                         STYLED_COMPONENTS_VERSION: versions_1.STYLED_COMPONENTS_VERSION,
                         NODE_TYPES_VERSION: versions_1.NODE_TYPES_VERSION,
+                        ESLINT_CONFIG_VERSION: versions_1.PACKAGE_VERSIONS.eslint,
+                        PRETTIER_CONFIG_VERSION: versions_1.PACKAGE_VERSIONS.prettier,
+                        TSCONFIG_VERSION: versions_1.PACKAGE_VERSIONS.tsconfig,
+                        WEBPACK_VERSION: versions_1.PACKAGE_VERSIONS.webpack,
                     };
                     return [4 /*yield*/, getFiles((0, path_1.join)(TEMPLATES_PATH, type))];
                 case 1:
@@ -996,7 +1000,7 @@ function getFiles(path) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.1.14',
+    project: '1.1.15',
     eslint: '1.0.25',
     prettier: '1.0.4',
     tsconfig: '1.0.9',

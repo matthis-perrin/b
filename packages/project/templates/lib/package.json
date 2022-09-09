@@ -12,9 +12,9 @@
     ]
   },
   "devDependencies": {
-    "@matthis/eslint-config-lib": "latest",
-    "@matthis/prettier-config": "latest",
-    "@matthis/tsconfig-lib": "latest"
+    "@matthis/eslint-config-lib": "{{ESLINT_CONFIG_VERSION}}",
+    "@matthis/prettier-config": "{{PRETTIER_CONFIG_VERSION}}",
+    "@matthis/tsconfig-lib": "{{TSCONFIG_VERSION}}"
   },
   "dependencies": {
   }
