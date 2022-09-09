@@ -10,7 +10,7 @@ const forbiddenProps = [
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
-    'eslint-plugin-react': '7.29.x',
+    'eslint-plugin-react': '7.31.x',
   },
   settings: {
     react: {
@@ -52,6 +52,7 @@ export const eslintReact: EslintMetadata = {
     'react/jsx-no-bind': 'off',
     'react/jsx-no-constructed-context-values': 'off',
     'react/jsx-no-duplicate-props': 'off',
+    'react/jsx-no-leaked-render': 'off',
     'react/jsx-no-literals': 'off',
     'react/jsx-no-script-url': 'off',
     'react/jsx-no-target-blank': 'off',
@@ -78,6 +79,7 @@ export const eslintReact: EslintMetadata = {
     'react/no-deprecated': 'off',
     'react/no-direct-mutation-state': 'off',
     'react/no-find-dom-node': 'off',
+    'react/no-invalid-html-attribute': 'off',
     'react/no-is-mounted': 'off',
     'react/no-multi-comp': 'off',
     'react/no-namespace': 'off',
@@ -136,6 +138,7 @@ export const eslintReact: EslintMetadata = {
     'react/jsx-no-comment-textnodes': 'warn',
     'react/jsx-no-bind': 'warn',
     'react/jsx-no-constructed-context-values': 'warn',
+    'react/jsx-no-leaked-render': 'warn',
     'react/jsx-no-script-url': 'warn',
     'react/jsx-no-target-blank': ['warn', {warnOnSpreadAttributes: true}],
     'react/jsx-no-undef': 'warn',
@@ -149,6 +152,7 @@ export const eslintReact: EslintMetadata = {
     'react/no-deprecated': 'warn',
     'react/no-direct-mutation-state': 'warn',
     'react/no-find-dom-node': 'warn',
+    'react/no-invalid-html-attribute': 'warn',
     'react/no-is-mounted': 'warn',
     'react/no-multi-comp': 'warn',
     'react/no-namespace': 'warn',

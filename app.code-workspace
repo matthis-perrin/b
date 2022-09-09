@@ -14,6 +14,10 @@
     "typescript.preferences.importModuleSpecifier": "non-relative",
     "typescript.tsdk": "./node_modules/typescript/lib",
     "eslint.lintTask.enable": true,
+    "eslint.options": {
+      "useESLintClass": true,
+      "reportUnusedDisableDirectives": "warn"
+    },
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": false,

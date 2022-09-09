@@ -3,7 +3,7 @@ import {EslintMetadata} from '../models';
 export const eslintUnicorn: EslintMetadata = {
   plugin: ['unicorn'],
   dependencies: {
-    'eslint-plugin-unicorn': '42.0.x',
+    'eslint-plugin-unicorn': '43.0.x',
   },
   settings: {},
   allOff: {
@@ -64,6 +64,7 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/prefer-at': 'off',
     'unicorn/prefer-code-point': 'off',
     'unicorn/prefer-date-now': 'off',
+    'unicorn/prefer-event-target': 'off',
     'unicorn/prefer-dom-node-append': 'off',
     'unicorn/prefer-dom-node-dataset': 'off',
     'unicorn/prefer-dom-node-remove': 'off',
@@ -72,6 +73,7 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/prefer-includes': 'off',
     'unicorn/prefer-json-parse-buffer': 'off',
     'unicorn/prefer-keyboard-event-key': 'off',
+    'unicorn/prefer-logical-operator-over-ternary': 'off',
     'unicorn/prefer-math-trunc': 'off',
     'unicorn/prefer-modern-dom-apis': 'off',
     'unicorn/prefer-modern-math-apis': 'off',
@@ -140,9 +142,11 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/prefer-array-index-of': 'warn',
     'unicorn/prefer-at': 'warn',
     'unicorn/prefer-date-now': 'warn',
+    'unicorn/prefer-event-target': 'warn',
     'unicorn/prefer-export-from': ['warn', {ignoreUsedVariables: true}],
     'unicorn/prefer-includes': 'warn',
     'unicorn/prefer-keyboard-event-key': 'warn',
+    'unicorn/prefer-logical-operator-over-ternary': 'warn',
     'unicorn/prefer-object-has-own': 'warn',
     'unicorn/prefer-math-trunc': 'warn',
     'unicorn/prefer-modern-dom-apis': 'warn',

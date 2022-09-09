@@ -3,7 +3,7 @@ import {EslintMetadata} from '../models';
 export const eslintSimpleImportSort: EslintMetadata = {
   plugin: ['simple-import-sort'],
   dependencies: {
-    'eslint-plugin-simple-import-sort': '7.0.x',
+    'eslint-plugin-simple-import-sort': '8.0.x',
   },
   settings: {},
   allOff: {
@@ -11,6 +11,6 @@ export const eslintSimpleImportSort: EslintMetadata = {
     'simple-import-sort/exports': 'off',
   },
   onlyOn: {
-    'simple-import-sort/imports': ['warn'],
+    'simple-import-sort/imports': 'warn',
   },
 };

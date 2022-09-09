@@ -3,7 +3,7 @@ import {EslintMetadata} from '../models';
 export const eslintReactHooks: EslintMetadata = {
   plugin: ['react-hooks'],
   dependencies: {
-    'eslint-plugin-react-hooks': '4.4.x',
+    'eslint-plugin-react-hooks': '4.6.x',
   },
   settings: {},
   allOff: {

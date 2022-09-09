@@ -22,8 +22,8 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "lib": [
-      "es2021"
+      "es2022"
     ],
-    "target": "es2021"
+    "target": "es2022"
   }
 }

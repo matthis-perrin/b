@@ -21,3 +21,4 @@
 - Handle CORS in backend/frontend when in dev
 - Proxy lambda response headers in webpack lambda plugin
 - Auto lambda monitoring and error logging
+- Migrate from eslint-plugin-node to eslint-plugin-n

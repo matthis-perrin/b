@@ -26,6 +26,10 @@ export function generateCodeWorkspace(
       'git.confirmSync': false,
       'typescript.preferences.importModuleSpecifier': 'non-relative',
       'eslint.lintTask.enable': true,
+      "eslint.useESLintClass": true,
+      "eslint.options": {
+        "reportUnusedDisableDirectives": "warn"
+      },
       'editor.formatOnSave': true,
       'editor.codeActionsOnSave': {
         'source.fixAll': false,

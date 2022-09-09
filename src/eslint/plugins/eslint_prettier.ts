@@ -4,7 +4,7 @@ import {EslintMetadata} from '../models';
 export const eslintPrettier: EslintMetadata = {
   plugin: ['prettier'],
   dependencies: {
-    'eslint-plugin-prettier': '4.0.x',
+    'eslint-plugin-prettier': '4.2.x',
     prettier: PRETTIER_VERSION,
   },
   settings: {},

@@ -74,14 +74,14 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
     additionalCompilerOptions = {
       module: 'none',
       moduleResolution: 'node',
-      lib: ['es2020'],
-      target: 'es2020',
+      lib: ['es2022'],
+      target: 'es2022',
     };
   } else if (type === RuntimeType.Web) {
     additionalCompilerOptions = {
       module: 'esnext',
       moduleResolution: 'node',
-      lib: ['es2020', 'dom', 'dom.iterable'],
+      lib: ['es2022', 'dom', 'dom.iterable'],
       target: 'esnext',
       //
       jsx: 'react',
@@ -90,8 +90,8 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
     additionalCompilerOptions = {
       module: 'commonjs',
       moduleResolution: 'node',
-      lib: ['es2021'],
-      target: 'es2021',
+      lib: ['es2022'],
+      target: 'es2022',
       //
       types: ['node'],
     };
@@ -99,7 +99,7 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
     additionalCompilerOptions = {
       module: 'esnext',
       moduleResolution: 'node',
-      lib: ['es2020'],
+      lib: ['es2022'],
       target: 'esnext',
       //
       jsx: 'react-native',

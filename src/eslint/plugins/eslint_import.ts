@@ -4,7 +4,7 @@ export const eslintImport: EslintMetadata = {
   plugin: ['import'],
   dependencies: {
     'eslint-plugin-import': '2.26.x',
-    'eslint-import-resolver-typescript': '2.7.x',
+    'eslint-import-resolver-typescript': '3.5.x',
   },
   settings: {
     'import/parsers': {

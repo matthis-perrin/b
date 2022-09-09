@@ -790,6 +790,10 @@ function generateCodeWorkspace(workspaceFragments) {
             'git.confirmSync': false,
             'typescript.preferences.importModuleSpecifier': 'non-relative',
             'eslint.lintTask.enable': true,
+            "eslint.useESLintClass": true,
+            "eslint.options": {
+                "reportUnusedDisableDirectives": "warn"
+            },
             'editor.formatOnSave': true,
             'editor.codeActionsOnSave': {
                 'source.fixAll': false,
@@ -992,15 +996,15 @@ function getFiles(path) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.NODE_TYPES_VERSION = exports.STYLED_COMPONENTS_VERSION = exports.STYLED_COMPONENTS_TYPES_VERSION = exports.REACT_NATIVE_VERSION = exports.REACT_ROUTER_VERSION = exports.REACT_VERSION = exports.TYPESCRIPT_VERSION = exports.PRETTIER_VERSION = exports.ESLINT_VERSION = exports.PACKAGE_VERSIONS = void 0;
 exports.PACKAGE_VERSIONS = {
-    project: '1.1.13',
-    eslint: '1.0.24',
-    prettier: '1.0.3',
-    tsconfig: '1.0.8',
+    project: '1.1.14',
+    eslint: '1.0.25',
+    prettier: '1.0.4',
+    tsconfig: '1.0.9',
     webpack: '1.0.25',
 };
-exports.ESLINT_VERSION = '8.13.x';
-exports.PRETTIER_VERSION = '2.6.x';
-exports.TYPESCRIPT_VERSION = '4.6.x';
+exports.ESLINT_VERSION = '8.23.x';
+exports.PRETTIER_VERSION = '2.7.x';
+exports.TYPESCRIPT_VERSION = '4.8.x';
 exports.REACT_VERSION = '17.0.x';
 exports.REACT_ROUTER_VERSION = '5.2.x';
 exports.REACT_NATIVE_VERSION = '0.66.x';
