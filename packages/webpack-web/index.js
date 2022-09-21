@@ -119,6 +119,7 @@ module.exports = x({ ["join"]: () => __WEBPACK_EXTERNAL_MODULE_node_path_02319fe
 /* harmony import */ var _src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
 /* harmony import */ var _src_webpack_plugins_tsconfig_paths_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9);
+// import {dependencyPackerPlugin} from '@src/webpack/plugins/dependency_packer_plugin';
 
 
 
@@ -130,11 +131,12 @@ function baseConfig() {
             plugins: [(0,_src_webpack_plugins_tsconfig_paths_plugin__WEBPACK_IMPORTED_MODULE_1__.tsconfigPathsPlugin)()],
             extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
-        stats: {
-            preset: 'errors-warnings',
-            assets: true,
-            timings: true,
-        },
+        // stats: {
+        //   preset: 'errors-warnings',
+        //   assets: true,
+        //   timings: true,
+        //   chunkModules: true,
+        // },
         optimization: {
             minimize: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__.isProd)(),
             minimizer: [(0,_src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_0__.terserPlugin)()],
@@ -366,17 +368,21 @@ module.exports = x({  });
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "cleanTerminalPlugin": () => (/* binding */ cleanTerminalPlugin)
 /* harmony export */ });
-function cleanTerminalPlugin() {
-    let firstRun = true;
-    return (compiler) => {
+class CleanTerminalPlugin {
+    firstRun = true;
+    apply(compiler) {
+        this.firstRun = true;
         compiler.hooks.afterCompile.tap('CleanTerminalPlugin', () => {
-            if (firstRun) {
-                firstRun = false;
+            if (this.firstRun) {
+                this.firstRun = false;
                 return;
             }
             process.stdout.write('\u001B[2J\u001B[3J\u001B[H');
         });
-    };
+    }
+}
+function cleanTerminalPlugin() {
+    return new CleanTerminalPlugin();
 }
 
 

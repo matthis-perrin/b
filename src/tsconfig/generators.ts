@@ -15,7 +15,6 @@ export async function generateForType(path: string, type: RuntimeType): Promise<
 function generateTsConfig(type: RuntimeType): Record<string, unknown> {
   const baseCompilerOptions = {
     allowSyntheticDefaultImports: true,
-    baseUrl: '.',
     downlevelIteration: true,
     esModuleInterop: true,
     incremental: true,

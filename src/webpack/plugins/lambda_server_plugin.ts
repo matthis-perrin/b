@@ -3,7 +3,9 @@ import {createServer, IncomingMessage, Server, ServerResponse} from 'node:http';
 
 import {Compiler} from 'webpack';
 
-export class LambdaServerPlugin {
+import {WebpackPlugin} from '@src/webpack/models';
+
+class LambdaServerPlugin {
   public apply(compiler: Compiler): void {
     let server: Server | undefined;
     compiler.hooks.initialize.tap('LambdaServerPlugin', () => {
@@ -122,4 +124,8 @@ export class LambdaServerPlugin {
       process.exit(1); // eslint-disable-line node/no-process-exit
     });
   }
+}
+
+export function lambdaServerPlugin(): WebpackPlugin {
+  return new LambdaServerPlugin();
 }

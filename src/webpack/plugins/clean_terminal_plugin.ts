@@ -2,15 +2,21 @@ import {Compiler} from 'webpack';
 
 import {WebpackPlugin} from '@src/webpack/models';
 
-export function cleanTerminalPlugin(): WebpackPlugin {
-  let firstRun = true;
-  return (compiler: Compiler): void => {
+class CleanTerminalPlugin {
+  private firstRun = true;
+
+  public apply(compiler: Compiler): void {
+    this.firstRun = true;
     compiler.hooks.afterCompile.tap('CleanTerminalPlugin', () => {
-      if (firstRun) {
-        firstRun = false;
+      if (this.firstRun) {
+        this.firstRun = false;
         return;
       }
       process.stdout.write('\u001B[2J\u001B[3J\u001B[H');
     });
-  };
+  }
+}
+
+export function cleanTerminalPlugin(): WebpackPlugin {
+  return new CleanTerminalPlugin();
 }

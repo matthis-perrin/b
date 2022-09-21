@@ -6,8 +6,8 @@
     "ncu": "ts-node --esm ./src/ncu.ts",
     "build": "NODE_ENV=development webpack build",
     "watch": "NODE_ENV=development webpack watch",
-    "start": "node dist/main.mjs",
-    "postinstall": "node install.mjs",
+    "start": "node dist/main.mjs || node dist/main.js",
+    "postinstall": "node install.js",
     "publish-all": "for d in ./packages/* ; do (cd \"$d\" && npm publish --access public && cd ..); done; rm -rf **/yarn.lock; yarn install"
   },
   "prettier": "@matthis/prettier-config",
@@ -34,7 +34,6 @@
     "@types/semver": "7.3.x",
     "babel-loader": "8.2.x",
     "babel-plugin-react-remove-properties": "0.3.x",
-    "dependency-packer-webpack-plugin": "2.0.x",
     "eslint-webpack-plugin": "3.1.x",
     "fork-ts-checker-webpack-plugin": "7.2.x",
     "html-webpack-plugin": "5.5.x",

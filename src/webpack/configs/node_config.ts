@@ -10,7 +10,7 @@ import {definePlugin} from '@src/webpack/plugins/define_plugin';
 import {dependencyPackerPlugin} from '@src/webpack/plugins/dependency_packer_plugin';
 import {eslintPlugin} from '@src/webpack/plugins/eslint_plugin';
 import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
-import {LambdaServerPlugin} from '@src/webpack/plugins/lambda_server_plugin';
+import {lambdaServerPlugin} from '@src/webpack/plugins/lambda_server_plugin';
 import {getDistDir, getProjectDir} from '@src/webpack/utils';
 
 export function nodeConfig(opts: {isLambda: boolean}): Configuration {
@@ -22,7 +22,7 @@ export function nodeConfig(opts: {isLambda: boolean}): Configuration {
     entry: {main: entry},
     output: {
       path: getDistDir(),
-      filename: `[name].mjs`,
+      filename: `[name].js`,
       clean: true,
       chunkFormat: 'module',
       ...(isLambda ? {library: 'handler', libraryTarget: 'umd'} : {}),
@@ -35,7 +35,7 @@ export function nodeConfig(opts: {isLambda: boolean}): Configuration {
       forkTsCheckerPlugin(),
       eslintPlugin(),
       cleanTerminalPlugin(),
-      new LambdaServerPlugin(),
+      lambdaServerPlugin(),
       dependencyPackerPlugin(),
     ],
     externalsType: 'module',
