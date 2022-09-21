@@ -1,10 +1,10 @@
-import {eslintPackages} from './eslint/index';
-import {RUNTIME_TYPE_TO_METADATA, RuntimeType} from './models';
-import {prettierPackage} from './prettier/index';
-import {projectPackage} from './project/index';
-import {generateTemplatesRootPackageJson, updateTemplatesLibVersions} from './templates';
-import {tsconfigPackages} from './tsconfig/index';
-import {webpackPackages} from './webpack/index';
+import {eslintPackages} from '@src/eslint/index';
+import {RUNTIME_TYPE_TO_METADATA, RuntimeType} from '@src/models';
+import {prettierPackage} from '@src/prettier/index';
+import {projectPackage} from '@src/project/index';
+import {generateTemplatesRootPackageJson, updateTemplatesLibVersions} from '@src/templates';
+import {tsconfigPackages} from '@src/tsconfig/index';
+import {webpackPackages} from '@src/webpack/index';
 
 const eslintRuntimes = [
   ...new Set(Object.values(RUNTIME_TYPE_TO_METADATA).map(data => data.eslint)).values(),

@@ -1,5 +1,6 @@
-import {exec} from 'child_process';
-import {createServer, IncomingMessage, Server, ServerResponse} from 'http';
+import {exec} from 'node:child_process';
+import {createServer, IncomingMessage, Server, ServerResponse} from 'node:http';
+
 import {Compiler} from 'webpack';
 
 export class LambdaServerPlugin {

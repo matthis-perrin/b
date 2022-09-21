@@ -1,5 +1,5 @@
-import {PRETTIER_VERSION} from '../../versions';
-import {EslintMetadata} from '../models';
+import {EslintMetadata} from '@src/eslint/models';
+import {PRETTIER_VERSION} from '@src/versions';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export const eslintPrettier: EslintMetadata = {

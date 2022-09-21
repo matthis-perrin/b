@@ -1,5 +1,6 @@
-import {WorkspaceFragment} from '../models';
 import {getProjectsFromWorkspaceFragment} from './generate_workspace';
+
+import {WorkspaceFragment} from '@src/models';
 
 export function generateCodeWorkspace(
   workspaceFragments: WorkspaceFragment[]

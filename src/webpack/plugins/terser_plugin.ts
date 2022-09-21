@@ -1,6 +1,6 @@
 import TerserWebpackPlugin from 'terser-webpack-plugin';
 
-import {WebpackPlugin} from '../models';
+import {WebpackPlugin} from '@src/webpack/models';
 
 export function terserPlugin(): WebpackPlugin {
   return new TerserWebpackPlugin({

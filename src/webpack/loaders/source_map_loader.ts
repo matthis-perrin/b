@@ -5,7 +5,7 @@ import '@babel/preset-typescript';
 import 'babel-loader';
 import 'source-map-loader';
 
-import {WebpackLoader} from '../models';
+import {WebpackLoader} from '@src/webpack/models';
 /* eslint-enable import/no-unassigned-import */
 
 export function sourceMapLoader(): WebpackLoader {

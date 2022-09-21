@@ -1,9 +1,9 @@
-import {join} from 'path';
+import {join} from 'node:path';
 
-import {cleanDir, writeJsFile, writeJsonFile} from '../fs';
-import {RuntimeType} from '../models';
-import {ESLINT_VERSION, PACKAGE_VERSIONS} from '../versions';
-import {PLUGINS_FOR_TYPE} from './plugins/index';
+import {PLUGINS_FOR_TYPE} from '@src/eslint/plugins/index';
+import {cleanDir, writeJsFile, writeJsonFile} from '@src/fs';
+import {RuntimeType} from '@src/models';
+import {ESLINT_VERSION, PACKAGE_VERSIONS} from '@src/versions';
 
 export async function generateForType(path: string, type: RuntimeType): Promise<void> {
   await cleanDir(path);
@@ -55,7 +55,6 @@ function generatePackageJson(type: RuntimeType): Record<string, unknown> {
     name: `@matthis/eslint-config-${type}`,
     version: PACKAGE_VERSIONS.eslint,
     license: 'UNLICENSED',
-    type: 'module',
     dependencies: sortedDependencies,
   };
 }

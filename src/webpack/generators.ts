@@ -1,12 +1,12 @@
-import {join} from 'path';
-import {fileURLToPath} from 'url';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
 
-import {cleanDir, writeJsonFile} from '../fs';
-import {RuntimeType} from '../models';
-import {compile} from '../packager';
-import {PACKAGE_VERSIONS} from '../versions';
-import {nodeConfig} from './configs/node_config';
-import {webConfig} from './configs/web_config';
+import {cleanDir, writeJsonFile} from '@src/fs';
+import {RuntimeType} from '@src/models';
+import {compile} from '@src/packager';
+import {PACKAGE_VERSIONS} from '@src/versions';
+import {nodeConfig} from '@src/webpack/configs/node_config';
+import {webConfig} from '@src/webpack/configs/web_config';
 
 export async function generateForType(path: string, type: RuntimeType): Promise<void> {
   await cleanDir(path);

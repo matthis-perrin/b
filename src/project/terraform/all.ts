@@ -4,22 +4,22 @@ import {
   ProjectType,
   RuntimeType,
   WorkspaceName,
-} from '../../models';
-import {neverHappens} from '../../type_utils';
-import {WorkspaceProject} from '../generate_workspace';
-import {generateApiGatewayTerraform} from './api_gateway';
-import {generateCloudfrontDistributionTerraform} from './cloudfront';
-import {generateLambdaTerraform} from './lambda';
+} from '@src/models';
+import {WorkspaceProject} from '@src/project/generate_workspace';
+import {generateApiGatewayTerraform} from '@src/project/terraform/api_gateway';
+import {generateCloudfrontDistributionTerraform} from '@src/project/terraform/cloudfront';
+import {generateLambdaTerraform} from '@src/project/terraform/lambda';
 import {
   generateCloudfrontDomainNameOutputTerraform,
   generateLambdaApiOutputsTerraform,
-} from './output';
-import {generateAwsProviderTerraform} from './provider';
+} from '@src/project/terraform/output';
+import {generateAwsProviderTerraform} from '@src/project/terraform/provider';
 import {
   generateLambdaFileUploadTerraform,
   generateS3BucketTerraform,
   generateWebFileUploadTerraform,
-} from './s3';
+} from '@src/project/terraform/s3';
+import {neverHappens} from '@src/type_utils';
 
 export function generateCommonTerraform(
   workspaceName: WorkspaceName,

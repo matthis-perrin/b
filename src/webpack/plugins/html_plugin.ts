@@ -2,8 +2,8 @@ import {join} from 'node:path';
 
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
-import {WebpackPlugin} from '../models';
-import {getProjectDir, isProd} from '../utils';
+import {WebpackPlugin} from '@src/webpack/models';
+import {getProjectDir, isProd} from '@src/webpack/utils';
 
 export function htmlPlugin(): WebpackPlugin {
   return new HtmlWebpackPlugin({

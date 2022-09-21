@@ -1,6 +1,6 @@
 import {Compiler} from 'webpack';
 
-import {WebpackPlugin} from '../models';
+import {WebpackPlugin} from '@src/webpack/models';
 
 export function cleanTerminalPlugin(): WebpackPlugin {
   let firstRun = true;

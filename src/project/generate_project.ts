@@ -1,9 +1,9 @@
-import {execSync} from 'child_process';
-import {join} from 'path';
+import {execSync} from 'node:child_process';
+import {join} from 'node:path';
 
-import {cp} from '../fs';
-import {PROJECT_TYPE_TO_METADATA, RuntimeType} from '../models';
-import {WorkspaceProject} from './generate_workspace';
+import {cp} from '@src/fs';
+import {PROJECT_TYPE_TO_METADATA, RuntimeType} from '@src/models';
+import {WorkspaceProject} from '@src/project/generate_workspace';
 
 // eslint-disable-next-line unicorn/prefer-module
 const TEMPLATES_PATH = join(__dirname, './templates');

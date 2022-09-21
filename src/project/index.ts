@@ -1,10 +1,10 @@
-import {join, resolve} from 'path';
-import {fileURLToPath} from 'url';
+import {join, resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
 
-import {cleanDir, readFile, writeJsonFile, writeRawFile} from '../fs';
-import {compile} from '../packager';
-import {copyTemplatesDirs} from '../templates';
-import {PACKAGE_VERSIONS} from '../versions';
+import {cleanDir, readFile, writeJsonFile, writeRawFile} from '@src/fs';
+import {compile} from '@src/packager';
+import {copyTemplatesDirs} from '@src/templates';
+import {PACKAGE_VERSIONS} from '@src/versions';
 
 export async function projectPackage(): Promise<void> {
   const path = join(resolve('.'), 'packages', `project`);

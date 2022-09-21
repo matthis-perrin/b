@@ -1,4 +1,4 @@
-import {Brand} from './type_utils';
+import {Brand} from '@src/type_utils';
 
 export type WorkspaceName = Brand<string, 'WorkspaceName'>;
 export type ProjectName = Brand<string, 'ProjectName'>;

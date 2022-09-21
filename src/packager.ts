@@ -1,6 +1,6 @@
-import {appendFileSync} from 'node:fs';
-
 import webpack, {Configuration} from 'webpack';
+
+import {tsconfigPathsPlugin} from '@src/webpack/plugins/tsconfig_paths_plugin';
 
 export async function compile(entry: string, dst: string, isLib: boolean): Promise<void> {
   const libOption = isLib
@@ -22,16 +22,19 @@ export async function compile(entry: string, dst: string, isLib: boolean): Promi
       ...libOption,
     },
     module: {rules: [{test: /\.ts$/u, loader: 'ts-loader'}]},
-    resolve: {extensions: ['.ts', '.js']},
+    resolve: {
+      extensions: ['.ts', '.js'],
+      plugins: [tsconfigPathsPlugin()],
+    },
     externalsType: 'module',
-    externals: ({request, context}, callback) => {
-      request?.startsWith('./') ||
-      request?.startsWith('@src/') ||
-      request?.startsWith('@shared/') ||
-      request?.startsWith('@shared-node/') ||
-      request?.startsWith('@shared-web/') ||
-      request?.startsWith('../') ||
-      request === entry
+    externals: ({request}, callback) => {
+      return request?.startsWith('./') ||
+        request?.startsWith('@src/') ||
+        request?.startsWith('@shared/') ||
+        request?.startsWith('@shared-node/') ||
+        request?.startsWith('@shared-web/') ||
+        request?.startsWith('../') ||
+        request === entry
         ? callback()
         : callback(undefined, request);
     },

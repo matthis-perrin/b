@@ -1,3 +1,6 @@
 {
-  "extends": "@matthis/tsconfig-react-native/tsconfig"
+  "extends": "@matthis/tsconfig-react-native/tsconfig",
+  "compilerOptions": {
+    "baseUrl": "."
+  }
 }

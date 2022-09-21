@@ -23,8 +23,9 @@
 - Proxy lambda response headers in webpack lambda plugin
 - Auto lambda monitoring and error logging
 - Migrate from eslint-plugin-node to eslint-plugin-n
-- Use ESM
 - Move cloudwatch trigger terraform to the file of the lambda it triggers
 - For asynchronous lambda are retried 2 times (remove or allow configuration)
 - babelLoader (Node version is hardcoded, corejs too)
 - eslint-simple-import-sort don't group @shared-web for node version
+- Don't generate .mjs, have "type": "module" in the package.json next to it
+- Not have to specify baseUrl in tsconfig.json

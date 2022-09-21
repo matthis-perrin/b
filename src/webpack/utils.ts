@@ -1,4 +1,4 @@
-import {join, resolve} from 'path';
+import {join, resolve} from 'node:path';
 
 export interface WebpackConfigFragment {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

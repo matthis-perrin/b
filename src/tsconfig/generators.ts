@@ -1,7 +1,8 @@
-import {cleanDir, writeJsonFile} from '../fs';
-import {RuntimeType} from '../models';
-import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '../versions';
-import {join} from 'path';
+import {join} from 'node:path';
+
+import {cleanDir, writeJsonFile} from '@src/fs';
+import {RuntimeType} from '@src/models';
+import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '@src/versions';
 
 export async function generateForType(path: string, type: RuntimeType): Promise<void> {
   await cleanDir(path);

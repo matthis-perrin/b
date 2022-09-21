@@ -1,4 +1,4 @@
-import {EslintMetadata} from '../models';
+import {EslintMetadata} from '@src/eslint/models';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export const eslintReactHooks: EslintMetadata = {

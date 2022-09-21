@@ -4,7 +4,7 @@ import '@babel/preset-env';
 import '@babel/preset-typescript';
 import 'babel-loader';
 
-import {WebpackLoader} from '../models';
+import {WebpackLoader} from '@src/webpack/models';
 /* eslint-enable import/no-unassigned-import */
 
 export function babelLoaderNode(): WebpackLoader {

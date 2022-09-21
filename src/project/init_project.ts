@@ -1,10 +1,12 @@
-import {mkdir} from 'fs/promises';
-import {basename, join} from 'path';
+import {mkdir} from 'node:fs/promises';
+import {basename, join} from 'node:path';
 
-import {maybeReadFile, rmDir} from '../fs';
-import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '../models';
-import {neverHappens} from '../type_utils';
-import {generateWorkspace, getProjectsFromWorkspaceFragment} from './generate_workspace';
+import prompts from 'prompts';
+
+import {maybeReadFile, rmDir} from '@src/fs';
+import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '@src/models';
+import {generateWorkspace, getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
+import {neverHappens} from '@src/type_utils';
 
 async function cancel(workspacePath?: string): Promise<never> {
   console.log('Cancelling...');
@@ -16,8 +18,6 @@ async function cancel(workspacePath?: string): Promise<never> {
 }
 
 async function initProject(): Promise<void> {
-  const prompts = require('prompts');
-
   let workspaceName: string;
   let workspacePath = process.cwd();
   const frags: WorkspaceFragment[] = [];
@@ -25,7 +25,7 @@ async function initProject(): Promise<void> {
   const alreadyGenerated: ProjectName[] = [];
 
   // Check if we are already in a workspace
-  const workspaceContent = undefined; //await maybeReadFile(join(workspacePath, 'app.code-workspace'));
+  const workspaceContent = await maybeReadFile(join(workspacePath, 'app.code-workspace'));
   if (workspaceContent !== undefined) {
     workspaceName = basename(workspacePath);
     for (const project of JSON.parse(workspaceContent).projects as WorkspaceFragment[]) {
@@ -107,7 +107,6 @@ async function askForWorkspaceFragment(
   } else if (type === WorkspaceFragmentType.StandaloneLambda) {
     const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
     return {type, lambdaName};
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === WorkspaceFragmentType.WebApp) {
     const websiteName = await askForProjectName('Frontend project name', 'frontend', takenNames);
     const lambdaName = await askForProjectName('Backend project name', 'backend', takenNames);

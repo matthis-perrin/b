@@ -1,13 +1,15 @@
 import {Configuration} from 'webpack';
 
-import {terserPlugin} from '../plugins/terser_plugin';
-import {isProd} from '../utils';
+import {terserPlugin} from '@src/webpack/plugins/terser_plugin';
+import {tsconfigPathsPlugin} from '@src/webpack/plugins/tsconfig_paths_plugin';
+import {isProd} from '@src/webpack/utils';
 
 export function baseConfig(): Configuration {
   return {
     mode: 'none',
     devtool: isProd() ? 'source-map' : 'eval',
     resolve: {
+      plugins: [tsconfigPathsPlugin()],
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
     stats: {

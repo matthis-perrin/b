@@ -1,22 +1,25 @@
-import {execSync} from 'child_process';
-import {join} from 'path';
+import {execSync} from 'node:child_process';
+import {join} from 'node:path';
 
-import {writeJsFile, writeJsonFile, writeRawFile} from '../fs';
+import {writeJsFile, writeJsonFile, writeRawFile} from '@src/fs';
 import {
   ProjectName,
   ProjectType,
   WorkspaceFragment,
   WorkspaceFragmentType,
   WorkspaceName,
-} from '../models';
-import {neverHappens} from '../type_utils';
-import {generateDeployScript} from './deploy_script';
-import {generateProject} from './generate_project';
-import {generateGitIgnore} from './gitignore';
-import {generateWorkspacePackageJson} from './package_json';
-import {generateSetupScript} from './setup_script';
-import {generateCommonTerraform, generateWorkspaceProjectTerraform} from './terraform/all';
-import {generateCodeWorkspace} from './vscode_workspace';
+} from '@src/models';
+import {generateDeployScript} from '@src/project/deploy_script';
+import {generateProject} from '@src/project/generate_project';
+import {generateGitIgnore} from '@src/project/gitignore';
+import {generateWorkspacePackageJson} from '@src/project/package_json';
+import {generateSetupScript} from '@src/project/setup_script';
+import {
+  generateCommonTerraform,
+  generateWorkspaceProjectTerraform,
+} from '@src/project/terraform/all';
+import {generateCodeWorkspace} from '@src/project/vscode_workspace';
+import {neverHappens} from '@src/type_utils';
 
 export interface WorkspaceProject {
   projectName: ProjectName;

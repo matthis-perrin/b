@@ -1,5 +1,5 @@
-import {TYPESCRIPT_VERSION} from '../../versions';
-import {EslintMetadata} from '../models';
+import {EslintMetadata} from '@src/eslint/models';
+import {TYPESCRIPT_VERSION} from '@src/versions';
 
 /* eslint-disable @typescript-eslint/naming-convention, no-null/no-null */
 export const eslintTypescript: EslintMetadata = {

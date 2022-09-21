@@ -1,10 +1,10 @@
-import {mkdir} from 'fs/promises';
-import {join, resolve} from 'path';
-import {fileURLToPath} from 'url';
+import {mkdir} from 'node:fs/promises';
+import {join, resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
 
-import {cleanDir, cp, readdir, readFile, writeJsonFile, writeRawFile} from './fs';
-import {RuntimeType} from './models';
-import {LIB_VERSIONS} from './versions';
+import {cleanDir, cp, readdir, readFile, writeJsonFile, writeRawFile} from '@src/fs';
+import {RuntimeType} from '@src/models';
+import {LIB_VERSIONS} from '@src/versions';
 
 const TEMPLATES_DIR = join(fileURLToPath(import.meta.url), '../../templates');
 

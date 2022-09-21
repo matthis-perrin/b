@@ -1,7 +1,7 @@
-import {join, resolve} from 'path';
+import {join, resolve} from 'node:path';
 
-import {RuntimeType} from '../models';
-import {generateForType} from './generators';
+import {generateForType} from '@src/eslint/generators';
+import {RuntimeType} from '@src/models';
 
 export async function eslintPackages(types: RuntimeType[]): Promise<void> {
   await Promise.all(

@@ -1,4 +1,4 @@
-import {EslintMetadata} from '../models';
+import {EslintMetadata} from '@src/eslint/models';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export const eslintImport: EslintMetadata = {
@@ -13,8 +13,8 @@ export const eslintImport: EslintMetadata = {
     },
     'import/extensions': ['.ts', '.tsx'],
     'import/resolver': {
-      node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      typescript: {
+        project: './tsconfig.json',
       },
     },
   },

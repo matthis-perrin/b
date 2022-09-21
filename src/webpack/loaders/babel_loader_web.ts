@@ -6,8 +6,8 @@ import 'babel-loader';
 import '@babel/preset-react';
 import 'babel-plugin-react-remove-properties';
 
-import {WebpackLoader} from '../models';
-import {isSelenium} from '../utils';
+import {WebpackLoader} from '@src/webpack/models';
+import {isSelenium} from '@src/webpack/utils';
 /* eslint-enable import/no-unassigned-import */
 
 export function babelLoaderWeb(): WebpackLoader {

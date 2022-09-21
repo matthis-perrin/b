@@ -6,9 +6,9 @@ import {
   WebAppWorkspaceFragment,
   WorkspaceFragment,
   WorkspaceFragmentType,
-} from '../models';
-import {neverHappens} from '../type_utils';
-import {getProjectsFromWorkspaceFragment} from './generate_workspace';
+} from '@src/models';
+import {getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
+import {neverHappens} from '@src/type_utils';
 
 export function generateDeployScript(workspaceFragments: WorkspaceFragment[]): string {
   const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
@@ -107,7 +107,6 @@ export function generateBuildWorkspaceFn(fragments: WorkspaceFragment[]): string
       return generateBuildWebAppProjectFn(fragment);
     } else if (type === WorkspaceFragmentType.StaticWebsite) {
       return generateBuildStaticWebsiteProjectFn(fragment);
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (type === WorkspaceFragmentType.StandaloneLambda) {
       return generateBuildStandaloneLambdaProjectFn(fragment);
     }

@@ -4,9 +4,9 @@ import {
   RuntimeType,
   RuntimeTypeMetadata,
   WorkspaceName,
-} from '../models';
-import {PACKAGE_VERSIONS} from '../versions';
-import {WorkspaceProject} from './generate_workspace';
+} from '@src/models';
+import {WorkspaceProject} from '@src/project/generate_workspace';
+import {PACKAGE_VERSIONS} from '@src/versions';
 
 function uniq(runtimes: (RuntimeType | undefined)[]): RuntimeType[] {
   return [...new Set(runtimes.filter((r): r is RuntimeType => r !== undefined)).values()];

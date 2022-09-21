@@ -1,6 +1,7 @@
-import {exec} from 'child_process';
-import {promises} from 'fs';
-import {dirname} from 'path';
+import {exec} from 'node:child_process';
+import {promises} from 'node:fs';
+import {dirname} from 'node:path';
+
 import {format} from 'prettier';
 
 export const {access, readFile, readdir, stat} = promises;

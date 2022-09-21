@@ -1,5 +1,5 @@
-import {LIB_VERSIONS} from '../../versions';
-import {EslintMetadata} from '../models';
+import {EslintMetadata} from '@src/eslint/models';
+import {LIB_VERSIONS} from '@src/versions';
 
 const forbiddenProps = [
   {propName: 'className', nessage: 'Use styled-components to style your component'},

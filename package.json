@@ -2,7 +2,6 @@
   "name": "b",
   "license": "UNLICENSED",
   "type": "module",
-  "sideEffects": false,
   "scripts": {
     "ncu": "ts-node --esm ./src/ncu.ts",
     "build": "NODE_ENV=development webpack build",
@@ -31,6 +30,7 @@
     "@matthis/webpack-node": "latest",
     "@types/node": "18.7.x",
     "@types/prettier": "2.7.x",
+    "@types/prompts": "^2.0.14",
     "@types/semver": "7.3.x",
     "babel-loader": "8.2.x",
     "babel-plugin-react-remove-properties": "0.3.x",
@@ -42,6 +42,7 @@
     "semver": "7.3.x",
     "source-map-loader": "4.0.x",
     "terser-webpack-plugin": "5.3.x",
+    "tsconfig-paths-webpack-plugin": "^4.0.0",
     "webpack": "5.74.x",
     "webpack-cli": "4.10.x",
     "webpack-dev-server": "4.11.x"

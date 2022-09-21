@@ -7,7 +7,7 @@ module.exports = {
   settings: {
     'import/parsers': {'@typescript-eslint/parser': ['.ts', '.tsx']},
     'import/extensions': ['.ts', '.tsx'],
-    'import/resolver': {node: {extensions: ['.js', '.jsx', '.ts', '.tsx']}},
+    'import/resolver': {typescript: {project: './tsconfig.json'}},
     react: {version: '17.0.x'},
   },
   plugins: [

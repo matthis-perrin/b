@@ -1,7 +1,7 @@
-import {join, resolve} from 'path';
+import {join, resolve} from 'node:path';
 
-import {RuntimeType} from '../models';
-import {generateForType} from './generators';
+import {RuntimeType} from '@src/models';
+import {generateForType} from '@src/tsconfig/generators';
 
 export async function tsconfigPackages(types: RuntimeType[]): Promise<void> {
   await Promise.all(

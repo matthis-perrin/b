@@ -1,4 +1,4 @@
-import {EslintMetadata} from '../models';
+import {EslintMetadata} from '@src/eslint/models';
 
 const importGroups = ['@shared/', '@shared-node/', '@shared-web/', '@src/'];
 

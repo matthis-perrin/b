@@ -1,7 +1,7 @@
 import webpack from 'webpack';
 
-import {WebpackPlugin} from '../models';
-import {getEnv} from '../utils';
+import {WebpackPlugin} from '@src/webpack/models';
+import {getEnv} from '@src/webpack/utils';
 
 export function definePlugin(): WebpackPlugin {
   const envPrefix = 'MATTHIS_';
