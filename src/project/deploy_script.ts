@@ -107,11 +107,11 @@ export function generateBuildWorkspaceFn(fragments: WorkspaceFragment[]): string
       return generateBuildWebAppProjectFn(fragment);
     } else if (type === WorkspaceFragmentType.StaticWebsite) {
       return generateBuildStaticWebsiteProjectFn(fragment);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (type === WorkspaceFragmentType.StandaloneLambda) {
       return generateBuildStandaloneLambdaProjectFn(fragment);
-    } else {
-      neverHappens(type, 'WorkspaceFragmentType');
     }
+    return neverHappens(type, `Unknown WorkspaceFragmentType "${type}"`);
   });
 
   return [

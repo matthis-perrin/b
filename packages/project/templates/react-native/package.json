@@ -1,5 +1,5 @@
 {
-  "name": "{{PROJECT_NAME}}",
+  "name": "react-native",
   "license": "UNLICENSED",
   "scripts": {
     "android": "react-native run-android",
@@ -20,19 +20,16 @@
     ]
   },
   "dependencies": {
-    "react": "{{REACT_VERSION}}",
-    "react-native": "{{REACT_NATIVE_VERSION}}",
-    "styled-components": "{{STYLED_COMPONENTS_VERSION}}"
+    "react": "17.0.x",
+    "react-native": "0.66.x",
+    "styled-components": "5.1.x"
   },
   "devDependencies": {
     "@babel/core": "7.12.x",
     "@babel/runtime": "7.12.x",
-    "@matthis/eslint-config-react-native": "latest",
-    "@matthis/prettier-config": "latest",
-    "@matthis/tsconfig-react-native": "latest",
-    "@types/react": "{{REACT_VERSION}}",
-    "@types/react-native": "{{REACT_NATIVE_VERSION}}",
-    "@types/styled-components": "{{STYLED_COMPONENTS_TYPES_VERSION}}",
+    "@types/react": "17.0.x",
+    "@types/react-native": "0.66.x",
+    "@types/styled-components": "5.1.x",
     "metro-react-native-babel-preset": "0.66.x"
   }
 }

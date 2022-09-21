@@ -1,7 +1,8 @@
 {
   "name": "@matthis/tsconfig-react-native",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "license": "UNLICENSED",
+  "type": "module",
   "main": "tsconfig.json",
   "dependencies": {
     "typescript": "4.8.x"

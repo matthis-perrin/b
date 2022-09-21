@@ -1,8 +1,7 @@
-import {join} from 'path';
-import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '../versions';
-
 import {cleanDir, writeJsonFile} from '../fs';
 import {RuntimeType} from '../models';
+import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '../versions';
+import {join} from 'path';
 
 export async function generateForType(path: string, type: RuntimeType): Promise<void> {
   await cleanDir(path);
@@ -15,60 +14,52 @@ export async function generateForType(path: string, type: RuntimeType): Promise<
 function generateTsConfig(type: RuntimeType): Record<string, unknown> {
   const baseCompilerOptions = {
     allowSyntheticDefaultImports: true,
-    // Emit __importStar and __importDefault helpers for runtime babel ecosystem compatibility
-    // and enable --allowSyntheticDefaultImports for typesystem compatibility.
-    // Allow default imports from modules with no default export.
-    // This does not affect code emit, just typechecking.
-    // --
-    // Enable iterating through iterators in for..of loops
+    baseUrl: '.',
     downlevelIteration: true,
-    // Allows us to import some library nicely. ie. import React from '@shared-frontend-lib/react'
-    // Enabled automatically when setting the flag `esModuleInterop` to true
     esModuleInterop: true,
-    // Enable incremental compilation by reading/writing information from prior compilations
-    // to a file on disk. This file is controlled by the --tsBuildInfoFile flag.
     incremental: true,
     // Perform additional checks to ensure that separate compilation (such as with
     // transpileModule or @babel/plugin-transform-typescript) would be safe.
     isolatedModules: false,
-    // The locale to use to show error messages, e.g. en-us.
     locale: 'en-us',
-    // Use the specified end of line sequence to be used when emitting files:
-    // "crlf" (windows) or "lf" (unix).”
     newLine: 'LF',
-    // Do not truncate error messages.
     noErrorTruncation: true,
-    // Report errors for fallthrough cases in switch statement.
     noFallthroughCasesInSwitch: true,
-    // Do not emit outputs.
     noEmit: true,
-    // Raise error on expressions and declarations with an implied any type.
     noImplicitReturns: true,
-    // Add undefined to any undeclared field in an interface with an index type
     noUncheckedIndexedAccess: true,
-    // Stylize errors and messages using color and context.
     pretty: true,
     // Skip type checking of all declaration files (*.d.ts).
     skipLibCheck: true,
-    // Enable all strict type checking options.
-    // Enables --noImplicitAny, --noImplicitThis, --alwaysStrict,
-    // --strictBindCallApply, --strictNullChecks, --strictFunctionTypes
-    // and --strictPropertyInitialization.
     strict: true,
-    // File path where to store the incremental build info
     tsBuildInfoFile: 'tmp/.tsbuildinfo',
     // Prevent all visible ”@types” packages to be included by default
     types: [],
   };
 
   let additionalCompilerOptions:
-    | (Record<string, boolean | string | string[]> & {
+    | (Record<string, boolean | string | string[] | Record<string, string[]>> & {
         module: string;
         moduleResolution: string;
         lib: string[];
         target: string;
+        paths: Record<string, string[]>;
       })
     | undefined;
+
+  const makePaths = (projects: string[]): Record<string, string[]> =>
+    Object.fromEntries([
+      ['@src/*', ['./src/*']],
+      [
+        '*',
+        [
+          './node_modules/*',
+          './node_modules/@types/*',
+          ...projects.flatMap(p => [`../${p}/node_modules/*`, `../${p}/node_modules/@types/*`]),
+        ],
+      ],
+      ...projects.flatMap(name => [[`${name}/*`, [`../${name}/src/*`]]]),
+    ]);
 
   if (type === RuntimeType.Lib) {
     additionalCompilerOptions = {
@@ -76,6 +67,7 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
       moduleResolution: 'node',
       lib: ['es2022'],
       target: 'es2022',
+      paths: makePaths(['shared']),
     };
   } else if (type === RuntimeType.Web) {
     additionalCompilerOptions = {
@@ -83,6 +75,7 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
       moduleResolution: 'node',
       lib: ['es2022', 'dom', 'dom.iterable'],
       target: 'esnext',
+      paths: makePaths(['shared', 'shared-web']),
       //
       jsx: 'react',
     };
@@ -92,6 +85,7 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
       moduleResolution: 'node',
       lib: ['es2022'],
       target: 'es2022',
+      paths: makePaths(['shared', 'shared-node']),
       //
       types: ['node'],
     };
@@ -101,6 +95,7 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
       moduleResolution: 'node',
       lib: ['es2022'],
       target: 'esnext',
+      paths: makePaths(['shared', 'shared-web']),
       //
       jsx: 'react-native',
     };
@@ -116,6 +111,7 @@ function generatePackageJson(type: RuntimeType): Record<string, unknown> {
     name: `@matthis/tsconfig-${type}`,
     version: PACKAGE_VERSIONS.tsconfig,
     license: 'UNLICENSED',
+    type: 'module',
     main: 'tsconfig.json',
     dependencies: {
       typescript: TYPESCRIPT_VERSION,

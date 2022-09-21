@@ -1,58 +1,33 @@
-import {eslintPackages} from './eslint';
-import {RuntimeType} from './models';
-import {prettierPackage} from './prettier';
-import {projectPackage} from './project';
-import {tsconfigPackages} from './tsconfig';
-import {webpackPackages} from './webpack';
+import {eslintPackages} from './eslint/index';
+import {RUNTIME_TYPE_TO_METADATA, RuntimeType} from './models';
+import {prettierPackage} from './prettier/index';
+import {projectPackage} from './project/index';
+import {generateTemplatesRootPackageJson, updateTemplatesLibVersions} from './templates';
+import {tsconfigPackages} from './tsconfig/index';
+import {webpackPackages} from './webpack/index';
 
-interface PackagesToGenerate {
-  eslint: boolean;
-  tsconfig: boolean;
-  webpack: boolean;
-}
-
-const toGenerate: Record<RuntimeType, PackagesToGenerate> = {
-  [RuntimeType.Web]: {
-    eslint: true,
-    tsconfig: true,
-    webpack: true,
-  },
-  [RuntimeType.Node]: {
-    eslint: true,
-    tsconfig: true,
-    webpack: true,
-  },
-  [RuntimeType.Lib]: {
-    eslint: true,
-    tsconfig: true,
-    webpack: false,
-  },
-  [RuntimeType.Lambda]: {
-    eslint: false,
-    tsconfig: false,
-    webpack: true,
-  },
-  [RuntimeType.ReactNative]: {
-    eslint: true,
-    tsconfig: true,
-    webpack: false,
-  },
-};
-
-const generationEntries = Object.entries(toGenerate) as [RuntimeType, PackagesToGenerate][];
+const eslintRuntimes = [
+  ...new Set(Object.values(RUNTIME_TYPE_TO_METADATA).map(data => data.eslint)).values(),
+];
+const tsConfigRuntimes = [
+  ...new Set(Object.values(RUNTIME_TYPE_TO_METADATA).map(data => data.tsconfig)).values(),
+];
+const webpackRuntimes = [
+  ...new Set(
+    Object.values(RUNTIME_TYPE_TO_METADATA)
+      .map(data => data.webpack)
+      .filter<RuntimeType>((d): d is RuntimeType => d !== undefined)
+  ).values(),
+];
 
 (async () => {
   await Promise.all([
+    generateTemplatesRootPackageJson(eslintRuntimes, tsConfigRuntimes, webpackRuntimes),
+    updateTemplatesLibVersions(),
     projectPackage(),
-    eslintPackages(
-      generationEntries.filter(([type, config]) => config.eslint).map(([type]) => type)
-    ),
+    eslintPackages(eslintRuntimes),
     prettierPackage(),
-    tsconfigPackages(
-      generationEntries.filter(([type, config]) => config.tsconfig).map(([type]) => type)
-    ),
-    webpackPackages(
-      generationEntries.filter(([type, config]) => config.webpack).map(([type]) => type)
-    ),
+    tsconfigPackages(tsConfigRuntimes),
+    webpackPackages(webpackRuntimes),
   ]);
 })().catch(console.error);

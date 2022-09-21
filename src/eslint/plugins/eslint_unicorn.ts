@@ -1,5 +1,6 @@
 import {EslintMetadata} from '../models';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintUnicorn: EslintMetadata = {
   plugin: ['unicorn'],
   dependencies: {
@@ -152,6 +153,7 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/prefer-modern-dom-apis': 'warn',
     'unicorn/prefer-modern-math-apis': 'warn',
     'unicorn/prefer-module': 'warn',
+    'unicorn/prefer-node-protocol': 'warn',
     'unicorn/prefer-native-coercion-functions': 'warn',
     'unicorn/prefer-negative-index': 'warn',
     'unicorn/prefer-prototype-methods': 'warn',
@@ -171,5 +173,4 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/throw-new-error': 'warn',
   },
 };
-
-/* eslint-enable @typescript-eslint/naming-convention */
+/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

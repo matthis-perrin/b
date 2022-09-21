@@ -1,17 +1,17 @@
-import {basename, join} from 'path';
-import {cwd} from 'process';
 import {mkdir} from 'fs/promises';
+import {basename, join} from 'path';
 
-import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '../models';
-import {generateWorkspace, getProjectsFromWorkspaceFragment} from './generate_workspace';
-import {neverHappens} from '../type_utils';
 import {maybeReadFile, rmDir} from '../fs';
+import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '../models';
+import {neverHappens} from '../type_utils';
+import {generateWorkspace, getProjectsFromWorkspaceFragment} from './generate_workspace';
 
 async function cancel(workspacePath?: string): Promise<never> {
   console.log('Cancelling...');
-  if (workspacePath) {
+  if (workspacePath !== undefined) {
     await rmDir(workspacePath);
   }
+  // eslint-disable-next-line node/no-process-exit
   process.exit(0);
 }
 
@@ -19,13 +19,13 @@ async function initProject(): Promise<void> {
   const prompts = require('prompts');
 
   let workspaceName: string;
-  let workspacePath = cwd();
+  let workspacePath = process.cwd();
   const frags: WorkspaceFragment[] = [];
   const takenNames = ['terraform'];
   const alreadyGenerated: ProjectName[] = [];
 
   // Check if we are already in a workspace
-  const workspaceContent = await maybeReadFile(join(workspacePath, 'app.code-workspace'));
+  const workspaceContent = undefined; //await maybeReadFile(join(workspacePath, 'app.code-workspace'));
   if (workspaceContent !== undefined) {
     workspaceName = basename(workspacePath);
     for (const project of JSON.parse(workspaceContent).projects as WorkspaceFragment[]) {
@@ -36,17 +36,18 @@ async function initProject(): Promise<void> {
     }
   } else {
     // Ask for workspace name
-    workspaceName = (
-      await prompts({
-        type: 'text',
-        name: 'workspaceName',
-        message: 'Workspace name',
-        validate: (v: string) => v.length > 0,
-      })
-    ).workspaceName;
+    const promptResponse = await prompts({
+      type: 'text',
+      name: 'workspaceName',
+      message: 'Workspace name',
+      validate: (v: string) => v.length > 0,
+    });
+    workspaceName = promptResponse.workspaceName;
+
     if (typeof workspaceName !== 'string') {
-      cancel();
+      return cancel();
     }
+
     workspacePath = join(workspacePath, workspaceName);
     await mkdir(workspacePath);
   }
@@ -55,8 +56,9 @@ async function initProject(): Promise<void> {
     while (true) {
       let frag;
       try {
+        // eslint-disable-next-line no-await-in-loop
         frag = await askForWorkspaceFragment(takenNames);
-      } catch (err) {
+      } catch (err: unknown) {
         console.error(String(err));
         continue;
       }
@@ -71,9 +73,9 @@ async function initProject(): Promise<void> {
     const name = workspaceName as WorkspaceName;
 
     await generateWorkspace(workspacePath, name, frags, alreadyGenerated);
-  } catch (err) {
+  } catch (err: unknown) {
     console.error(String(err));
-    cancel(workspaceName);
+    await cancel(workspaceName);
   }
 }
 
@@ -105,13 +107,13 @@ async function askForWorkspaceFragment(
   } else if (type === WorkspaceFragmentType.StandaloneLambda) {
     const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
     return {type, lambdaName};
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === WorkspaceFragmentType.WebApp) {
     const websiteName = await askForProjectName('Frontend project name', 'frontend', takenNames);
     const lambdaName = await askForProjectName('Backend project name', 'backend', takenNames);
     return {type, websiteName, lambdaName};
-  } else {
-    neverHappens(type, 'WorkspaceFragmentType');
   }
+  neverHappens(type, `Unknown WorkspaceFragmentType "${type}"`);
 }
 
 async function askForProjectName(
@@ -130,15 +132,13 @@ async function askForProjectName(
     }
   }
 
-  const value = (
-    await prompts({
-      type: 'text',
-      name: 'value',
-      message: question,
-      initial,
-      validate: (v: string) => v.length > 0,
-    })
-  ).value;
+  const {value} = await prompts({
+    type: 'text',
+    name: 'value',
+    message: question,
+    initial,
+    validate: (v: string) => v.length > 0,
+  });
   if (typeof value !== 'string') {
     throw new Error(`${question} is required`);
   }

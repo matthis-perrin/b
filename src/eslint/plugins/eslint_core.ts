@@ -1,5 +1,6 @@
 import {EslintMetadata} from '../models';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintCore: EslintMetadata = {
   plugin: [],
   dependencies: {},
@@ -201,6 +202,7 @@ export const eslintCore: EslintMetadata = {
     'no-regex-spaces': 'off',
     'no-restricted-exports': 'off',
     'no-restricted-globals': 'off',
+    // Use @typescript-eslint/no-restricted-imports
     'no-restricted-imports': 'off',
     'no-restricted-modules': 'off',
     'no-restricted-properties': 'off',
@@ -346,7 +348,7 @@ export const eslintCore: EslintMetadata = {
     'no-console': 'warn',
     'no-const-assign': 'warn',
     'no-constant-binary-expression': 'warn',
-    'no-constant-condition': 'warn',
+    'no-constant-condition': ['warn', {checkLoops: false}],
     'no-constructor-return': 'warn',
     'no-control-regex': 'warn',
     'no-debugger': 'warn',
@@ -470,10 +472,13 @@ export const eslintCore: EslintMetadata = {
     'no-template-curly-in-string': 'warn',
     'no-this-before-super': 'warn',
     'no-undef-init': 'warn',
-    'no-underscore-dangle': ['warn', {
-      enforceInMethodNames: true,
-      enforceInClassFields: true,
-    }],
+    'no-underscore-dangle': [
+      'warn',
+      {
+        enforceInMethodNames: true,
+        enforceInClassFields: true,
+      },
+    ],
     'no-unmodified-loop-condition': 'warn',
     'no-unneeded-ternary': 'warn',
     'no-unreachable-loop': 'warn',
@@ -519,3 +524,4 @@ export const eslintCore: EslintMetadata = {
     // 'no-warning-comments': ['warn', {terms: ['todo'], location: 'start'}],
   },
 };
+/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

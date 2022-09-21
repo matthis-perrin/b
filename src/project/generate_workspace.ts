@@ -1,21 +1,22 @@
 import {execSync} from 'child_process';
 import {join} from 'path';
+
 import {writeJsFile, writeJsonFile, writeRawFile} from '../fs';
 import {
-  WorkspaceName,
-  WorkspaceFragment,
   ProjectName,
-  WorkspaceFragmentType,
   ProjectType,
+  WorkspaceFragment,
+  WorkspaceFragmentType,
+  WorkspaceName,
 } from '../models';
-import {generateCodeWorkspace} from './vscode_workspace';
+import {neverHappens} from '../type_utils';
+import {generateDeployScript} from './deploy_script';
 import {generateProject} from './generate_project';
 import {generateGitIgnore} from './gitignore';
 import {generateWorkspacePackageJson} from './package_json';
 import {generateSetupScript} from './setup_script';
-import {generateDeployScript} from './deploy_script';
 import {generateCommonTerraform, generateWorkspaceProjectTerraform} from './terraform/all';
-import {neverHappens} from '../type_utils';
+import {generateCodeWorkspace} from './vscode_workspace';
 
 export interface WorkspaceProject {
   projectName: ProjectName;
@@ -23,22 +24,22 @@ export interface WorkspaceProject {
 }
 
 export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): WorkspaceProject[] {
-  const {type} = fragment;
-  if (type === WorkspaceFragmentType.StaticWebsite) {
+  if (fragment.type === WorkspaceFragmentType.StaticWebsite) {
     return [
       {
         projectName: fragment.websiteName,
         type: ProjectType.Web,
       },
     ];
-  } else if (type === WorkspaceFragmentType.StandaloneLambda) {
+  } else if (fragment.type === WorkspaceFragmentType.StandaloneLambda) {
     return [
       {
         projectName: fragment.lambdaName,
         type: ProjectType.LambdaApi,
       },
     ];
-  } else if (type === WorkspaceFragmentType.WebApp) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (fragment.type === WorkspaceFragmentType.WebApp) {
     return [
       {
         projectName: fragment.websiteName,
@@ -49,9 +50,8 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         type: ProjectType.LambdaApi,
       },
     ];
-  } else {
-    neverHappens(type, 'ProjectType');
   }
+  neverHappens(fragment, `Unknown ProjectType ${(fragment as WorkspaceFragment).type}`);
 }
 
 export async function generateWorkspace(
@@ -67,11 +67,14 @@ export async function generateWorkspace(
   await Promise.all(
     projects
       .filter(p => !alreadyGenerated.includes(p.projectName))
-      .map(project => generateProject(join(dst, project.projectName), project))
+      .map(async project => generateProject(join(dst, project.projectName), project))
   );
 
   // package.json
-  await writeJsonFile(join(dst, 'package.json'), generateWorkspacePackageJson(workspaceName));
+  await writeJsonFile(
+    join(dst, 'package.json'),
+    generateWorkspacePackageJson(workspaceName, projects)
+  );
 
   // .gitignore
   await writeRawFile(join(dst, '.gitignore'), generateGitIgnore());
@@ -87,16 +90,16 @@ export async function generateWorkspace(
 
   // Terraform folder generation
   const terraformPath = join(dst, 'terraform');
-  writeRawFile(join(terraformPath, 'base.tf'), generateCommonTerraform(workspaceName, projects));
-  await Promise.all(
-    projects
+  await Promise.all([
+    writeRawFile(join(terraformPath, 'base.tf'), generateCommonTerraform(workspaceName, projects)),
+    ...projects
       .filter(p => !alreadyGenerated.includes(p.projectName))
       .map(async p => {
         const content = generateWorkspaceProjectTerraform(p);
         const name = `${p.projectName}_terraform`;
         await writeRawFile(join(terraformPath, `${name}.tf`), content);
-      })
-  );
+      }),
+  ]);
 
   // Run setup.js
   console.log('Running post install script');

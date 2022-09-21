@@ -1,6 +1,7 @@
 import {TYPESCRIPT_VERSION} from '../../versions';
 import {EslintMetadata} from '../models';
 
+/* eslint-disable @typescript-eslint/naming-convention, no-null/no-null */
 export const eslintTypescript: EslintMetadata = {
   plugin: ['@typescript-eslint'],
   dependencies: {
@@ -172,7 +173,7 @@ export const eslintTypescript: EslintMetadata = {
       },
       {
         selector: 'property',
-        // eslint-disable-next-line no-null/no-null
+
         format: null,
         custom: {
           regex: '^([a-zA-Z]([a-z]+)?((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?)$',
@@ -227,7 +228,17 @@ export const eslintTypescript: EslintMetadata = {
     '@typescript-eslint/no-redeclare': 'warn',
     '@typescript-eslint/no-redundant-type-constituents': 'warn',
     '@typescript-eslint/no-require-imports': 'warn',
-    '@typescript-eslint/no-restricted-imports': 'warn',
+    '@typescript-eslint/no-restricted-imports': [
+      'warn',
+      {
+        patterns: [
+          {
+            group: ['\\.*'],
+            message: 'Relative import forbidden, prefer using the @src/ notation',
+          },
+        ],
+      },
+    ],
     '@typescript-eslint/no-this-alias': 'warn',
     '@typescript-eslint/no-throw-literal': 'warn',
     '@typescript-eslint/no-unnecessary-boolean-literal-compare': [
@@ -297,5 +308,4 @@ export const eslintTypescript: EslintMetadata = {
     '@typescript-eslint/unified-signatures': ['warn', {ignoreDifferentlyNamedParameters: true}],
   },
 };
-
-/* eslint-enable @typescript-eslint/naming-convention */
+/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

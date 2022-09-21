@@ -1,26 +1,9 @@
 {
+  "extends": "@matthis/tsconfig-node/tsconfig",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true,
-    "esModuleInterop": true,
-    "incremental": true,
-    "isolatedModules": true,
-    "locale": "en-us",
-    "module": "commonjs",
-    "target": "es5",
-    "moduleResolution": "node",
-    "newLine": "LF",
-    "noErrorTruncation": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "preserveWatchOutput": true,
-    "pretty": true,
-    "skipLibCheck": true,
-    "strict": true
+    "module": "ES2022",
+    "noEmit": false,
+    "baseUrl": "."
   },
-  "include": ["src"],
-  "exclude": ["src/project/templates/*", "src/project/templates/*", "src/project/old_templates/*"]
+  "include": ["src"]
 }

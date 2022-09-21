@@ -1,5 +1,6 @@
 import {EslintMetadata} from '../models';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintNoNull: EslintMetadata = {
   plugin: ['no-null'],
   dependencies: {
@@ -13,3 +14,4 @@ export const eslintNoNull: EslintMetadata = {
     'no-null/no-null': 'warn',
   },
 };
+/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

@@ -1,6 +1,7 @@
 import {PRETTIER_VERSION} from '../../versions';
 import {EslintMetadata} from '../models';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintPrettier: EslintMetadata = {
   plugin: ['prettier'],
   dependencies: {
@@ -15,3 +16,4 @@ export const eslintPrettier: EslintMetadata = {
     'prettier/prettier': 'warn',
   },
 };
+/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

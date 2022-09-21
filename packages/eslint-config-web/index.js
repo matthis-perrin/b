@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  ignorePatterns: ['webpack.config.js'],
+  ignorePatterns: ['**/*.js'],
   env: {browser: true, node: false, es6: true},
   parser: '@typescript-eslint/parser',
   parserOptions: {project: './tsconfig.json', sourceType: 'module'},
@@ -132,7 +132,7 @@ module.exports = {
     'no-console': 'warn',
     'no-const-assign': 'warn',
     'no-constant-binary-expression': 'warn',
-    'no-constant-condition': 'warn',
+    'no-constant-condition': ['warn', {checkLoops: false}],
     'no-constructor-return': 'warn',
     'no-continue': 'off',
     'no-control-regex': 'warn',
@@ -435,7 +435,20 @@ module.exports = {
     'import/unambiguous': 'off',
     'no-null/no-null': 'warn',
     'prettier/prettier': 'warn',
-    'simple-import-sort/imports': 'warn',
+    'simple-import-sort/imports': [
+      'warn',
+      {
+        groups: [
+          ['^\\u0000'],
+          ['^node:'],
+          ['^(?!@shared/|@shared-node/|@shared-web/|@src/)'],
+          ['^@shared/'],
+          ['^@shared-node/'],
+          ['^@shared-web/'],
+          ['^@src/'],
+        ],
+      },
+    ],
     'simple-import-sort/exports': 'off',
     '@typescript-eslint/adjacent-overload-signatures': 'warn',
     '@typescript-eslint/array-type': 'warn',
@@ -544,7 +557,14 @@ module.exports = {
     '@typescript-eslint/no-redeclare': 'warn',
     '@typescript-eslint/no-redundant-type-constituents': 'warn',
     '@typescript-eslint/no-require-imports': 'warn',
-    '@typescript-eslint/no-restricted-imports': 'warn',
+    '@typescript-eslint/no-restricted-imports': [
+      'warn',
+      {
+        patterns: [
+          {group: ['\\.*'], message: 'Relative import forbidden, prefer using the @src/ notation'},
+        ],
+      },
+    ],
     '@typescript-eslint/no-shadow': 'off',
     '@typescript-eslint/no-this-alias': 'warn',
     '@typescript-eslint/no-throw-literal': 'warn',
@@ -700,7 +720,7 @@ module.exports = {
     'unicorn/prefer-module': 'warn',
     'unicorn/prefer-native-coercion-functions': 'warn',
     'unicorn/prefer-negative-index': 'warn',
-    'unicorn/prefer-node-protocol': 'off',
+    'unicorn/prefer-node-protocol': 'warn',
     'unicorn/prefer-number-properties': 'off',
     'unicorn/prefer-object-has-own': 'warn',
     'unicorn/prefer-optional-catch-binding': 'off',

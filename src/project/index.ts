@@ -1,6 +1,9 @@
 import {join, resolve} from 'path';
-import {cleanDir, cp, readFile, writeRawFile, writeJsonFile} from '../fs';
+import {fileURLToPath} from 'url';
+
+import {cleanDir, readFile, writeJsonFile, writeRawFile} from '../fs';
 import {compile} from '../packager';
+import {copyTemplatesDirs} from '../templates';
 import {PACKAGE_VERSIONS} from '../versions';
 
 export async function projectPackage(): Promise<void> {
@@ -12,7 +15,7 @@ export async function projectPackage(): Promise<void> {
   ]);
   const indexPath = join(path, 'index.js');
   await Promise.all([
-    cp(join(__dirname, 'templates'), join(path)),
+    copyTemplatesDirs(join(path, 'templates')),
     writeRawFile(indexPath, `#!/usr/bin/env node\n${await readFile(indexPath)}`),
   ]);
 }
@@ -22,6 +25,7 @@ function generatePackageJson(): Record<string, unknown> {
     name: `@matthis/project`,
     version: PACKAGE_VERSIONS.project,
     license: 'UNLICENSED',
+    type: 'module',
     bin: {
       main: './index.js',
     },
@@ -33,7 +37,7 @@ function generatePackageJson(): Record<string, unknown> {
 }
 
 async function writeScript(path: string): Promise<void> {
-  const entry = join(__dirname, `init_project.ts`);
+  const entry = join(fileURLToPath(import.meta.url), `../init_project.ts`);
   const dst = join(path);
-  await compile(entry, dst);
+  await compile(entry, dst, false);
 }

@@ -12,10 +12,9 @@
     "git.autofetch": true,
     "git.confirmSync": false,
     "typescript.preferences.importModuleSpecifier": "non-relative",
-    "typescript.tsdk": "./node_modules/typescript/lib",
     "eslint.lintTask.enable": true,
+    "eslint.useESLintClass": true,
     "eslint.options": {
-      "useESLintClass": true,
       "reportUnusedDisableDirectives": "warn"
     },
     "editor.formatOnSave": true,
@@ -23,7 +22,8 @@
       "source.fixAll": false,
       "source.fixAll.eslint": true
     },
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "emmet.showExpandedAbbreviation": "never"
   },
   "extensions": {
     "recommendations": [

@@ -1,15 +1,14 @@
 import packageMetadata from 'package-json';
 import {join, resolve} from 'path';
-import {satisfies} from 'semver';
-import {ESLINT_VERSION, REACT_VERSION} from './versions';
-import {PLUGINS_FOR_TYPE} from './eslint/plugins';
+import semver from 'semver';
+
 import {readdir, readFile} from './fs';
 
 export async function check(): Promise<void> {
   const packagePath = join(resolve('.'), 'packages');
   const packageDirs = await readdir(packagePath);
   const packageJsonFiles = await Promise.all(
-    packageDirs.map(d => readFile(join(packagePath, d, 'package.json')))
+    packageDirs.map(async d => readFile(join(packagePath, d, 'package.json')))
   );
   const dependencies = packageJsonFiles.map(
     f => (JSON.parse(f.toString()).dependencies ?? {}) as Record<string, string>
@@ -33,11 +32,11 @@ export async function check(): Promise<void> {
 
   if (errors.length > 0) {
     console.error(errors.join('\n'));
-    process.exit(1);
+    process.exit(1); // eslint-disable-line node/no-process-exit
   }
 
   const res = await Promise.all(
-    Object.entries(flatDependencies).map(([name, version]) => checkPackage(name, version[0]))
+    Object.entries(flatDependencies).map(async ([name, version]) => checkPackage(name, version[0]))
   );
   const outdated = res.filter(r => r !== undefined) as [string, string, string][];
   if (outdated.length === 0) {
@@ -62,11 +61,12 @@ async function checkPackage(
   name: string,
   version: string
 ): Promise<[string, string, string] | undefined> {
-  const latest = ((await packageMetadata(name)) as any).version;
-  if (!satisfies(latest, version)) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const latest = ((await packageMetadata(name)) as any).version as string;
+  if (!semver.satisfies(latest, version)) {
     return [name, version, latest];
   }
-  return;
+  return undefined;
 }
 
 check().catch(console.error);

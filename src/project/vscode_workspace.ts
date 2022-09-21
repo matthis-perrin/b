@@ -14,6 +14,7 @@ export function generateCodeWorkspace(
       {path: '.', name: 'root'},
     ],
     settings: {
+      /* eslint-disable @typescript-eslint/naming-convention */
       'files.exclude': Object.fromEntries([
         ...projectNames.map(p => [p, true]),
         ['terraform', true],
@@ -26,9 +27,9 @@ export function generateCodeWorkspace(
       'git.confirmSync': false,
       'typescript.preferences.importModuleSpecifier': 'non-relative',
       'eslint.lintTask.enable': true,
-      "eslint.useESLintClass": true,
-      "eslint.options": {
-        "reportUnusedDisableDirectives": "warn"
+      'eslint.useESLintClass': true,
+      'eslint.options': {
+        reportUnusedDisableDirectives: 'warn',
       },
       'editor.formatOnSave': true,
       'editor.codeActionsOnSave': {
@@ -37,6 +38,7 @@ export function generateCodeWorkspace(
       },
       'editor.defaultFormatter': 'esbenp.prettier-vscode',
       'emmet.showExpandedAbbreviation': 'never',
+      /* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */
     },
     extensions: {
       recommendations: [

@@ -38,7 +38,6 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
     return {
       statusCode: 200,
       headers: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         'Content-Type': 'text/html',
       },
       // eslint-disable-next-line node/no-process-env

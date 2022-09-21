@@ -1,18 +1,29 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.1.15',
-  eslint: '1.0.25',
-  prettier: '1.0.4',
-  tsconfig: '1.0.9',
-  webpack: '1.0.25',
+  project: '1.2.0',
+  eslint: '1.1.0',
+  prettier: '1.1.0',
+  tsconfig: '1.1.0',
+  webpack: '1.1.0',
 };
 
 export const ESLINT_VERSION = '8.23.x';
 export const PRETTIER_VERSION = '2.7.x';
 export const TYPESCRIPT_VERSION = '4.8.x';
 
-export const REACT_VERSION = '17.0.x';
-export const REACT_ROUTER_VERSION = '5.2.x';
-export const REACT_NATIVE_VERSION = '0.66.x';
-export const STYLED_COMPONENTS_TYPES_VERSION = '5.1.x';
-export const STYLED_COMPONENTS_VERSION = '5.1.x';
-export const NODE_TYPES_VERSION = '16.11.x';
+/* eslint-disable @typescript-eslint/naming-convention */
+export const LIB_VERSIONS = {
+  '@types/react': '17.0.x',
+  '@types/react-dom': '17.0.x',
+  react: '17.0.x',
+  'react-dom': '17.0.x',
+
+  '@types/react-native': '0.66.x',
+  'react-native': '0.66.x',
+
+  '@types/styled-components': '5.1.x',
+  'styled-components': '5.1.x',
+
+  'react-router': '5.2.x',
+  'react-router-dom': '5.2.x',
+};
+/* eslint-enable @typescript-eslint/naming-convention */

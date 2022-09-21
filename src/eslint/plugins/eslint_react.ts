@@ -1,4 +1,4 @@
-import {REACT_VERSION} from '../../versions';
+import {LIB_VERSIONS} from '../../versions';
 import {EslintMetadata} from '../models';
 
 const forbiddenProps = [
@@ -7,6 +7,7 @@ const forbiddenProps = [
   {propName: 'id', nessage: 'Use React ref instead'},
 ];
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
@@ -14,7 +15,7 @@ export const eslintReact: EslintMetadata = {
   },
   settings: {
     react: {
-      version: REACT_VERSION,
+      version: LIB_VERSIONS.react,
     },
   },
   allOff: {
@@ -134,7 +135,10 @@ export const eslintReact: EslintMetadata = {
         checkLocalVariables: true,
       },
     ],
-    'react/jsx-key': ['warn', {checkFragmentShorthand: true, checkKeyMustBeforeSpread: true, warnOnDuplicates: true}],
+    'react/jsx-key': [
+      'warn',
+      {checkFragmentShorthand: true, checkKeyMustBeforeSpread: true, warnOnDuplicates: true},
+    ],
     'react/jsx-no-comment-textnodes': 'warn',
     'react/jsx-no-bind': 'warn',
     'react/jsx-no-constructed-context-values': 'warn',
@@ -171,5 +175,4 @@ export const eslintReact: EslintMetadata = {
     'react/void-dom-elements-no-children': 'warn',
   },
 };
-
-/* eslint-enable @typescript-eslint/naming-convention */
+/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

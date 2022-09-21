@@ -1,11 +1,11 @@
 import {join, resolve} from 'path';
 
+import {RuntimeType} from '../models';
 import {generateForType} from './generators';
-import {ALL_RUNTIME_TYPES, RuntimeType} from '../models';
 
 export async function eslintPackages(types: RuntimeType[]): Promise<void> {
   await Promise.all(
-    types.map(type =>
+    types.map(async type =>
       generateForType(join(resolve('.'), 'packages', `eslint-config-${type}`), type)
     )
   );

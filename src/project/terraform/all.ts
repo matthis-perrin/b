@@ -1,10 +1,8 @@
 import {
+  PROJECT_TYPE_TO_METADATA,
   ProjectName,
   ProjectType,
-  PROJECT_TYPE_TO_METADATA,
   RuntimeType,
-  WorkspaceFragment,
-  WorkspaceFragmentType,
   WorkspaceName,
 } from '../../models';
 import {neverHappens} from '../../type_utils';
@@ -13,14 +11,14 @@ import {generateApiGatewayTerraform} from './api_gateway';
 import {generateCloudfrontDistributionTerraform} from './cloudfront';
 import {generateLambdaTerraform} from './lambda';
 import {
-  generateLambdaApiOutputsTerraform,
   generateCloudfrontDomainNameOutputTerraform,
+  generateLambdaApiOutputsTerraform,
 } from './output';
 import {generateAwsProviderTerraform} from './provider';
 import {
   generateLambdaFileUploadTerraform,
-  generateWebFileUploadTerraform,
   generateS3BucketTerraform,
+  generateWebFileUploadTerraform,
 } from './s3';
 
 export function generateCommonTerraform(
@@ -44,11 +42,11 @@ export function generateWorkspaceProjectTerraform(project: WorkspaceProject): st
     return generateWebTerraform(projectName);
   } else if (type === ProjectType.LambdaFunction) {
     return generateLambdaFunctionTerraform(projectName);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === ProjectType.LambdaApi) {
     return generateLambdaApiTerraform(projectName);
-  } else {
-    neverHappens(type, 'ProjectType');
   }
+  neverHappens(type, 'ProjectType');
 }
 
 export function generateWebTerraform(projectName: ProjectName): string {

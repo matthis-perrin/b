@@ -1,33 +1,60 @@
-import webpack from 'webpack';
+import {appendFileSync} from 'node:fs';
 
-export async function compile(entry: string, dst: string): Promise<void> {
-  const config: webpack.Configuration = {
+import webpack, {Configuration} from 'webpack';
+
+export async function compile(entry: string, dst: string, isLib: boolean): Promise<void> {
+  const libOption = isLib
+    ? {
+        library: {
+          type: 'module',
+          // export: 'default',
+        },
+      }
+    : {};
+  const config: Configuration = {
     mode: 'none',
     target: 'node',
     entry,
     output: {
       path: dst,
       filename: 'index.js',
-      library: {
-        type: 'commonjs',
-        export: 'default',
-      },
-      libraryTarget: 'umd',
+      chunkFormat: 'module',
+      ...libOption,
     },
-    module: {rules: [{test: /\.ts$/, loader: 'ts-loader'}]},
+    module: {rules: [{test: /\.ts$/u, loader: 'ts-loader'}]},
     resolve: {extensions: ['.ts', '.js']},
-    externals: ({request}, callback) =>
-      request?.startsWith('./') || request?.startsWith('../') || request === entry
+    externalsType: 'module',
+    externals: ({request, context}, callback) => {
+      request?.startsWith('./') ||
+      request?.startsWith('@src/') ||
+      request?.startsWith('@shared/') ||
+      request?.startsWith('@shared-node/') ||
+      request?.startsWith('@shared-web/') ||
+      request?.startsWith('../') ||
+      request === entry
         ? callback()
-        : callback(undefined, 'commonjs ' + request),
+        : callback(undefined, request);
+    },
+    node: {
+      __dirname: false, // eslint-disable-line @typescript-eslint/naming-convention
+      __filename: false, // eslint-disable-line @typescript-eslint/naming-convention
+    },
+    experiments: {
+      outputModule: true,
+    },
+    optimization: {
+      usedExports: true,
+    },
   };
 
   return new Promise((resolve, reject) => {
     webpack(config, (err, stats) => {
       if (err) {
+        console.error(`Failure to compile ${entry}`);
         reject(err);
       } else if (stats?.hasErrors()) {
-        reject(new Error(stats?.toString({errorDetails: true})));
+        console.error(`Failure to compile ${entry}`);
+        reject(new Error(stats.toString({errorDetails: true})));
       } else {
         resolve();
       }

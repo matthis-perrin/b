@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
     "downlevelIteration": true,
     "esModuleInterop": true,
     "incremental": true,
@@ -22,6 +23,20 @@
     "lib": [
       "es2022"
     ],
-    "target": "es2022"
+    "target": "es2022",
+    "paths": {
+      "@src/*": [
+        "./src/*"
+      ],
+      "*": [
+        "./node_modules/*",
+        "./node_modules/@types/*",
+        "../shared/node_modules/*",
+        "../shared/node_modules/@types/*"
+      ],
+      "shared/*": [
+        "../shared/src/*"
+      ]
+    }
   }
 }

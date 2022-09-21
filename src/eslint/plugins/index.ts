@@ -1,3 +1,5 @@
+import {RuntimeType} from '../../models';
+import {EslintMetadata} from '../models';
 import {eslintComments} from './eslint_comments';
 import {eslintCore} from './eslint_core';
 import {eslintImport} from './eslint_import';
@@ -9,8 +11,6 @@ import {eslintReactHooks} from './eslint_react_hooks';
 import {eslintSimpleImportSort} from './eslint_simple_import_sort';
 import {eslintTypescript} from './eslint_typescript';
 import {eslintUnicorn} from './eslint_unicorn';
-import {EslintMetadata} from '../models';
-import {RuntimeType} from '../../models';
 
 const BASE_PLUGINS = [
   eslintComments,

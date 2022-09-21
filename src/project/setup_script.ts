@@ -48,7 +48,7 @@ async function installNodeModulesAtPath(path) {
       if (!error) {
         resolve();
       } else {
-        console.error(\`Failure to run \\\`yarn install\\\` at "\${path}"\`);
+        console.error(\`Failure to run \\\`yarn install\\\` at "\${path}"\\n\${stderr}\`);
         reject();
       }
     });
@@ -56,10 +56,11 @@ async function installNodeModulesAtPath(path) {
 }
 
 async function installNodeModules() {
-${projects
-  .map(p => `  await installNodeModulesAtPath(path.join(process.cwd(), '${p}'));`)
-  .join('\n')}
-}
+  await Promise.all([
+    installNodeModulesAtPath(process.cwd()),
+    ${projects.map(p => `installNodeModulesAtPath(path.join(process.cwd(), '${p}')),`).join('\n')}
+  ])
+  }
 
 async function run() {
   console.log('Checking requirements...');

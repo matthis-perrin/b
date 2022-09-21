@@ -1,484 +1,552 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(global, function() {
-return /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
-/******/ 	var __webpack_modules__ = ([
+import * as __WEBPACK_EXTERNAL_MODULE__babel_core_2e08d31d__ from "@babel/core";
+import * as __WEBPACK_EXTERNAL_MODULE__babel_preset_env_a24bbad6__ from "@babel/preset-env";
+import * as __WEBPACK_EXTERNAL_MODULE__babel_preset_react_5605368a__ from "@babel/preset-react";
+import * as __WEBPACK_EXTERNAL_MODULE__babel_preset_typescript_328b6127__ from "@babel/preset-typescript";
+import * as __WEBPACK_EXTERNAL_MODULE_babel_loader_91c76fa1__ from "babel-loader";
+import * as __WEBPACK_EXTERNAL_MODULE_babel_plugin_react_remove_properties_6138ae9f__ from "babel-plugin-react-remove-properties";
+import * as __WEBPACK_EXTERNAL_MODULE_eslint_webpack_plugin_6c2e632d__ from "eslint-webpack-plugin";
+import * as __WEBPACK_EXTERNAL_MODULE_fork_ts_checker_webpack_plugin_a37ada7e__ from "fork-ts-checker-webpack-plugin";
+import * as __WEBPACK_EXTERNAL_MODULE_html_webpack_plugin_ea66bb30__ from "html-webpack-plugin";
+import * as __WEBPACK_EXTERNAL_MODULE_node_path_02319fef__ from "node:path";
+import * as __WEBPACK_EXTERNAL_MODULE_path__ from "path";
+import * as __WEBPACK_EXTERNAL_MODULE_source_map_loader_e8528deb__ from "source-map-loader";
+import * as __WEBPACK_EXTERNAL_MODULE_terser_webpack_plugin_3cd6887c__ from "terser-webpack-plugin";
+import * as __WEBPACK_EXTERNAL_MODULE_webpack__ from "webpack";
+import * as __WEBPACK_EXTERNAL_MODULE_webpack_dev_server_49d33e28__ from "webpack-dev-server";
+/******/ var __webpack_modules__ = ([
 /* 0 */,
 /* 1 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "webConfig": () => (/* binding */ webConfig)
+/* harmony export */ });
+/* harmony import */ var webpack_dev_server__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+/* harmony import */ var _loaders_babel_loader_web__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
+/* harmony import */ var _loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(15);
+/* harmony import */ var _plugins_clean_terminal_plugin__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(26);
+/* harmony import */ var _plugins_define_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(17);
+/* harmony import */ var _plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(24);
+/* harmony import */ var _plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(22);
+/* harmony import */ var _plugins_html_plugin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(19);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
+/* harmony import */ var _base_config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+// eslint-disable-next-line import/no-unassigned-import
 
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.webConfig = void 0;
-var path_1 = __webpack_require__(2);
-var base_1 = __webpack_require__(3);
-var loaders_1 = __webpack_require__(12);
-var plugins_1 = __webpack_require__(4);
-var utils_1 = __webpack_require__(5);
+
+
+
+
+
+
+
+
+
 function webConfig() {
-    var base = (0, base_1.baseConfig)({ hashOutput: true });
-    var define = (0, plugins_1.definePlugin)();
-    var html = (0, plugins_1.htmlPlugin)();
-    var forkTsChecker = (0, plugins_1.forkTsCheckerPlugin)();
-    var eslint = (0, plugins_1.eslintPlugin)();
-    var cleanTerminal = (0, plugins_1.cleanTerminalPlugin)();
-    var babel = (0, loaders_1.babelLoaderWeb)();
-    var sourceMap = (0, loaders_1.sourceMapLoader)();
+    const base = (0,_base_config__WEBPACK_IMPORTED_MODULE_2__.baseConfig)();
     return {
-        dependencies: __assign(__assign(__assign(__assign(__assign(__assign(__assign(__assign({ 'webpack-dev-server': '4.9.x' }, base.dependencies), define.dependencies), html.dependencies), forkTsChecker.dependencies), eslint.dependencies), cleanTerminal.dependencies), babel.dependencies), sourceMap.dependencies),
-        config: function () {
-            var baseWebpackConfig = base.config();
-            return __assign(__assign({}, baseWebpackConfig), { target: 'web', entry: {
-                    main: (0, path_1.join)((0, utils_1.getProjectDir)(), "src/index.tsx"),
-                }, module: {
-                    rules: [babel.config(), sourceMap.config()],
-                }, plugins: [
-                    define.config(),
-                    html.config(),
-                    forkTsChecker.config(),
-                    eslint.config(),
-                    cleanTerminal.config(),
-                ], devServer: !(0, utils_1.isProd)()
-                    ? {
-                        static: (0, utils_1.getDistDir)(),
-                        compress: true,
-                        hot: true,
-                        open: true,
-                    }
-                    : undefined, optimization: __assign(__assign({}, baseWebpackConfig.optimization), { splitChunks: {
-                        cacheGroups: {
-                            vendor: {
-                                test: /[\\/]node_modules[\\/]/,
-                                chunks: 'initial',
-                                name: 'vendor',
-                                enforce: true,
-                            },
-                        },
-                    } }) });
+        ...base,
+        target: 'web',
+        entry: {
+            main: (0,path__WEBPACK_IMPORTED_MODULE_1__.join)((0,_utils__WEBPACK_IMPORTED_MODULE_3__.getProjectDir)(), `src/index.tsx`),
+        },
+        output: {
+            path: (0,_utils__WEBPACK_IMPORTED_MODULE_3__.getDistDir)(),
+            filename: `[name].[contenthash].js`,
+            clean: true,
+            publicPath: '/',
+        },
+        module: {
+            rules: [(0,_loaders_babel_loader_web__WEBPACK_IMPORTED_MODULE_4__.babelLoaderWeb)(), (0,_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_5__.sourceMapLoader)()],
+        },
+        plugins: [
+            (0,_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_6__.definePlugin)(),
+            (0,_plugins_html_plugin__WEBPACK_IMPORTED_MODULE_7__.htmlPlugin)(),
+            (0,_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_8__.forkTsCheckerPlugin)(),
+            (0,_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_9__.eslintPlugin)(),
+            (0,_plugins_clean_terminal_plugin__WEBPACK_IMPORTED_MODULE_10__.cleanTerminalPlugin)(),
+        ],
+        devServer: !(0,_utils__WEBPACK_IMPORTED_MODULE_3__.isProd)()
+            ? {
+                static: (0,_utils__WEBPACK_IMPORTED_MODULE_3__.getDistDir)(),
+                compress: true,
+                hot: true,
+                open: true,
+            }
+            : undefined,
+        optimization: {
+            ...base.optimization,
+            splitChunks: {
+                cacheGroups: {
+                    vendor: {
+                        test: /[/\\]node_modules[/\\]/u,
+                        chunks: 'initial',
+                        name: 'vendor',
+                        enforce: true,
+                    },
+                },
+            },
         },
     };
 }
-exports.webConfig = webConfig;
 
 
 /***/ }),
 /* 2 */
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-module.exports = require("path");
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({  });
 
 /***/ }),
 /* 3 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.baseConfig = void 0;
-var plugins_1 = __webpack_require__(4);
-var utils_1 = __webpack_require__(5);
-function baseConfig(opts) {
-    var hashOutput = opts.hashOutput, libraryExportName = opts.libraryExportName;
-    var terserPluginConfig = (0, plugins_1.terserPlugin)();
-    return {
-        dependencies: __assign({ webpack: '5.73.x', 'webpack-cli': '4.10.x' }, terserPluginConfig.dependencies),
-        config: function () {
-            var _a;
-            return ({
-                mode: 'none',
-                devtool: (0, utils_1.isProd)() ? 'source-map' : 'eval',
-                output: __assign({ path: (0, utils_1.getDistDir)(), filename: "[name]" + (hashOutput ? '.[contenthash]' : '') + ".js", clean: true, publicPath: (_a = process.env['PUBLIC_PATH']) !== null && _a !== void 0 ? _a : '/' }, (libraryExportName === undefined ? {} : { library: 'handler', libraryTarget: 'umd' })),
-                resolve: {
-                    extensions: ['.js', '.jsx', '.ts', '.tsx'],
-                },
-                stats: {
-                    preset: 'errors-warnings',
-                    assets: true,
-                    timings: true,
-                },
-                optimization: {
-                    minimize: (0, utils_1.isProd)(),
-                    minimizer: [terserPluginConfig.config()],
-                },
-                experiments: {
-                    backCompat: true,
-                },
-            });
-        },
-    };
-}
-exports.baseConfig = baseConfig;
-
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({ ["join"]: () => __WEBPACK_EXTERNAL_MODULE_path__.join, ["resolve"]: () => __WEBPACK_EXTERNAL_MODULE_path__.resolve });
 
 /***/ }),
 /* 4 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "baseConfig": () => (/* binding */ baseConfig)
+/* harmony export */ });
+/* harmony import */ var _plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
 
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.terserPlugin = exports.cleanTerminalPlugin = exports.eslintPlugin = exports.forkTsCheckerPlugin = exports.htmlPlugin = exports.definePlugin = void 0;
-var path_1 = __webpack_require__(2);
-var utils_1 = __webpack_require__(5);
-function definePlugin() {
+function baseConfig() {
     return {
-        dependencies: {},
-        config: function () {
-            var DefinePlugin = __webpack_require__(6).DefinePlugin;
-            var envPrefix = 'MATTHIS_';
-            var extraEnv = Object.fromEntries(Object.entries(process.env)
-                .filter(function (_a) {
-                var _b = __read(_a, 1), name = _b[0];
-                return name.startsWith(envPrefix);
-            })
-                .map(function (_a) {
-                var _b = __read(_a, 2), name = _b[0], value = _b[1];
-                return ["process.env." + name.slice(envPrefix.length), value];
-            }));
-            return new DefinePlugin(__assign({ 'process.env.NODE_ENV': JSON.stringify((0, utils_1.getEnv)()) }, extraEnv));
+        mode: 'none',
+        devtool: (0,_utils__WEBPACK_IMPORTED_MODULE_0__.isProd)() ? 'source-map' : 'eval',
+        resolve: {
+            extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        },
+        stats: {
+            preset: 'errors-warnings',
+            assets: true,
+            timings: true,
+        },
+        optimization: {
+            minimize: (0,_utils__WEBPACK_IMPORTED_MODULE_0__.isProd)(),
+            minimizer: [(0,_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_1__.terserPlugin)()],
+        },
+        experiments: {
+            backCompat: true,
         },
     };
 }
-exports.definePlugin = definePlugin;
-function htmlPlugin() {
-    return {
-        dependencies: {
-            'html-webpack-plugin': '5.5.x',
-        },
-        config: function () {
-            var HtmlWebpackPlugin = __webpack_require__(7);
-            return new HtmlWebpackPlugin({
-                template: (0, path_1.join)((0, utils_1.getProjectDir)(), 'src/index.html'),
-                minify: (0, utils_1.isProd)(),
-            });
-        },
-    };
-}
-exports.htmlPlugin = htmlPlugin;
-function forkTsCheckerPlugin() {
-    return {
-        dependencies: {
-            'fork-ts-checker-webpack-plugin': '7.2.x',
-        },
-        config: function () {
-            var ForkTsCheckerWebpackPlugin = __webpack_require__(8);
-            return new ForkTsCheckerWebpackPlugin({
-                typescript: {
-                    diagnosticOptions: {
-                        semantic: true,
-                        syntactic: true,
-                    },
-                    mode: 'write-references',
-                    configFile: (0, path_1.join)((0, utils_1.getProjectDir)(), 'tsconfig.json'),
-                },
-            });
-        },
-    };
-}
-exports.forkTsCheckerPlugin = forkTsCheckerPlugin;
-function eslintPlugin() {
-    return {
-        dependencies: {
-            'eslint-webpack-plugin': '3.1.x',
-        },
-        config: function () {
-            var EslintWebpackPlugin = __webpack_require__(9);
-            return new EslintWebpackPlugin({
-                extensions: ['ts', 'tsx'],
-                files: [(0, path_1.join)((0, utils_1.getProjectDir)(), 'src/**/*.ts*')],
-                threads: true,
-            });
-        },
-    };
-}
-exports.eslintPlugin = eslintPlugin;
-function cleanTerminalPlugin() {
-    return {
-        dependencies: {
-            'clean-terminal-webpack-plugin': '3.0.x',
-        },
-        config: function () {
-            var CleanTerminalPlugin = __webpack_require__(10);
-            return new CleanTerminalPlugin();
-        },
-    };
-}
-exports.cleanTerminalPlugin = cleanTerminalPlugin;
-function terserPlugin() {
-    return {
-        dependencies: {
-            'terser-webpack-plugin': '5.3.x',
-        },
-        config: function () {
-            var TerserWebpackPlugin = __webpack_require__(11);
-            return new TerserWebpackPlugin({
-                terserOptions: {
-                    format: {
-                        comments: false,
-                    },
-                },
-                extractComments: false,
-            });
-        },
-    };
-}
-exports.terserPlugin = terserPlugin;
 
 
 /***/ }),
 /* 5 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getDistDir": () => (/* binding */ getDistDir),
+/* harmony export */   "getEnv": () => (/* binding */ getEnv),
+/* harmony export */   "getProjectDir": () => (/* binding */ getProjectDir),
+/* harmony export */   "isProd": () => (/* binding */ isProd),
+/* harmony export */   "isSelenium": () => (/* binding */ isSelenium)
+/* harmony export */ });
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDistDir = exports.getProjectDir = exports.getEnv = exports.isSelenium = exports.isProd = void 0;
-var path_1 = __webpack_require__(2);
 function isProd() {
-    return process.env['NODE_ENV'] === 'production';
+    return process.env['NODE_ENV'] === 'production'; // eslint-disable-line node/no-process-env
 }
-exports.isProd = isProd;
 function isSelenium() {
-    return process.env['IS_SELENIUM'] === '1';
+    return process.env['IS_SELENIUM'] === '1'; // eslint-disable-line node/no-process-env
 }
-exports.isSelenium = isSelenium;
 function getEnv() {
     return isProd() ? 'production' : 'development';
 }
-exports.getEnv = getEnv;
 function getProjectDir() {
-    return (0, path_1.join)((0, path_1.resolve)('.'));
+    return (0,path__WEBPACK_IMPORTED_MODULE_0__.join)((0,path__WEBPACK_IMPORTED_MODULE_0__.resolve)('.'));
 }
-exports.getProjectDir = getProjectDir;
 function getDistDir() {
-    return (0, path_1.join)(getProjectDir(), 'dist');
+    return (0,path__WEBPACK_IMPORTED_MODULE_0__.join)(getProjectDir(), 'dist');
 }
-exports.getDistDir = getDistDir;
 
 
 /***/ }),
 /* 6 */
-/***/ ((module) => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-module.exports = require("webpack");
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "terserPlugin": () => (/* binding */ terserPlugin)
+/* harmony export */ });
+/* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
+
+function terserPlugin() {
+    return new terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__["default"]({
+        terserOptions: {
+            format: {
+                comments: false,
+            },
+        },
+        extractComments: false,
+    });
+}
+
 
 /***/ }),
 /* 7 */
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-module.exports = require("html-webpack-plugin");
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({ ["default"]: () => __WEBPACK_EXTERNAL_MODULE_terser_webpack_plugin_3cd6887c__["default"] });
 
 /***/ }),
 /* 8 */
-/***/ ((module) => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-module.exports = require("fork-ts-checker-webpack-plugin");
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "babelLoaderWeb": () => (/* binding */ babelLoaderWeb)
+/* harmony export */ });
+/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
+/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(12);
+/* harmony import */ var _babel_preset_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(13);
+/* harmony import */ var babel_plugin_react_remove_properties__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(14);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(5);
+/* eslint-disable import/no-unassigned-import */
+
+
+
+
+
+
+
+/* eslint-enable import/no-unassigned-import */
+function babelLoaderWeb() {
+    return {
+        test: /\.tsx?$/u,
+        exclude: /\/node_modules\//u,
+        loader: 'babel-loader',
+        options: {
+            presets: [
+                [
+                    '@babel/preset-env',
+                    {
+                        targets: '> 10%',
+                        bugfixes: true,
+                        useBuiltIns: 'usage',
+                        corejs: { version: '3.10' },
+                    },
+                ],
+                ['@babel/preset-react'],
+                ['@babel/preset-typescript'],
+            ],
+            plugins: (0,_utils__WEBPACK_IMPORTED_MODULE_6__.isSelenium)() ? [] : [['react-remove-properties', { properties: ['data-test-id'] }]],
+        },
+    };
+}
+
 
 /***/ }),
 /* 9 */
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-module.exports = require("eslint-webpack-plugin");
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({  });
 
 /***/ }),
 /* 10 */
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-module.exports = require("clean-terminal-webpack-plugin");
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({  });
 
 /***/ }),
 /* 11 */
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-module.exports = require("terser-webpack-plugin");
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({  });
 
 /***/ }),
 /* 12 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({  });
+
+/***/ }),
+/* 13 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({  });
+
+/***/ }),
+/* 14 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({  });
+
+/***/ }),
+/* 15 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "sourceMapLoader": () => (/* binding */ sourceMapLoader)
+/* harmony export */ });
+/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
+/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(12);
+/* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(16);
+/* eslint-disable import/no-unassigned-import */
 
 
-//   'source-map-loader': '3.0.x',
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sourceMapLoader = exports.babelLoaderNode = exports.babelLoaderWeb = void 0;
-var utils_1 = __webpack_require__(5);
-var babelBaseDependencies = {
-    '@babel/core': '7.17.x',
-    '@babel/preset-env': '7.16.x',
-    '@babel/preset-typescript': '7.16.x',
-    'babel-loader': '8.2.x',
-};
-function babelLoaderWeb() {
-    return {
-        dependencies: __assign(__assign({}, babelBaseDependencies), { '@babel/preset-react': '7.16.x', 'babel-plugin-react-remove-properties': '0.3.x' }),
-        config: function () { return ({
-            test: /\.tsx?$/u,
-            exclude: /\/node_modules\//u,
-            loader: 'babel-loader',
-            options: {
-                presets: [
-                    [
-                        '@babel/preset-env',
-                        {
-                            targets: '> 10%',
-                            bugfixes: true,
-                            useBuiltIns: 'usage',
-                            corejs: { version: '3.10' },
-                        },
-                    ],
-                    ['@babel/preset-react'],
-                    ['@babel/preset-typescript'],
-                ],
-                plugins: (0, utils_1.isSelenium)() ? [] : [['react-remove-properties', { properties: ['data-test-id'] }]],
-            },
-        }); },
-    };
-}
-exports.babelLoaderWeb = babelLoaderWeb;
-function babelLoaderNode() {
-    return {
-        dependencies: __assign({}, babelBaseDependencies),
-        config: function () { return ({
-            test: /\.tsx?$/u,
-            exclude: /\/node_modules\//u,
-            loader: 'babel-loader',
-            options: {
-                presets: [
-                    [
-                        '@babel/preset-env',
-                        {
-                            targets: {
-                                node: 16,
-                            },
-                        },
-                    ],
-                    ['@babel/preset-typescript'],
-                ],
-            },
-        }); },
-    };
-}
-exports.babelLoaderNode = babelLoaderNode;
+
+
+
+/* eslint-enable import/no-unassigned-import */
 function sourceMapLoader() {
     return {
-        dependencies: {
-            'source-map-loader': '3.0.x',
-        },
-        config: function () { return ({
-            test: /\.js$/,
-            use: ['source-map-loader'],
-            enforce: 'pre',
-        }); },
+        test: /\.js$/u,
+        use: ['source-map-loader'],
+        enforce: 'pre',
     };
 }
-exports.sourceMapLoader = sourceMapLoader;
+
+
+/***/ }),
+/* 16 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({  });
+
+/***/ }),
+/* 17 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "definePlugin": () => (/* binding */ definePlugin)
+/* harmony export */ });
+/* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(18);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
+
+
+function definePlugin() {
+    const envPrefix = 'MATTHIS_';
+    const extraEnv = Object.fromEntries(Object.entries(process.env) // eslint-disable-line node/no-process-env
+        .filter(([name]) => name.startsWith(envPrefix))
+        .map(([name, value]) => [`process.env.${name.slice(envPrefix.length)}`, value]));
+    return new webpack__WEBPACK_IMPORTED_MODULE_0__["default"].DefinePlugin({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        'process.env.NODE_ENV': JSON.stringify((0,_utils__WEBPACK_IMPORTED_MODULE_1__.getEnv)()),
+        ...extraEnv,
+    });
+}
+
+
+/***/ }),
+/* 18 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({ ["default"]: () => __WEBPACK_EXTERNAL_MODULE_webpack__["default"] });
+
+/***/ }),
+/* 19 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "htmlPlugin": () => (/* binding */ htmlPlugin)
+/* harmony export */ });
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* harmony import */ var html_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(21);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5);
+
+
+
+function htmlPlugin() {
+    return new html_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__["default"]({
+        template: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,_utils__WEBPACK_IMPORTED_MODULE_2__.getProjectDir)(), 'src/index.html'),
+        minify: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.isProd)(),
+    });
+}
+
+
+/***/ }),
+/* 20 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({ ["join"]: () => __WEBPACK_EXTERNAL_MODULE_node_path_02319fef__.join });
+
+/***/ }),
+/* 21 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({ ["default"]: () => __WEBPACK_EXTERNAL_MODULE_html_webpack_plugin_ea66bb30__["default"] });
+
+/***/ }),
+/* 22 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "forkTsCheckerPlugin": () => (/* binding */ forkTsCheckerPlugin)
+/* harmony export */ });
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(23);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5);
+
+
+
+function forkTsCheckerPlugin() {
+    return new fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__["default"]({
+        typescript: {
+            diagnosticOptions: {
+                semantic: true,
+                syntactic: true,
+            },
+            mode: 'write-references',
+            configFile: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,_utils__WEBPACK_IMPORTED_MODULE_2__.getProjectDir)(), 'tsconfig.json'),
+        },
+    });
+}
+
+
+/***/ }),
+/* 23 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({ ["default"]: () => __WEBPACK_EXTERNAL_MODULE_fork_ts_checker_webpack_plugin_a37ada7e__["default"] });
+
+/***/ }),
+/* 24 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "eslintPlugin": () => (/* binding */ eslintPlugin)
+/* harmony export */ });
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* harmony import */ var eslint_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(25);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5);
+
+
+
+function eslintPlugin() {
+    return new eslint_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__["default"]({
+        extensions: ['ts', 'tsx'],
+        files: [(0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,_utils__WEBPACK_IMPORTED_MODULE_2__.getProjectDir)(), 'src/**/*.ts*')],
+        threads: true,
+    });
+}
+
+
+/***/ }),
+/* 25 */
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
+var y = x => () => x
+module.exports = x({ ["default"]: () => __WEBPACK_EXTERNAL_MODULE_eslint_webpack_plugin_6c2e632d__["default"] });
+
+/***/ }),
+/* 26 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "cleanTerminalPlugin": () => (/* binding */ cleanTerminalPlugin)
+/* harmony export */ });
+function cleanTerminalPlugin() {
+    let firstRun = true;
+    return (compiler) => {
+        compiler.hooks.afterCompile.tap('CleanTerminalPlugin', () => {
+            if (firstRun) {
+                firstRun = false;
+                return;
+            }
+            process.stdout.write('\u001B[2J\u001B[3J\u001B[H');
+        });
+    };
+}
 
 
 /***/ })
-/******/ 	]);
+/******/ ]);
 /************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
+/******/ // The module cache
+/******/ var __webpack_module_cache__ = {};
+/******/ 
+/******/ // The require function
+/******/ function __webpack_require__(moduleId) {
+/******/ 	// Check if module is in cache
+/******/ 	var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 	if (cachedModule !== undefined) {
+/******/ 		return cachedModule.exports;
 /******/ 	}
-/******/ 	
+/******/ 	// Create a new module (and put it into the cache)
+/******/ 	var module = __webpack_module_cache__[moduleId] = {
+/******/ 		// no module.id needed
+/******/ 		// no module.loaded needed
+/******/ 		exports: {}
+/******/ 	};
+/******/ 
+/******/ 	// Execute the module function
+/******/ 	__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 
+/******/ 	// Return the exports of the module
+/******/ 	return module.exports;
+/******/ }
+/******/ 
+/************************************************************************/
+/******/ /* webpack/runtime/define property getters */
+/******/ (() => {
+/******/ 	// define getter functions for harmony exports
+/******/ 	__webpack_require__.d = (exports, definition) => {
+/******/ 		for(var key in definition) {
+/******/ 			if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 			}
+/******/ 		}
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/hasOwnProperty shorthand */
+/******/ (() => {
+/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ })();
+/******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-var exports = __webpack_exports__;
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _configs_web_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-var web_1 = __webpack_require__(1);
-exports["default"] = (0, web_1.webConfig)().config();
+// eslint-disable-next-line import/no-default-export
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,_configs_web_config__WEBPACK_IMPORTED_MODULE_0__.webConfig)());
 
 })();
 
-__webpack_exports__ = __webpack_exports__["default"];
-/******/ 	return __webpack_exports__;
-/******/ })()
-;
-});
+var __webpack_exports__default = __webpack_exports__["default"];
+export { __webpack_exports__default as default };

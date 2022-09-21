@@ -1,9 +1,9 @@
 import {join} from 'path';
-import {ESLINT_VERSION, PACKAGE_VERSIONS} from '../versions';
 
-import {cleanDir, writeJsonFile, writeJsFile} from '../fs';
+import {cleanDir, writeJsFile, writeJsonFile} from '../fs';
 import {RuntimeType} from '../models';
-import {PLUGINS_FOR_TYPE} from './plugins';
+import {ESLINT_VERSION, PACKAGE_VERSIONS} from '../versions';
+import {PLUGINS_FOR_TYPE} from './plugins/index';
 
 export async function generateForType(path: string, type: RuntimeType): Promise<void> {
   await cleanDir(path);
@@ -20,7 +20,7 @@ function generateEslintConfig(type: RuntimeType): Record<string, unknown> {
   const plugins = PLUGINS_FOR_TYPE[type];
   const eslintConfig = {
     root: true,
-    ignorePatterns: ['webpack.config.js'],
+    ignorePatterns: ['**/*.js'],
     env: {
       browser: type === RuntimeType.Web,
       node: type === RuntimeType.Node,
@@ -55,6 +55,7 @@ function generatePackageJson(type: RuntimeType): Record<string, unknown> {
     name: `@matthis/eslint-config-${type}`,
     version: PACKAGE_VERSIONS.eslint,
     license: 'UNLICENSED',
+    type: 'module',
     dependencies: sortedDependencies,
   };
 }

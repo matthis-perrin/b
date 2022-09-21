@@ -45,10 +45,9 @@ export async function cleanDir(dirPath: string): Promise<void> {
 }
 
 export async function cp(from: string, to: string): Promise<void> {
-  console.log('copy', from, to);
-  return new Promise((resolve, reject) =>
-    exec(`cp -R ${from} ${to}`, err => (err ? reject(err) : resolve()))
-  );
+  return new Promise((resolve, reject) => {
+    exec(`cp -R ${from} ${to}`, err => (err ? reject(err) : resolve()));
+  });
 }
 
 export async function exists(path: string): Promise<boolean> {
@@ -62,7 +61,8 @@ export async function exists(path: string): Promise<boolean> {
 
 export async function maybeReadFile(path: string): Promise<string | undefined> {
   try {
-    return (await readFile(path)).toString();
+    const fileContent = await readFile(path);
+    return fileContent.toString();
   } catch {
     return undefined;
   }
