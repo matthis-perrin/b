@@ -1,4 +1,4 @@
-import webpack, {Configuration} from 'webpack';
+import webpack, {Configuration} from 'webpack'; // eslint-disable-line import/no-named-as-default
 
 import {tsconfigPathsPlugin} from '@src/webpack/plugins/tsconfig_paths_plugin';
 

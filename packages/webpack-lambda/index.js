@@ -170,7 +170,7 @@ module.exports = x({ ["default"]: () => __WEBPACK_EXTERNAL_MODULE_terser_webpack
 /* harmony import */ var tsconfig_paths_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
 
 function tsconfigPathsPlugin() {
-    return new tsconfig_paths_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__["default"]({});
+    return new tsconfig_paths_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__.TsconfigPathsPlugin({});
 }
 
 
@@ -180,7 +180,7 @@ function tsconfigPathsPlugin() {
 
 var x = y => { var x = {}; __webpack_require__.d(x, y); return x; }
 var y = x => () => x
-module.exports = x({ ["default"]: () => __WEBPACK_EXTERNAL_MODULE_tsconfig_paths_webpack_plugin_a86394ce__["default"] });
+module.exports = x({ ["TsconfigPathsPlugin"]: () => __WEBPACK_EXTERNAL_MODULE_tsconfig_paths_webpack_plugin_a86394ce__.TsconfigPathsPlugin });
 
 /***/ }),
 /* 8 */
@@ -349,7 +349,7 @@ function cleanTerminalPlugin() {
 /* harmony export */ });
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(18);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
-
+ // eslint-disable-line import/no-named-as-default
 
 function definePlugin() {
     const envPrefix = 'MATTHIS_';

@@ -1,4 +1,4 @@
-import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
+import {TsconfigPathsPlugin} from 'tsconfig-paths-webpack-plugin';
 
 import {WebpackResolver} from '@src/webpack/models';
 

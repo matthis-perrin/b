@@ -1,4 +1,4 @@
-import webpack from 'webpack';
+import webpack from 'webpack'; // eslint-disable-line import/no-named-as-default
 
 import {WebpackPlugin} from '@src/webpack/models';
 import {getEnv} from '@src/webpack/utils';
