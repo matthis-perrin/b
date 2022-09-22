@@ -1,30 +1,19 @@
-import {readdir, readFile, stat, writeFile} from 'node:fs/promises';
-import {join, resolve} from 'node:path';
+import {writeFile} from 'node:fs/promises';
 
 import {createMatchPathAsync, loadConfig} from 'tsconfig-paths';
 import {Compiler, ExternalModule, NormalModule} from 'webpack';
 
 import {WebpackPlugin} from '@src/webpack/models';
+import {findPackageJson} from '@src/webpack/utils';
 
-async function findPackageJsonVersion(
-  p: string
-): Promise<{name: string; version: string} | undefined> {
-  const pStat = await stat(p);
-  if (pStat.isDirectory()) {
-    const dir = await readdir(p);
-    if (dir.includes('package.json')) {
-      const fileContent = await readFile(join(p, 'package.json'));
-      const {name, version} = JSON.parse(fileContent.toString());
-      return {name, version};
-    }
-    if (p === '/') {
-      return undefined;
-    }
-  }
-  return findPackageJsonVersion(resolve(`${p}/..`));
+export interface DependencyPackerPluginOptions {
+  name: string;
+  version: string;
 }
 
 class DependencyPackerPlugin {
+  public constructor(private readonly options?: DependencyPackerPluginOptions) {}
+
   public apply(compiler: Compiler): void {
     const name = 'DependencyPackerPlugin';
     const depMap = new Map<string, string>();
@@ -55,11 +44,11 @@ class DependencyPackerPlugin {
             if (res === undefined) {
               return;
             }
-            const dep = await findPackageJsonVersion(res);
-            if (dep === undefined) {
+            const packageJson = await findPackageJson(res);
+            if (packageJson === undefined) {
               return;
             }
-            depMap.set(dep.name, dep.version);
+            depMap.set(packageJson.name as string, packageJson.version as string);
           })
         );
       });
@@ -68,15 +57,35 @@ class DependencyPackerPlugin {
       if (stats.hasErrors()) {
         return;
       }
-      const outputDirectory = stats.compilation.compiler.options.output.path;
       const dependencies = Object.fromEntries(
         [...depMap.entries()].sort((e1, e2) => e1[0].localeCompare(e2[0]))
       );
+
+      let name = this.options?.name;
+      let version = this.options?.version;
+
+      if (name === undefined || version === undefined) {
+        const entryPoints = Object.values(stats.compilation.compiler.options.entry);
+        const entryPoint = entryPoints[0].import.at(-1) as string;
+        const entryPackageJson = await findPackageJson(entryPoint);
+        if (!entryPackageJson) {
+          console.error(`Failure to retrieve entryPoint's package.json for ${entryPoint}`);
+          return;
+        }
+
+        name = entryPackageJson.name as string;
+        version = entryPackageJson.version as string;
+      }
+
+      const outputDirectory = stats.compilation.compiler.options.output.path as string;
       await writeFile(
         `${outputDirectory}/package.json`,
         JSON.stringify(
           {
+            name,
+            version,
             type: 'module',
+            main: 'index.js',
             dependencies,
           },
           undefined,
@@ -87,6 +96,6 @@ class DependencyPackerPlugin {
   }
 }
 
-export function dependencyPackerPlugin(): WebpackPlugin {
-  return new DependencyPackerPlugin();
+export function dependencyPackerPlugin(opts?: DependencyPackerPluginOptions): WebpackPlugin {
+  return new DependencyPackerPlugin(opts);
 }

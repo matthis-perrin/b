@@ -7,19 +7,23 @@ import {babelLoaderNode} from '@src/webpack/loaders/babel_loader_node';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {cleanTerminalPlugin} from '@src/webpack/plugins/clean_terminal_plugin';
 import {definePlugin} from '@src/webpack/plugins/define_plugin';
-import {dependencyPackerPlugin} from '@src/webpack/plugins/dependency_packer_plugin';
-import {eslintPlugin} from '@src/webpack/plugins/eslint_plugin';
-import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
+import {
+  dependencyPackerPlugin,
+  DependencyPackerPluginOptions,
+} from '@src/webpack/plugins/dependency_packer_plugin';
 import {lambdaServerPlugin} from '@src/webpack/plugins/lambda_server_plugin';
 import {getDistDir, getProjectDir} from '@src/webpack/utils';
 
-export function nodeConfig(opts: {isLambda: boolean}): Configuration {
-  const {isLambda} = opts;
-  const entry = join(getProjectDir(), `src/index.ts`);
+export function nodeConfig(opts: {
+  isLambda: boolean;
+  packageOptions?: DependencyPackerPluginOptions;
+}): Configuration {
+  const {isLambda, packageOptions} = opts;
+  const base = baseConfig();
   return {
-    ...baseConfig(),
+    ...base,
     target: 'node',
-    entry: {main: entry},
+    entry: {index: join(getProjectDir(), `src/index.ts`)},
     output: {
       path: getDistDir(),
       filename: `[name].js`,
@@ -31,14 +35,12 @@ export function nodeConfig(opts: {isLambda: boolean}): Configuration {
       rules: [babelLoaderNode(), sourceMapLoader()],
     },
     plugins: [
+      ...(base.plugins ?? []),
       definePlugin(),
-      forkTsCheckerPlugin(),
-      eslintPlugin(),
       cleanTerminalPlugin(),
       lambdaServerPlugin(),
-      dependencyPackerPlugin(),
+      dependencyPackerPlugin(packageOptions),
     ],
-    externalsType: 'module',
     experiments: {
       outputModule: true,
     },

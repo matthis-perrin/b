@@ -1,12 +1,12 @@
 import {execSync} from 'node:child_process';
 import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 import {cp} from '@src/fs';
 import {PROJECT_TYPE_TO_METADATA, RuntimeType} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
 
-// eslint-disable-next-line unicorn/prefer-module
-const TEMPLATES_PATH = join(__dirname, './templates');
+const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../../../templates');
 
 export async function generateProject(dst: string, project: WorkspaceProject): Promise<void> {
   const {projectName, type} = project;

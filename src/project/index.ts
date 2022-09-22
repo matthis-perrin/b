@@ -39,5 +39,5 @@ function generatePackageJson(): Record<string, unknown> {
 async function writeScript(path: string): Promise<void> {
   const entry = join(fileURLToPath(import.meta.url), `../init_project.ts`);
   const dst = join(path);
-  await compile(entry, dst, false);
+  await compile(entry, dst, false, '@matthis/project', PACKAGE_VERSIONS.project);
 }

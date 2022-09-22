@@ -1,10 +1,8 @@
 import {
   PROJECT_TYPE_TO_METADATA,
   RuntimeType,
-  StandaloneLambdaWorkspaceFragment,
-  StaticWebsiteWorkspaceFragment,
-  WebAppWorkspaceFragment,
   WorkspaceFragment,
+  WorkspaceFragmentRegistry,
   WorkspaceFragmentType,
 } from '@src/models';
 import {getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
@@ -109,6 +107,9 @@ export function generateBuildWorkspaceFn(fragments: WorkspaceFragment[]): string
       return generateBuildStaticWebsiteProjectFn(fragment);
     } else if (type === WorkspaceFragmentType.StandaloneLambda) {
       return generateBuildStandaloneLambdaProjectFn(fragment);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    } else if (type === WorkspaceFragmentType.NodeLib) {
+      return generateBuildNodeLibProjectFn(fragment);
     }
     return neverHappens(type, `Unknown WorkspaceFragmentType "${type}"`);
   });
@@ -131,7 +132,7 @@ interface FunctionSourceCode {
 }
 
 export function generateBuildWebAppProjectFn(
-  fragment: WebAppWorkspaceFragment
+  fragment: WorkspaceFragmentRegistry[WorkspaceFragmentType.WebApp]
 ): FunctionSourceCode {
   const functionName = `buildWebApp_${fragment.websiteName}`;
   return {
@@ -163,7 +164,7 @@ async function ${functionName}(outputs) {
 }
 
 export function generateBuildStaticWebsiteProjectFn(
-  fragment: StaticWebsiteWorkspaceFragment
+  fragment: WorkspaceFragmentRegistry[WorkspaceFragmentType.StaticWebsite]
 ): FunctionSourceCode {
   const functionName = `buildStaticWebsite_${fragment.websiteName}`;
   return {
@@ -181,7 +182,7 @@ async function ${functionName}(outputs) {
 }
 
 export function generateBuildStandaloneLambdaProjectFn(
-  fragment: StandaloneLambdaWorkspaceFragment
+  fragment: WorkspaceFragmentRegistry[WorkspaceFragmentType.StandaloneLambda]
 ): FunctionSourceCode {
   const functionName = `buildStandaloneLambda_${fragment.lambdaName}`;
   return {
@@ -195,6 +196,23 @@ async function ${functionName}(outputs) {
   runCommand({
     command: \`yarn install --modules-folder dist/node_modules --production --no-bin-links\`,
     cwd: ${fragment.lambdaName}Path,
+  });
+}
+`,
+    name: functionName,
+  };
+}
+
+export function generateBuildNodeLibProjectFn(
+  fragment: WorkspaceFragmentRegistry[WorkspaceFragmentType.NodeLib]
+): FunctionSourceCode {
+  const functionName = `buildNodeLib_${fragment.libName}`;
+  return {
+    sourceCode: `
+async function ${functionName}(outputs) {
+  runCommand({
+    command: \`yarn build\`,
+    cwd: ${fragment.libName}Path,
   });
 }
 `,

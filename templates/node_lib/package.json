@@ -1,14 +1,16 @@
 {
   "name": "lib",
   "license": "UNLICENSED",
+  "type": "module",
   "scripts": {
     "lint": "eslint --ext ts,tsx src",
-    "tsc": "tsc -p tsconfig.json"
+    "tsc": "tsc -p tsconfig.json",
+    "build": "NODE_ENV=development ../node_modules/.bin/webpack"
   },
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
     "extends": [
-      "@matthis/eslint-config-lib"
+      "@matthis/eslint-config-node"
     ]
   }
 }

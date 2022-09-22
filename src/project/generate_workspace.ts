@@ -41,7 +41,6 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         type: ProjectType.LambdaApi,
       },
     ];
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (fragment.type === WorkspaceFragmentType.WebApp) {
     return [
       {
@@ -51,6 +50,14 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
       {
         projectName: fragment.lambdaName,
         type: ProjectType.LambdaApi,
+      },
+    ];
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (fragment.type === WorkspaceFragmentType.NodeLib) {
+    return [
+      {
+        projectName: fragment.libName,
+        type: ProjectType.NodeLib,
       },
     ];
   }

@@ -32,5 +32,5 @@ function generatePackageJson(type: RuntimeType): Record<string, unknown> {
 async function writeWebpackConfig(type: RuntimeType, path: string): Promise<void> {
   const entry = join(fileURLToPath(import.meta.url), `../${type}.ts`);
   const dst = join(path);
-  await compile(entry, dst, true);
+  await compile(entry, dst, true, `@matthis/webpack-${type}`, PACKAGE_VERSIONS.webpack);
 }

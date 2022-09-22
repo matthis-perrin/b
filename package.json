@@ -6,7 +6,8 @@
     "ncu": "ts-node --esm ./src/ncu.ts",
     "build": "NODE_ENV=development webpack build",
     "watch": "NODE_ENV=development webpack watch",
-    "start": "node dist/main.mjs || node dist/main.js",
+    "project": "yarn build && yarn start && cd packages/project/ && yarn install && cd ../../ && node packages/project/index.js",
+    "start": "node dist/main.js",
     "postinstall": "node install.js",
     "publish-all": "for d in ./packages/* ; do (cd \"$d\" && npm publish --access public && cd ..); done; rm -rf **/yarn.lock; yarn install"
   },

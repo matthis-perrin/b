@@ -1,7 +1,7 @@
 import {mkdir} from 'node:fs/promises';
 import {basename, join} from 'node:path';
 
-import prompts from 'prompts';
+import {prompt} from 'prompts';
 
 import {maybeReadFile, rmDir} from '@src/fs';
 import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '@src/models';
@@ -26,9 +26,13 @@ async function initProject(): Promise<void> {
 
   // Check if we are already in a workspace
   const workspaceContent = await maybeReadFile(join(workspacePath, 'app.code-workspace'));
-  if (workspaceContent !== undefined) {
+  const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
+  const workspaceProjects = Array.isArray(workspaceJson.projects)
+    ? workspaceJson.projects
+    : undefined;
+  if (workspaceProjects !== undefined) {
     workspaceName = basename(workspacePath);
-    for (const project of JSON.parse(workspaceContent).projects as WorkspaceFragment[]) {
+    for (const project of workspaceProjects as WorkspaceFragment[]) {
       frags.push(project);
       const projectNames = getProjectsFromWorkspaceFragment(project).map(p => p.projectName);
       takenNames.push(...projectNames);
@@ -36,7 +40,7 @@ async function initProject(): Promise<void> {
     }
   } else {
     // Ask for workspace name
-    const promptResponse = await prompts({
+    const promptResponse = await prompt({
       type: 'text',
       name: 'workspaceName',
       message: 'Workspace name',
@@ -82,10 +86,8 @@ async function initProject(): Promise<void> {
 async function askForWorkspaceFragment(
   takenNames: string[]
 ): Promise<WorkspaceFragment | undefined> {
-  const prompts = require('prompts');
-
   const DONE_GENERATING = 'done_generating';
-  const {workspaceFragmentType} = await prompts({
+  const {workspaceFragmentType} = await prompt({
     type: 'select',
     name: 'workspaceFragmentType',
     message: 'Choose a type of project to add to the workspace',
@@ -93,6 +95,7 @@ async function askForWorkspaceFragment(
       {title: 'Web App', value: WorkspaceFragmentType.WebApp},
       {title: 'Static Website', value: WorkspaceFragmentType.StaticWebsite},
       {title: 'Standalone Lambda', value: WorkspaceFragmentType.StandaloneLambda},
+      {title: 'Node lib', value: WorkspaceFragmentType.NodeLib},
       {title: `I'm done`, value: DONE_GENERATING},
     ],
   });
@@ -111,6 +114,10 @@ async function askForWorkspaceFragment(
     const websiteName = await askForProjectName('Frontend project name', 'frontend', takenNames);
     const lambdaName = await askForProjectName('Backend project name', 'backend', takenNames);
     return {type, websiteName, lambdaName};
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === WorkspaceFragmentType.NodeLib) {
+    const libName = await askForProjectName('Lib project name', 'lib', takenNames);
+    return {type, libName};
   }
   neverHappens(type, `Unknown WorkspaceFragmentType "${type}"`);
 }

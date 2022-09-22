@@ -1,5 +1,5 @@
 {
-  "extends": "@matthis/tsconfig-lib/tsconfig",
+  "extends": "@matthis/tsconfig-node/tsconfig",
   "compilerOptions": {
     "baseUrl": "."
   }

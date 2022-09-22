@@ -1,1 +1,2 @@
-module.exports = require('@matthis/webpack-web');
+import config from '@matthis/webpack-web';
+export default config;

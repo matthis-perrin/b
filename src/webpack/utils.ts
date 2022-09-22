@@ -1,3 +1,4 @@
+import {readdir, readFile, stat} from 'node:fs/promises';
 import {join, resolve} from 'node:path';
 
 export interface WebpackConfigFragment {
@@ -24,4 +25,19 @@ export function getProjectDir(): string {
 
 export function getDistDir(): string {
   return join(getProjectDir(), 'dist');
+}
+
+export async function findPackageJson(p: string): Promise<Record<string, unknown> | undefined> {
+  const pStat = await stat(p);
+  if (pStat.isDirectory()) {
+    const dir = await readdir(p);
+    if (dir.includes('package.json')) {
+      const fileContent = await readFile(join(p, 'package.json'));
+      return JSON.parse(fileContent.toString());
+    }
+    if (p === '/') {
+      return undefined;
+    }
+  }
+  return findPackageJson(resolve(`${p}/..`));
 }

@@ -1,1 +1,2 @@
-module.exports = require('@matthis/webpack-lambda');
+import config from '@matthis/webpack-lambda';
+export default config;

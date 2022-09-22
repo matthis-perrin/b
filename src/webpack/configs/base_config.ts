@@ -1,18 +1,20 @@
 import {Configuration} from 'webpack';
 
-// import {dependencyPackerPlugin} from '@src/webpack/plugins/dependency_packer_plugin';
+import {eslintPlugin} from '@src/webpack/plugins/eslint_plugin';
+import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
 import {terserPlugin} from '@src/webpack/plugins/terser_plugin';
 import {tsconfigPathsPlugin} from '@src/webpack/plugins/tsconfig_paths_plugin';
-import {isProd} from '@src/webpack/utils';
+import {findPackageJson, isProd} from '@src/webpack/utils';
 
 export function baseConfig(): Configuration {
   return {
     mode: 'none',
-    devtool: isProd() ? 'source-map' : 'eval',
+    // devtool: isProd() ? 'source-map' : 'eval',
     resolve: {
       plugins: [tsconfigPathsPlugin()],
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
+    plugins: [forkTsCheckerPlugin(), eslintPlugin()],
     stats: {
       preset: 'errors-warnings',
       assets: true,
@@ -29,8 +31,20 @@ export function baseConfig(): Configuration {
         return cb(new Error('No resolver when checking for externals'));
       }
       (resolver as (ctx: string, req: string) => Promise<string>)(context ?? '', request ?? '')
-        .then(res => (res.includes('/node_modules/') ? cb(undefined, request) : cb()))
-        .catch(() => cb(undefined, request));
+        .then(res => {
+          if (!res.includes('/node_modules/')) {
+            return cb();
+          }
+          findPackageJson(res)
+            .then(packageJson => {
+              if (packageJson && packageJson.type === 'module') {
+                return cb(undefined, `module ${request}`);
+              }
+              cb(undefined, `node-commonjs ${request}`);
+            })
+            .catch(() => cb(undefined, `node-commonjs ${request}`));
+        })
+        .catch(() => cb(undefined, `node-commonjs ${request}`));
     },
     experiments: {
       backCompat: true,

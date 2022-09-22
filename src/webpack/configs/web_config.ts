@@ -10,8 +10,6 @@ import {babelLoaderWeb} from '@src/webpack/loaders/babel_loader_web';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {cleanTerminalPlugin} from '@src/webpack/plugins/clean_terminal_plugin';
 import {definePlugin} from '@src/webpack/plugins/define_plugin';
-import {eslintPlugin} from '@src/webpack/plugins/eslint_plugin';
-import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
 import {htmlPlugin} from '@src/webpack/plugins/html_plugin';
 import {getDistDir, getProjectDir, isProd} from '@src/webpack/utils';
 
@@ -20,9 +18,7 @@ export function webConfig(): Configuration {
   return {
     ...base,
     target: 'web',
-    entry: {
-      main: join(getProjectDir(), `src/index.tsx`),
-    },
+    entry: {main: join(getProjectDir(), `src/index.tsx`)},
     output: {
       path: getDistDir(),
       filename: `[name].[contenthash].js`,
@@ -32,13 +28,7 @@ export function webConfig(): Configuration {
     module: {
       rules: [babelLoaderWeb(), sourceMapLoader()],
     },
-    plugins: [
-      definePlugin(),
-      htmlPlugin(),
-      forkTsCheckerPlugin(),
-      eslintPlugin(),
-      cleanTerminalPlugin(),
-    ],
+    plugins: [...(base.plugins ?? []), definePlugin(), htmlPlugin(), cleanTerminalPlugin()],
     devServer: !isProd()
       ? {
           static: getDistDir(),

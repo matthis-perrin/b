@@ -42,9 +42,11 @@ export function generateWorkspaceProjectTerraform(project: WorkspaceProject): st
     return generateWebTerraform(projectName);
   } else if (type === ProjectType.LambdaFunction) {
     return generateLambdaFunctionTerraform(projectName);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === ProjectType.LambdaApi) {
     return generateLambdaApiTerraform(projectName);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === ProjectType.NodeLib) {
+    return generateNodeLibTerraform();
   }
   neverHappens(type, 'ProjectType');
 }
@@ -70,4 +72,8 @@ export function generateLambdaApiTerraform(projectName: ProjectName): string {
     generateLambdaApiOutputsTerraform(projectName),
     generateApiGatewayTerraform(projectName),
   ].join('\n\n');
+}
+
+export function generateNodeLibTerraform(): string {
+  return '';
 }
