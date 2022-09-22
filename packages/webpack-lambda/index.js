@@ -69,17 +69,6 @@ function nodeConfig(opts) {
             (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_6__.dependencyPackerPlugin)(),
         ],
         externalsType: 'module',
-        externals: (ctx, cb) => {
-            const { request, context } = ctx;
-            if ((request?.startsWith('.') && !context?.includes('node_modules')) ||
-                request?.startsWith('@src/') ||
-                request?.startsWith('@shared/') ||
-                request?.startsWith('@shared-node/') ||
-                request === entry) {
-                return cb();
-            }
-            return cb(undefined, request);
-        },
         experiments: {
             outputModule: true,
         },
@@ -117,15 +106,24 @@ function baseConfig() {
             plugins: [(0,_src_webpack_plugins_tsconfig_paths_plugin__WEBPACK_IMPORTED_MODULE_1__.tsconfigPathsPlugin)()],
             extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
-        // stats: {
-        //   preset: 'errors-warnings',
-        //   assets: true,
-        //   timings: true,
-        //   chunkModules: true,
-        // },
+        stats: {
+            preset: 'errors-warnings',
+            assets: true,
+            timings: true,
+        },
         optimization: {
             minimize: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__.isProd)(),
             minimizer: [(0,_src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_0__.terserPlugin)()],
+        },
+        externals: (ctx, cb) => {
+            const { request, context } = ctx;
+            const resolver = ctx.getResolve?.();
+            if (!resolver) {
+                return cb(new Error('No resolver when checking for externals'));
+            }
+            resolver(context ?? '', request ?? '')
+                .then(res => (res.includes('/node_modules/') ? cb(undefined, request) : cb()))
+                .catch(() => cb(undefined, request));
         },
         experiments: {
             backCompat: true,

@@ -22,6 +22,16 @@ export function baseConfig(): Configuration {
       minimize: isProd(),
       minimizer: [terserPlugin()],
     },
+    externals: (ctx, cb) => {
+      const {request, context} = ctx;
+      const resolver = ctx.getResolve?.();
+      if (!resolver) {
+        return cb(new Error('No resolver when checking for externals'));
+      }
+      (resolver as (ctx: string, req: string) => Promise<string>)(context ?? '', request ?? '')
+        .then(res => (res.includes('/node_modules/') ? cb(undefined, request) : cb()))
+        .catch(() => cb(undefined, request));
+    },
     experiments: {
       backCompat: true,
     },

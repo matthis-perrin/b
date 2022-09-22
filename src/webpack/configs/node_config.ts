@@ -39,19 +39,6 @@ export function nodeConfig(opts: {isLambda: boolean}): Configuration {
       dependencyPackerPlugin(),
     ],
     externalsType: 'module',
-    externals: (ctx, cb) => {
-      const {request, context} = ctx;
-      if (
-        (request?.startsWith('.') && !context?.includes('node_modules')) ||
-        request?.startsWith('@src/') ||
-        request?.startsWith('@shared/') ||
-        request?.startsWith('@shared-node/') ||
-        request === entry
-      ) {
-        return cb();
-      }
-      return cb(undefined, request);
-    },
     experiments: {
       outputModule: true,
     },
