@@ -1,5 +1,7 @@
 import {Configuration} from 'webpack';
 
+import {cleanTerminalPlugin} from '@src/webpack/plugins/clean_terminal_plugin';
+import {definePlugin} from '@src/webpack/plugins/define_plugin';
 import {eslintPlugin} from '@src/webpack/plugins/eslint_plugin';
 import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
 import {terserPlugin} from '@src/webpack/plugins/terser_plugin';
@@ -14,7 +16,7 @@ export function baseConfig(): Configuration {
       plugins: [tsconfigPathsPlugin()],
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
-    plugins: [forkTsCheckerPlugin(), eslintPlugin()],
+    plugins: [forkTsCheckerPlugin(), eslintPlugin(), definePlugin(), cleanTerminalPlugin()],
     stats: {
       preset: 'errors-warnings',
       assets: true,

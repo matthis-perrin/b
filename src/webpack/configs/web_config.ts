@@ -8,8 +8,6 @@ import {Configuration} from 'webpack';
 import {baseConfig} from '@src/webpack/configs/base_config';
 import {babelLoaderWeb} from '@src/webpack/loaders/babel_loader_web';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
-import {cleanTerminalPlugin} from '@src/webpack/plugins/clean_terminal_plugin';
-import {definePlugin} from '@src/webpack/plugins/define_plugin';
 import {htmlPlugin} from '@src/webpack/plugins/html_plugin';
 import {getDistDir, getProjectDir, isProd} from '@src/webpack/utils';
 
@@ -28,7 +26,7 @@ export function webConfig(): Configuration {
     module: {
       rules: [babelLoaderWeb(), sourceMapLoader()],
     },
-    plugins: [...(base.plugins ?? []), definePlugin(), htmlPlugin(), cleanTerminalPlugin()],
+    plugins: [...(base.plugins ?? []), htmlPlugin()],
     devServer: !isProd()
       ? {
           static: getDistDir(),

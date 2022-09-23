@@ -5,8 +5,6 @@ import {Configuration} from 'webpack';
 import {baseConfig} from '@src/webpack/configs/base_config';
 import {babelLoaderNode} from '@src/webpack/loaders/babel_loader_node';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
-import {cleanTerminalPlugin} from '@src/webpack/plugins/clean_terminal_plugin';
-import {definePlugin} from '@src/webpack/plugins/define_plugin';
 import {
   dependencyPackerPlugin,
   DependencyPackerPluginOptions,
@@ -33,12 +31,7 @@ export function nodeConfig(opts: {
     module: {
       rules: [babelLoaderNode(), sourceMapLoader()],
     },
-    plugins: [
-      ...(base.plugins ?? []),
-      definePlugin(),
-      cleanTerminalPlugin(),
-      dependencyPackerPlugin(packageOptions),
-    ],
+    plugins: [...(base.plugins ?? []), dependencyPackerPlugin(packageOptions)],
     experiments: {
       outputModule: true,
     },
