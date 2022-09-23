@@ -164,6 +164,7 @@ let RuntimeType; //
   RuntimeType["Lib"] = "lib";
   RuntimeType["Lambda"] = "lambda";
   RuntimeType["ReactNative"] = "react-native";
+  RuntimeType["NodeLib"] = "node-lib";
 })(RuntimeType || (RuntimeType = {}));
 
 let ProjectType;
@@ -186,7 +187,7 @@ const PROJECT_TYPE_TO_METADATA = {
     runtimeType: RuntimeType.Lambda
   },
   [ProjectType.NodeLib]: {
-    runtimeType: RuntimeType.Node
+    runtimeType: RuntimeType.NodeLib
   }
 };
 const RUNTIME_TYPE_TO_METADATA = {
@@ -212,6 +213,11 @@ const RUNTIME_TYPE_TO_METADATA = {
   [RuntimeType.ReactNative]: {
     eslint: RuntimeType.ReactNative,
     tsconfig: RuntimeType.ReactNative
+  },
+  [RuntimeType.NodeLib]: {
+    eslint: RuntimeType.Node,
+    tsconfig: RuntimeType.Node,
+    webpack: RuntimeType.NodeLib
   }
 }; //
 // Workspace Fragment type
@@ -659,11 +665,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.3',
+  project: '1.2.5',
   eslint: '1.1.2',
   prettier: '1.1.1',
   tsconfig: '1.1.2',
-  webpack: '1.1.5'
+  webpack: '1.1.7'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';

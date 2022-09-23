@@ -44,7 +44,12 @@ export function baseConfig(): Configuration {
             })
             .catch(() => cb(undefined, `node-commonjs ${request}`));
         })
-        .catch(() => cb(undefined, `node-commonjs ${request}`));
+        .catch((err: unknown) => {
+          if (!request?.startsWith('node:')) {
+            console.log(String(err));
+          }
+          cb(undefined, `node-commonjs ${request}`);
+        });
     },
     experiments: {
       backCompat: true,

@@ -1,6 +1,2 @@
-import nodeConfig from '@matthis/webpack-node';
-
-const config = {
-  ...nodeConfig,
-};
+import config from '@matthis/webpack-node-lib';
 export default config;

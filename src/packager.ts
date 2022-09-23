@@ -9,18 +9,11 @@ export async function compile(
   name: string,
   version: string
 ): Promise<void> {
-  const libOption = isLib
-    ? {
-        library: {
-          type: 'module',
-        },
-      }
-    : {};
-  const baseConfig = nodeConfig({isLambda: false, packageOptions: {name, version}});
+  const baseConfig = nodeConfig({isLib, packageOptions: {name, version}});
   const config = {
     ...baseConfig,
     entry: {index: entry},
-    output: {...baseConfig.output, path: dst, ...libOption},
+    output: {...baseConfig.output, path: dst},
   };
 
   return new Promise((resolve, reject) => {

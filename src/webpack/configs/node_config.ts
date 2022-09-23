@@ -11,14 +11,13 @@ import {
   dependencyPackerPlugin,
   DependencyPackerPluginOptions,
 } from '@src/webpack/plugins/dependency_packer_plugin';
-import {lambdaServerPlugin} from '@src/webpack/plugins/lambda_server_plugin';
 import {getDistDir, getProjectDir} from '@src/webpack/utils';
 
 export function nodeConfig(opts: {
-  isLambda: boolean;
+  isLib: boolean;
   packageOptions?: DependencyPackerPluginOptions;
 }): Configuration {
-  const {isLambda, packageOptions} = opts;
+  const {isLib, packageOptions} = opts;
   const base = baseConfig();
   return {
     ...base,
@@ -29,7 +28,7 @@ export function nodeConfig(opts: {
       filename: `[name].js`,
       clean: true,
       chunkFormat: 'module',
-      ...(isLambda ? {library: 'handler', libraryTarget: 'umd'} : {}),
+      ...(isLib ? {library: {type: 'module'}} : {}),
     },
     module: {
       rules: [babelLoaderNode(), sourceMapLoader()],
@@ -38,7 +37,6 @@ export function nodeConfig(opts: {
       ...(base.plugins ?? []),
       definePlugin(),
       cleanTerminalPlugin(),
-      lambdaServerPlugin(),
       dependencyPackerPlugin(packageOptions),
     ],
     experiments: {

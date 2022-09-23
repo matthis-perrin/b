@@ -140,7 +140,13 @@ function baseConfig() {
 
           cb(undefined, `node-commonjs ${request}`);
         }).catch(() => cb(undefined, `node-commonjs ${request}`));
-      }).catch(() => cb(undefined, `node-commonjs ${request}`));
+      }).catch(err => {
+        if (!(request !== null && request !== void 0 && request.startsWith('node:'))) {
+          console.log(String(err));
+        }
+
+        cb(undefined, `node-commonjs ${request}`);
+      });
     },
     experiments: {
       backCompat: true

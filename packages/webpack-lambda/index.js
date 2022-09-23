@@ -16,9 +16,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_webpack_plugins_clean_terminal_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(21);
 /* harmony import */ var _src_webpack_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(22);
 /* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(24);
-/* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(26);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(6);
-
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(6);
 
 
 
@@ -29,29 +27,30 @@ __webpack_require__.r(__webpack_exports__);
 
 function nodeConfig(opts) {
   const {
-    isLambda,
+    isLib,
     packageOptions
   } = opts;
   const base = (0,_src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)();
   return { ...base,
     target: 'node',
     entry: {
-      index: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.getProjectDir)(), `src/index.ts`)
+      index: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_7__.getProjectDir)(), `src/index.ts`)
     },
     output: {
-      path: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.getDistDir)(),
+      path: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_7__.getDistDir)(),
       filename: `[name].js`,
       clean: true,
       chunkFormat: 'module',
-      ...(isLambda ? {
-        library: 'handler',
-        libraryTarget: 'umd'
+      ...(isLib ? {
+        library: {
+          type: 'module'
+        }
       } : {})
     },
     module: {
       rules: [(0,_src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__.babelLoaderNode)(), (0,_src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__.sourceMapLoader)()]
     },
-    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_5__.definePlugin)(), (0,_src_webpack_plugins_clean_terminal_plugin__WEBPACK_IMPORTED_MODULE_4__.cleanTerminalPlugin)(), (0,_src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_7__.lambdaServerPlugin)(), (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_6__.dependencyPackerPlugin)(packageOptions)],
+    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_5__.definePlugin)(), (0,_src_webpack_plugins_clean_terminal_plugin__WEBPACK_IMPORTED_MODULE_4__.cleanTerminalPlugin)(), (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_6__.dependencyPackerPlugin)(packageOptions)],
     experiments: {
       outputModule: true
     }
@@ -125,7 +124,13 @@ function baseConfig() {
 
           cb(undefined, `node-commonjs ${request}`);
         }).catch(() => cb(undefined, `node-commonjs ${request}`));
-      }).catch(() => cb(undefined, `node-commonjs ${request}`));
+      }).catch(err => {
+        if (!(request !== null && request !== void 0 && request.startsWith('node:'))) {
+          console.log(String(err));
+        }
+
+        cb(undefined, `node-commonjs ${request}`);
+      });
     },
     experiments: {
       backCompat: true
@@ -816,11 +821,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _configs_node_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
- // eslint-disable-next-line import/no-default-export
+/* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(26);
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,_configs_node_config__WEBPACK_IMPORTED_MODULE_0__.nodeConfig)({
-  isLambda: true
-}));
+
+const baseConfig = (0,_configs_node_config__WEBPACK_IMPORTED_MODULE_0__.nodeConfig)({
+  isLib: true
+});
+const config = { ...baseConfig,
+  plugins: [...(baseConfig.plugins ?? []), (0,_src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__.lambdaServerPlugin)()]
+}; // eslint-disable-next-line import/no-default-export
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (config);
 })();
 
 var __webpack_exports__default = __webpack_exports__["default"];

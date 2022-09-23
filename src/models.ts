@@ -13,6 +13,7 @@ export enum RuntimeType {
   Lib = 'lib',
   Lambda = 'lambda',
   ReactNative = 'react-native',
+  NodeLib = 'node-lib',
 }
 
 //
@@ -34,7 +35,7 @@ export const PROJECT_TYPE_TO_METADATA: Record<ProjectType, ProjectTypeMetadata> 
   [ProjectType.Web]: {runtimeType: RuntimeType.Web},
   [ProjectType.LambdaFunction]: {runtimeType: RuntimeType.Lambda},
   [ProjectType.LambdaApi]: {runtimeType: RuntimeType.Lambda},
-  [ProjectType.NodeLib]: {runtimeType: RuntimeType.Node},
+  [ProjectType.NodeLib]: {runtimeType: RuntimeType.NodeLib},
 };
 
 export interface RuntimeTypeMetadata {
@@ -66,6 +67,11 @@ export const RUNTIME_TYPE_TO_METADATA: Record<RuntimeType, RuntimeTypeMetadata> 
   [RuntimeType.ReactNative]: {
     eslint: RuntimeType.ReactNative,
     tsconfig: RuntimeType.ReactNative,
+  },
+  [RuntimeType.NodeLib]: {
+    eslint: RuntimeType.Node,
+    tsconfig: RuntimeType.Node,
+    webpack: RuntimeType.NodeLib,
   },
 };
 
