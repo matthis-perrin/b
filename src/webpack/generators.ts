@@ -14,5 +14,8 @@ export async function generateForType(path: string, type: RuntimeType): Promise<
 async function compileWebpackConfig(type: RuntimeType, path: string): Promise<void> {
   const entry = join(fileURLToPath(import.meta.url), `../${type}.ts`);
   const dst = join(path);
-  await compile(entry, dst, true, `@matthis/webpack-${type}`, PACKAGE_VERSIONS.webpack);
+  await compile(entry, dst, true, {
+    name: `@matthis/webpack-${type}`,
+    version: PACKAGE_VERSIONS.webpack,
+  });
 }

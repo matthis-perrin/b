@@ -6,13 +6,8 @@ import {Compiler, ExternalModule, NormalModule} from 'webpack';
 import {WebpackPlugin} from '@src/webpack/models';
 import {findPackageJson} from '@src/webpack/utils';
 
-export interface DependencyPackerPluginOptions {
-  name: string;
-  version: string;
-}
-
 class DependencyPackerPlugin {
-  public constructor(private readonly options?: DependencyPackerPluginOptions) {}
+  public constructor(private readonly packageJsonProperties: Record<string, unknown> = {}) {}
 
   public apply(compiler: Compiler): void {
     const name = 'DependencyPackerPlugin';
@@ -61,8 +56,7 @@ class DependencyPackerPlugin {
         [...depMap.entries()].sort((e1, e2) => e1[0].localeCompare(e2[0]))
       );
 
-      let name = this.options?.name;
-      let version = this.options?.version;
+      let {name, version, ...extraProps} = this.packageJsonProperties;
 
       if (name === undefined || version === undefined) {
         const entryPoints = Object.values(stats.compilation.compiler.options.entry);
@@ -86,6 +80,7 @@ class DependencyPackerPlugin {
             version,
             type: 'module',
             main: 'index.js',
+            ...extraProps,
             dependencies,
           },
           undefined,
@@ -96,6 +91,8 @@ class DependencyPackerPlugin {
   }
 }
 
-export function dependencyPackerPlugin(opts?: DependencyPackerPluginOptions): WebpackPlugin {
-  return new DependencyPackerPlugin(opts);
+export function dependencyPackerPlugin(
+  packageJsonProperties?: Record<string, unknown>
+): WebpackPlugin {
+  return new DependencyPackerPlugin(packageJsonProperties);
 }

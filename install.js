@@ -18,9 +18,6 @@ async function execAsync(cmd, options) {
 }
 
 const root = process.cwd();
-await execAsync('yarn build', {cwd: root});
-await execAsync('yarn start', {cwd: root});
-
 const templatesDir = join(root, 'templates');
 const templateDirsEnt = await readdir(templatesDir, {withFileTypes: true});
 const templateDirs = templateDirsEnt

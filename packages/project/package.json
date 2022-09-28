@@ -1,8 +1,9 @@
 {
   "name": "@matthis/project",
-  "version": "1.2.5",
+  "version": "1.2.8",
   "type": "module",
   "main": "index.js",
+  "bin": "./index.mjs",
   "dependencies": {
     "prettier": "2.7.1",
     "prompts": "2.4.2"

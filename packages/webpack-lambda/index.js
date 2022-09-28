@@ -24,7 +24,7 @@ __webpack_require__.r(__webpack_exports__);
 function nodeConfig(opts) {
   const {
     isLib,
-    packageOptions
+    packageJsonProperties
   } = opts;
   const base = (0,_src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)();
   return { ...base,
@@ -46,7 +46,7 @@ function nodeConfig(opts) {
     module: {
       rules: [(0,_src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__.babelLoaderNode)(), (0,_src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__.sourceMapLoader)()]
     },
-    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__.dependencyPackerPlugin)(packageOptions)],
+    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__.dependencyPackerPlugin)(packageJsonProperties)],
     experiments: {
       outputModule: true
     }
@@ -491,8 +491,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class DependencyPackerPlugin {
-  constructor(options) {
-    this.options = options;
+  constructor(packageJsonProperties = {}) {
+    this.packageJsonProperties = packageJsonProperties;
   }
 
   apply(compiler) {
@@ -540,15 +540,16 @@ class DependencyPackerPlugin {
       });
     });
     compiler.hooks.done.tapPromise(name, async stats => {
-      var _this$options, _this$options2;
-
       if (stats.hasErrors()) {
         return;
       }
 
       const dependencies = Object.fromEntries([...depMap.entries()].sort((e1, e2) => e1[0].localeCompare(e2[0])));
-      let name = (_this$options = this.options) === null || _this$options === void 0 ? void 0 : _this$options.name;
-      let version = (_this$options2 = this.options) === null || _this$options2 === void 0 ? void 0 : _this$options2.version;
+      let {
+        name,
+        version,
+        ...extraProps
+      } = this.packageJsonProperties;
 
       if (name === undefined || version === undefined) {
         const entryPoints = Object.values(stats.compilation.compiler.options.entry);
@@ -570,6 +571,7 @@ class DependencyPackerPlugin {
         version,
         type: 'module',
         main: 'index.js',
+        ...extraProps,
         dependencies
       }, undefined, 2));
     });
@@ -577,8 +579,8 @@ class DependencyPackerPlugin {
 
 }
 
-function dependencyPackerPlugin(opts) {
-  return new DependencyPackerPlugin(opts);
+function dependencyPackerPlugin(packageJsonProperties) {
+  return new DependencyPackerPlugin(packageJsonProperties);
 }
 
 /***/ }),

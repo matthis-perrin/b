@@ -341,7 +341,7 @@ module.exports = {
     'padded-blocks': 'off',
     'padding-line-between-statements': 'off',
     'prefer-arrow-callback': 'off',
-    'prefer-const': 'warn',
+    'prefer-const': ['warn', {destructuring: 'all'}],
     'prefer-destructuring': ['warn', {array: false}],
     'prefer-exponentiation-operator': 'warn',
     'prefer-message-ids': 'off',

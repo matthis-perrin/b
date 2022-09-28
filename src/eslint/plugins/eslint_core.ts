@@ -501,7 +501,7 @@ export const eslintCore: EslintMetadata = {
     'object-shorthand': 'warn',
     'one-var': ['warn', 'never'],
     'operator-assignment': 'warn',
-    'prefer-const': 'warn',
+    'prefer-const': ['warn', {destructuring: 'all'}],
     'prefer-destructuring': ['warn', {array: false}],
     'prefer-exponentiation-operator': 'warn',
     'prefer-named-capture-group': 'warn',
