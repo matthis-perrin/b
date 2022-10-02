@@ -41,7 +41,6 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
     // Interop Constraints
     allowSyntheticDefaultImports: true,
     esModuleInterop: false, // disabled
-    isolatedModules: true,
     // Output Formatting
     noErrorTruncation: true,
     pretty: true,

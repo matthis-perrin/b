@@ -25,7 +25,6 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": false,
-    "isolatedModules": true,
     "noErrorTruncation": true,
     "pretty": true,
     "skipLibCheck": true,
