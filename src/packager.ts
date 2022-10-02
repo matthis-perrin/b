@@ -22,12 +22,17 @@ export async function compile(
       if (err) {
         console.error(`Failure to compile ${entry}`);
         reject(err);
-      } else if (stats?.hasErrors()) {
-        console.error(`Failure to compile ${entry}`);
-        reject(new Error(stats.toString({errorDetails: true})));
-      } else {
-        resolve();
+      } else if (stats?.hasErrors() || stats?.hasWarnings()) {
+        const {errors = [], warnings = []} = stats.toJson({errors: true, warnings: true});
+        console.log('-------');
+        console.log(`Compiled ${entry} with errors:`);
+        console.log(errors.map(err => `${err.file}:${err.loc}\n[error] ${err.message}`).join('\n'));
+        console.log(
+          warnings.map(warn => `${warn.file}:${warn.loc}\n[warning] ${warn.message}`).join('\n')
+        );
+        console.log('-------');
       }
+      resolve();
     });
   });
 }

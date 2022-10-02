@@ -7,7 +7,7 @@
     "build": "NODE_ENV=development webpack build",
     "watch": "NODE_ENV=development webpack watch",
     "project": "yarn build && yarn start && cd packages/project/ && yarn install && cd ../../ && node packages/project/index.js",
-    "start": "node dist/main.js",
+    "start": "node dist/index.js",
     "postinstall": "node install.js",
     "publish-all": "for d in ./packages/* ; do (cd \"$d\" && npm publish --access public && cd ..); done; rm -rf **/yarn.lock; yarn install"
   },
@@ -25,6 +25,7 @@
     "@babel/preset-env": "7.19.x",
     "@babel/preset-react": "7.18.x",
     "@babel/preset-typescript": "7.18.x",
+    "@babel/register": "^7.18.9",
     "@matthis/eslint-config-node": "latest",
     "@matthis/prettier-config": "latest",
     "@matthis/tsconfig-node": "latest",
@@ -35,20 +36,19 @@
     "@types/semver": "7.3.x",
     "babel-loader": "8.2.x",
     "babel-plugin-react-remove-properties": "0.3.x",
-    "eslint-webpack-plugin": "3.1.x",
+    "chokidar": "3.5.x",
     "fork-ts-checker-webpack-plugin": "7.2.x",
     "html-webpack-plugin": "5.5.x",
     "package-json": "8.1.x",
     "semver": "7.3.x",
     "source-map-loader": "4.0.x",
     "terser-webpack-plugin": "5.3.x",
-    "tsconfig-paths-webpack-plugin": "^4.0.0",
+    "tsconfig-paths-webpack-plugin": "4.0.x",
     "webpack": "5.74.x",
     "webpack-cli": "4.10.x",
     "webpack-dev-server": "4.11.x"
   },
   "dependencies": {
-    "prompts": "2.4.x",
-    "ts-loader": "9.4.x"
+    "prompts": "2.4.x"
   }
 }

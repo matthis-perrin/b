@@ -1,6 +1,6 @@
 {
   "name": "@matthis/project",
-  "version": "1.2.8",
+  "version": "1.2.10",
   "type": "module",
   "main": "index.js",
   "bin": "./index.mjs",

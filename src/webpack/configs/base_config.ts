@@ -39,7 +39,7 @@ export function baseConfig(): Configuration {
           }
           findPackageJson(res)
             .then(packageJson => {
-              if (packageJson && packageJson.type === 'module') {
+              if (packageJson && packageJson['type'] === 'module') {
                 return cb(undefined, `module ${request}`);
               }
               cb(undefined, `node-commonjs ${request}`);

@@ -14,27 +14,39 @@ export async function generateForType(path: string, type: RuntimeType): Promise<
 
 function generateTsConfig(type: RuntimeType): Record<string, unknown> {
   const baseCompilerOptions = {
-    allowSyntheticDefaultImports: true,
-    downlevelIteration: true,
-    esModuleInterop: true,
-    incremental: true,
-    // Perform additional checks to ensure that separate compilation (such as with
-    // transpileModule or @babel/plugin-transform-typescript) would be safe.
-    isolatedModules: false,
-    locale: 'en-us',
-    newLine: 'LF',
-    noErrorTruncation: true,
+    // Type Checking
+    allowUnreachableCode: false,
+    allowUnusedLabels: false,
+    alwaysStrict: true,
+    exactOptionalPropertyTypes: false, // disabled
     noFallthroughCasesInSwitch: true,
-    noEmit: true,
+    noImplicitAny: true,
+    noImplicitOverride: true,
     noImplicitReturns: true,
+    noImplicitThis: true,
+    noPropertyAccessFromIndexSignature: true,
     noUncheckedIndexedAccess: true,
-    pretty: true,
-    // Skip type checking of all declaration files (*.d.ts).
-    skipLibCheck: true,
+    noUnusedLocals: false, // disabled (handled by eslint)
+    noUnusedParameters: false, // disabled (handled by eslint)
     strict: true,
-    tsBuildInfoFile: 'tmp/.tsbuildinfo',
-    // Prevent all visible ”@types” packages to be included by default
+    strictBindCallApply: true,
+    strictFunctionTypes: true,
+    strictNullChecks: true,
+    strictPropertyInitialization: true,
+    useUnknownInCatchVariables: true,
+    // Modules
     types: [],
+    // Emit
+    noEmit: true,
+    // Interop Constraints
+    allowSyntheticDefaultImports: true,
+    esModuleInterop: false, // disabled
+    isolatedModules: true,
+    // Output Formatting
+    noErrorTruncation: true,
+    pretty: true,
+    // Completeness
+    skipLibCheck: true,
   };
 
   let additionalCompilerOptions:

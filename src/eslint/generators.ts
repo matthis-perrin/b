@@ -20,7 +20,7 @@ function generateEslintConfig(type: RuntimeType): Record<string, unknown> {
   const plugins = PLUGINS_FOR_TYPE[type];
   const eslintConfig = {
     root: true,
-    ignorePatterns: ['**/*.js'],
+    ignorePatterns: ['js', 'cjs', 'mjs'].map(ext => `**/*.${ext}`),
     env: {
       browser: type === RuntimeType.Web,
       node: type === RuntimeType.Node,

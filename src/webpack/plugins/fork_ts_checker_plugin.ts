@@ -9,11 +9,18 @@ export function forkTsCheckerPlugin(): WebpackPlugin {
   return new ForkTsCheckerWebpackPlugin({
     typescript: {
       diagnosticOptions: {
-        semantic: true,
         syntactic: true,
+        semantic: true,
+        declaration: true,
+        global: true,
       },
-      mode: 'write-references',
+      mode: 'readonly',
       configFile: join(getProjectDir(), 'tsconfig.json'),
     },
+    formatter: issue => {
+      issue.severity = 'warning';
+      return issue.message;
+    },
+    logger: {log: () => {}, error: () => {}},
   });
 }

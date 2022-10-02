@@ -43,7 +43,7 @@ class DependencyPackerPlugin {
             if (packageJson === undefined) {
               return;
             }
-            depMap.set(packageJson.name as string, packageJson.version as string);
+            depMap.set(packageJson['name'] as string, packageJson['version'] as string);
           })
         );
       });
@@ -67,8 +67,8 @@ class DependencyPackerPlugin {
           return;
         }
 
-        name = entryPackageJson.name as string;
-        version = entryPackageJson.version as string;
+        name = entryPackageJson['name'] as string;
+        version = entryPackageJson['version'] as string;
       }
 
       const outputDirectory = stats.compilation.compiler.options.output.path as string;
