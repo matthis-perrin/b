@@ -36,7 +36,7 @@ export function generateCommonTerraform(
   ].join('\n\n');
 }
 
-export function generateWorkspaceProjectTerraform(project: WorkspaceProject): string {
+export function generateWorkspaceProjectTerraform(project: WorkspaceProject): string | undefined {
   const {projectName, type} = project;
   if (type === ProjectType.Web) {
     return generateWebTerraform(projectName);
@@ -44,9 +44,11 @@ export function generateWorkspaceProjectTerraform(project: WorkspaceProject): st
     return generateLambdaFunctionTerraform(projectName);
   } else if (type === ProjectType.LambdaApi) {
     return generateLambdaApiTerraform(projectName);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === ProjectType.NodeLib) {
-    return generateNodeLibTerraform();
+    return undefined;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === ProjectType.NodeScript) {
+    return undefined;
   }
   neverHappens(type, 'ProjectType');
 }
@@ -72,8 +74,4 @@ export function generateLambdaApiTerraform(projectName: ProjectName): string {
     generateLambdaApiOutputsTerraform(projectName),
     generateApiGatewayTerraform(projectName),
   ].join('\n\n');
-}
-
-export function generateNodeLibTerraform(): string {
-  return '';
 }

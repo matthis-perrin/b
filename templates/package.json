@@ -13,6 +13,7 @@
     "@matthis/webpack-lambda": "file:../packages/webpack-lambda",
     "@matthis/webpack-node": "file:../packages/webpack-node",
     "@matthis/webpack-node-lib": "file:../packages/webpack-node-lib",
+    "@matthis/webpack-node-script": "file:../packages/webpack-node-script",
     "@matthis/webpack-web": "file:../packages/webpack-web"
   }
 }

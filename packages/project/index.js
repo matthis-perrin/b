@@ -153,9 +153,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 // Runtime types
 //
-let RuntimeType; //
-// Project type
-//
+let RuntimeType;
 
 (function (RuntimeType) {
   RuntimeType["Web"] = "web";
@@ -164,31 +162,9 @@ let RuntimeType; //
   RuntimeType["Lambda"] = "lambda";
   RuntimeType["ReactNative"] = "react-native";
   RuntimeType["NodeLib"] = "node-lib";
+  RuntimeType["NodeScript"] = "node-script";
 })(RuntimeType || (RuntimeType = {}));
 
-let ProjectType;
-
-(function (ProjectType) {
-  ProjectType["Web"] = "web";
-  ProjectType["LambdaFunction"] = "lambda_function";
-  ProjectType["LambdaApi"] = "lambda_api";
-  ProjectType["NodeLib"] = "node_lib";
-})(ProjectType || (ProjectType = {}));
-
-const PROJECT_TYPE_TO_METADATA = {
-  [ProjectType.Web]: {
-    runtimeType: RuntimeType.Web
-  },
-  [ProjectType.LambdaFunction]: {
-    runtimeType: RuntimeType.Lambda
-  },
-  [ProjectType.LambdaApi]: {
-    runtimeType: RuntimeType.Lambda
-  },
-  [ProjectType.NodeLib]: {
-    runtimeType: RuntimeType.NodeLib
-  }
-};
 const RUNTIME_TYPE_TO_METADATA = {
   [RuntimeType.Web]: {
     eslint: RuntimeType.Web,
@@ -217,6 +193,41 @@ const RUNTIME_TYPE_TO_METADATA = {
     eslint: RuntimeType.Node,
     tsconfig: RuntimeType.Node,
     webpack: RuntimeType.NodeLib
+  },
+  [RuntimeType.NodeScript]: {
+    eslint: RuntimeType.Node,
+    tsconfig: RuntimeType.Node,
+    webpack: RuntimeType.NodeScript
+  }
+}; //
+// Project type
+//
+
+let ProjectType;
+
+(function (ProjectType) {
+  ProjectType["Web"] = "web";
+  ProjectType["LambdaFunction"] = "lambda_function";
+  ProjectType["LambdaApi"] = "lambda_api";
+  ProjectType["NodeLib"] = "node_lib";
+  ProjectType["NodeScript"] = "node_script";
+})(ProjectType || (ProjectType = {}));
+
+const PROJECT_TYPE_TO_METADATA = {
+  [ProjectType.Web]: {
+    runtimeType: RuntimeType.Web
+  },
+  [ProjectType.LambdaFunction]: {
+    runtimeType: RuntimeType.Lambda
+  },
+  [ProjectType.LambdaApi]: {
+    runtimeType: RuntimeType.Lambda
+  },
+  [ProjectType.NodeLib]: {
+    runtimeType: RuntimeType.NodeLib
+  },
+  [ProjectType.NodeScript]: {
+    runtimeType: RuntimeType.NodeScript
   }
 }; //
 // Workspace Fragment type
@@ -229,6 +240,7 @@ let WorkspaceFragmentType;
   WorkspaceFragmentType["StandaloneLambda"] = "standalone-lambda";
   WorkspaceFragmentType["WebApp"] = "web-app";
   WorkspaceFragmentType["NodeLib"] = "node-lib";
+  WorkspaceFragmentType["NodeScript"] = "node-script";
 })(WorkspaceFragmentType || (WorkspaceFragmentType = {}));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -289,11 +301,16 @@ function getProjectsFromWorkspaceFragment(fragment) {
     }, {
       projectName: fragment.lambdaName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_3__.ProjectType.LambdaApi
-    }]; // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_3__.WorkspaceFragmentType.NodeLib) {
     return [{
       projectName: fragment.libName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_3__.ProjectType.NodeLib
+    }]; // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_3__.WorkspaceFragmentType.NodeScript) {
+    return [{
+      projectName: fragment.scriptName,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_3__.ProjectType.NodeScript
     }];
   }
 
@@ -318,6 +335,11 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'terraform');
   await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateCommonTerraform)(workspaceName, projects)), ...projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async p => {
     const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateWorkspaceProjectTerraform)(p);
+
+    if (content === undefined) {
+      return;
+    }
+
     const name = `${p.projectName}_terraform`;
     await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(terraformPath, `${name}.tf`), content);
   })]); // Run setup.js
@@ -336,6 +358,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "generateBuildNodeLibProjectFn": () => (/* binding */ generateBuildNodeLibProjectFn),
+/* harmony export */   "generateBuildNodeScriptProjectFn": () => (/* binding */ generateBuildNodeScriptProjectFn),
 /* harmony export */   "generateBuildStandaloneLambdaProjectFn": () => (/* binding */ generateBuildStandaloneLambdaProjectFn),
 /* harmony export */   "generateBuildStaticWebsiteProjectFn": () => (/* binding */ generateBuildStaticWebsiteProjectFn),
 /* harmony export */   "generateBuildWebAppProjectFn": () => (/* binding */ generateBuildWebAppProjectFn),
@@ -441,9 +464,11 @@ function generateBuildWorkspaceFn(fragments) {
     } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.StaticWebsite) {
       return generateBuildStaticWebsiteProjectFn(fragment);
     } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.StandaloneLambda) {
-      return generateBuildStandaloneLambdaProjectFn(fragment); // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      return generateBuildStandaloneLambdaProjectFn(fragment);
     } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.NodeLib) {
-      return generateBuildNodeLibProjectFn(fragment);
+      return generateBuildNodeLibProjectFn(fragment); // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.NodeScript) {
+      return generateBuildNodeScriptProjectFn(fragment);
     }
 
     return (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_2__.neverHappens)(type, `Unknown WorkspaceFragmentType "${type}"`);
@@ -525,6 +550,20 @@ async function ${functionName}(outputs) {
   runCommand({
     command: \`yarn build\`,
     cwd: ${fragment.libName}Path,
+  });
+}
+`,
+    name: functionName
+  };
+}
+function generateBuildNodeScriptProjectFn(fragment) {
+  const functionName = `buildNodeScript_${fragment.scriptName}`;
+  return {
+    sourceCode: `
+async function ${functionName}(outputs) {
+  runCommand({
+    command: \`yarn build\`,
+    cwd: ${fragment.scriptName}Path,
   });
 }
 `,
@@ -787,7 +826,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "generateCommonTerraform": () => (/* binding */ generateCommonTerraform),
 /* harmony export */   "generateLambdaApiTerraform": () => (/* binding */ generateLambdaApiTerraform),
 /* harmony export */   "generateLambdaFunctionTerraform": () => (/* binding */ generateLambdaFunctionTerraform),
-/* harmony export */   "generateNodeLibTerraform": () => (/* binding */ generateNodeLibTerraform),
 /* harmony export */   "generateWebTerraform": () => (/* binding */ generateWebTerraform),
 /* harmony export */   "generateWorkspaceProjectTerraform": () => (/* binding */ generateWorkspaceProjectTerraform)
 /* harmony export */ });
@@ -821,9 +859,11 @@ function generateWorkspaceProjectTerraform(project) {
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaFunction) {
     return generateLambdaFunctionTerraform(projectName);
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaApi) {
-    return generateLambdaApiTerraform(projectName); // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return generateLambdaApiTerraform(projectName);
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeLib) {
-    return generateNodeLibTerraform();
+    return undefined; // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
+    return undefined;
   }
 
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_7__.neverHappens)(type, 'ProjectType');
@@ -836,9 +876,6 @@ function generateLambdaFunctionTerraform(projectName) {
 }
 function generateLambdaApiTerraform(projectName) {
   return [generateLambdaFunctionTerraform(projectName), (0,_src_project_terraform_output__WEBPACK_IMPORTED_MODULE_4__.generateLambdaApiOutputsTerraform)(projectName), (0,_src_project_terraform_api_gateway__WEBPACK_IMPORTED_MODULE_1__.generateApiGatewayTerraform)(projectName)].join('\n\n');
-}
-function generateNodeLibTerraform() {
-  return '';
 }
 
 /***/ }),
@@ -1424,6 +1461,14 @@ async function initProject() {
   }
 }
 
+const WorkspaceFragmentTypeToString = {
+  [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.WebApp]: 'Web App',
+  [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StaticWebsite]: 'Static Website',
+  [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StandaloneLambda]: 'Standalone Lambda',
+  [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeLib]: 'Node Lib',
+  [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeScript]: 'Node Script'
+};
+
 async function askForWorkspaceFragment(takenNames) {
   const DONE_GENERATING = 'done_generating';
   const {
@@ -1432,19 +1477,10 @@ async function askForWorkspaceFragment(takenNames) {
     type: 'select',
     name: 'workspaceFragmentType',
     message: 'Choose a type of project to add to the workspace',
-    choices: [{
-      title: 'Web App',
-      value: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.WebApp
-    }, {
-      title: 'Static Website',
-      value: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StaticWebsite
-    }, {
-      title: 'Standalone Lambda',
-      value: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StandaloneLambda
-    }, {
-      title: 'Node lib',
-      value: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeLib
-    }, {
+    choices: [...Object.entries(WorkspaceFragmentTypeToString).map(([value, title]) => ({
+      value,
+      title
+    })), {
       title: `I'm done`,
       value: DONE_GENERATING
     }]
@@ -1475,21 +1511,27 @@ async function askForWorkspaceFragment(takenNames) {
       type,
       websiteName,
       lambdaName
-    }; // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    };
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeLib) {
     const libName = await askForProjectName('Lib project name', 'lib', takenNames);
     return {
       type,
       libName
+    }; // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeScript) {
+    const scriptName = await askForProjectName('Script project name', 'script', takenNames);
+    return {
+      type,
+      scriptName
     };
   }
 
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.neverHappens)(type, `Unknown WorkspaceFragmentType "${type}"`);
 }
 
-async function askForProjectName(question, defaultValue, takenNames) {
-  const prompts = __webpack_require__(3);
+const VALID_PROJECT_NAME = /^[a-zA-Z0-9_]+$/u;
 
+async function askForProjectName(question, defaultValue, takenNames) {
   let initial = defaultValue;
 
   if (takenNames.includes(initial)) {
@@ -1503,7 +1545,7 @@ async function askForProjectName(question, defaultValue, takenNames) {
 
   const {
     value
-  } = await prompts({
+  } = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({
     type: 'text',
     name: 'value',
     message: question,
@@ -1513,6 +1555,10 @@ async function askForProjectName(question, defaultValue, takenNames) {
 
   if (typeof value !== 'string') {
     throw new Error(`${question} is required`);
+  }
+
+  if (!VALID_PROJECT_NAME.test(value)) {
+    throw new Error(`Invalid project name "${value}". Allowed characters are a-z, A-Z, 0-9 and _`);
   }
 
   if (takenNames.includes(value)) {

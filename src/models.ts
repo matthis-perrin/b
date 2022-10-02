@@ -14,29 +14,8 @@ export enum RuntimeType {
   Lambda = 'lambda',
   ReactNative = 'react-native',
   NodeLib = 'node-lib',
+  NodeScript = 'node-script',
 }
-
-//
-// Project type
-//
-
-export enum ProjectType {
-  Web = 'web',
-  LambdaFunction = 'lambda_function',
-  LambdaApi = 'lambda_api',
-  NodeLib = 'node_lib',
-}
-
-interface ProjectTypeMetadata {
-  runtimeType: RuntimeType;
-}
-
-export const PROJECT_TYPE_TO_METADATA: Record<ProjectType, ProjectTypeMetadata> = {
-  [ProjectType.Web]: {runtimeType: RuntimeType.Web},
-  [ProjectType.LambdaFunction]: {runtimeType: RuntimeType.Lambda},
-  [ProjectType.LambdaApi]: {runtimeType: RuntimeType.Lambda},
-  [ProjectType.NodeLib]: {runtimeType: RuntimeType.NodeLib},
-};
 
 export interface RuntimeTypeMetadata {
   eslint: RuntimeType;
@@ -73,6 +52,35 @@ export const RUNTIME_TYPE_TO_METADATA: Record<RuntimeType, RuntimeTypeMetadata> 
     tsconfig: RuntimeType.Node,
     webpack: RuntimeType.NodeLib,
   },
+  [RuntimeType.NodeScript]: {
+    eslint: RuntimeType.Node,
+    tsconfig: RuntimeType.Node,
+    webpack: RuntimeType.NodeScript,
+  },
+};
+
+//
+// Project type
+//
+
+export enum ProjectType {
+  Web = 'web',
+  LambdaFunction = 'lambda_function',
+  LambdaApi = 'lambda_api',
+  NodeLib = 'node_lib',
+  NodeScript = 'node_script',
+}
+
+interface ProjectTypeMetadata {
+  runtimeType: RuntimeType;
+}
+
+export const PROJECT_TYPE_TO_METADATA: Record<ProjectType, ProjectTypeMetadata> = {
+  [ProjectType.Web]: {runtimeType: RuntimeType.Web},
+  [ProjectType.LambdaFunction]: {runtimeType: RuntimeType.Lambda},
+  [ProjectType.LambdaApi]: {runtimeType: RuntimeType.Lambda},
+  [ProjectType.NodeLib]: {runtimeType: RuntimeType.NodeLib},
+  [ProjectType.NodeScript]: {runtimeType: RuntimeType.NodeScript},
 };
 
 //
@@ -84,6 +92,7 @@ export enum WorkspaceFragmentType {
   StandaloneLambda = 'standalone-lambda',
   WebApp = 'web-app',
   NodeLib = 'node-lib',
+  NodeScript = 'node-script',
 }
 
 interface WorkspaceFragmentBase {
@@ -107,6 +116,10 @@ export interface WorkspaceFragmentRegistry {
   [WorkspaceFragmentType.NodeLib]: {
     type: WorkspaceFragmentType.NodeLib;
     libName: ProjectName;
+  };
+  [WorkspaceFragmentType.NodeScript]: {
+    type: WorkspaceFragmentType.NodeScript;
+    scriptName: ProjectName;
   };
 }
 

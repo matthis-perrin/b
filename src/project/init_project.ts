@@ -83,6 +83,14 @@ async function initProject(): Promise<void> {
   }
 }
 
+const WorkspaceFragmentTypeToString: Record<WorkspaceFragmentType, string> = {
+  [WorkspaceFragmentType.WebApp]: 'Web App',
+  [WorkspaceFragmentType.StaticWebsite]: 'Static Website',
+  [WorkspaceFragmentType.StandaloneLambda]: 'Standalone Lambda',
+  [WorkspaceFragmentType.NodeLib]: 'Node Lib',
+  [WorkspaceFragmentType.NodeScript]: 'Node Script',
+};
+
 async function askForWorkspaceFragment(
   takenNames: string[]
 ): Promise<WorkspaceFragment | undefined> {
@@ -92,10 +100,7 @@ async function askForWorkspaceFragment(
     name: 'workspaceFragmentType',
     message: 'Choose a type of project to add to the workspace',
     choices: [
-      {title: 'Web App', value: WorkspaceFragmentType.WebApp},
-      {title: 'Static Website', value: WorkspaceFragmentType.StaticWebsite},
-      {title: 'Standalone Lambda', value: WorkspaceFragmentType.StandaloneLambda},
-      {title: 'Node lib', value: WorkspaceFragmentType.NodeLib},
+      ...Object.entries(WorkspaceFragmentTypeToString).map(([value, title]) => ({value, title})),
       {title: `I'm done`, value: DONE_GENERATING},
     ],
   });
@@ -114,21 +119,24 @@ async function askForWorkspaceFragment(
     const websiteName = await askForProjectName('Frontend project name', 'frontend', takenNames);
     const lambdaName = await askForProjectName('Backend project name', 'backend', takenNames);
     return {type, websiteName, lambdaName};
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === WorkspaceFragmentType.NodeLib) {
     const libName = await askForProjectName('Lib project name', 'lib', takenNames);
     return {type, libName};
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === WorkspaceFragmentType.NodeScript) {
+    const scriptName = await askForProjectName('Script project name', 'script', takenNames);
+    return {type, scriptName};
   }
   neverHappens(type, `Unknown WorkspaceFragmentType "${type}"`);
 }
+
+const VALID_PROJECT_NAME = /^[a-zA-Z0-9_]+$/u;
 
 async function askForProjectName(
   question: string,
   defaultValue: string,
   takenNames: string[]
 ): Promise<ProjectName> {
-  const prompts = require('prompts');
-
   let initial = defaultValue;
   if (takenNames.includes(initial)) {
     let index = 2;
@@ -138,7 +146,7 @@ async function askForProjectName(
     }
   }
 
-  const {value} = await prompts({
+  const {value} = await prompt({
     type: 'text',
     name: 'value',
     message: question,
@@ -147,6 +155,9 @@ async function askForProjectName(
   });
   if (typeof value !== 'string') {
     throw new Error(`${question} is required`);
+  }
+  if (!VALID_PROJECT_NAME.test(value)) {
+    throw new Error(`Invalid project name "${value}". Allowed characters are a-z, A-Z, 0-9 and _`);
   }
   if (takenNames.includes(value)) {
     throw new Error(`${value} is taken`);

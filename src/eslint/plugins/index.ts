@@ -30,4 +30,5 @@ export const PLUGINS_FOR_TYPE: Record<RuntimeType, EslintMetadata[]> = {
   [RuntimeType.Lib]: [...BASE_PLUGINS],
   [RuntimeType.ReactNative]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
   [RuntimeType.NodeLib]: [...BASE_PLUGINS, eslintNode],
+  [RuntimeType.NodeScript]: [...BASE_PLUGINS, eslintNode],
 };

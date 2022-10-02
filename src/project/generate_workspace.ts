@@ -52,12 +52,19 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         type: ProjectType.LambdaApi,
       },
     ];
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (fragment.type === WorkspaceFragmentType.NodeLib) {
     return [
       {
         projectName: fragment.libName,
         type: ProjectType.NodeLib,
+      },
+    ];
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (fragment.type === WorkspaceFragmentType.NodeScript) {
+    return [
+      {
+        projectName: fragment.scriptName,
+        type: ProjectType.NodeScript,
       },
     ];
   }
@@ -106,6 +113,9 @@ export async function generateWorkspace(
       .filter(p => !alreadyGenerated.includes(p.projectName))
       .map(async p => {
         const content = generateWorkspaceProjectTerraform(p);
+        if (content === undefined) {
+          return;
+        }
         const name = `${p.projectName}_terraform`;
         await writeRawFile(join(terraformPath, `${name}.tf`), content);
       }),
