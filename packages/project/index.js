@@ -703,11 +703,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.10',
+  project: '1.2.11',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.4',
-  webpack: '1.1.11'
+  webpack: '1.1.12'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
