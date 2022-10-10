@@ -2,5 +2,6 @@
   "extends": "@matthis/tsconfig-web/tsconfig",
   "compilerOptions": {
     "baseUrl": "."
-  }
+  },
+  "include": ["src", "../shared"]
 }

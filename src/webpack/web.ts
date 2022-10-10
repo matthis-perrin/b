@@ -1,4 +1,7 @@
-import {webConfig} from './configs/web_config';
+import {Configuration} from 'webpack';
 
-// eslint-disable-next-line import/no-default-export
-export default webConfig();
+import {webConfig} from '@src/webpack/configs/web_config';
+
+export function config(context?: string): Configuration {
+  return webConfig({context});
+}

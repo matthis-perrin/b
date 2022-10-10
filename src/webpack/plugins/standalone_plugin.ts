@@ -2,11 +2,11 @@ import {Compiler} from 'webpack';
 
 export abstract class StandalonePlugin {
   protected abstract name: string;
+  protected context: string = process.cwd();
 
   public apply(compiler: Compiler): void {
-    compiler.hooks.initialize.tap(this.name, () => {
-      this.setup(compiler);
-    });
+    this.context = compiler.context;
+    compiler.hooks.beforeRun.tapPromise(this.name, async () => this.setup(compiler));
     compiler.hooks.shutdown.tapPromise(this.name, async () => this.exitHandlerAsync(compiler));
 
     process.on('beforeExit', () => this.exitHandler(compiler));
@@ -16,8 +16,8 @@ export abstract class StandalonePlugin {
     process.on('uncaughtException', () => this.exitHandler(compiler));
   }
 
-  protected abstract setup(compiler: Compiler): void;
-  protected abstract teardown(compiler: Compiler): Promise<void>;
+  protected abstract setup(compiler: Compiler): void | Promise<void>;
+  protected abstract teardown(compiler: Compiler): void | Promise<void>;
 
   private hasExited = false;
   private exitHandler(compiler: Compiler): void {
@@ -25,7 +25,7 @@ export abstract class StandalonePlugin {
       return;
     }
     this.hasExited = true;
-    this.teardown(compiler)
+    Promise.resolve(this.teardown(compiler))
       .catch(err => {
         console.error(`Error during teardown of plugin ${this.name}`);
         console.error(err);

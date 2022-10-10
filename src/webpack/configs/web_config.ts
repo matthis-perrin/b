@@ -9,16 +9,17 @@ import {baseConfig} from '@src/webpack/configs/base_config';
 import {babelLoaderWeb} from '@src/webpack/loaders/babel_loader_web';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {htmlPlugin} from '@src/webpack/plugins/html_plugin';
-import {getDistDir, getProjectDir, isProd} from '@src/webpack/utils';
+import {isProd} from '@src/webpack/utils';
 
-export function webConfig(): Configuration {
-  const base = baseConfig();
+export function webConfig(opts: {context?: string}): Configuration {
+  const {context = process.cwd()} = opts;
+  const base = baseConfig(context);
   return {
     ...base,
     target: 'web',
-    entry: {main: join(getProjectDir(), `src/index.tsx`)},
+    entry: {main: join(context, 'src/index.tsx')},
     output: {
-      path: getDistDir(),
+      path: join(context, 'dist'),
       filename: `[name].[contenthash].js`,
       clean: true,
       publicPath: '/',
@@ -26,10 +27,10 @@ export function webConfig(): Configuration {
     module: {
       rules: [babelLoaderWeb(), sourceMapLoader()],
     },
-    plugins: [...(base.plugins ?? []), htmlPlugin()],
+    plugins: [...(base.plugins ?? []), htmlPlugin(context)],
     devServer: !isProd()
       ? {
-          static: getDistDir(),
+          static: join(context, 'dist'),
           compress: true,
           hot: true,
           open: true,

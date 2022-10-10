@@ -1,7 +1,6 @@
 import {writeFile} from 'node:fs/promises';
 
-import {createMatchPathAsync, loadConfig} from 'tsconfig-paths';
-import {Compiler, ExternalModule, NormalModule} from 'webpack';
+import {Compiler} from 'webpack';
 
 import {WebpackPlugin} from '@src/webpack/models';
 import {findPackageJson} from '@src/webpack/utils';
@@ -13,41 +12,59 @@ class DependencyPackerPlugin {
     const name = 'DependencyPackerPlugin';
     const depMap = new Map<string, string>();
 
-    const loadResult = loadConfig(process.cwd());
-    if (loadResult.resultType === 'failed') {
-      return;
-    }
-    const matcher = createMatchPathAsync(loadResult.absoluteBaseUrl, loadResult.paths);
-    const matcherAsync = async (req: string): Promise<string | undefined> => {
-      return new Promise<string | undefined>(resolve => {
-        matcher(req, undefined, undefined, undefined, (err, res) => {
-          resolve(err || res === undefined ? undefined : res);
-        });
-      });
-    };
-
-    compiler.hooks.beforeRun.tap(name, () => depMap.clear());
-    compiler.hooks.compilation.tap(name, compilation => {
-      compilation.hooks.finishModules.tapPromise(name, async modules => {
-        await Promise.allSettled(
-          [...modules].map(async m => {
-            if (!('userRequest' in m)) {
-              return;
-            }
-            const module = m as ExternalModule | NormalModule;
-            const res = await matcherAsync(module.userRequest);
-            if (res === undefined) {
-              return;
-            }
-            const packageJson = await findPackageJson(res);
-            if (packageJson === undefined) {
-              return;
-            }
-            depMap.set(packageJson['name'] as string, packageJson['version'] as string);
-          })
-        );
+    compiler.resolverFactory.hooks.resolver.for('normal').tap(name, resolver => {
+      resolver.hooks.result.tap(name, result => {
+        if (
+          result.descriptionFileRoot !== undefined &&
+          result.descriptionFileRoot === compiler.context
+        ) {
+          return result;
+        }
+        if (
+          result.descriptionFileData &&
+          'name' in result.descriptionFileData &&
+          'version' in result.descriptionFileData
+        ) {
+          const {name, version} = result.descriptionFileData as {name: string; version: string};
+          depMap.set(name, version);
+        } else {
+          console.log('failure to identify module', result.descriptionFileData);
+        }
+        return result;
       });
     });
+
+    compiler.hooks.beforeRun.tap(name, () => depMap.clear());
+    // compiler.hooks.compilation.tap(name, compilation => {
+    //   // compilation.hooks.finishModules.tapPromise(name, async modules => {
+    //   //   await Promise.allSettled(
+    //   //     [...modules].map(async m => {
+    //   //       if (!('userRequest' in m)) {
+    //   //         return;
+    //   //       }
+    //   //       // console.log(
+    //   //       //   compilation.resolverFactory
+    //   //       //     .get('normal')
+    //   //       //     .resolveSync(m.context, compiler.context, m.request)
+    //   //       // );
+    //   //       const module = m as ExternalModule | NormalModule;
+    //   //       const request = module.userRequest;
+    //   //       if (request.startsWith('node:')) {
+    //   //         return;
+    //   //       }
+    //   //       const res = await matcherAsync(module.userRequest);
+    //   //       if (res === undefined) {
+    //   //         return;
+    //   //       }
+    //   //       const packageJson = await findPackageJson(res);
+    //   //       if (packageJson === undefined) {
+    //   //         return;
+    //   //       }
+    //   //       depMap.set(packageJson['name'] as string, packageJson['version'] as string);
+    //   //     })
+    //   //   );
+    //   // });
+    // });
     compiler.hooks.done.tapPromise(name, async stats => {
       if (stats.hasErrors()) {
         return;
@@ -60,7 +77,11 @@ class DependencyPackerPlugin {
 
       if (name === undefined || version === undefined) {
         const entryPoints = Object.values(stats.compilation.compiler.options.entry);
-        const entryPoint = entryPoints[0].import.at(-1) as string;
+        const [firstEntryPoint] = entryPoints;
+        if (firstEntryPoint === undefined) {
+          return;
+        }
+        const entryPoint = firstEntryPoint.import.at(-1) as string;
         const entryPackageJson = await findPackageJson(entryPoint);
         if (!entryPackageJson) {
           console.error(`Failure to retrieve entryPoint's package.json for ${entryPoint}`);

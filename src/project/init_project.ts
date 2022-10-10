@@ -20,7 +20,11 @@ async function cancel(workspacePath?: string): Promise<never> {
 async function initProject(): Promise<void> {
   let workspaceName: string;
   let workspacePath = process.cwd();
-  const frags: WorkspaceFragment[] = [];
+  const frags: WorkspaceFragment[] = [
+    {
+      type: WorkspaceFragmentType.Shared,
+    },
+  ];
   const takenNames = ['terraform'];
   const alreadyGenerated: ProjectName[] = [];
 
@@ -83,7 +87,9 @@ async function initProject(): Promise<void> {
   }
 }
 
-const WorkspaceFragmentTypeToString: Record<WorkspaceFragmentType, string> = {
+type SelectableWorkspaceFragmentType = Exclude<WorkspaceFragmentType, WorkspaceFragmentType.Shared>;
+
+const WorkspaceFragmentTypeToString: Record<SelectableWorkspaceFragmentType, string> = {
   [WorkspaceFragmentType.WebApp]: 'Web App',
   [WorkspaceFragmentType.StaticWebsite]: 'Static Website',
   [WorkspaceFragmentType.StandaloneLambda]: 'Standalone Lambda',
@@ -107,7 +113,7 @@ async function askForWorkspaceFragment(
   if (workspaceFragmentType === undefined || workspaceFragmentType === DONE_GENERATING) {
     return undefined;
   }
-  const type = workspaceFragmentType as WorkspaceFragmentType;
+  const type = workspaceFragmentType as SelectableWorkspaceFragmentType;
 
   if (type === WorkspaceFragmentType.StaticWebsite) {
     const websiteName = await askForProjectName('Website project name', 'website', takenNames);

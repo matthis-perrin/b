@@ -9,6 +9,7 @@ import {
   WorkspaceFragmentType,
   WorkspaceName,
 } from '@src/models';
+import {generateBuildScript} from '@src/project/build_script';
 import {generateDeployScript} from '@src/project/deploy_script';
 import {generateProject} from '@src/project/generate_project';
 import {generateGitIgnore} from '@src/project/gitignore';
@@ -59,12 +60,19 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         type: ProjectType.NodeLib,
       },
     ];
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (fragment.type === WorkspaceFragmentType.NodeScript) {
     return [
       {
         projectName: fragment.scriptName,
         type: ProjectType.NodeScript,
+      },
+    ];
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (fragment.type === WorkspaceFragmentType.Shared) {
+    return [
+      {
+        projectName: 'shared' as ProjectName,
+        type: ProjectType.Shared,
       },
     ];
   }
@@ -87,23 +95,24 @@ export async function generateWorkspace(
       .map(async project => generateProject(join(dst, project.projectName), project))
   );
 
-  // package.json
-  await writeJsonFile(
-    join(dst, 'package.json'),
-    generateWorkspacePackageJson(workspaceName, projects)
-  );
-
-  // .gitignore
-  await writeRawFile(join(dst, '.gitignore'), generateGitIgnore());
-
-  // app.code-workspace
-  await writeJsonFile(join(dst, 'app.code-workspace'), generateCodeWorkspace(workspaceFragments));
-
-  // setup.js
-  await writeJsFile(join(dst, 'setup.js'), generateSetupScript(projectNames));
-
-  // deploy.js
-  await writeJsFile(join(dst, 'deploy.js'), generateDeployScript(workspaceFragments));
+  // Generate workspace root files
+  await Promise.all([
+    // package.json
+    await writeJsonFile(
+      join(dst, 'package.json'),
+      generateWorkspacePackageJson(workspaceName, projects)
+    ),
+    // .gitignore
+    await writeRawFile(join(dst, '.gitignore'), generateGitIgnore()),
+    // app.code-workspace
+    await writeJsonFile(join(dst, 'app.code-workspace'), generateCodeWorkspace(workspaceFragments)),
+    // setup.js
+    await writeJsFile(join(dst, 'setup.js'), generateSetupScript(projectNames)),
+    // deploy.js
+    await writeJsFile(join(dst, 'deploy.js'), generateDeployScript(workspaceFragments)),
+    // build.js
+    await writeJsFile(join(dst, 'build.js'), generateBuildScript(workspaceFragments)),
+  ]);
 
   // Terraform folder generation
   const terraformPath = join(dst, 'terraform');

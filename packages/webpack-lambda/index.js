@@ -14,8 +14,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(20);
 /* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(25);
 /* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(27);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7);
-
 
 
 
@@ -23,17 +21,19 @@ __webpack_require__.r(__webpack_exports__);
 
 function nodeConfig(opts) {
   const {
+    context = process.cwd(),
     isLib,
+    noEntry,
     packageJsonProperties
   } = opts;
-  const base = (0,_src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)();
+  const base = (0,_src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)(context);
   return { ...base,
     target: 'node',
-    entry: {
-      index: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__.getProjectDir)(), `src/index.ts`)
+    entry: noEntry ? {} : {
+      index: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(context, `src/index.ts`)
     },
     output: {
-      path: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__.getDistDir)(),
+      path: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(context, 'dist'),
       filename: `[name].js`,
       clean: true,
       chunkFormat: 'module',
@@ -72,7 +72,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_webpack_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9);
 /* harmony import */ var _src_webpack_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
 /* harmony import */ var _src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(16);
-/* harmony import */ var _src_webpack_plugins_tsconfig_paths_plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(18);
+/* harmony import */ var _src_webpack_plugins_ts_config_alias__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(18);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7);
 
 
@@ -81,15 +81,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function baseConfig() {
+function baseConfig(contextOpt) {
+  const context = contextOpt ?? process.cwd();
   return {
     mode: 'none',
+    context,
+    entry: {},
     // devtool: isProd() ? 'source-map' : 'eval',
     resolve: {
-      plugins: [(0,_src_webpack_plugins_tsconfig_paths_plugin__WEBPACK_IMPORTED_MODULE_5__.tsconfigPathsPlugin)()],
-      extensions: ['.js', '.jsx', '.ts', '.tsx']
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      alias: (0,_src_webpack_plugins_ts_config_alias__WEBPACK_IMPORTED_MODULE_5__.getTsConfigAlias)(context)
     },
-    plugins: [(0,_src_webpack_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_3__.forkTsCheckerPlugin)(), (0,_src_webpack_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_2__.eslintPlugin)(), (0,_src_webpack_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_1__.definePlugin)(), (0,_src_webpack_plugins_clean_terminal_plugin__WEBPACK_IMPORTED_MODULE_0__.cleanTerminalPlugin)()],
+    plugins: [(0,_src_webpack_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_3__.forkTsCheckerPlugin)(context), (0,_src_webpack_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_2__.eslintPlugin)(), (0,_src_webpack_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_1__.definePlugin)(), (0,_src_webpack_plugins_clean_terminal_plugin__WEBPACK_IMPORTED_MODULE_0__.cleanTerminalPlugin)()],
     stats: {
       preset: 'errors-warnings',
       assets: true,
@@ -106,13 +109,22 @@ function baseConfig() {
         request,
         context
       } = ctx;
+
+      if (request === undefined) {
+        return cb();
+      }
+
+      if (request.startsWith('node:')) {
+        return cb(undefined, `node-commonjs ${request}`);
+      }
+
       const resolver = (_ctx$getResolve = ctx.getResolve) === null || _ctx$getResolve === void 0 ? void 0 : _ctx$getResolve.call(ctx);
 
       if (!resolver) {
         return cb(new Error('No resolver when checking for externals'));
       }
 
-      resolver(context ?? '', request ?? '').then(res => {
+      resolver(context ?? '', request).then(res => {
         if (!res.includes('/node_modules/')) {
           return cb();
         }
@@ -125,11 +137,14 @@ function baseConfig() {
           cb(undefined, `node-commonjs ${request}`);
         }).catch(() => cb(undefined, `node-commonjs ${request}`));
       }).catch(err => {
-        if (!(request !== null && request !== void 0 && request.startsWith('node:'))) {
-          console.log(String(err));
-        }
+        console.log('Resolution failure for webpack externals');
 
-        cb(undefined, `node-commonjs ${request}`);
+        if (typeof err === 'object' && err && 'details' in err) {
+          console.log(String(err));
+          console.log(err.details);
+        } else {
+          console.log(err);
+        }
       });
     },
     experiments: {
@@ -205,9 +220,7 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("webpack");
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "findPackageJson": () => (/* binding */ findPackageJson),
-/* harmony export */   "getDistDir": () => (/* binding */ getDistDir),
 /* harmony export */   "getEnv": () => (/* binding */ getEnv),
-/* harmony export */   "getProjectDir": () => (/* binding */ getProjectDir),
 /* harmony export */   "isProd": () => (/* binding */ isProd),
 /* harmony export */   "isSelenium": () => (/* binding */ isSelenium)
 /* harmony export */ });
@@ -226,29 +239,39 @@ function isSelenium() {
 function getEnv() {
   return isProd() ? 'production' : 'development';
 }
-function getProjectDir() {
-  return (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.resolve)('.'));
-}
-function getDistDir() {
-  return (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(getProjectDir(), 'dist');
-}
+const packageJsonCache = new Map();
 async function findPackageJson(p) {
-  const pStat = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.stat)(p);
-
-  if (pStat.isDirectory()) {
-    const dir = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readdir)(p);
-
-    if (dir.includes('package.json')) {
-      const fileContent = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(p, 'package.json'));
-      return JSON.parse(fileContent.toString());
-    }
-
-    if (p === '/') {
-      return undefined;
-    }
+  if (packageJsonCache.has(p)) {
+    return packageJsonCache.get(p);
   }
 
-  return findPackageJson((0,node_path__WEBPACK_IMPORTED_MODULE_1__.resolve)(`${p}/..`));
+  try {
+    const pStat = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.stat)(p);
+
+    if (pStat.isDirectory()) {
+      const dir = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readdir)(p);
+
+      if (dir.includes('package.json')) {
+        const fileContent = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(p, 'package.json'));
+        const json = JSON.parse(fileContent.toString());
+        packageJsonCache.set(p, json);
+        return json;
+      }
+
+      if (p === '/') {
+        return undefined;
+      }
+    }
+
+    const res = await findPackageJson((0,node_path__WEBPACK_IMPORTED_MODULE_1__.resolve)(`${p}/..`));
+    packageJsonCache.set(p, res);
+    return res;
+  } catch (err) {
+    console.log('findPackageJson');
+    console.log(err);
+    packageJsonCache.set(p, undefined);
+    return undefined;
+  }
 }
 
 /***/ }),
@@ -275,8 +298,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(webpack__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(12);
 /* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(13);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7);
-
 
 
 
@@ -287,10 +308,13 @@ __webpack_require__.r(__webpack_exports__);
 class EslintWebpackError extends webpack__WEBPACK_IMPORTED_MODULE_3__.WebpackError {
   name = 'EslintWebpackError';
 
-  constructor(eslintRunId, filePath, message, loc) {
+  constructor(eslintRunId, message, filePath, loc) {
     super(message);
     this.eslintRunId = eslintRunId;
-    this.file = filePath;
+
+    if (filePath !== undefined) {
+      this.file = filePath;
+    }
 
     if (loc) {
       this.loc = loc;
@@ -305,30 +329,33 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
   name = 'EslintPlugin';
   fileStates = new Map();
 
-  setup(compiler) {
-    this.runEslintInterval = setInterval(() => this.runEslint(), RUN_ESLINT_INTERVAL);
-    this.watcher = (0,chokidar__WEBPACK_IMPORTED_MODULE_1__.watch)(['src/**/*.ts', 'src/**/*.tsx'].map(p => (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.getProjectDir)(), p)));
-    this.watcher.on('add', path => {
-      this.fileStates.set(path, {
-        status: 'queued'
+  async setup(compiler) {
+    return new Promise(resolve => {
+      this.runEslintInterval = setInterval(() => this.runEslint(), RUN_ESLINT_INTERVAL);
+      this.watcher = (0,chokidar__WEBPACK_IMPORTED_MODULE_1__.watch)(['src/**/*.ts', 'src/**/*.tsx'].map(p => (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(this.context, p)));
+      this.watcher.on('add', path => {
+        this.fileStates.set(path, {
+          status: 'queued'
+        });
+      }).on('change', path => {
+        this.fileStates.set(path, {
+          status: 'queued'
+        });
+      }).on('unlink', path => {
+        this.fileStates.delete(path);
+      }).on('ready', () => {
+        this.runEslint();
+        resolve();
       });
-    }).on('change', path => {
-      this.fileStates.set(path, {
-        status: 'queued'
+      compiler.hooks.compilation.tap(this.name, comp => {
+        this.compilation = comp;
+        this.syncErrorsAndWarnings();
       });
-    }).on('unlink', path => {
-      this.fileStates.delete(path);
-    }).on('ready', () => {
-      this.runEslint();
-    });
-    compiler.hooks.compilation.tap(this.name, comp => {
-      this.compilation = comp;
-      this.syncErrorsAndWarnings();
-    });
-    compiler.hooks.afterCompile.tapPromise(this.name, async compilation => {
-      if (!compilation.options.watch) {
-        await this.awaitIdle();
-      }
+      compiler.hooks.afterCompile.tapPromise(this.name, async compilation => {
+        if (!compilation.options.watch) {
+          await this.awaitIdle();
+        }
+      });
     });
   }
 
@@ -348,31 +375,7 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
       });
     }
 
-    const eslint = new eslint__WEBPACK_IMPORTED_MODULE_2__.ESLint({
-      cwd: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.getProjectDir)()
-    });
-    eslint.lintFiles(filesQueued.map(e => e[0])).then(results => {
-      for (const result of results) {
-        const currentState = this.fileStates.get(result.filePath);
-
-        if (!currentState || currentState.status !== 'in-progress' || currentState.eslintRunId !== eslintRunId) {
-          continue;
-        }
-
-        if (result.messages.length > 0) {
-          this.fileStates.set(result.filePath, {
-            status: 'failed',
-            eslintRunId,
-            messages: result.messages
-          });
-        } else {
-          this.fileStates.set(result.filePath, {
-            status: 'success',
-            eslintRunId
-          });
-        }
-      }
-    }).catch(err => {
+    const handleError = err => {
       for (const [filePath] of filesQueued) {
         const currentState = this.fileStates.get(filePath);
 
@@ -386,36 +389,89 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
           err
         });
       }
-    }).finally(() => {
+    };
+
+    try {
+      const tsConfigPath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(this.context, 'tsconfig.json');
+      const eslint = new eslint__WEBPACK_IMPORTED_MODULE_2__.ESLint({
+        cwd: this.context,
+        overrideConfig: {
+          settings: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            'import/resolver': {
+              typescript: {
+                project: tsConfigPath
+              }
+            }
+          },
+          parserOptions: {
+            project: tsConfigPath
+          }
+        }
+      });
+      eslint.lintFiles(filesQueued.map(e => e[0])).then(results => {
+        for (const result of results) {
+          const currentState = this.fileStates.get(result.filePath);
+
+          if (!currentState || currentState.status !== 'in-progress' || currentState.eslintRunId !== eslintRunId) {
+            continue;
+          }
+
+          if (result.messages.length > 0) {
+            this.fileStates.set(result.filePath, {
+              status: 'failed',
+              eslintRunId,
+              messages: result.messages
+            });
+          } else {
+            this.fileStates.set(result.filePath, {
+              status: 'success',
+              eslintRunId
+            });
+          }
+        }
+      }).catch(handleError).finally(() => {
+        this.syncErrorsAndWarnings();
+        this.checkIdle();
+      });
+    } catch (err) {
+      handleError(err);
       this.syncErrorsAndWarnings();
       this.checkIdle();
-    });
+    }
   }
 
   syncErrorsAndWarnings() {
     if (!this.compilation) {
       return;
+    } // Errors
+
+
+    let eslintError;
+
+    for (const fileState of this.fileStates.values()) {
+      if (fileState.status === 'errored') {
+        eslintError = new EslintWebpackError(fileState.eslintRunId, `Failure to run ESLint:\n${fileState.err instanceof Error ? fileState.err.stack : String(fileState.err)}`);
+      }
     }
 
+    this.compilation.errors = [...this.compilation.errors.filter(w => !('eslintRunId' in w)), ...(eslintError ? [eslintError] : [])]; // Warnings
+
     this.compilation.warnings = [...this.compilation.warnings.filter(w => !('eslintRunId' in w)), ...[...this.fileStates.entries()].sort((e1, e2) => e1[0].localeCompare(e2[0])).flatMap(([filePath, fileState]) => {
-      if (fileState.status === 'errored') {
-        return [new EslintWebpackError(fileState.eslintRunId, filePath, `Failure to run ESLint (${String(fileState.err)}):\n${fileState.err instanceof Error ? fileState.err.stack : 'no stack'}`)];
+      if (fileState.status !== 'failed') {
+        return [];
       }
 
-      if (fileState.status === 'failed') {
-        return fileState.messages.map(msg => new EslintWebpackError(fileState.eslintRunId, filePath, (0,_src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_4__.stripAnsi)(msg.message), {
-          start: {
-            line: msg.line,
-            column: msg.column
-          },
-          end: msg.endLine === undefined ? undefined : {
-            line: msg.endLine,
-            column: msg.endColumn
-          }
-        }));
-      }
-
-      return [];
+      return fileState.messages.map(msg => new EslintWebpackError(fileState.eslintRunId, filePath, (0,_src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_4__.stripAnsi)(msg.message), {
+        start: {
+          line: msg.line,
+          column: msg.column
+        },
+        end: msg.endLine === undefined ? undefined : {
+          line: msg.endLine,
+          column: msg.endColumn
+        }
+      }));
     })];
   }
 
@@ -485,10 +541,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "StandalonePlugin": () => (/* binding */ StandalonePlugin)
 /* harmony export */ });
 class StandalonePlugin {
+  context = process.cwd();
+
   apply(compiler) {
-    compiler.hooks.initialize.tap(this.name, () => {
-      this.setup(compiler);
-    });
+    this.context = compiler.context;
+    compiler.hooks.beforeRun.tapPromise(this.name, async () => this.setup(compiler));
     compiler.hooks.shutdown.tapPromise(this.name, async () => this.exitHandlerAsync(compiler));
     process.on('beforeExit', () => this.exitHandler(compiler));
     process.on('exit', () => this.exitHandler(compiler));
@@ -505,7 +562,7 @@ class StandalonePlugin {
     }
 
     this.hasExited = true;
-    this.teardown(compiler).catch(err => {
+    Promise.resolve(this.teardown(compiler)).catch(err => {
       console.error(`Error during teardown of plugin ${this.name}`);
       console.error(err);
     }) // eslint-disable-next-line node/no-process-exit
@@ -535,11 +592,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(15);
 /* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
 
 
-
-function forkTsCheckerPlugin() {
+function forkTsCheckerPlugin(context) {
   return new (fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1___default())({
     typescript: {
       diagnosticOptions: {
@@ -549,12 +604,12 @@ function forkTsCheckerPlugin() {
         global: true
       },
       mode: 'readonly',
-      configFile: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__.getProjectDir)(), 'tsconfig.json')
+      configFile: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(context, 'tsconfig.json'),
+      configOverwrite: {
+        include: ['src']
+      }
     },
-    formatter: issue => {
-      issue.severity = 'warning';
-      return issue.message;
-    },
+    formatter: 'basic',
     logger: {
       log: () => {},
       error: () => {}
@@ -602,20 +657,79 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("terser-webpa
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "tsconfigPathsPlugin": () => (/* binding */ tsconfigPathsPlugin)
+/* harmony export */   "getTsConfigAlias": () => (/* binding */ getTsConfigAlias)
 /* harmony export */ });
-/* harmony import */ var tsconfig_paths_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
-/* harmony import */ var tsconfig_paths_webpack_plugin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(tsconfig_paths_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
 
-function tsconfigPathsPlugin() {
-  return new tsconfig_paths_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__.TsconfigPathsPlugin({});
+
+
+function loadConfig(path) {
+  const config = JSON.parse((0,node_fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)(path).toString());
+
+  if (typeof config.extends !== 'string') {
+    return config;
+  }
+
+  let extendConfig = {};
+  let dir = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.dirname)(path);
+  const extendPath = config.extends + (config.extends.endsWith('.json') ? '' : '.json');
+
+  if (extendPath.startsWith('./')) {
+    extendConfig = loadConfig((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dir, extendPath));
+  } else {
+    while (true) {
+      const pathToTry = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dir, 'node_modules', extendPath);
+
+      if ((0,node_fs__WEBPACK_IMPORTED_MODULE_0__.existsSync)(pathToTry)) {
+        extendConfig = loadConfig(pathToTry);
+        break;
+      }
+
+      const newDir = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dir, '..');
+
+      if (newDir === dir) {
+        break;
+      }
+
+      dir = newDir;
+    }
+  }
+
+  delete config.extends;
+  return { ...extendConfig,
+    ...config,
+    compilerOptions: { ...extendConfig.compilerOptions,
+      ...config.compilerOptions
+    }
+  };
+}
+
+function getTsConfigAlias(context) {
+  const tsconfigPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(context, 'tsconfig.json');
+  const {
+    paths = {}
+  } = loadConfig(tsconfigPath)['compilerOptions'] ?? {};
+  const alias = {};
+
+  for (const item of Object.keys(paths)) {
+    var _paths$item;
+
+    const key = item.replace('/*', '');
+    const value = ((_paths$item = paths[item]) === null || _paths$item === void 0 ? void 0 : _paths$item.map(v => (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(context, v.replace('/*', '').replace('*', '')))) ?? [];
+    alias[key] = value;
+  }
+
+  return alias;
 }
 
 /***/ }),
 /* 19 */
 /***/ ((module) => {
 
-module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("tsconfig-paths-webpack-plugin");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs");
 
 /***/ }),
 /* 20 */
@@ -729,10 +843,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var tsconfig_paths__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(28);
-/* harmony import */ var tsconfig_paths__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(tsconfig_paths__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
-
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
 
 
 
@@ -744,47 +855,56 @@ class DependencyPackerPlugin {
   apply(compiler) {
     const name = 'DependencyPackerPlugin';
     const depMap = new Map();
-    const loadResult = (0,tsconfig_paths__WEBPACK_IMPORTED_MODULE_1__.loadConfig)(process.cwd());
+    compiler.resolverFactory.hooks.resolver.for('normal').tap(name, resolver => {
+      resolver.hooks.result.tap(name, result => {
+        if (result.descriptionFileRoot !== undefined && result.descriptionFileRoot === compiler.context) {
+          return result;
+        }
 
-    if (loadResult.resultType === 'failed') {
-      return;
-    }
+        if (result.descriptionFileData && 'name' in result.descriptionFileData && 'version' in result.descriptionFileData) {
+          const {
+            name,
+            version
+          } = result.descriptionFileData;
+          depMap.set(name, version);
+        } else {
+          console.log('failure to identify module', result.descriptionFileData);
+        }
 
-    const matcher = (0,tsconfig_paths__WEBPACK_IMPORTED_MODULE_1__.createMatchPathAsync)(loadResult.absoluteBaseUrl, loadResult.paths);
-
-    const matcherAsync = async req => {
-      return new Promise(resolve => {
-        matcher(req, undefined, undefined, undefined, (err, res) => {
-          resolve(err || res === undefined ? undefined : res);
-        });
-      });
-    };
-
-    compiler.hooks.beforeRun.tap(name, () => depMap.clear());
-    compiler.hooks.compilation.tap(name, compilation => {
-      compilation.hooks.finishModules.tapPromise(name, async modules => {
-        await Promise.allSettled([...modules].map(async m => {
-          if (!('userRequest' in m)) {
-            return;
-          }
-
-          const module = m;
-          const res = await matcherAsync(module.userRequest);
-
-          if (res === undefined) {
-            return;
-          }
-
-          const packageJson = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__.findPackageJson)(res);
-
-          if (packageJson === undefined) {
-            return;
-          }
-
-          depMap.set(packageJson['name'], packageJson['version']);
-        }));
+        return result;
       });
     });
+    compiler.hooks.beforeRun.tap(name, () => depMap.clear()); // compiler.hooks.compilation.tap(name, compilation => {
+    //   // compilation.hooks.finishModules.tapPromise(name, async modules => {
+    //   //   await Promise.allSettled(
+    //   //     [...modules].map(async m => {
+    //   //       if (!('userRequest' in m)) {
+    //   //         return;
+    //   //       }
+    //   //       // console.log(
+    //   //       //   compilation.resolverFactory
+    //   //       //     .get('normal')
+    //   //       //     .resolveSync(m.context, compiler.context, m.request)
+    //   //       // );
+    //   //       const module = m as ExternalModule | NormalModule;
+    //   //       const request = module.userRequest;
+    //   //       if (request.startsWith('node:')) {
+    //   //         return;
+    //   //       }
+    //   //       const res = await matcherAsync(module.userRequest);
+    //   //       if (res === undefined) {
+    //   //         return;
+    //   //       }
+    //   //       const packageJson = await findPackageJson(res);
+    //   //       if (packageJson === undefined) {
+    //   //         return;
+    //   //       }
+    //   //       depMap.set(packageJson['name'] as string, packageJson['version'] as string);
+    //   //     })
+    //   //   );
+    //   // });
+    // });
+
     compiler.hooks.done.tapPromise(name, async stats => {
       if (stats.hasErrors()) {
         return;
@@ -799,8 +919,14 @@ class DependencyPackerPlugin {
 
       if (name === undefined || version === undefined) {
         const entryPoints = Object.values(stats.compilation.compiler.options.entry);
-        const entryPoint = entryPoints[0].import.at(-1);
-        const entryPackageJson = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__.findPackageJson)(entryPoint);
+        const [firstEntryPoint] = entryPoints;
+
+        if (firstEntryPoint === undefined) {
+          return;
+        }
+
+        const entryPoint = firstEntryPoint.import.at(-1);
+        const entryPackageJson = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__.findPackageJson)(entryPoint);
 
         if (!entryPackageJson) {
           console.error(`Failure to retrieve entryPoint's package.json for ${entryPoint}`);
@@ -831,28 +957,25 @@ function dependencyPackerPlugin(packageJsonProperties) {
 
 /***/ }),
 /* 28 */
-/***/ ((module) => {
-
-module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("tsconfig-paths");
-
-/***/ }),
-/* 29 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "lambdaServerPlugin": () => (/* binding */ lambdaServerPlugin)
 /* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(30);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(29);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(31);
+/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(30);
 /* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_http__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
 
 
 
 
-class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_2__.StandalonePlugin {
+
+class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_3__.StandalonePlugin {
   name = 'LambdaServerPlugin';
 
   setup(compiler) {
@@ -887,7 +1010,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
       }
 
       req.on('end', () => {
-        const command = `node -e "require('./dist/main').handler({httpMethod: '${method}', path: '${url}', body: ${body === '' ? 'null' : `atob('${btoa(body)}')`}, headers: ${`JSON.parse(atob('${btoa(JSON.stringify(headers))}'))`}}).then(json => console.log(JSON.stringify(json))).catch(console.error);"`;
+        const command = `node -e "require('${(0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(this.context, 'dist/main')}').handler({httpMethod: '${method}', path: '${url}', body: ${body === '' ? 'null' : `atob('${btoa(body)}')`}, headers: ${`JSON.parse(atob('${btoa(JSON.stringify(headers))}'))`}}).then(json => console.log(JSON.stringify(json))).catch(console.error);"`;
         (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, (error, stdout, stderr) => {
           const err = error ? String(error) : stderr;
 
@@ -964,13 +1087,13 @@ function lambdaServerPlugin() {
 }
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:http");
@@ -1049,21 +1172,22 @@ var __webpack_exports__ = {};
 (() => {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "config": () => (/* binding */ config)
 /* harmony export */ });
-/* harmony import */ var _configs_node_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(29);
+/* harmony import */ var _src_webpack_configs_node_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(28);
 
 
-const baseConfig = (0,_configs_node_config__WEBPACK_IMPORTED_MODULE_0__.nodeConfig)({
-  isLib: true
-});
-const config = { ...baseConfig,
-  plugins: [...(baseConfig.plugins ?? []), (0,_src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__.lambdaServerPlugin)()]
-}; // eslint-disable-next-line import/no-default-export
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (config);
+function config(context) {
+  const baseConfig = (0,_src_webpack_configs_node_config__WEBPACK_IMPORTED_MODULE_0__.nodeConfig)({
+    context,
+    isLib: true
+  });
+  return { ...baseConfig,
+    plugins: [...(baseConfig.plugins ?? []), (0,_src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__.lambdaServerPlugin)()]
+  };
+}
 })();
 
-var __webpack_exports__default = __webpack_exports__["default"];
-export { __webpack_exports__default as default };
+var __webpack_exports__config = __webpack_exports__.config;
+export { __webpack_exports__config as config };

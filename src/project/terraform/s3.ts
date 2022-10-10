@@ -1,4 +1,4 @@
-import {ProjectName, WorkspaceName} from '../../models';
+import {ProjectName, WorkspaceName} from '@src/models';
 
 export function generateS3BucketTerraform(
   workspaceName: WorkspaceName,

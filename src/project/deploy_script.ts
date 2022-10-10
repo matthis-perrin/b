@@ -109,9 +109,11 @@ export function generateBuildWorkspaceFn(fragments: WorkspaceFragment[]): string
       return generateBuildStandaloneLambdaProjectFn(fragment);
     } else if (type === WorkspaceFragmentType.NodeLib) {
       return generateBuildNodeLibProjectFn(fragment);
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (type === WorkspaceFragmentType.NodeScript) {
       return generateBuildNodeScriptProjectFn(fragment);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    } else if (type === WorkspaceFragmentType.Shared) {
+      return generateBuildSharedProjectFn();
     }
     return neverHappens(type, `Unknown WorkspaceFragmentType "${type}"`);
   });
@@ -232,6 +234,21 @@ async function ${functionName}(outputs) {
   runCommand({
     command: \`yarn build\`,
     cwd: ${fragment.scriptName}Path,
+  });
+}
+`,
+    name: functionName,
+  };
+}
+
+export function generateBuildSharedProjectFn(): FunctionSourceCode {
+  const functionName = `buildShared`;
+  return {
+    sourceCode: `
+async function ${functionName}(outputs) {
+  runCommand({
+    command: \`yarn build\`,
+    cwd: sharedPath,
   });
 }
 `,

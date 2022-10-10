@@ -1,5 +1,6 @@
 import {exec} from 'node:child_process';
 import {createServer, IncomingMessage, Server, ServerResponse} from 'node:http';
+import {join} from 'node:path';
 
 import {Compiler} from 'webpack';
 
@@ -39,7 +40,10 @@ class LambdaServerPlugin extends StandalonePlugin {
       }
 
       req.on('end', () => {
-        const command = `node -e "require('./dist/main').handler({httpMethod: '${method}', path: '${url}', body: ${
+        const command = `node -e "require('${join(
+          this.context,
+          'dist/main'
+        )}').handler({httpMethod: '${method}', path: '${url}', body: ${
           body === '' ? 'null' : `atob('${btoa(body)}')`
         }, headers: ${`JSON.parse(atob('${btoa(
           JSON.stringify(headers)

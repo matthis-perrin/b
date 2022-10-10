@@ -18,14 +18,21 @@
     ],
     "rules": {
       "no-console": "off"
-    }
+    },
+    "overrides": [
+      {
+        "files": "src/webpack/*.ts",
+        "rules": {
+          "unicorn/filename-case": "off"
+        }
+      }
+    ]
   },
   "devDependencies": {
     "@babel/core": "7.19.x",
     "@babel/preset-env": "7.19.x",
     "@babel/preset-react": "7.18.x",
     "@babel/preset-typescript": "7.18.x",
-    "@babel/register": "^7.18.9",
     "@matthis/eslint-config-node": "latest",
     "@matthis/prettier-config": "latest",
     "@matthis/tsconfig-node": "latest",
@@ -43,7 +50,6 @@
     "semver": "7.3.x",
     "source-map-loader": "4.0.x",
     "terser-webpack-plugin": "5.3.x",
-    "tsconfig-paths-webpack-plugin": "4.0.x",
     "webpack": "5.74.x",
     "webpack-cli": "4.10.x",
     "webpack-dev-server": "4.11.x"

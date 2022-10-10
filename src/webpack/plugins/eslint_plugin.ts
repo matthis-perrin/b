@@ -7,7 +7,6 @@ import {Compilation, Compiler, WebpackError} from 'webpack';
 import {WebpackPlugin} from '@src/webpack/models';
 import {stripAnsi} from '@src/webpack/plugins/formatter';
 import {StandalonePlugin} from '@src/webpack/plugins/standalone_plugin';
-import {getProjectDir} from '@src/webpack/utils';
 
 interface QueuedFileState {
   status: 'queued';
@@ -46,12 +45,14 @@ class EslintWebpackError extends WebpackError {
   public override name = 'EslintWebpackError';
   public constructor(
     public readonly eslintRunId: number,
-    filePath: string,
     message: string,
+    filePath?: string,
     loc?: WebpackError['loc']
   ) {
     super(message);
-    this.file = filePath;
+    if (filePath !== undefined) {
+      this.file = filePath;
+    }
     if (loc) {
       this.loc = loc;
     }
@@ -68,30 +69,33 @@ class EslintPlugin extends StandalonePlugin {
   private compilation: Compilation | undefined;
   private resolveAwaitIdlePromise: (() => void) | undefined;
 
-  protected setup(compiler: Compiler): void {
-    this.runEslintInterval = setInterval(() => this.runEslint(), RUN_ESLINT_INTERVAL);
-    this.watcher = watch(['src/**/*.ts', 'src/**/*.tsx'].map(p => join(getProjectDir(), p)));
-    this.watcher
-      .on('add', path => {
-        this.fileStates.set(path, {status: 'queued'});
-      })
-      .on('change', path => {
-        this.fileStates.set(path, {status: 'queued'});
-      })
-      .on('unlink', path => {
-        this.fileStates.delete(path);
-      })
-      .on('ready', () => {
-        this.runEslint();
+  protected async setup(compiler: Compiler): Promise<void> {
+    return new Promise<void>(resolve => {
+      this.runEslintInterval = setInterval(() => this.runEslint(), RUN_ESLINT_INTERVAL);
+      this.watcher = watch(['src/**/*.ts', 'src/**/*.tsx'].map(p => join(this.context, p)));
+      this.watcher
+        .on('add', path => {
+          this.fileStates.set(path, {status: 'queued'});
+        })
+        .on('change', path => {
+          this.fileStates.set(path, {status: 'queued'});
+        })
+        .on('unlink', path => {
+          this.fileStates.delete(path);
+        })
+        .on('ready', () => {
+          this.runEslint();
+          resolve();
+        });
+      compiler.hooks.compilation.tap(this.name, comp => {
+        this.compilation = comp;
+        this.syncErrorsAndWarnings();
       });
-    compiler.hooks.compilation.tap(this.name, comp => {
-      this.compilation = comp;
-      this.syncErrorsAndWarnings();
-    });
-    compiler.hooks.afterCompile.tapPromise(this.name, async compilation => {
-      if (!compilation.options.watch) {
-        await this.awaitIdle();
-      }
+      compiler.hooks.afterCompile.tapPromise(this.name, async compilation => {
+        if (!compilation.options.watch) {
+          await this.awaitIdle();
+        }
+      });
     });
   }
 
@@ -106,53 +110,98 @@ class EslintPlugin extends StandalonePlugin {
       this.fileStates.set(filePath, {status: 'in-progress', eslintRunId});
     }
 
-    const eslint = new ESLint({cwd: getProjectDir()});
-    eslint
-      .lintFiles(filesQueued.map(e => e[0]))
-      .then(results => {
-        for (const result of results) {
-          const currentState = this.fileStates.get(result.filePath);
-          if (
-            !currentState ||
-            currentState.status !== 'in-progress' ||
-            currentState.eslintRunId !== eslintRunId
-          ) {
-            continue;
-          }
-          if (result.messages.length > 0) {
-            this.fileStates.set(result.filePath, {
-              status: 'failed',
-              eslintRunId,
-              messages: result.messages,
-            });
-          } else {
-            this.fileStates.set(result.filePath, {status: 'success', eslintRunId});
-          }
+    const handleError = (err: unknown): void => {
+      for (const [filePath] of filesQueued) {
+        const currentState = this.fileStates.get(filePath);
+        if (
+          !currentState ||
+          currentState.status !== 'in-progress' ||
+          currentState.eslintRunId !== eslintRunId
+        ) {
+          continue;
         }
-      })
-      .catch(err => {
-        for (const [filePath] of filesQueued) {
-          const currentState = this.fileStates.get(filePath);
-          if (
-            !currentState ||
-            currentState.status !== 'in-progress' ||
-            currentState.eslintRunId !== eslintRunId
-          ) {
-            continue;
-          }
-          this.fileStates.set(filePath, {status: 'errored', eslintRunId, err});
-        }
-      })
-      .finally(() => {
-        this.syncErrorsAndWarnings();
-        this.checkIdle();
+        this.fileStates.set(filePath, {status: 'errored', eslintRunId, err});
+      }
+    };
+
+    try {
+      const tsConfigPath = join(this.context, 'tsconfig.json');
+      const eslint = new ESLint({
+        cwd: this.context,
+        overrideConfig: {
+          settings: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            'import/resolver': {
+              typescript: {
+                project: tsConfigPath,
+              },
+            },
+          },
+          parserOptions: {
+            project: tsConfigPath,
+          },
+        },
       });
+      eslint
+        .lintFiles(filesQueued.map(e => e[0]))
+        .then(results => {
+          for (const result of results) {
+            const currentState = this.fileStates.get(result.filePath);
+            if (
+              !currentState ||
+              currentState.status !== 'in-progress' ||
+              currentState.eslintRunId !== eslintRunId
+            ) {
+              continue;
+            }
+            if (result.messages.length > 0) {
+              this.fileStates.set(result.filePath, {
+                status: 'failed',
+                eslintRunId,
+                messages: result.messages,
+              });
+            } else {
+              this.fileStates.set(result.filePath, {status: 'success', eslintRunId});
+            }
+          }
+        })
+        .catch(handleError)
+        .finally(() => {
+          this.syncErrorsAndWarnings();
+          this.checkIdle();
+        });
+    } catch (err: unknown) {
+      handleError(err);
+      this.syncErrorsAndWarnings();
+      this.checkIdle();
+    }
   }
 
   private syncErrorsAndWarnings(): void {
     if (!this.compilation) {
       return;
     }
+
+    // Errors
+    let eslintError: EslintWebpackError | undefined;
+    for (const fileState of this.fileStates.values()) {
+      if (fileState.status === 'errored') {
+        eslintError = new EslintWebpackError(
+          fileState.eslintRunId,
+          `Failure to run ESLint:\n${
+            fileState.err instanceof Error ? fileState.err.stack : String(fileState.err)
+          }`
+        );
+      }
+    }
+    this.compilation.errors = [
+      ...(this.compilation.errors as (EslintWebpackError | WebpackError)[]).filter(
+        w => !('eslintRunId' in w)
+      ),
+      ...(eslintError ? [eslintError] : []),
+    ];
+
+    // Warnings
     this.compilation.warnings = [
       ...(this.compilation.warnings as (EslintWebpackError | WebpackError)[]).filter(
         w => !('eslintRunId' in w)
@@ -160,30 +209,19 @@ class EslintPlugin extends StandalonePlugin {
       ...[...this.fileStates.entries()]
         .sort((e1, e2) => e1[0].localeCompare(e2[0]))
         .flatMap(([filePath, fileState]) => {
-          if (fileState.status === 'errored') {
-            return [
-              new EslintWebpackError(
-                fileState.eslintRunId,
-                filePath,
-                `Failure to run ESLint (${String(fileState.err)}):\n${
-                  fileState.err instanceof Error ? fileState.err.stack : 'no stack'
-                }`
-              ),
-            ];
+          if (fileState.status !== 'failed') {
+            return [];
           }
-          if (fileState.status === 'failed') {
-            return fileState.messages.map(
-              msg =>
-                new EslintWebpackError(fileState.eslintRunId, filePath, stripAnsi(msg.message), {
-                  start: {line: msg.line, column: msg.column},
-                  end:
-                    msg.endLine === undefined
-                      ? undefined
-                      : {line: msg.endLine, column: msg.endColumn},
-                })
-            );
-          }
-          return [];
+          return fileState.messages.map(
+            msg =>
+              new EslintWebpackError(fileState.eslintRunId, filePath, stripAnsi(msg.message), {
+                start: {line: msg.line, column: msg.column},
+                end:
+                  msg.endLine === undefined
+                    ? undefined
+                    : {line: msg.endLine, column: msg.endColumn},
+              })
+          );
         }),
     ];
   }

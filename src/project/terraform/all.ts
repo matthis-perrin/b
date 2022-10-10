@@ -46,8 +46,10 @@ export function generateWorkspaceProjectTerraform(project: WorkspaceProject): st
     return generateLambdaApiTerraform(projectName);
   } else if (type === ProjectType.NodeLib) {
     return undefined;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === ProjectType.NodeScript) {
+    return undefined;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === ProjectType.Shared) {
     return undefined;
   }
   neverHappens(type, 'ProjectType');

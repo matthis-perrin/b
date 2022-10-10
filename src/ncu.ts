@@ -1,8 +1,9 @@
-import packageMetadata from 'package-json';
-import {join, resolve} from 'path';
-import semver from 'semver';
+import {join, resolve} from 'node:path';
 
-import {readdir, readFile} from './fs';
+import packageMetadata from 'package-json';
+import {satisfies} from 'semver';
+
+import {readdir, readFile} from '@src/fs';
 
 export async function check(): Promise<void> {
   const packagePath = join(resolve('.'), 'packages');
@@ -63,7 +64,7 @@ async function checkPackage(
 ): Promise<[string, string, string] | undefined> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const latest = ((await packageMetadata(name)) as any).version as string;
-  if (!semver.satisfies(latest, version)) {
+  if (!satisfies(latest, version)) {
     return [name, version, latest];
   }
   return undefined;

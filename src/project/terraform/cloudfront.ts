@@ -1,4 +1,4 @@
-import {ProjectName} from '../../models';
+import {ProjectName} from '@src/models';
 
 export function generateCloudfrontDistributionTerraform(projectName: ProjectName): string {
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');

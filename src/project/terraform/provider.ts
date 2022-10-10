@@ -1,4 +1,4 @@
-import {WorkspaceName} from '../../models';
+import {WorkspaceName} from '@src/models';
 
 export function generateAwsProviderTerraform(workspaceName: WorkspaceName): string {
   return `

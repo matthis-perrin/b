@@ -1,4 +1,4 @@
-import {ProjectName} from '../../models';
+import {ProjectName} from '@src/models';
 
 export function generateLambdaTerraform(projectName: ProjectName): string {
   return `

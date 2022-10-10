@@ -44,10 +44,10 @@
         "../shared-web/node_modules/*",
         "../shared-web/node_modules/@types/*"
       ],
-      "shared/*": [
+      "@shared/*": [
         "../shared/src/*"
       ],
-      "shared-web/*": [
+      "@shared-web/*": [
         "../shared-web/src/*"
       ]
     },

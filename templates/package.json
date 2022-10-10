@@ -11,6 +11,7 @@
     "@matthis/tsconfig-react-native": "file:../packages/tsconfig-react-native",
     "@matthis/tsconfig-web": "file:../packages/tsconfig-web",
     "@matthis/webpack-lambda": "file:../packages/webpack-lambda",
+    "@matthis/webpack-lib": "file:../packages/webpack-lib",
     "@matthis/webpack-node": "file:../packages/webpack-node",
     "@matthis/webpack-node-lib": "file:../packages/webpack-node-lib",
     "@matthis/webpack-node-script": "file:../packages/webpack-node-script",

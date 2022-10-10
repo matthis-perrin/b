@@ -1,4 +1,7 @@
-import {nodeConfig} from './configs/node_config';
+import {Configuration} from 'webpack';
 
-// eslint-disable-next-line import/no-default-export
-export default nodeConfig({isLib: true});
+import {nodeConfig} from '@src/webpack/configs/node_config';
+
+export function config(context?: string): Configuration {
+  return nodeConfig({context, isLib: true});
+}

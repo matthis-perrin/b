@@ -30,6 +30,7 @@ export function generateWorkspacePackageJson(
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
+      build: 'node ./build.js',
     },
     eslintConfig: {
       ignorePatterns: ['**/*.js'],

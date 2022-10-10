@@ -3,9 +3,8 @@ import {join} from 'node:path';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
 import {WebpackPlugin} from '@src/webpack/models';
-import {getProjectDir} from '@src/webpack/utils';
 
-export function forkTsCheckerPlugin(): WebpackPlugin {
+export function forkTsCheckerPlugin(context: string): WebpackPlugin {
   return new ForkTsCheckerWebpackPlugin({
     typescript: {
       diagnosticOptions: {
@@ -15,12 +14,12 @@ export function forkTsCheckerPlugin(): WebpackPlugin {
         global: true,
       },
       mode: 'readonly',
-      configFile: join(getProjectDir(), 'tsconfig.json'),
+      configFile: join(context, 'tsconfig.json'),
+      configOverwrite: {
+        include: ['src'],
+      },
     },
-    formatter: issue => {
-      issue.severity = 'warning';
-      return issue.message;
-    },
+    formatter: 'basic',
     logger: {log: () => {}, error: () => {}},
   });
 }

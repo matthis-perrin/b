@@ -69,7 +69,7 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
           ...projects.flatMap(p => [`../${p}/node_modules/*`, `../${p}/node_modules/@types/*`]),
         ],
       ],
-      ...projects.flatMap(name => [[`${name}/*`, [`../${name}/src/*`]]]),
+      ...projects.flatMap(name => [[`@${name}/*`, [`../${name}/src/*`]]]),
     ]);
 
   if (type === RuntimeType.Lib) {

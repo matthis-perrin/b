@@ -8,7 +8,7 @@ export async function compile(
   isLib: boolean,
   packageJsonProperties: Record<string, unknown> = {}
 ): Promise<void> {
-  const baseConfig = nodeConfig({isLib, packageJsonProperties});
+  const baseConfig = nodeConfig({context: process.cwd(), isLib, packageJsonProperties});
   const plugins = (baseConfig.plugins ?? []).filter(p => !(p instanceof DefinePlugin));
   const config = {
     ...baseConfig,

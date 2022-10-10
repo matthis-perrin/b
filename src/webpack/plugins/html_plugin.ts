@@ -3,11 +3,11 @@ import {join} from 'node:path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 import {WebpackPlugin} from '@src/webpack/models';
-import {getProjectDir, isProd} from '@src/webpack/utils';
+import {isProd} from '@src/webpack/utils';
 
-export function htmlPlugin(): WebpackPlugin {
+export function htmlPlugin(context: string): WebpackPlugin {
   return new HtmlWebpackPlugin({
-    template: join(getProjectDir(), 'src/index.html'),
+    template: join(context, 'src/index.html'),
     minify: isProd(),
   });
 }

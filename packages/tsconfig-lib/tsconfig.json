@@ -42,7 +42,7 @@
         "../shared/node_modules/*",
         "../shared/node_modules/@types/*"
       ],
-      "shared/*": [
+      "@shared/*": [
         "../shared/src/*"
       ]
     }

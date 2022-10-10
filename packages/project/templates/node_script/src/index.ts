@@ -1,1 +1,3 @@
-console.log('Test');
+import {DUMMY} from '@shared/index';
+
+console.log(DUMMY);

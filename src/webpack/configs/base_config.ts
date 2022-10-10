@@ -5,18 +5,22 @@ import {definePlugin} from '@src/webpack/plugins/define_plugin';
 import {eslintPlugin} from '@src/webpack/plugins/eslint_plugin';
 import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
 import {terserPlugin} from '@src/webpack/plugins/terser_plugin';
-import {tsconfigPathsPlugin} from '@src/webpack/plugins/tsconfig_paths_plugin';
+import {getTsConfigAlias} from '@src/webpack/plugins/ts_config_alias';
 import {findPackageJson, isProd} from '@src/webpack/utils';
 
-export function baseConfig(): Configuration {
+export function baseConfig(contextOpt?: string): Configuration {
+  const context = contextOpt ?? process.cwd();
+
   return {
     mode: 'none',
+    context,
+    entry: {},
     // devtool: isProd() ? 'source-map' : 'eval',
     resolve: {
-      plugins: [tsconfigPathsPlugin()],
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      alias: getTsConfigAlias(context),
     },
-    plugins: [forkTsCheckerPlugin(), eslintPlugin(), definePlugin(), cleanTerminalPlugin()],
+    plugins: [forkTsCheckerPlugin(context), eslintPlugin(), definePlugin(), cleanTerminalPlugin()],
     stats: {
       preset: 'errors-warnings',
       assets: true,
@@ -28,11 +32,18 @@ export function baseConfig(): Configuration {
     },
     externals: (ctx, cb) => {
       const {request, context} = ctx;
+      if (request === undefined) {
+        return cb();
+      }
+      if (request.startsWith('node:')) {
+        return cb(undefined, `node-commonjs ${request}`);
+      }
+
       const resolver = ctx.getResolve?.();
       if (!resolver) {
         return cb(new Error('No resolver when checking for externals'));
       }
-      (resolver as (ctx: string, req: string) => Promise<string>)(context ?? '', request ?? '')
+      (resolver as (ctx: string, req: string) => Promise<string>)(context ?? '', request)
         .then(res => {
           if (!res.includes('/node_modules/')) {
             return cb();
@@ -47,10 +58,13 @@ export function baseConfig(): Configuration {
             .catch(() => cb(undefined, `node-commonjs ${request}`));
         })
         .catch((err: unknown) => {
-          if (!request?.startsWith('node:')) {
+          console.log('Resolution failure for webpack externals');
+          if (typeof err === 'object' && err && 'details' in err) {
             console.log(String(err));
+            console.log((err as {details: string}).details);
+          } else {
+            console.log(err);
           }
-          cb(undefined, `node-commonjs ${request}`);
         });
     },
     experiments: {

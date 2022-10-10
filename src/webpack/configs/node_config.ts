@@ -6,20 +6,21 @@ import {baseConfig} from '@src/webpack/configs/base_config';
 import {babelLoaderNode} from '@src/webpack/loaders/babel_loader_node';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {dependencyPackerPlugin} from '@src/webpack/plugins/dependency_packer_plugin';
-import {getDistDir, getProjectDir} from '@src/webpack/utils';
 
 export function nodeConfig(opts: {
+  context?: string;
   isLib: boolean;
+  noEntry?: boolean;
   packageJsonProperties?: Record<string, unknown>;
 }): Configuration {
-  const {isLib, packageJsonProperties} = opts;
-  const base = baseConfig();
+  const {context = process.cwd(), isLib, noEntry, packageJsonProperties} = opts;
+  const base = baseConfig(context);
   return {
     ...base,
     target: 'node',
-    entry: {index: join(getProjectDir(), `src/index.ts`)},
+    entry: noEntry ? {} : {index: join(context, `src/index.ts`)},
     output: {
-      path: getDistDir(),
+      path: join(context, 'dist'),
       filename: `[name].js`,
       clean: true,
       chunkFormat: 'module',

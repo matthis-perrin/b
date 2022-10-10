@@ -37,6 +37,7 @@ export const RUNTIME_TYPE_TO_METADATA: Record<RuntimeType, RuntimeTypeMetadata> 
   [RuntimeType.Lib]: {
     eslint: RuntimeType.Lib,
     tsconfig: RuntimeType.Lib,
+    webpack: RuntimeType.Lib,
   },
   [RuntimeType.Lambda]: {
     eslint: RuntimeType.Node,
@@ -69,6 +70,7 @@ export enum ProjectType {
   LambdaApi = 'lambda_api',
   NodeLib = 'node_lib',
   NodeScript = 'node_script',
+  Shared = 'shared',
 }
 
 interface ProjectTypeMetadata {
@@ -81,6 +83,7 @@ export const PROJECT_TYPE_TO_METADATA: Record<ProjectType, ProjectTypeMetadata> 
   [ProjectType.LambdaApi]: {runtimeType: RuntimeType.Lambda},
   [ProjectType.NodeLib]: {runtimeType: RuntimeType.NodeLib},
   [ProjectType.NodeScript]: {runtimeType: RuntimeType.NodeScript},
+  [ProjectType.Shared]: {runtimeType: RuntimeType.Lib},
 };
 
 //
@@ -93,6 +96,7 @@ export enum WorkspaceFragmentType {
   WebApp = 'web-app',
   NodeLib = 'node-lib',
   NodeScript = 'node-script',
+  Shared = 'shared',
 }
 
 interface WorkspaceFragmentBase {
@@ -120,6 +124,9 @@ export interface WorkspaceFragmentRegistry {
   [WorkspaceFragmentType.NodeScript]: {
     type: WorkspaceFragmentType.NodeScript;
     scriptName: ProjectName;
+  };
+  [WorkspaceFragmentType.Shared]: {
+    type: WorkspaceFragmentType.Shared;
   };
 }
 
