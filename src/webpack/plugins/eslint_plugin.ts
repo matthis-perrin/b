@@ -91,10 +91,10 @@ class EslintPlugin extends StandalonePlugin {
         this.compilation = comp;
         this.syncErrorsAndWarnings();
       });
-      compiler.hooks.afterCompile.tapPromise(this.name, async compilation => {
-        if (!compilation.options.watch) {
-          await this.awaitIdle();
-        }
+      compiler.hooks.afterCompile.tapAsync(this.name, (compilation, cb) => {
+        setTimeout(() => {
+          this.awaitIdle().finally(cb);
+        }, RUN_ESLINT_INTERVAL);
       });
     });
   }

@@ -10,7 +10,7 @@ export function generateBuildScript(workspaceFragments: WorkspaceFragment[]): st
   const target = resolve('./script');
   
   import(join(target, 'webpack.config.js')).then(({getConfig}) => {
-    webpack(getConfig(target), (err, stats) => {
+    webpack({getConfig(target), ...watch: true}, (err, stats) => {
       if (err || !stats) {
         console.log('####### ERROR #######');
         console.log(err);
@@ -23,7 +23,7 @@ export function generateBuildScript(workspaceFragments: WorkspaceFragment[]): st
       if (errors.length > 0) {
         for (const error of errors) {
           console.log('ERROR ' + error.file);
-          console.log(error.stack ?? error.message);
+          console.log(error.message);
           console.log('');
         }
         console.log('');
@@ -31,7 +31,7 @@ export function generateBuildScript(workspaceFragments: WorkspaceFragment[]): st
   
       for (const warning of warnings) {
         console.log('WARNING ' + warning.file);
-        console.log(warning.stack ?? warning.message);
+        console.log(warning.message);
         console.log('');
       }
     });

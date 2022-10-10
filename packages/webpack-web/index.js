@@ -370,10 +370,10 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
         this.compilation = comp;
         this.syncErrorsAndWarnings();
       });
-      compiler.hooks.afterCompile.tapPromise(this.name, async compilation => {
-        if (!compilation.options.watch) {
-          await this.awaitIdle();
-        }
+      compiler.hooks.afterCompile.tapAsync(this.name, (compilation, cb) => {
+        setTimeout(() => {
+          this.awaitIdle().finally(cb);
+        }, RUN_ESLINT_INTERVAL);
       });
     });
   }
@@ -560,11 +560,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "StandalonePlugin": () => (/* binding */ StandalonePlugin)
 /* harmony export */ });
 class StandalonePlugin {
-  context = process.cwd();
+  context = process.cwd(); // INITIALIZE
 
   apply(compiler) {
     this.context = compiler.context;
-    compiler.hooks.beforeRun.tapPromise(this.name, async () => this.setup(compiler));
+    compiler.hooks.beforeRun.tapPromise(this.name, async () => this.setupHandler(compiler));
+    compiler.hooks.watchRun.tapPromise(this.name, async () => this.setupHandler(compiler));
     compiler.hooks.shutdown.tapPromise(this.name, async () => this.exitHandlerAsync(compiler));
     process.on('beforeExit', () => this.exitHandler(compiler));
     process.on('exit', () => this.exitHandler(compiler));
@@ -572,6 +573,19 @@ class StandalonePlugin {
     process.on('SIGINT', () => this.exitHandler(compiler));
     process.on('uncaughtException', () => this.exitHandler(compiler));
   }
+
+  // SETUP
+  hasStarted = false;
+
+  async setupHandler(compiler) {
+    if (this.hasStarted) {
+      return;
+    }
+
+    this.hasStarted = true;
+    await this.setup(compiler);
+  } // EXIT
+
 
   hasExited = false;
 
