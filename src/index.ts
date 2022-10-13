@@ -5,6 +5,7 @@ import {projectPackage} from '@src/project/index';
 import {generateTemplatesRootPackageJson, updateTemplatesLibVersions} from '@src/templates';
 import {tsconfigPackages} from '@src/tsconfig/index';
 import {webpackPackages} from '@src/webpack/index';
+import {webpackRunnerPackage} from '@src/webpack-runner';
 
 const eslintRuntimes = [
   ...new Set(Object.values(RUNTIME_TYPE_TO_METADATA).map(data => data.eslint)).values(),
@@ -29,5 +30,6 @@ const webpackRuntimes = [
     prettierPackage(),
     tsconfigPackages(tsConfigRuntimes),
     webpackPackages(webpackRuntimes),
+    webpackRunnerPackage(),
   ]);
 })().catch(console.error);

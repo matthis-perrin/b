@@ -103,11 +103,11 @@ function baseConfig(contextOpt) {
       minimizer: [(0,_src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_4__.terserPlugin)()]
     },
     externals: (ctx, cb) => {
-      var _ctx$getResolve;
-
       const {
         request,
-        context
+        context,
+        contextInfo,
+        getResolve
       } = ctx;
 
       if (request === undefined) {
@@ -118,7 +118,7 @@ function baseConfig(contextOpt) {
         return cb(undefined, `node-commonjs ${request}`);
       }
 
-      const resolver = (_ctx$getResolve = ctx.getResolve) === null || _ctx$getResolve === void 0 ? void 0 : _ctx$getResolve.call(ctx);
+      const resolver = getResolve === null || getResolve === void 0 ? void 0 : getResolve();
 
       if (!resolver) {
         return cb(new Error('No resolver when checking for externals'));
@@ -136,15 +136,8 @@ function baseConfig(contextOpt) {
 
           cb(undefined, `node-commonjs ${request}`);
         }).catch(() => cb(undefined, `node-commonjs ${request}`));
-      }).catch(err => {
-        console.log('Resolution failure for webpack externals');
-
-        if (typeof err === 'object' && err && 'details' in err) {
-          console.log(String(err));
-          console.log(err.details);
-        } else {
-          console.log(err);
-        }
+      }).catch(() => {
+        cb(new Error(`Can't resolve '${request}' in '${contextInfo === null || contextInfo === void 0 ? void 0 : contextInfo.issuer}'`));
       });
     },
     experiments: {
@@ -462,7 +455,7 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
         return [];
       }
 
-      return fileState.messages.map(msg => new EslintWebpackError(fileState.eslintRunId, filePath, (0,_src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_4__.stripAnsi)(msg.message), {
+      return fileState.messages.map(msg => new EslintWebpackError(fileState.eslintRunId, (0,_src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_4__.stripAnsi)(msg.message), filePath, {
         start: {
           line: msg.line,
           column: msg.column

@@ -214,7 +214,7 @@ class EslintPlugin extends StandalonePlugin {
           }
           return fileState.messages.map(
             msg =>
-              new EslintWebpackError(fileState.eslintRunId, filePath, stripAnsi(msg.message), {
+              new EslintWebpackError(fileState.eslintRunId, stripAnsi(msg.message), filePath, {
                 start: {line: msg.line, column: msg.column},
                 end:
                   msg.endLine === undefined

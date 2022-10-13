@@ -4,37 +4,11 @@ import {WorkspaceFragment} from '@src/models';
 export function generateBuildScript(workspaceFragments: WorkspaceFragment[]): string {
   // const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
   return `
-  const {join, resolve} = require('node:path');
-  const {webpack} = require('webpack');
-  
-  const target = resolve('./script');
-  
-  import(join(target, 'webpack.config.js')).then(({getConfig}) => {
-    webpack({getConfig(target), ...watch: true}, (err, stats) => {
-      if (err || !stats) {
-        console.log('####### ERROR #######');
-        console.log(err);
-        console.log('#####################');
-        return;
-      }
-  
-      const {errors, warnings} = stats.toJson({errors: true, warnings: true});
-  
-      if (errors.length > 0) {
-        for (const error of errors) {
-          console.log('ERROR ' + error.file);
-          console.log(error.message);
-          console.log('');
-        }
-        console.log('');
-      }
-  
-      for (const warning of warnings) {
-        console.log('WARNING ' + warning.file);
-        console.log(warning.message);
-        console.log('');
-      }
-    });
-  });  
+import {join, resolve} from 'node:path';
+import {runWebpacks} from '@matthis/webpack-runner';
+
+const target = resolve('./script');
+
+runWebpacks({projectPaths: [target]}).catch(console.error);
 `.trim();
 }

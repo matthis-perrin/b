@@ -341,7 +341,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
   await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'app.code-workspace'), (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__.generateCodeWorkspace)(workspaceFragments)), // setup.js
   await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'setup.js'), (0,_src_project_setup_script__WEBPACK_IMPORTED_MODULE_9__.generateSetupScript)(projectNames)), // deploy.js
   await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'deploy.js'), (0,_src_project_deploy_script__WEBPACK_IMPORTED_MODULE_5__.generateDeployScript)(workspaceFragments)), // build.js
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'build.js'), (0,_src_project_build_script__WEBPACK_IMPORTED_MODULE_4__.generateBuildScript)(workspaceFragments))]); // Terraform folder generation
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'build.mjs'), (0,_src_project_build_script__WEBPACK_IMPORTED_MODULE_4__.generateBuildScript)(workspaceFragments))]); // Terraform folder generation
 
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'terraform');
   await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects)), ...projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async p => {
@@ -374,38 +374,12 @@ __webpack_require__.r(__webpack_exports__);
 function generateBuildScript(workspaceFragments) {
   // const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
   return `
-  const {join, resolve} = require('node:path');
-  const {webpack} = require('webpack');
-  
-  const target = resolve('./script');
-  
-  import(join(target, 'webpack.config.js')).then(({getConfig}) => {
-    webpack(getConfig(target), (err, stats) => {
-      if (err || !stats) {
-        console.log('####### ERROR #######');
-        console.log(err);
-        console.log('#####################');
-        return;
-      }
-  
-      const {errors, warnings} = stats.toJson({errors: true, warnings: true});
-  
-      if (errors.length > 0) {
-        for (const error of errors) {
-          console.log('ERROR ' + error.file);
-          console.log(error.stack ?? error.message);
-          console.log('');
-        }
-        console.log('');
-      }
-  
-      for (const warning of warnings) {
-        console.log('WARNING ' + warning.file);
-        console.log(warning.stack ?? warning.message);
-        console.log('');
-      }
-    });
-  });  
+import {join, resolve} from 'node:path';
+import {runWebpacks} from '@matthis/webpack-runner';
+
+const target = resolve('./script');
+
+runWebpacks({projectPaths: [target]}).catch(console.error);
 `.trim();
 }
 
@@ -757,12 +731,12 @@ function generateWorkspacePackageJson(workspaceName, projects) {
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
-      build: 'node ./build.js'
+      build: 'node ./build.mjs'
     },
     eslintConfig: {
       ignorePatterns: ['**/*.js']
     },
-    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack])].sort((d1, d2) => d1[0].localeCompare(d2[0])))
+    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner]].sort((d1, d2) => d1[0].localeCompare(d2[0])))
   };
 }
 
@@ -779,11 +753,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.13',
+  project: '1.2.14',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
-  webpack: '1.1.19'
+  webpack: '1.1.20',
+  runner: '1.0.1'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';

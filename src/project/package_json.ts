@@ -30,7 +30,7 @@ export function generateWorkspacePackageJson(
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
-      build: 'node ./build.js',
+      build: 'node ./build.mjs',
     },
     eslintConfig: {
       ignorePatterns: ['**/*.js'],
@@ -51,6 +51,7 @@ export function generateWorkspacePackageJson(
             `@matthis/webpack-${runtime}`,
             PACKAGE_VERSIONS.webpack,
           ]),
+          ['@matthis/webpack-runner', PACKAGE_VERSIONS.runner],
         ] as [string, string][]
       ).sort((d1, d2) => d1[0].localeCompare(d2[0]))
     ),

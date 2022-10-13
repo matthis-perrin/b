@@ -1,4 +1,4 @@
-import {Configuration} from 'webpack';
+import {Compiler, Configuration, ExternalModule} from 'webpack';
 
 import {cleanTerminalPlugin} from '@src/webpack/plugins/clean_terminal_plugin';
 import {definePlugin} from '@src/webpack/plugins/define_plugin';
@@ -31,7 +31,7 @@ export function baseConfig(contextOpt?: string): Configuration {
       minimizer: [terserPlugin()],
     },
     externals: (ctx, cb) => {
-      const {request, context} = ctx;
+      const {request, context, contextInfo, getResolve} = ctx;
       if (request === undefined) {
         return cb();
       }
@@ -39,7 +39,7 @@ export function baseConfig(contextOpt?: string): Configuration {
         return cb(undefined, `node-commonjs ${request}`);
       }
 
-      const resolver = ctx.getResolve?.();
+      const resolver = getResolve?.();
       if (!resolver) {
         return cb(new Error('No resolver when checking for externals'));
       }
@@ -57,14 +57,8 @@ export function baseConfig(contextOpt?: string): Configuration {
             })
             .catch(() => cb(undefined, `node-commonjs ${request}`));
         })
-        .catch((err: unknown) => {
-          console.log('Resolution failure for webpack externals');
-          if (typeof err === 'object' && err && 'details' in err) {
-            console.log(String(err));
-            console.log((err as {details: string}).details);
-          } else {
-            console.log(err);
-          }
+        .catch(() => {
+          cb(new Error(`Can't resolve '${request}' in '${contextInfo?.issuer}'`));
         });
     },
     experiments: {
