@@ -25,6 +25,7 @@ export async function generateTemplatesRootPackageJson(
   );
   await writeJsonFile(join(resolve('.'), 'templates', 'package.json'), {
     name: 'all-dependencies',
+    license: 'UNLICENSED',
     devDependencies,
   });
 }

@@ -1,6 +1,5 @@
 import {Configuration} from 'webpack';
 
-import {cleanTerminalPlugin} from '@src/webpack/plugins/clean_terminal_plugin';
 import {definePlugin} from '@src/webpack/plugins/define_plugin';
 import {eslintPlugin} from '@src/webpack/plugins/eslint_plugin';
 import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
@@ -21,13 +20,7 @@ export function baseConfig(contextOpt?: string): Configuration {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       alias: getTsConfigAlias(context),
     },
-    plugins: [
-      new YarnPlugin(),
-      forkTsCheckerPlugin(context),
-      eslintPlugin(),
-      definePlugin(),
-      cleanTerminalPlugin(),
-    ],
+    plugins: [new YarnPlugin(), forkTsCheckerPlugin(context), eslintPlugin(), definePlugin()],
     stats: {
       preset: 'errors-warnings',
       assets: true,

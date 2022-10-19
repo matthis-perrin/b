@@ -44,7 +44,7 @@ function requirementDetection() {
 
 async function installNodeModulesAtPath(path) {
   return new Promise((resolve, reject) => {
-    exec(\`yarn install --non-interactive\`, {cwd: path}, (error, stdout, stderr) => {
+    exec(\`yarn install --check-files --audit --non-interactive --ignore-optional\`, {cwd: path}, (error, stdout, stderr) => {
       if (!error) {
         resolve();
       } else {

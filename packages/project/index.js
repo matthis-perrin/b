@@ -376,16 +376,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "generateBuildScript": () => (/* binding */ generateBuildScript)
 /* harmony export */ });
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+
 function generateBuildScript(workspaceFragments) {
-  // const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
+  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_0__.getProjectsFromWorkspaceFragment);
   return `
-import {join, resolve} from 'node:path';
+import {resolve} from 'node:path';
 import {runWebpacks} from '@matthis/webpack-runner';
 
-const target = resolve('./script');
-
-runWebpacks({projectPaths: [target]}).catch(console.error);
+runWebpacks({root: resolve('.'), projectPaths: [${projects.map(p => `resolve('./${p.projectName}'),`).join('')}]}).catch(console.error);
 `.trim();
 }
 
@@ -739,7 +738,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
     eslintConfig: {
       ignorePatterns: ['**/*.js']
     },
-    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner]].sort((d1, d2) => d1[0].localeCompare(d2[0])))
+    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner], ['typescript', _src_versions__WEBPACK_IMPORTED_MODULE_1__.TYPESCRIPT_VERSION]].sort((d1, d2) => d1[0].localeCompare(d2[0])))
   };
 }
 
@@ -756,12 +755,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.15',
+  project: '1.2.21',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
-  webpack: '1.1.21',
-  runner: '1.0.1'
+  webpack: '1.1.23',
+  runner: '1.0.6'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
@@ -834,7 +833,7 @@ function requirementDetection() {
 
 async function installNodeModulesAtPath(path) {
   return new Promise((resolve, reject) => {
-    exec(\`yarn install --non-interactive\`, {cwd: path}, (error, stdout, stderr) => {
+    exec(\`yarn install --check-files --audit --non-interactive --ignore-optional\`, {cwd: path}, (error, stdout, stderr) => {
       if (!error) {
         resolve();
       } else {

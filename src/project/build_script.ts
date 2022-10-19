@@ -1,14 +1,14 @@
 import {WorkspaceFragment} from '@src/models';
+import {getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function generateBuildScript(workspaceFragments: WorkspaceFragment[]): string {
-  // const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
+  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
   return `
-import {join, resolve} from 'node:path';
+import {resolve} from 'node:path';
 import {runWebpacks} from '@matthis/webpack-runner';
 
-const target = resolve('./script');
-
-runWebpacks({projectPaths: [target]}).catch(console.error);
+runWebpacks({root: resolve('.'), projectPaths: [${projects
+    .map(p => `resolve('./${p.projectName}'),`)
+    .join('')}]}).catch(console.error);
 `.trim();
 }

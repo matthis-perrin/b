@@ -10,11 +10,9 @@ export class YarnPlugin {
       const command = [
         'yarn',
         'install',
-        // Always show warnings even after first install
         '--audit',
-        // Skip (don't download or install) optional dependencies even if available
+        '--check-files',
         '--ignore-optional',
-        // Disable interactive prompts, like when there’s an invalid version of a dependency.
         '--non-interactive',
       ].join(' ');
       exec(command, {cwd: compiler.context}, (error, stdout, stderr) => {

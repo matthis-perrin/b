@@ -40,6 +40,7 @@
     "@types/prettier": "2.7.x",
     "@types/prompts": "^2.0.14",
     "@types/semver": "7.3.x",
+    "ansi-colors": "4.1.x",
     "babel-loader": "8.2.x",
     "babel-plugin-react-remove-properties": "0.3.x",
     "chokidar": "3.5.x",

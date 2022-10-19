@@ -41,13 +41,14 @@ type FileState =
   | FailureFileState
   | ErroredFileState;
 
-class EslintWebpackError extends WebpackError {
+export class EslintWebpackError extends WebpackError {
   public override name = 'EslintWebpackError';
   public constructor(
     public readonly eslintRunId: number,
     message: string,
     filePath?: string,
-    loc?: WebpackError['loc']
+    loc?: WebpackError['loc'],
+    public readonly ruleId?: string
   ) {
     super(message);
     if (filePath !== undefined) {
@@ -214,13 +215,19 @@ class EslintPlugin extends StandalonePlugin {
           }
           return fileState.messages.map(
             msg =>
-              new EslintWebpackError(fileState.eslintRunId, stripAnsi(msg.message), filePath, {
-                start: {line: msg.line, column: msg.column},
-                end:
-                  msg.endLine === undefined
-                    ? undefined
-                    : {line: msg.endLine, column: msg.endColumn},
-              })
+              new EslintWebpackError(
+                fileState.eslintRunId,
+                stripAnsi(msg.message),
+                filePath,
+                {
+                  start: {line: msg.line, column: msg.column},
+                  end:
+                    msg.endLine === undefined
+                      ? undefined
+                      : {line: msg.endLine, column: msg.endColumn},
+                },
+                msg.ruleId ?? undefined
+              )
           );
         }),
     ];

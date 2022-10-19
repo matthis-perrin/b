@@ -6,7 +6,7 @@ import {
   WorkspaceName,
 } from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
-import {PACKAGE_VERSIONS} from '@src/versions';
+import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '@src/versions';
 
 function uniq(runtimes: (RuntimeType | undefined)[]): RuntimeType[] {
   return [...new Set(runtimes.filter((r): r is RuntimeType => r !== undefined)).values()];
@@ -52,6 +52,7 @@ export function generateWorkspacePackageJson(
             PACKAGE_VERSIONS.webpack,
           ]),
           ['@matthis/webpack-runner', PACKAGE_VERSIONS.runner],
+          ['typescript', TYPESCRIPT_VERSION],
         ] as [string, string][]
       ).sort((d1, d2) => d1[0].localeCompare(d2[0]))
     ),
