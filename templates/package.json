@@ -1,5 +1,6 @@
 {
   "name": "all-dependencies",
+  "license": "UNLICENSED",
   "devDependencies": {
     "@matthis/eslint-config-lib": "file:../packages/eslint-config-lib",
     "@matthis/eslint-config-node": "file:../packages/eslint-config-node",

@@ -1,4 +1,4 @@
-import {Compiler, Configuration, ExternalModule} from 'webpack';
+import {Configuration} from 'webpack';
 
 import {cleanTerminalPlugin} from '@src/webpack/plugins/clean_terminal_plugin';
 import {definePlugin} from '@src/webpack/plugins/define_plugin';
@@ -6,6 +6,7 @@ import {eslintPlugin} from '@src/webpack/plugins/eslint_plugin';
 import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
 import {terserPlugin} from '@src/webpack/plugins/terser_plugin';
 import {getTsConfigAlias} from '@src/webpack/plugins/ts_config_alias';
+import {YarnPlugin} from '@src/webpack/plugins/yarn_plugin';
 import {findPackageJson, isProd} from '@src/webpack/utils';
 
 export function baseConfig(contextOpt?: string): Configuration {
@@ -20,7 +21,13 @@ export function baseConfig(contextOpt?: string): Configuration {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       alias: getTsConfigAlias(context),
     },
-    plugins: [forkTsCheckerPlugin(context), eslintPlugin(), definePlugin(), cleanTerminalPlugin()],
+    plugins: [
+      new YarnPlugin(),
+      forkTsCheckerPlugin(context),
+      eslintPlugin(),
+      definePlugin(),
+      cleanTerminalPlugin(),
+    ],
     stats: {
       preset: 'errors-warnings',
       assets: true,

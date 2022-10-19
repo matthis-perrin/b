@@ -8,6 +8,10 @@ async function execAsync(cmd, options) {
   return new Promise((resolve, reject) => {
     exec(cmd, {cwd}, (error, stdout, stderr) => {
       if (!error) {
+        if (stderr.trim().length > 0) {
+          console.log(`Warnings in ${cwd}`);
+          console.log(stderr);
+        }
         resolve();
       } else {
         console.error(`Failure to run \`${cmd}\` in ${cwd}`);
@@ -24,6 +28,6 @@ const templateDirs = templateDirsEnt
   .filter(ent => ent.isDirectory() && ent.name !== 'node_modules')
   .map(ent => join(templatesDir, ent.name));
 await Promise.all([
-  execAsync('yarn install', {cwd: templatesDir}),
+  execAsync('yarn install --audit', {cwd: templatesDir}),
   ...templateDirs.map(dir => execAsync('yarn install', {cwd: dir})),
 ]);

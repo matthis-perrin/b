@@ -31,7 +31,6 @@ function formatError(err, type) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const msg = err.error.message;
     const match = /(?<msg>Can't resolve '[^']+') in '(?<file>[^']+)'/u.exec(msg);
-
     if (match) {
       console.log(`[module-not-found] (${match[2]}) ${match[1]}`);
     } else {
@@ -132,13 +131,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 async function runWebpacks(opts) {
-  const configs = await Promise.all(opts.projectPaths.map(async projectPath => // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
-  import(
-  /*webpackIgnore: true*/
-  (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'webpack.config.js')).then(({
+  const configs = await Promise.all(opts.projectPaths.map(async projectPath =>
+  // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
+  import( /*webpackIgnore: true*/(0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'webpack.config.js')).then(({
     getConfig
   }) => getConfig(projectPath))));
-  (0,webpack__WEBPACK_IMPORTED_MODULE_1__.webpack)(configs.map(c => ({ ...c,
+  (0,webpack__WEBPACK_IMPORTED_MODULE_1__.webpack)(configs.map(c => ({
+    ...c,
     watch: false
   })), (err, res) => {
     try {
@@ -148,21 +147,17 @@ async function runWebpacks(opts) {
         console.log('#####################');
         return;
       }
-
       res.stats.map(stats => {
         const {
           errors,
           warnings
         } = stats.compilation;
-
         for (const error of errors) {
           (0,_src_webpack_runner_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(error, 'error');
         }
-
         for (const warning of warnings) {
           (0,_src_webpack_runner_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(warning, 'warning');
         }
-
         return undefined;
       });
     } catch (err) {

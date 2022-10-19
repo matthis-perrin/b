@@ -1,6 +1,7 @@
 import webpack, {DefinePlugin} from 'webpack'; // eslint-disable-line import/no-named-as-default
 
 import {nodeConfig} from '@src/webpack/configs/node_config';
+import {YarnPlugin} from '@src/webpack/plugins/yarn_plugin';
 
 export async function compile(
   entry: string,
@@ -9,7 +10,9 @@ export async function compile(
   packageJsonProperties: Record<string, unknown> = {}
 ): Promise<void> {
   const baseConfig = nodeConfig({context: process.cwd(), isLib, packageJsonProperties});
-  const plugins = (baseConfig.plugins ?? []).filter(p => !(p instanceof DefinePlugin));
+  const plugins = (baseConfig.plugins ?? []).filter(
+    p => !(p instanceof DefinePlugin || p instanceof YarnPlugin)
+  );
   const config = {
     ...baseConfig,
     entry: {index: entry},

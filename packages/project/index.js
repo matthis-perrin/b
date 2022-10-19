@@ -89,7 +89,6 @@ async function rmDir(dirPath) {
 }
 async function cleanDir(dirPath) {
   console.log('clean', dirPath);
-
   try {
     await rmDir(dirPath);
   } finally {
@@ -153,8 +152,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 // Runtime types
 //
-let RuntimeType;
 
+let RuntimeType;
 (function (RuntimeType) {
   RuntimeType["Web"] = "web";
   RuntimeType["Node"] = "node";
@@ -164,7 +163,6 @@ let RuntimeType;
   RuntimeType["NodeLib"] = "node-lib";
   RuntimeType["NodeScript"] = "node-script";
 })(RuntimeType || (RuntimeType = {}));
-
 const RUNTIME_TYPE_TO_METADATA = {
   [RuntimeType.Web]: {
     eslint: RuntimeType.Web,
@@ -200,12 +198,13 @@ const RUNTIME_TYPE_TO_METADATA = {
     tsconfig: RuntimeType.Node,
     webpack: RuntimeType.NodeScript
   }
-}; //
+};
+
+//
 // Project type
 //
 
 let ProjectType;
-
 (function (ProjectType) {
   ProjectType["Web"] = "web";
   ProjectType["LambdaFunction"] = "lambda_function";
@@ -214,7 +213,6 @@ let ProjectType;
   ProjectType["NodeScript"] = "node_script";
   ProjectType["Shared"] = "shared";
 })(ProjectType || (ProjectType = {}));
-
 const PROJECT_TYPE_TO_METADATA = {
   [ProjectType.Web]: {
     runtimeType: RuntimeType.Web
@@ -234,12 +232,13 @@ const PROJECT_TYPE_TO_METADATA = {
   [ProjectType.Shared]: {
     runtimeType: RuntimeType.Lib
   }
-}; //
+};
+
+//
 // Workspace Fragment type
 //
 
 let WorkspaceFragmentType;
-
 (function (WorkspaceFragmentType) {
   WorkspaceFragmentType["StaticWebsite"] = "static-website";
   WorkspaceFragmentType["StandaloneLambda"] = "standalone-lambda";
@@ -248,7 +247,6 @@ let WorkspaceFragmentType;
   WorkspaceFragmentType["NodeScript"] = "node-script";
   WorkspaceFragmentType["Shared"] = "shared";
 })(WorkspaceFragmentType || (WorkspaceFragmentType = {}));
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function validateRegistry() {
   return true;
@@ -319,42 +317,50 @@ function getProjectsFromWorkspaceFragment(fragment) {
     return [{
       projectName: fragment.scriptName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_3__.ProjectType.NodeScript
-    }]; // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    }];
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_3__.WorkspaceFragmentType.Shared) {
     return [{
       projectName: 'shared',
       type: _src_models__WEBPACK_IMPORTED_MODULE_3__.ProjectType.Shared
     }];
   }
-
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_12__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
 }
 async function generateWorkspace(dst, workspaceName, workspaceFragments, alreadyGenerated) {
   const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
-  const projectNames = projects.map(p => p.projectName); // Create projects files from templates
+  const projectNames = projects.map(p => p.projectName);
 
-  await Promise.all(projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__.generateProject)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, project.projectName), project))); // Generate workspace root files
+  // Create projects files from templates
+  await Promise.all(projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__.generateProject)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, project.projectName), project)));
 
-  await Promise.all([// package.json
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'package.json'), (0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_8__.generateWorkspacePackageJson)(workspaceName, projects)), // .gitignore
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, '.gitignore'), (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__.generateGitIgnore)()), // app.code-workspace
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'app.code-workspace'), (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__.generateCodeWorkspace)(workspaceFragments)), // setup.js
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'setup.js'), (0,_src_project_setup_script__WEBPACK_IMPORTED_MODULE_9__.generateSetupScript)(projectNames)), // deploy.js
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'deploy.js'), (0,_src_project_deploy_script__WEBPACK_IMPORTED_MODULE_5__.generateDeployScript)(workspaceFragments)), // build.js
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'build.mjs'), (0,_src_project_build_script__WEBPACK_IMPORTED_MODULE_4__.generateBuildScript)(workspaceFragments))]); // Terraform folder generation
+  // Generate workspace root files
+  await Promise.all([
+  // package.json
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'package.json'), (0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_8__.generateWorkspacePackageJson)(workspaceName, projects)),
+  // .gitignore
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, '.gitignore'), (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__.generateGitIgnore)()),
+  // app.code-workspace
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'app.code-workspace'), (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__.generateCodeWorkspace)(workspaceFragments)),
+  // setup.js
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'setup.js'), (0,_src_project_setup_script__WEBPACK_IMPORTED_MODULE_9__.generateSetupScript)(projectNames)),
+  // deploy.js
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'deploy.js'), (0,_src_project_deploy_script__WEBPACK_IMPORTED_MODULE_5__.generateDeployScript)(workspaceFragments)),
+  // build.js
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'build.mjs'), (0,_src_project_build_script__WEBPACK_IMPORTED_MODULE_4__.generateBuildScript)(workspaceFragments))]);
 
+  // Terraform folder generation
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'terraform');
   await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects)), ...projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async p => {
     const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateWorkspaceProjectTerraform)(p);
-
     if (content === undefined) {
       return;
     }
-
     const name = `${p.projectName}_terraform`;
     await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(terraformPath, `${name}.tf`), content);
-  })]); // Run setup.js
+  })]);
 
+  // Run setup.js
   console.log('Running post install script');
   const commands = [`cd ${dst}`, `node setup.js`];
   (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '), {
@@ -491,7 +497,6 @@ function generateBuildWorkspaceFn(fragments) {
     const {
       type
     } = fragment;
-
     if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.WebApp) {
       return generateBuildWebAppProjectFn(fragment);
     } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.StaticWebsite) {
@@ -501,11 +506,11 @@ function generateBuildWorkspaceFn(fragments) {
     } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.NodeLib) {
       return generateBuildNodeLibProjectFn(fragment);
     } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.NodeScript) {
-      return generateBuildNodeScriptProjectFn(fragment); // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      return generateBuildNodeScriptProjectFn(fragment);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.Shared) {
       return generateBuildSharedProjectFn();
     }
-
     return (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_2__.neverHappens)(type, `Unknown WorkspaceFragmentType "${type}"`);
   });
   return [...buildFunctions.map(fn => fn.sourceCode), `
@@ -658,10 +663,11 @@ async function generateProject(dst, project) {
   const {
     projectName,
     type
-  } = project; // Copy template files
+  } = project;
+  // Copy template files
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(TEMPLATES_PATH, type), dst);
 
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(TEMPLATES_PATH, type), dst); // Post generation script for React Native project
-
+  // Post generation script for React Native project
   if (_src_models__WEBPACK_IMPORTED_MODULE_4__.PROJECT_TYPE_TO_METADATA[type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_4__.RuntimeType.ReactNative) {
     console.log('Running post install script');
     const commands = [`pushd ${dst}`, `npx --yes react-native init ${projectName}`, `mv ${projectName}/ios .`, `mv ${projectName}/android .`, `rm -rf ${projectName}`, `popd`];
@@ -712,15 +718,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(17);
 
 
-
 function uniq(runtimes) {
   return [...new Set(runtimes.filter(r => r !== undefined)).values()];
 }
-
 function projectMetadata(p) {
   return _src_models__WEBPACK_IMPORTED_MODULE_0__.RUNTIME_TYPE_TO_METADATA[_src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType];
 }
-
 function generateWorkspacePackageJson(workspaceName, projects) {
   const eslintRuntimes = uniq(projects.map(p => projectMetadata(p).eslint));
   const tsconfigRuntimes = uniq(projects.map(p => projectMetadata(p).tsconfig));
@@ -753,18 +756,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.14',
+  project: '1.2.15',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
-  webpack: '1.1.20',
+  webpack: '1.1.21',
   runner: '1.0.1'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
 const TYPESCRIPT_VERSION = '4.8.x';
-/* eslint-disable @typescript-eslint/naming-convention */
 
+/* eslint-disable @typescript-eslint/naming-convention */
 const LIB_VERSIONS = {
   '@types/react': '17.0.x',
   '@types/react-dom': '17.0.x',
@@ -904,7 +907,6 @@ function generateWorkspaceProjectTerraform(project) {
     projectName,
     type
   } = project;
-
   if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web) {
     return generateWebTerraform(projectName);
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaFunction) {
@@ -914,11 +916,11 @@ function generateWorkspaceProjectTerraform(project) {
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeLib) {
     return undefined;
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
-    return undefined; // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return undefined;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Shared) {
     return undefined;
   }
-
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_7__.neverHappens)(type, 'ProjectType');
 }
 function generateWebTerraform(projectName) {
@@ -1338,8 +1340,8 @@ function generateCodeWorkspace(workspaceFragments) {
       'editor.defaultFormatter': 'esbenp.prettier-vscode',
       'emmet.showExpandedAbbreviation': 'never'
       /* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */
-
     },
+
     extensions: {
       recommendations: ['dbaeumer.vscode-eslint', 'esbenp.prettier-vscode', 'VisualStudioExptTeam.vscodeintellicode', 'styled-components.vscode-styled-components', 'naumovs.color-highlight', 'eamodio.gitlens']
     }
@@ -1436,18 +1438,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 async function cancel(workspacePath) {
   console.log('Cancelling...');
-
   if (workspacePath !== undefined) {
     await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.rmDir)(workspacePath);
-  } // eslint-disable-next-line node/no-process-exit
-
-
+  }
+  // eslint-disable-next-line node/no-process-exit
   process.exit(0);
 }
-
 async function initProject() {
   let workspaceName;
   let workspacePath = process.cwd();
@@ -1455,15 +1453,14 @@ async function initProject() {
     type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.Shared
   }];
   const takenNames = ['terraform'];
-  const alreadyGenerated = []; // Check if we are already in a workspace
+  const alreadyGenerated = [];
 
+  // Check if we are already in a workspace
   const workspaceContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.maybeReadFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(workspacePath, 'app.code-workspace'));
   const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
   const workspaceProjects = Array.isArray(workspaceJson.projects) ? workspaceJson.projects : undefined;
-
   if (workspaceProjects !== undefined) {
     workspaceName = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.basename)(workspacePath);
-
     for (const project of workspaceProjects) {
       frags.push(project);
       const projectNames = (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.getProjectsFromWorkspaceFragment)(project).map(p => p.projectName);
@@ -1479,19 +1476,15 @@ async function initProject() {
       validate: v => v.length > 0
     });
     workspaceName = promptResponse.workspaceName;
-
     if (typeof workspaceName !== 'string') {
       return cancel();
     }
-
     workspacePath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(workspacePath, workspaceName);
     await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.mkdir)(workspacePath);
   }
-
   try {
     while (true) {
       let frag;
-
       try {
         // eslint-disable-next-line no-await-in-loop
         frag = await askForWorkspaceFragment(takenNames);
@@ -1499,7 +1492,6 @@ async function initProject() {
         console.error(String(err));
         continue;
       }
-
       if (frag) {
         frags.push(frag);
         takenNames.push(...(0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.getProjectsFromWorkspaceFragment)(frag).map(p => p.projectName));
@@ -1507,7 +1499,6 @@ async function initProject() {
         break;
       }
     }
-
     const name = workspaceName;
     await (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.generateWorkspace)(workspacePath, name, frags, alreadyGenerated);
   } catch (err) {
@@ -1515,7 +1506,6 @@ async function initProject() {
     await cancel(workspaceName);
   }
 }
-
 const WorkspaceFragmentTypeToString = {
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.WebApp]: 'Web App',
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StaticWebsite]: 'Static Website',
@@ -1523,7 +1513,6 @@ const WorkspaceFragmentTypeToString = {
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeLib]: 'Node Lib',
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeScript]: 'Node Script'
 };
-
 async function askForWorkspaceFragment(takenNames) {
   const DONE_GENERATING = 'done_generating';
   const {
@@ -1540,13 +1529,10 @@ async function askForWorkspaceFragment(takenNames) {
       value: DONE_GENERATING
     }]
   });
-
   if (workspaceFragmentType === undefined || workspaceFragmentType === DONE_GENERATING) {
     return undefined;
   }
-
   const type = workspaceFragmentType;
-
   if (type === _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StaticWebsite) {
     const websiteName = await askForProjectName('Website project name', 'website', takenNames);
     return {
@@ -1572,7 +1558,8 @@ async function askForWorkspaceFragment(takenNames) {
     return {
       type,
       libName
-    }; // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeScript) {
     const scriptName = await askForProjectName('Script project name', 'script', takenNames);
     return {
@@ -1580,24 +1567,18 @@ async function askForWorkspaceFragment(takenNames) {
       scriptName
     };
   }
-
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.neverHappens)(type, `Unknown WorkspaceFragmentType "${type}"`);
 }
-
 const VALID_PROJECT_NAME = /^[a-zA-Z0-9_]+$/u;
-
 async function askForProjectName(question, defaultValue, takenNames) {
   let initial = defaultValue;
-
   if (takenNames.includes(initial)) {
     let index = 2;
-
     while (takenNames.includes(initial)) {
       initial = `${defaultValue}_${index}`;
       index++;
     }
   }
-
   const {
     value
   } = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({
@@ -1607,22 +1588,17 @@ async function askForProjectName(question, defaultValue, takenNames) {
     initial,
     validate: v => v.length > 0
   });
-
   if (typeof value !== 'string') {
     throw new Error(`${question} is required`);
   }
-
   if (!VALID_PROJECT_NAME.test(value)) {
     throw new Error(`Invalid project name "${value}". Allowed characters are a-z, A-Z, 0-9 and _`);
   }
-
   if (takenNames.includes(value)) {
     throw new Error(`${value} is taken`);
   }
-
   return value;
 }
-
 initProject().catch(console.error);
 })();
 

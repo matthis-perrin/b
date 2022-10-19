@@ -25,6 +25,7 @@ async function writeScript(path: string): Promise<void> {
   await compile(entry, dst, false, {
     name: '@matthis/project',
     version: PACKAGE_VERSIONS.project,
+    license: 'UNLICENSED',
     bin: './index.mjs',
   });
 }

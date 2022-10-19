@@ -8,8 +8,7 @@
     "watch": "NODE_ENV=development webpack watch",
     "project": "yarn build && yarn start && cd packages/project/ && yarn install && cd ../../ && node packages/project/index.js",
     "start": "node dist/index.js",
-    "postinstall": "node install.js",
-    "publish-all": "for d in ./packages/* ; do (cd \"$d\" && npm publish --access public && cd ..); done; rm -rf **/yarn.lock; yarn install"
+    "postinstall": "node install.js"
   },
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
@@ -56,5 +55,6 @@
   },
   "dependencies": {
     "prompts": "2.4.x"
-  }
+  },
+  "version": "0.0.0"
 }
