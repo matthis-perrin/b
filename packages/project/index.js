@@ -347,7 +347,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
   // deploy.js
   await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'deploy.js'), (0,_src_project_deploy_script__WEBPACK_IMPORTED_MODULE_5__.generateDeployScript)(workspaceFragments)),
   // build.js
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'build.mjs'), (0,_src_project_build_script__WEBPACK_IMPORTED_MODULE_4__.generateBuildScript)(workspaceFragments))]);
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'build.mjs'), (0,_src_project_build_script__WEBPACK_IMPORTED_MODULE_4__.generateBuildScript)())]);
 
   // Terraform folder generation
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'terraform');
@@ -376,15 +376,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "generateBuildScript": () => (/* binding */ generateBuildScript)
 /* harmony export */ });
-/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
-
-function generateBuildScript(workspaceFragments) {
-  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_0__.getProjectsFromWorkspaceFragment);
+function generateBuildScript() {
   return `
 import {resolve} from 'node:path';
-import {runWebpacks} from '@matthis/webpack-runner';
+import {runAllWebpacks} from '@matthis/webpack-runner';
 
-runWebpacks({root: resolve('.'), projectPaths: [${projects.map(p => `resolve('./${p.projectName}'),`).join('')}]}).catch(console.error);
+runAllWebpacks(resolve('.')).catch(console.error);
 `.trim();
 }
 
@@ -755,12 +752,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.21',
+  project: '1.2.24',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
   webpack: '1.1.23',
-  runner: '1.0.6'
+  runner: '1.0.9'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';

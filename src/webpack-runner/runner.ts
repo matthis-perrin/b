@@ -1,10 +1,14 @@
+import {readdir} from 'node:fs/promises';
 import {join, relative} from 'node:path';
 
+import {underline} from 'ansi-colors';
 import {Configuration, Stats, webpack} from 'webpack';
 
+import {exists} from '@src/fs';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
 import {renderErrors, renderProjectStatus} from '@src/webpack-runner/renderer';
+import {table} from '@src/webpack-runner/text_table';
 
 interface RunWebpacksOptions {
   root: string;
@@ -42,16 +46,19 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     const errors = [...statuses.values()].flatMap(v => v.errors);
     const groupedErrors = groupAndSortErrors(errors);
 
-    const summary = [...statuses.entries()]
-      .map(([projectPath, status]) =>
-        renderProjectStatus(projectPath, status.firstRun, status.isRunning, groupedErrors)
-      )
-      .join('\n');
+    const summary = [...statuses.entries()].map(([projectPath, status]) =>
+      renderProjectStatus(projectPath, status.firstRun, status.isRunning, groupedErrors)
+    );
+    summary.unshift([
+      underline(`Projects (${projectPaths.length})`),
+      underline('Status'),
+      underline('Run'),
+    ]);
     const report = renderErrors(groupedErrors);
 
     process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
     console.log(`Projects (${projectPaths.length}):`);
-    console.log(summary);
+    console.log(table(summary));
     if (report.length > 0) {
       console.log('\n-----\n');
       console.log(report);
@@ -78,4 +85,16 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       }
     });
   }
+}
+
+export async function runAllWebpacks(root: string): Promise<void> {
+  const rootFiles = await readdir(root, {withFileTypes: true});
+  const dirs = rootFiles.filter(ent => ent.isDirectory()).map(dir => join(root, dir.name));
+  const packages = await Promise.all(
+    dirs.map(async dir => ((await exists(join(dir, 'package.json'))) ? dir : undefined))
+  );
+  await runWebpacks({
+    root,
+    projectPaths: packages.filter((p): p is string => p !== undefined),
+  });
 }

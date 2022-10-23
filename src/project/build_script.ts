@@ -1,14 +1,8 @@
-import {WorkspaceFragment} from '@src/models';
-import {getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
-
-export function generateBuildScript(workspaceFragments: WorkspaceFragment[]): string {
-  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
+export function generateBuildScript(): string {
   return `
 import {resolve} from 'node:path';
-import {runWebpacks} from '@matthis/webpack-runner';
+import {runAllWebpacks} from '@matthis/webpack-runner';
 
-runWebpacks({root: resolve('.'), projectPaths: [${projects
-    .map(p => `resolve('./${p.projectName}'),`)
-    .join('')}]}).catch(console.error);
+runAllWebpacks(resolve('.')).catch(console.error);
 `.trim();
 }

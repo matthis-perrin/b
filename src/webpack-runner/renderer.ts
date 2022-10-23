@@ -26,7 +26,7 @@ export function renderProjectStatus(
   firstRun: boolean,
   isRunning: boolean,
   errors: GroupedErrors
-): string {
+): string[] {
   const out = [formatProject(name)];
 
   const projectErrors = errors.errorsByProjectByFile.get(name);
@@ -34,22 +34,24 @@ export function renderProjectStatus(
     const all = [...projectErrors.values()];
     const errorCount = all.flatMap(errors => errors.filter(err => err.severity === 'error')).length;
     const warnCount = all.flatMap(warns => warns.filter(err => err.severity === 'warning')).length;
+    const diag: string[] = [];
 
     if (errorCount > 0) {
       const plural = errorCount > 1 ? 's' : '';
-      out.push(bgRed.whiteBright(` ${errorCount} error${plural} `));
+      diag.push(bgRed.whiteBright(` ${errorCount} error${plural} `));
     }
     if (warnCount > 0) {
       const plural = warnCount > 1 ? 's' : '';
-      out.push(bgYellow.whiteBright(` ${warnCount} warning${plural} `));
+      diag.push(bgYellow.whiteBright(` ${warnCount} warning${plural} `));
     }
+    out.push(diag.join(' '));
   } else if (!firstRun) {
     out.push(green('success'));
   }
 
   if (isRunning) {
-    out.push(gray(' in progress'));
+    out.push(gray('in progress'));
   }
 
-  return out.join(' ');
+  return out;
 }
