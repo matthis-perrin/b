@@ -298,7 +298,7 @@ function getProjectsFromWorkspaceFragment(fragment) {
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_3__.WorkspaceFragmentType.StandaloneLambda) {
     return [{
       projectName: fragment.lambdaName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_3__.ProjectType.LambdaApi
+      type: _src_models__WEBPACK_IMPORTED_MODULE_3__.ProjectType.LambdaFunction
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_3__.WorkspaceFragmentType.WebApp) {
     return [{
@@ -752,7 +752,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.25',
+  project: '1.2.26',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',

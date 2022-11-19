@@ -39,7 +39,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
     return [
       {
         projectName: fragment.lambdaName,
-        type: ProjectType.LambdaApi,
+        type: ProjectType.LambdaFunction,
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.WebApp) {
