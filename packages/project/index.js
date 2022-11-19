@@ -352,7 +352,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
   // Terraform folder generation
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'terraform');
   await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects)), ...projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async p => {
-    const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateWorkspaceProjectTerraform)(p);
+    const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateWorkspaceProjectTerraform)(workspaceName, p);
     if (content === undefined) {
       return;
     }
@@ -434,7 +434,7 @@ function ensureDistFolders(projects) {
       const files = fs.readdirSync(dist);
       if (files.length === 0) {
         fs.writeFileSync(
-          path.join(dist, 'main.js'),
+          path.join(dist, 'index.js'),
           \`exports.handler = async function() {return ''};\`
         );
       }
@@ -752,7 +752,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.24',
+  project: '1.2.25',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
@@ -898,17 +898,17 @@ __webpack_require__.r(__webpack_exports__);
 function generateCommonTerraform(workspaceName, projects) {
   return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_5__.generateAwsProviderTerraform)(workspaceName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_6__.generateS3BucketTerraform)(workspaceName, projects.filter(p => _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_0__.RuntimeType.Web).map(p => p.projectName))].join('\n\n');
 }
-function generateWorkspaceProjectTerraform(project) {
+function generateWorkspaceProjectTerraform(workspaceName, project) {
   const {
     projectName,
     type
   } = project;
   if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web) {
-    return generateWebTerraform(projectName);
+    return generateWebTerraform(workspaceName, projectName);
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaFunction) {
-    return generateLambdaFunctionTerraform(projectName);
+    return generateLambdaFunctionTerraform(workspaceName, projectName);
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaApi) {
-    return generateLambdaApiTerraform(projectName);
+    return generateLambdaApiTerraform(workspaceName, projectName);
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeLib) {
     return undefined;
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
@@ -919,14 +919,14 @@ function generateWorkspaceProjectTerraform(project) {
   }
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_7__.neverHappens)(type, 'ProjectType');
 }
-function generateWebTerraform(projectName) {
-  return [(0,_src_project_terraform_output__WEBPACK_IMPORTED_MODULE_4__.generateCloudfrontDomainNameOutputTerraform)(projectName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_6__.generateWebFileUploadTerraform)(projectName), (0,_src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_2__.generateCloudfrontDistributionTerraform)(projectName)].join('\n\n');
+function generateWebTerraform(workspaceName, projectName) {
+  return [(0,_src_project_terraform_output__WEBPACK_IMPORTED_MODULE_4__.generateCloudfrontDomainNameOutputTerraform)(workspaceName, projectName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_6__.generateWebFileUploadTerraform)(workspaceName, projectName), (0,_src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_2__.generateCloudfrontDistributionTerraform)(workspaceName, projectName)].join('\n\n');
 }
-function generateLambdaFunctionTerraform(projectName) {
-  return [(0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_3__.generateLambdaTerraform)(projectName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_6__.generateLambdaFileUploadTerraform)(projectName)].join('\n\n');
+function generateLambdaFunctionTerraform(workspaceName, projectName) {
+  return [(0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_3__.generateLambdaTerraform)(workspaceName, projectName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_6__.generateLambdaFileUploadTerraform)(workspaceName, projectName)].join('\n\n');
 }
-function generateLambdaApiTerraform(projectName) {
-  return [generateLambdaFunctionTerraform(projectName), (0,_src_project_terraform_output__WEBPACK_IMPORTED_MODULE_4__.generateLambdaApiOutputsTerraform)(projectName), (0,_src_project_terraform_api_gateway__WEBPACK_IMPORTED_MODULE_1__.generateApiGatewayTerraform)(projectName)].join('\n\n');
+function generateLambdaApiTerraform(workspaceName, projectName) {
+  return [generateLambdaFunctionTerraform(workspaceName, projectName), (0,_src_project_terraform_output__WEBPACK_IMPORTED_MODULE_4__.generateLambdaApiOutputsTerraform)(workspaceName, projectName), (0,_src_project_terraform_api_gateway__WEBPACK_IMPORTED_MODULE_1__.generateApiGatewayTerraform)(workspaceName, projectName)].join('\n\n');
 }
 
 /***/ }),
@@ -937,11 +937,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "generateApiGatewayTerraform": () => (/* binding */ generateApiGatewayTerraform)
 /* harmony export */ });
-function generateApiGatewayTerraform(projectName) {
+function generateApiGatewayTerraform(workspaceName, projectName) {
   return `
 resource "aws_api_gateway_rest_api" "${projectName}" {
-  name        = "${projectName}-RestAPI"
-  description = "Rest API for the \\"${projectName}\\" app"
+  name        = "${workspaceName}-${projectName}-RestAPI"
+  description = "Rest API for the \\"${workspaceName}-${projectName}\\" app"
 }
 
 resource "aws_api_gateway_resource" "${projectName}" {
@@ -1019,7 +1019,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "generateCloudfrontDistributionTerraform": () => (/* binding */ generateCloudfrontDistributionTerraform)
 /* harmony export */ });
-function generateCloudfrontDistributionTerraform(projectName) {
+function generateCloudfrontDistributionTerraform(workspaceName, projectName) {
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
   const originId = `${bucketName}-origin-id`;
   return `
@@ -1094,10 +1094,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "generateLambdaTerraform": () => (/* binding */ generateLambdaTerraform)
 /* harmony export */ });
-function generateLambdaTerraform(projectName) {
+function generateLambdaTerraform(workspaceName, projectName) {
   return `
 # Define any extra role for the lambda here
-data "aws_iam_policy_document" "lambda_${projectName}_extra_role" {
+data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
   statement {
     actions   = ["s3:ListAllMyBuckets"]
     resources = ["*"]
@@ -1105,17 +1105,17 @@ data "aws_iam_policy_document" "lambda_${projectName}_extra_role" {
 }
 
 resource "aws_lambda_function" "${projectName}" {
-  function_name     = "${projectName}-API"
+  function_name     = "${workspaceName}-${projectName}"
   s3_bucket         = aws_s3_bucket.code.id
   s3_key            = aws_s3_bucket_object.${projectName}_archive.id
   source_code_hash  = data.archive_file.${projectName}_archive.output_sha
-  handler           = "main.handler"
+  handler           = "index.handler"
   runtime           = "nodejs14.x"
-  role              = aws_iam_role.lambda_${projectName}_exec.arn
+  role              = aws_iam_role.${projectName}_lambda_exec.arn
 }
 
-resource "aws_iam_role" "lambda_${projectName}_exec" {
-  name = "${projectName}-API-assume-role"
+resource "aws_iam_role" "${projectName}_lambda_exec" {
+  name = "${workspaceName}-${projectName}-assume-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -1131,7 +1131,7 @@ resource "aws_iam_role" "lambda_${projectName}_exec" {
   })
 
   inline_policy {
-    name = "${projectName}-API-cloudwatch-role"
+    name = "${workspaceName}-${projectName}-cloudwatch-role"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
@@ -1149,8 +1149,8 @@ resource "aws_iam_role" "lambda_${projectName}_exec" {
   }
   
   inline_policy {
-    name = "${projectName}-API-extra-role"
-    policy = data.aws_iam_policy_document.lambda_${projectName}_extra_role.json
+    name = "${workspaceName}-${projectName}-extra-role"
+    policy = data.aws_iam_policy_document.${projectName}_lambda_extra_role.json
   }
 }
 `.trim();
@@ -1165,18 +1165,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "generateCloudfrontDomainNameOutputTerraform": () => (/* binding */ generateCloudfrontDomainNameOutputTerraform),
 /* harmony export */   "generateLambdaApiOutputsTerraform": () => (/* binding */ generateLambdaApiOutputsTerraform)
 /* harmony export */ });
-function generateCloudfrontDomainNameOutputTerraform(projectName) {
+function generateCloudfrontDomainNameOutputTerraform(workspaceName, projectName) {
   return `
 output "${projectName}_cloudfront_domain_name" {
   value       = aws_cloudfront_distribution.${projectName}.domain_name
-  description = "Domain (from cloudfront) where the \\"${projectName}\\" frontend is available."
+  description = "Domain (from cloudfront) where the \\"${workspaceName}-${projectName}\\" frontend is available."
 }`.trim();
 }
-function generateLambdaApiOutputsTerraform(projectName) {
+function generateLambdaApiOutputsTerraform(workspaceName, projectName) {
   return `
 output "${projectName}_api_url" {
   value = aws_api_gateway_deployment.${projectName}.invoke_url
-  description = "URL where the \\"${projectName}\\" lambda api can be called."
+  description = "URL where the \\"${workspaceName}-${projectName}\\" lambda api can be called."
 }`.trim();
 }
 
@@ -1223,39 +1223,44 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 function generateS3BucketTerraform(workspaceName, webProjectNames) {
   const bucketName = workspaceName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
-  return `
-resource "aws_s3_bucket" "code" {
-  bucket_prefix = "${bucketName}-"
-}
-
-resource "aws_s3_bucket_acl" "code_bucket_acl" {
-  bucket = aws_s3_bucket.code.id
-  acl    = "private"
-}
-
-data "aws_iam_policy_document" "cloudfront_access_to_code" {
-  ${webProjectNames.map(p => `
-  statement {
-    actions   = ["s3:GetObject"]
-    resources = [
-      "\${aws_s3_bucket.code.arn}/${p}/*",
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.${p}.iam_arn]
-    }
+  const CODE_BUCKET = `
+  resource "aws_s3_bucket" "code" {
+    bucket_prefix = "${bucketName}-"
   }
-`.trim()).join('\n\n')}
-}
-
-resource "aws_s3_bucket_policy" "code" {
-  bucket = aws_s3_bucket.code.id
-  policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
-}
-
+  
+  resource "aws_s3_bucket_acl" "code_bucket_acl" {
+    bucket = aws_s3_bucket.code.id
+    acl    = "private"
+  }
 `.trim();
+  const CLOUDFRONT_ACCESS = `
+  data "aws_iam_policy_document" "cloudfront_access_to_code" {
+    ${webProjectNames.map(p => `
+    statement {
+      actions   = ["s3:GetObject"]
+      resources = [
+        "\${aws_s3_bucket.code.arn}/${p}/*",
+      ]
+      principals {
+        type        = "AWS"
+        identifiers = [aws_cloudfront_origin_access_identity.${p}.iam_arn]
+      }
+    }
+  `.trim()).join('\n\n')}
+  }
+
+  resource "aws_s3_bucket_policy" "code" {
+    bucket = aws_s3_bucket.code.id
+    policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
+  }
+`.trim();
+  const out = [CODE_BUCKET];
+  if (webProjectNames.length > 0) {
+    out.push(CLOUDFRONT_ACCESS);
+  }
+  return out.join('\n\n');
 }
-function generateWebFileUploadTerraform(projectName) {
+function generateWebFileUploadTerraform(workspaceName, projectName) {
   return `
 module "${projectName}_template_files" {
   source = "hashicorp/dir/template"
@@ -1273,7 +1278,7 @@ resource "aws_s3_bucket_object" "${projectName}_files" {
 }
 `.trim();
 }
-function generateLambdaFileUploadTerraform(projectName) {
+function generateLambdaFileUploadTerraform(workspaceName, projectName) {
   return `
 data "archive_file" "${projectName}_archive" {
   type        = "zip"

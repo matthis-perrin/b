@@ -121,7 +121,7 @@ export async function generateWorkspace(
     ...projects
       .filter(p => !alreadyGenerated.includes(p.projectName))
       .map(async p => {
-        const content = generateWorkspaceProjectTerraform(p);
+        const content = generateWorkspaceProjectTerraform(workspaceName, p);
         if (content === undefined) {
           return;
         }

@@ -1,9 +1,12 @@
-import {ProjectName} from '@src/models';
+import {ProjectName, WorkspaceName} from '@src/models';
 
-export function generateLambdaTerraform(projectName: ProjectName): string {
+export function generateLambdaTerraform(
+  workspaceName: WorkspaceName,
+  projectName: ProjectName
+): string {
   return `
 # Define any extra role for the lambda here
-data "aws_iam_policy_document" "lambda_${projectName}_extra_role" {
+data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
   statement {
     actions   = ["s3:ListAllMyBuckets"]
     resources = ["*"]
@@ -11,17 +14,17 @@ data "aws_iam_policy_document" "lambda_${projectName}_extra_role" {
 }
 
 resource "aws_lambda_function" "${projectName}" {
-  function_name     = "${projectName}-API"
+  function_name     = "${workspaceName}-${projectName}"
   s3_bucket         = aws_s3_bucket.code.id
   s3_key            = aws_s3_bucket_object.${projectName}_archive.id
   source_code_hash  = data.archive_file.${projectName}_archive.output_sha
-  handler           = "main.handler"
+  handler           = "index.handler"
   runtime           = "nodejs14.x"
-  role              = aws_iam_role.lambda_${projectName}_exec.arn
+  role              = aws_iam_role.${projectName}_lambda_exec.arn
 }
 
-resource "aws_iam_role" "lambda_${projectName}_exec" {
-  name = "${projectName}-API-assume-role"
+resource "aws_iam_role" "${projectName}_lambda_exec" {
+  name = "${workspaceName}-${projectName}-assume-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -37,7 +40,7 @@ resource "aws_iam_role" "lambda_${projectName}_exec" {
   })
 
   inline_policy {
-    name = "${projectName}-API-cloudwatch-role"
+    name = "${workspaceName}-${projectName}-cloudwatch-role"
     policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
@@ -55,8 +58,8 @@ resource "aws_iam_role" "lambda_${projectName}_exec" {
   }
   
   inline_policy {
-    name = "${projectName}-API-extra-role"
-    policy = data.aws_iam_policy_document.lambda_${projectName}_extra_role.json
+    name = "${workspaceName}-${projectName}-extra-role"
+    policy = data.aws_iam_policy_document.${projectName}_lambda_extra_role.json
   }
 }
 `.trim();

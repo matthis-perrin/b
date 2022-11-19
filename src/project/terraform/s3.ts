@@ -5,44 +5,55 @@ export function generateS3BucketTerraform(
   webProjectNames: ProjectName[]
 ): string {
   const bucketName = workspaceName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
-  return `
-resource "aws_s3_bucket" "code" {
-  bucket_prefix = "${bucketName}-"
-}
 
-resource "aws_s3_bucket_acl" "code_bucket_acl" {
-  bucket = aws_s3_bucket.code.id
-  acl    = "private"
-}
-
-data "aws_iam_policy_document" "cloudfront_access_to_code" {
-  ${webProjectNames
-    .map(p =>
-      `
-  statement {
-    actions   = ["s3:GetObject"]
-    resources = [
-      "\${aws_s3_bucket.code.arn}/${p}/*",
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.${p}.iam_arn]
-    }
+  const CODE_BUCKET = `
+  resource "aws_s3_bucket" "code" {
+    bucket_prefix = "${bucketName}-"
   }
-`.trim()
-    )
-    .join('\n\n')}
-}
-
-resource "aws_s3_bucket_policy" "code" {
-  bucket = aws_s3_bucket.code.id
-  policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
-}
-
+  
+  resource "aws_s3_bucket_acl" "code_bucket_acl" {
+    bucket = aws_s3_bucket.code.id
+    acl    = "private"
+  }
 `.trim();
+
+  const CLOUDFRONT_ACCESS = `
+  data "aws_iam_policy_document" "cloudfront_access_to_code" {
+    ${webProjectNames
+      .map(p =>
+        `
+    statement {
+      actions   = ["s3:GetObject"]
+      resources = [
+        "\${aws_s3_bucket.code.arn}/${p}/*",
+      ]
+      principals {
+        type        = "AWS"
+        identifiers = [aws_cloudfront_origin_access_identity.${p}.iam_arn]
+      }
+    }
+  `.trim()
+      )
+      .join('\n\n')}
+  }
+
+  resource "aws_s3_bucket_policy" "code" {
+    bucket = aws_s3_bucket.code.id
+    policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
+  }
+`.trim();
+
+  const out = [CODE_BUCKET];
+  if (webProjectNames.length > 0) {
+    out.push(CLOUDFRONT_ACCESS);
+  }
+  return out.join('\n\n');
 }
 
-export function generateWebFileUploadTerraform(projectName: ProjectName): string {
+export function generateWebFileUploadTerraform(
+  workspaceName: WorkspaceName,
+  projectName: ProjectName
+): string {
   return `
 module "${projectName}_template_files" {
   source = "hashicorp/dir/template"
@@ -61,7 +72,10 @@ resource "aws_s3_bucket_object" "${projectName}_files" {
 `.trim();
 }
 
-export function generateLambdaFileUploadTerraform(projectName: ProjectName): string {
+export function generateLambdaFileUploadTerraform(
+  workspaceName: WorkspaceName,
+  projectName: ProjectName
+): string {
   return `
 data "archive_file" "${projectName}_archive" {
   type        = "zip"

@@ -1,6 +1,9 @@
-import {ProjectName} from '@src/models';
+import {ProjectName, WorkspaceName} from '@src/models';
 
-export function generateCloudfrontDistributionTerraform(projectName: ProjectName): string {
+export function generateCloudfrontDistributionTerraform(
+  workspaceName: WorkspaceName,
+  projectName: ProjectName
+): string {
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
   const originId = `${bucketName}-origin-id`;
   return `

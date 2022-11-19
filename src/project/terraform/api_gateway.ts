@@ -1,10 +1,13 @@
-import {ProjectName} from '@src/models';
+import {ProjectName, WorkspaceName} from '@src/models';
 
-export function generateApiGatewayTerraform(projectName: ProjectName): string {
+export function generateApiGatewayTerraform(
+  workspaceName: WorkspaceName,
+  projectName: ProjectName
+): string {
   return `
 resource "aws_api_gateway_rest_api" "${projectName}" {
-  name        = "${projectName}-RestAPI"
-  description = "Rest API for the \\"${projectName}\\" app"
+  name        = "${workspaceName}-${projectName}-RestAPI"
+  description = "Rest API for the \\"${workspaceName}-${projectName}\\" app"
 }
 
 resource "aws_api_gateway_resource" "${projectName}" {

@@ -36,14 +36,17 @@ export function generateCommonTerraform(
   ].join('\n\n');
 }
 
-export function generateWorkspaceProjectTerraform(project: WorkspaceProject): string | undefined {
+export function generateWorkspaceProjectTerraform(
+  workspaceName: WorkspaceName,
+  project: WorkspaceProject
+): string | undefined {
   const {projectName, type} = project;
   if (type === ProjectType.Web) {
-    return generateWebTerraform(projectName);
+    return generateWebTerraform(workspaceName, projectName);
   } else if (type === ProjectType.LambdaFunction) {
-    return generateLambdaFunctionTerraform(projectName);
+    return generateLambdaFunctionTerraform(workspaceName, projectName);
   } else if (type === ProjectType.LambdaApi) {
-    return generateLambdaApiTerraform(projectName);
+    return generateLambdaApiTerraform(workspaceName, projectName);
   } else if (type === ProjectType.NodeLib) {
     return undefined;
   } else if (type === ProjectType.NodeScript) {
@@ -55,25 +58,34 @@ export function generateWorkspaceProjectTerraform(project: WorkspaceProject): st
   neverHappens(type, 'ProjectType');
 }
 
-export function generateWebTerraform(projectName: ProjectName): string {
+export function generateWebTerraform(
+  workspaceName: WorkspaceName,
+  projectName: ProjectName
+): string {
   return [
-    generateCloudfrontDomainNameOutputTerraform(projectName),
-    generateWebFileUploadTerraform(projectName),
-    generateCloudfrontDistributionTerraform(projectName),
+    generateCloudfrontDomainNameOutputTerraform(workspaceName, projectName),
+    generateWebFileUploadTerraform(workspaceName, projectName),
+    generateCloudfrontDistributionTerraform(workspaceName, projectName),
   ].join('\n\n');
 }
 
-export function generateLambdaFunctionTerraform(projectName: ProjectName): string {
+export function generateLambdaFunctionTerraform(
+  workspaceName: WorkspaceName,
+  projectName: ProjectName
+): string {
   return [
-    generateLambdaTerraform(projectName),
-    generateLambdaFileUploadTerraform(projectName),
+    generateLambdaTerraform(workspaceName, projectName),
+    generateLambdaFileUploadTerraform(workspaceName, projectName),
   ].join('\n\n');
 }
 
-export function generateLambdaApiTerraform(projectName: ProjectName): string {
+export function generateLambdaApiTerraform(
+  workspaceName: WorkspaceName,
+  projectName: ProjectName
+): string {
   return [
-    generateLambdaFunctionTerraform(projectName),
-    generateLambdaApiOutputsTerraform(projectName),
-    generateApiGatewayTerraform(projectName),
+    generateLambdaFunctionTerraform(workspaceName, projectName),
+    generateLambdaApiOutputsTerraform(workspaceName, projectName),
+    generateApiGatewayTerraform(workspaceName, projectName),
   ].join('\n\n');
 }

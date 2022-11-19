@@ -36,7 +36,7 @@ function ensureDistFolders(projects) {
       const files = fs.readdirSync(dist);
       if (files.length === 0) {
         fs.writeFileSync(
-          path.join(dist, 'main.js'),
+          path.join(dist, 'index.js'),
           \`exports.handler = async function() {return ''};\`
         );
       }
