@@ -381,7 +381,7 @@ function generateBuildScript() {
 import {resolve} from 'node:path';
 import {runAllWebpacks} from '@matthis/webpack-runner';
 
-runAllWebpacks(resolve('.')).catch(console.error);
+runAllWebpacks({root: resolve('.'), watch: false}).catch(console.error);
 `.trim();
 }
 
@@ -752,12 +752,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.26',
+  project: '1.2.27',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
   webpack: '1.1.23',
-  runner: '1.0.9'
+  runner: '1.0.12'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';

@@ -7,12 +7,17 @@ import {Configuration, Stats, webpack} from 'webpack';
 import {exists} from '@src/fs';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
-import {renderErrors, renderProjectStatus} from '@src/webpack-runner/renderer';
+import {
+  renderErrors,
+  renderErrorWarningCount,
+  renderProjectStatus,
+} from '@src/webpack-runner/renderer';
 import {table} from '@src/webpack-runner/text_table';
 
 interface RunWebpacksOptions {
   root: string;
   projectPaths: string[];
+  watch: boolean;
 }
 
 interface ProjectStatus {
@@ -24,13 +29,15 @@ interface ProjectStatus {
 const name = 'WebpackRunner';
 
 export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
-  const {root, projectPaths} = opts;
+  const {root, projectPaths, watch} = opts;
   const statuses = new Map<string, ProjectStatus>();
 
   function handleStart(project: string): void {
     const current = statuses.get(project) ?? {firstRun: true, isRunning: true, errors: []};
     statuses.set(project, {...current, isRunning: true});
-    redraw();
+    if (watch) {
+      redraw();
+    }
   }
 
   function handleResults(project: string, stats: Stats): void {
@@ -39,7 +46,9 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       ...stats.compilation.warnings.map(warn => parseError(warn, {root, severity: 'warning'})),
     ];
     statuses.set(project, {firstRun: false, isRunning: false, errors});
-    redraw();
+    if (watch) {
+      redraw();
+    }
   }
 
   function redraw(): void {
@@ -56,11 +65,12 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     ]);
     const report = renderErrors(groupedErrors);
 
-    process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
-    console.log(`Projects (${projectPaths.length}):`);
+    if (watch) {
+      process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
+    }
     console.log(table(summary));
     if (report.length > 0) {
-      console.log('\n-----\n');
+      console.log(`\nBuild completed with ${renderErrorWarningCount(errors)}\n`);
       console.log(report);
     }
   }
@@ -77,17 +87,36 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     compiler.hooks.beforeRun.tap(name, () => handleStart(projectName));
     compiler.hooks.watchRun.tap(name, () => handleStart(projectName));
     compiler.hooks.done.tap(name, stats => handleResults(projectName, stats));
-    compiler.watch({}, (err, res) => {
-      if (err || !res) {
-        console.log(err);
-        // eslint-disable-next-line node/no-process-exit
-        process.exit(1);
-      }
-    });
+
+    if (watch) {
+      compiler.watch({}, (err, res) => {
+        if (err || !res) {
+          console.log(err);
+          // eslint-disable-next-line node/no-process-exit
+          process.exit(1);
+        }
+      });
+    } else {
+      compiler.run((err, res) => {
+        if (err || !res) {
+          console.log(err);
+          // eslint-disable-next-line node/no-process-exit
+          process.exit(1);
+        }
+        if ([...statuses.values()].every(status => !status.isRunning)) {
+          redraw();
+          // eslint-disable-next-line node/no-process-exit
+          process.exit(0);
+        }
+      });
+    }
   }
 }
 
-export async function runAllWebpacks(root: string): Promise<void> {
+export async function runAllWebpacks(
+  options: Omit<RunWebpacksOptions, 'projectPaths'>
+): Promise<void> {
+  const {root, watch} = options;
   const rootFiles = await readdir(root, {withFileTypes: true});
   const dirs = rootFiles.filter(ent => ent.isDirectory()).map(dir => join(root, dir.name));
   const packages = await Promise.all(
@@ -96,5 +125,6 @@ export async function runAllWebpacks(root: string): Promise<void> {
   await runWebpacks({
     root,
     projectPaths: packages.filter((p): p is string => p !== undefined),
+    watch,
   });
 }

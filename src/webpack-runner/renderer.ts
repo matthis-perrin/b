@@ -2,6 +2,7 @@ import {bgRed, bgYellow, gray, green} from 'ansi-colors';
 
 import {formatError, formatFilePath, formatProject} from '@src/webpack-runner/error_formatter';
 import {GroupedErrors} from '@src/webpack-runner/error_grouper';
+import {ParsedError} from '@src/webpack-runner/error_parser';
 
 export function renderErrors(errors: GroupedErrors): string {
   const {errorsByProjectByFile, globalErrors} = errors;
@@ -28,23 +29,9 @@ export function renderProjectStatus(
   errors: GroupedErrors
 ): string[] {
   const out = [formatProject(name)];
-
   const projectErrors = errors.errorsByProjectByFile.get(name);
   if (projectErrors) {
-    const all = [...projectErrors.values()];
-    const errorCount = all.flatMap(errors => errors.filter(err => err.severity === 'error')).length;
-    const warnCount = all.flatMap(warns => warns.filter(err => err.severity === 'warning')).length;
-    const diag: string[] = [];
-
-    if (errorCount > 0) {
-      const plural = errorCount > 1 ? 's' : '';
-      diag.push(bgRed.whiteBright(` ${errorCount} error${plural} `));
-    }
-    if (warnCount > 0) {
-      const plural = warnCount > 1 ? 's' : '';
-      diag.push(bgYellow.whiteBright(` ${warnCount} warning${plural} `));
-    }
-    out.push(diag.join(' '));
+    out.push(renderErrorWarningCount([...projectErrors.values()].flat()));
   } else if (!firstRun) {
     out.push(green('success'));
   }
@@ -54,4 +41,20 @@ export function renderProjectStatus(
   }
 
   return out;
+}
+
+export function renderErrorWarningCount(errors: ParsedError[]): string {
+  const errorCount = errors.filter(err => err.severity === 'error').length;
+  const warnCount = errors.filter(err => err.severity === 'warning').length;
+  const diag: string[] = [];
+
+  if (errorCount > 0) {
+    const plural = errorCount > 1 ? 's' : '';
+    diag.push(bgRed.whiteBright(` ${errorCount} error${plural} `));
+  }
+  if (warnCount > 0) {
+    const plural = warnCount > 1 ? 's' : '';
+    diag.push(bgYellow.whiteBright(` ${warnCount} warning${plural} `));
+  }
+  return diag.join(' ');
 }

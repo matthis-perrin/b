@@ -304,6 +304,7 @@ function parseError(err, opts) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "renderErrorWarningCount": () => (/* binding */ renderErrorWarningCount),
 /* harmony export */   "renderErrors": () => (/* binding */ renderErrors),
 /* harmony export */   "renderProjectStatus": () => (/* binding */ renderProjectStatus)
 /* harmony export */ });
@@ -333,19 +334,7 @@ function renderProjectStatus(name, firstRun, isRunning, errors) {
   const out = [(0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_1__.formatProject)(name)];
   const projectErrors = errors.errorsByProjectByFile.get(name);
   if (projectErrors) {
-    const all = [...projectErrors.values()];
-    const errorCount = all.flatMap(errors => errors.filter(err => err.severity === 'error')).length;
-    const warnCount = all.flatMap(warns => warns.filter(err => err.severity === 'warning')).length;
-    const diag = [];
-    if (errorCount > 0) {
-      const plural = errorCount > 1 ? 's' : '';
-      diag.push(ansi_colors__WEBPACK_IMPORTED_MODULE_0__.bgRed.whiteBright(` ${errorCount} error${plural} `));
-    }
-    if (warnCount > 0) {
-      const plural = warnCount > 1 ? 's' : '';
-      diag.push(ansi_colors__WEBPACK_IMPORTED_MODULE_0__.bgYellow.whiteBright(` ${warnCount} warning${plural} `));
-    }
-    out.push(diag.join(' '));
+    out.push(renderErrorWarningCount([...projectErrors.values()].flat()));
   } else if (!firstRun) {
     out.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green)('success'));
   }
@@ -353,6 +342,20 @@ function renderProjectStatus(name, firstRun, isRunning, errors) {
     out.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)('in progress'));
   }
   return out;
+}
+function renderErrorWarningCount(errors) {
+  const errorCount = errors.filter(err => err.severity === 'error').length;
+  const warnCount = errors.filter(err => err.severity === 'warning').length;
+  const diag = [];
+  if (errorCount > 0) {
+    const plural = errorCount > 1 ? 's' : '';
+    diag.push(ansi_colors__WEBPACK_IMPORTED_MODULE_0__.bgRed.whiteBright(` ${errorCount} error${plural} `));
+  }
+  if (warnCount > 0) {
+    const plural = warnCount > 1 ? 's' : '';
+    diag.push(ansi_colors__WEBPACK_IMPORTED_MODULE_0__.bgYellow.whiteBright(` ${warnCount} warning${plural} `));
+  }
+  return diag.join(' ');
 }
 
 /***/ }),
@@ -546,7 +549,8 @@ const name = 'WebpackRunner';
 async function runWebpacks(opts) {
   const {
     root,
-    projectPaths
+    projectPaths,
+    watch
   } = opts;
   const statuses = new Map();
   function handleStart(project) {
@@ -559,7 +563,9 @@ async function runWebpacks(opts) {
       ...current,
       isRunning: true
     });
-    redraw();
+    if (watch) {
+      redraw();
+    }
   }
   function handleResults(project, stats) {
     const errors = [...stats.compilation.errors.map(err => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_6__.parseError)(err, {
@@ -574,7 +580,9 @@ async function runWebpacks(opts) {
       isRunning: false,
       errors
     });
-    redraw();
+    if (watch) {
+      redraw();
+    }
   }
   function redraw() {
     const errors = [...statuses.values()].flatMap(v => v.errors);
@@ -582,11 +590,13 @@ async function runWebpacks(opts) {
     const summary = [...statuses.entries()].map(([projectPath, status]) => (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_7__.renderProjectStatus)(projectPath, status.firstRun, status.isRunning, groupedErrors));
     summary.unshift([(0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)(`Projects (${projectPaths.length})`), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Status'), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Run')]);
     const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_7__.renderErrors)(groupedErrors);
-    process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
-    console.log(`Projects (${projectPaths.length}):`);
+    if (watch) {
+      process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
+    }
+
     console.log((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_8__.table)(summary));
     if (report.length > 0) {
-      console.log('\n-----\n');
+      console.log(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_7__.renderErrorWarningCount)(errors)}\n`);
       console.log(report);
     }
   }
@@ -605,16 +615,35 @@ async function runWebpacks(opts) {
     compiler.hooks.beforeRun.tap(name, () => handleStart(projectName));
     compiler.hooks.watchRun.tap(name, () => handleStart(projectName));
     compiler.hooks.done.tap(name, stats => handleResults(projectName, stats));
-    compiler.watch({}, (err, res) => {
-      if (err || !res) {
-        console.log(err);
-        // eslint-disable-next-line node/no-process-exit
-        process.exit(1);
-      }
-    });
+    if (watch) {
+      compiler.watch({}, (err, res) => {
+        if (err || !res) {
+          console.log(err);
+          // eslint-disable-next-line node/no-process-exit
+          process.exit(1);
+        }
+      });
+    } else {
+      compiler.run((err, res) => {
+        if (err || !res) {
+          console.log(err);
+          // eslint-disable-next-line node/no-process-exit
+          process.exit(1);
+        }
+        if ([...statuses.values()].every(status => !status.isRunning)) {
+          redraw();
+          // eslint-disable-next-line node/no-process-exit
+          process.exit(0);
+        }
+      });
+    }
   }
 }
-async function runAllWebpacks(root) {
+async function runAllWebpacks(options) {
+  const {
+    root,
+    watch
+  } = options;
   const rootFiles = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readdir)(root, {
     withFileTypes: true
   });
@@ -622,7 +651,8 @@ async function runAllWebpacks(root) {
   const packages = await Promise.all(dirs.map(async dir => (await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.exists)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dir, 'package.json'))) ? dir : undefined));
   await runWebpacks({
     root,
-    projectPaths: packages.filter(p => p !== undefined)
+    projectPaths: packages.filter(p => p !== undefined),
+    watch
   });
 }
 })();

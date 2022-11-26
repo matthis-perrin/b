@@ -3,6 +3,6 @@ export function generateBuildScript(): string {
 import {resolve} from 'node:path';
 import {runAllWebpacks} from '@matthis/webpack-runner';
 
-runAllWebpacks(resolve('.')).catch(console.error);
+runAllWebpacks({root: resolve('.'), watch: false}).catch(console.error);
 `.trim();
 }
