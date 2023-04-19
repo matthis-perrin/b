@@ -8,7 +8,8 @@
     "watch": "NODE_ENV=development webpack watch",
     "project": "yarn build && yarn start && cd packages/project/ && yarn install && cd ../../ && node packages/project/index.js",
     "start": "node dist/index.js",
-    "postinstall": "node install.js"
+    "postinstall": "node install.js",
+    "clean": "node clean.js"
   },
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
