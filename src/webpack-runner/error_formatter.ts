@@ -42,5 +42,5 @@ export function formatError(err: ParsedError): string {
       err.severity
     )} ${formatLabel(err.code, err.type)}`;
   }
-  return `[${err.severity}] ${err.message}`;
+  return formatMessage(`[${err.severity}] ${err.message}`, err.severity);
 }

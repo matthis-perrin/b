@@ -1,8 +1,11 @@
-import {bgRed, bgYellow, gray, green} from 'ansi-colors';
+import {bgRed, bgYellow, gray, green, red} from 'ansi-colors';
 
+import {neverHappens} from '@src/type_utils';
+import {LambdaServerEvent} from '@src/webpack/plugins/lambda_server_plugin';
 import {formatError, formatFilePath, formatProject} from '@src/webpack-runner/error_formatter';
 import {GroupedErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError} from '@src/webpack-runner/error_parser';
+import {LambdaServerEvents} from '@src/webpack-runner/runner';
 
 export function renderErrors(errors: GroupedErrors): string {
   const {errorsByProjectByFile, globalErrors} = errors;
@@ -26,21 +29,37 @@ export function renderProjectStatus(
   name: string,
   firstRun: boolean,
   isRunning: boolean,
-  errors: GroupedErrors
+  errors: GroupedErrors,
+  compilationFailure: string | undefined,
+  lambdaServerEvents: LambdaServerEvents
 ): string[] {
-  const out = [formatProject(name)];
+  // First column
+  const column1 = formatProject(name);
+
+  // Second column
+  let column2 = '';
   const projectErrors = errors.errorsByProjectByFile.get(name);
   if (projectErrors) {
-    out.push(renderErrorWarningCount([...projectErrors.values()].flat()));
+    column2 = renderErrorWarningCount([...projectErrors.values()].flat());
   } else if (!firstRun) {
-    out.push(green('success'));
+    column2 = green('success');
+  } else if (isRunning) {
+    column2 = gray('in progress');
   }
 
-  if (isRunning) {
-    out.push(gray('in progress'));
+  // Third column
+  const column3: string[] = [];
+  if (lambdaServerEvents.startEvent) {
+    column3.push(renderLambdaServerEvent(lambdaServerEvents.startEvent));
+  }
+  if (compilationFailure !== undefined) {
+    column3.push(red(compilationFailure));
+  }
+  if (lambdaServerEvents.lastEvent) {
+    column3.push(renderLambdaServerEvent(lambdaServerEvents.lastEvent));
   }
 
-  return out;
+  return [column1, column2, column3.join(' ')];
 }
 
 export function renderErrorWarningCount(errors: ParsedError[]): string {
@@ -57,4 +76,26 @@ export function renderErrorWarningCount(errors: ParsedError[]): string {
     diag.push(bgYellow.whiteBright(` ${warnCount} warning${plural} `));
   }
   return diag.join(' ');
+}
+
+export function renderLambdaServerEvent(event: LambdaServerEvent): string {
+  const type = event.event;
+  if (type === 'start') {
+    return `http://localhost:${event.port}`;
+  }
+  const req = gray(`${event.method} ${event.path}`);
+  if (type === 'error') {
+    return `${req} ${red(event.err)}`;
+  } else if (type === 'request') {
+    return `${req} ${gray('running lambda...')}`;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === 'response') {
+    const httpCode = `[HTTP ${event.statusCode}]`;
+    const size = `[${event.byteLength.toLocaleString()}b]`;
+    const duration = `[${event.duration.toLocaleString()}ms]`;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    const color = event.statusCode >= 400 ? red : green;
+    return `${req} ${color(`${httpCode} ${size} ${duration}`)}`;
+  }
+  neverHappens(type);
 }

@@ -152,9 +152,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 // Runtime types
 //
-
-let RuntimeType;
-(function (RuntimeType) {
+let RuntimeType = /*#__PURE__*/function (RuntimeType) {
   RuntimeType["Web"] = "web";
   RuntimeType["Node"] = "node";
   RuntimeType["Lib"] = "lib";
@@ -162,7 +160,8 @@ let RuntimeType;
   RuntimeType["ReactNative"] = "react-native";
   RuntimeType["NodeLib"] = "node-lib";
   RuntimeType["NodeScript"] = "node-script";
-})(RuntimeType || (RuntimeType = {}));
+  return RuntimeType;
+}({});
 const RUNTIME_TYPE_TO_METADATA = {
   [RuntimeType.Web]: {
     eslint: RuntimeType.Web,
@@ -204,15 +203,15 @@ const RUNTIME_TYPE_TO_METADATA = {
 // Project type
 //
 
-let ProjectType;
-(function (ProjectType) {
+let ProjectType = /*#__PURE__*/function (ProjectType) {
   ProjectType["Web"] = "web";
   ProjectType["LambdaFunction"] = "lambda_function";
   ProjectType["LambdaApi"] = "lambda_api";
   ProjectType["NodeLib"] = "node_lib";
   ProjectType["NodeScript"] = "node_script";
   ProjectType["Shared"] = "shared";
-})(ProjectType || (ProjectType = {}));
+  return ProjectType;
+}({});
 const PROJECT_TYPE_TO_METADATA = {
   [ProjectType.Web]: {
     runtimeType: RuntimeType.Web
@@ -238,15 +237,15 @@ const PROJECT_TYPE_TO_METADATA = {
 // Workspace Fragment type
 //
 
-let WorkspaceFragmentType;
-(function (WorkspaceFragmentType) {
+let WorkspaceFragmentType = /*#__PURE__*/function (WorkspaceFragmentType) {
   WorkspaceFragmentType["StaticWebsite"] = "static-website";
   WorkspaceFragmentType["StandaloneLambda"] = "standalone-lambda";
   WorkspaceFragmentType["WebApp"] = "web-app";
   WorkspaceFragmentType["NodeLib"] = "node-lib";
   WorkspaceFragmentType["NodeScript"] = "node-script";
   WorkspaceFragmentType["Shared"] = "shared";
-})(WorkspaceFragmentType || (WorkspaceFragmentType = {}));
+  return WorkspaceFragmentType;
+}({});
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function validateRegistry() {
   return true;
@@ -381,7 +380,7 @@ function generateBuildScript() {
 import {resolve} from 'node:path';
 import {runAllWebpacks} from '@matthis/webpack-runner';
 
-runAllWebpacks({root: resolve('.'), watch: false}).catch(console.error);
+runAllWebpacks({root: resolve('.'), watch: process.argv.includes('--watch')}).catch(console.error);
 `.trim();
 }
 
@@ -630,7 +629,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "neverHappens": () => (/* binding */ neverHappens)
 /* harmony export */ });
 function neverHappens(value, msg) {
-  throw new Error(msg);
+  throw new Error(msg ?? `Unexpected value ${value}`);
 }
 
 /***/ }),
@@ -699,6 +698,7 @@ terraform/.terraform*
 terraform/*.tfstate.backup
 terraform/.aws-credentials
 terraform/archives
+*/log
     `.trim();
 }
 
@@ -730,7 +730,8 @@ function generateWorkspacePackageJson(workspaceName, projects) {
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
-      build: 'node ./build.mjs'
+      build: 'node ./build.mjs',
+      watch: 'node ./build.mjs --watch'
     },
     eslintConfig: {
       ignorePatterns: ['**/*.js']
@@ -752,12 +753,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.2.27',
+  project: '1.3.0',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
-  webpack: '1.1.23',
-  runner: '1.0.12'
+  webpack: '1.2.0',
+  runner: '1.1.0'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';

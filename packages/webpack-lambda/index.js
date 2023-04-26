@@ -925,101 +925,179 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(30);
-/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_http__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(12);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(30);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(18);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(31);
+/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(node_http__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(32);
+/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(12);
 
 
 
 
-class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_3__.StandalonePlugin {
+
+
+
+
+class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_7__.StandalonePlugin {
   name = 'LambdaServerPlugin';
-  setup(compiler) {
+  async setup(compiler) {
+    // Only starts the lambda server in watch mode
     if (!compiler.options.watch) {
       return;
     }
-    this.server = (0,node_http__WEBPACK_IMPORTED_MODULE_1__.createServer)((req, res) => {
-      const url = req.url;
-      const method = req.method;
 
-      // Parse body
-      let body = '';
-      req.on('data', chunk => {
-        body += chunk;
+    // Find the root of the project and create the log dir there
+    try {
+      const root = await this.lookupRoot(compiler.context);
+      const logDir = (0,node_path__WEBPACK_IMPORTED_MODULE_5__.join)(root, 'log');
+      await (0,_src_fs__WEBPACK_IMPORTED_MODULE_6__.rmDir)(logDir);
+      await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_3__.mkdir)(logDir, {
+        recursive: true
       });
-
-      // Parse headers
-      const headers = {};
-      while (true) {
-        const key = req.rawHeaders.shift();
-        const value = req.rawHeaders.shift();
-        if (key === undefined || value === undefined) {
-          break;
-        }
-        if (['HOST', 'CONNECTION', 'CONTENT-LENGTH'].includes(key.toUpperCase())) {
-          continue;
-        }
-        headers[key] = value;
+      this.runtimeLogFile = (0,node_path__WEBPACK_IMPORTED_MODULE_5__.join)(logDir, 'lambda_server_runtime.txt');
+      this.appLogFile = (0,node_path__WEBPACK_IMPORTED_MODULE_5__.join)(logDir, 'lambda_server_log.txt');
+      if (await (0,_src_fs__WEBPACK_IMPORTED_MODULE_6__.exists)(this.runtimeLogFile)) {
+        await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_3__.rm)(this.runtimeLogFile);
       }
-      req.on('end', () => {
-        const command = `node -e "require('${(0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(this.context, 'dist/main')}').handler({httpMethod: '${method}', path: '${url}', body: ${body === '' ? 'null' : `atob('${btoa(body)}')`}, headers: ${`JSON.parse(atob('${btoa(JSON.stringify(headers))}'))`}}).then(json => console.log(JSON.stringify(json))).catch(console.error);"`;
-        (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, (error, stdout, stderr) => {
-          const err = error ? String(error) : stderr;
-          if (err.length > 0) {
-            const output = JSON.stringify({
-              err: 'Failure to run lambda',
-              message: err
-            });
-            console.error(output);
-            res.statusCode = 500;
-            res.setHeader('Content-Type', 'application/json');
-            res.write(output);
-            res.end();
-          } else {
-            try {
-              const {
-                statusCode,
-                body
-              } = JSON.parse(stdout);
-              res.statusCode = statusCode;
-              res.setHeader('Content-Type', 'application/json');
-              res.write(body);
-              res.end();
-            } catch (err) {
-              const output = JSON.stringify({
-                err: 'Invalid lambda response',
-                message: String(err),
-                response: stdout
-              });
-              console.error(output);
-              res.statusCode = 500;
-              res.setHeader('Content-Type', 'application/json');
-              res.write(output);
-              res.end();
-            }
-          }
+    } catch {
+      throw new Error(`Failure to identify project root from ${compiler.context}`);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    const hexHash = (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.createHash)('md5').update(compiler.context).digest('hex').slice(0, 4);
+    const port = 1024 + Math.floor(parseInt(hexHash, 16) / 2);
+    return new Promise((resolve, reject) => {
+      this.server = (0,node_http__WEBPACK_IMPORTED_MODULE_4__.createServer)((req, res) => {
+        const url = req.url ?? '';
+        const method = req.method ?? '';
+
+        // Log the request
+        this.runtimeLog({
+          event: 'request',
+          path: url,
+          method
         });
 
-        //
-        // TODO: Add those headers
-        //
-        // "CloudFront-Forwarded-Proto": "https",
-        // "CloudFront-Is-Desktop-Viewer": "true",
-        // "CloudFront-Is-Mobile-Viewer": "false",
-        // "CloudFront-Is-SmartTV-Viewer": "false",
-        // "CloudFront-Is-Tablet-Viewer": "false",
-        // "CloudFront-Viewer-Country": "FR",
-        // "Via": "2.0 c06f5d2130689f511352f5187fabf420.cloudfront.net (CloudFront)",
-        // "X-Amz-Cf-Id": "AuD_VLlE0k9_Di4k3sbzvJsvqMvX1KB6Hrko2oML94_l5oAE26QQaA==",
-        // "X-Amzn-Trace-Id": "Root=1-62430173-334e883b77b37ba6721ccc09",
-        // "X-Forwarded-For": "82.65.31.41, 130.176.183.40",
-        // "X-Forwarded-Port": "443",
-        // "X-Forwarded-Proto": "https"
+        // Parse body
+        let body = '';
+        req.on('data', chunk => {
+          body += chunk;
+        });
+
+        // Parse headers
+        const headers = {};
+        while (true) {
+          const key = req.rawHeaders.shift();
+          const value = req.rawHeaders.shift();
+          if (key === undefined || value === undefined) {
+            break;
+          }
+          headers[key] = value;
+        }
+        const handlerPath = (0,node_path__WEBPACK_IMPORTED_MODULE_5__.join)(this.context, 'dist/index.js');
+        const bodyParam = body === '' ? 'null' : `atob('${btoa(body)}')`;
+        // const headerParam = `JSON.parse(atob('${btoa(JSON.stringify(headers))}'))`;
+        const headerParam = "''";
+        const internalError = err => {
+          this.runtimeLog({
+            event: 'error',
+            err,
+            path: url,
+            method
+          });
+          res.statusCode = 500;
+          res.end();
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        const sendRes = (body, duration, statusCode = 200) => {
+          this.runtimeLog({
+            event: 'response',
+            path: url,
+            method,
+            statusCode,
+            duration,
+            byteLength: body.length
+          });
+          res.statusCode = statusCode;
+          res.write(body);
+          res.end();
+        };
+        const TOKEN = (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)();
+        const commandJs = `
+(async () => {
+  try {
+    const {handler} = await import('${handlerPath}');
+    const json = await handler({httpMethod: '${method}', path: '${url}', body: ${bodyParam}, headers: ${headerParam}});
+    process.stdout.write(\`${TOKEN}\${JSON.stringify(json)}${TOKEN}\`);
+  }
+  catch (err) {
+    process.stderr.write(\`${TOKEN}\${String(err)}${TOKEN}\`);
+  }
+})()
+        `.trim();
+        req.on('end', () => {
+          const command = [`node -e "eval(atob('${btoa(commandJs)}'))"`].join('');
+          const startTs = Date.now();
+          (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, (error, stdout, stderr) => {
+            const duration = Date.now() - startTs;
+            const infoOutput = this.parseOutput(stdout, TOKEN);
+            const errOutput = this.parseOutput(stderr, TOKEN);
+            this.appLog(infoOutput.logs);
+            this.appLog(errOutput.logs);
+            const err = error ? String(error) : errOutput.result;
+            if (err !== undefined) {
+              return internalError(err.split('\n')[0] ?? err);
+            }
+            const stdoutRes = infoOutput.result ?? '';
+            try {
+              if (stdoutRes === 'undefined') {
+                return internalError(`Lambda returned undefined`);
+              }
+              const result = JSON.parse(stdoutRes);
+              if (typeof result === 'undefined') {
+                return internalError(`Invalid response: ${stdoutRes}`);
+              }
+              res.setHeader('Content-Type', 'application/json');
+              // eslint-disable-next-line no-null/no-null
+              if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
+                const {
+                  body,
+                  statusCode
+                } = result;
+                if (!('statusCode' in result)) {
+                  return sendRes(stdoutRes, duration);
+                } else if (typeof statusCode !== 'number') {
+                  return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
+                }
+                const resBody = typeof body === 'string' ? body : JSON.stringify(body);
+                return sendRes(resBody, duration, statusCode);
+              } else if (typeof result === 'string') {
+                return sendRes(result, duration);
+              }
+              return sendRes(stdoutRes, duration);
+            } catch (err) {
+              return internalError(String(err));
+            }
+          });
+        });
+      }).listen(port).on('error', err => {
+        reject(err);
+      }).on('listening', () => {
+        resolve();
+        this.runtimeLog({
+          event: 'start',
+          port
+        });
       });
-      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    }).listen(7777);
+    });
   }
   async teardown() {
     return new Promise((resolve, reject) => {
@@ -1033,6 +1111,51 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
       });
     });
   }
+
+  // Parse the output (stdout or stderr) of a script and extract the data
+  // that is wrapped by the value of `token`.
+  // parseOutput('Hello###foo###World', '###') => {result: 'foo', logs: 'HelloWorld'}
+  // parseOutput('Hello World', '###') => {result: undefined, logs: 'Hello World'}
+  parseOutput(output, token) {
+    const tokenIndex1 = output.indexOf(token);
+    if (tokenIndex1 !== -1) {
+      const tokenIndex2 = output.indexOf(token, tokenIndex1 + token.length);
+      if (tokenIndex1 !== -1) {
+        return {
+          result: output.slice(tokenIndex1 + token.length, tokenIndex2),
+          logs: (output.slice(0, tokenIndex1) + output.slice(tokenIndex2 + token.length)).trim()
+        };
+      }
+    }
+    return {
+      logs: output.trim()
+    };
+  }
+  async lookupRoot(fromPath) {
+    if (await (0,_src_fs__WEBPACK_IMPORTED_MODULE_6__.exists)((0,node_path__WEBPACK_IMPORTED_MODULE_5__.join)(fromPath, 'package.json'))) {
+      return fromPath;
+    }
+    const parent = (0,node_path__WEBPACK_IMPORTED_MODULE_5__.join)(fromPath, '..');
+    if (parent === fromPath) {
+      throw new Error('Failure to lookup root');
+    }
+    return this.lookupRoot(parent);
+  }
+  runtimeLog(event) {
+    if (this.runtimeLogFile === undefined) {
+      return;
+    }
+    (0,node_fs__WEBPACK_IMPORTED_MODULE_2__.appendFileSync)(this.runtimeLogFile, `${JSON.stringify({
+      t: new Date().toISOString(),
+      ...event
+    })}\n`);
+  }
+  appLog(log) {
+    if (this.appLogFile === undefined || log.length === 0) {
+      return;
+    }
+    (0,node_fs__WEBPACK_IMPORTED_MODULE_2__.appendFileSync)(this.appLogFile, `${log}\n`);
+  }
 }
 function lambdaServerPlugin() {
   return new LambdaServerPlugin();
@@ -1042,7 +1165,120 @@ function lambdaServerPlugin() {
 /* 30 */
 /***/ ((module) => {
 
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
+
+/***/ }),
+/* 31 */
+/***/ ((module) => {
+
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:http");
+
+/***/ }),
+/* 32 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "access": () => (/* binding */ access),
+/* harmony export */   "cleanDir": () => (/* binding */ cleanDir),
+/* harmony export */   "cp": () => (/* binding */ cp),
+/* harmony export */   "exists": () => (/* binding */ exists),
+/* harmony export */   "maybeReadFile": () => (/* binding */ maybeReadFile),
+/* harmony export */   "readFile": () => (/* binding */ readFile),
+/* harmony export */   "readdir": () => (/* binding */ readdir),
+/* harmony export */   "rmDir": () => (/* binding */ rmDir),
+/* harmony export */   "stat": () => (/* binding */ stat),
+/* harmony export */   "writeJsFile": () => (/* binding */ writeJsFile),
+/* harmony export */   "writeJsonFile": () => (/* binding */ writeJsonFile),
+/* harmony export */   "writeRawFile": () => (/* binding */ writeRawFile)
+/* harmony export */ });
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(18);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(33);
+/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(prettier__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+const {
+  access,
+  readFile,
+  readdir,
+  stat
+} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
+const {
+  writeFile,
+  mkdir,
+  rm
+} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
+async function writeJsonFile(path, json) {
+  await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
+}
+async function writeJsFile(path, js) {
+  await writeRawFile(path, `${(0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(js, {
+    parser: 'babel',
+    printWidth: 100,
+    singleQuote: true,
+    trailingComma: 'es5',
+    bracketSpacing: false,
+    arrowParens: 'avoid',
+    endOfLine: 'auto'
+  })}\n`);
+}
+async function writeRawFile(path, content) {
+  console.log(`write ${path}`);
+  await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
+    recursive: true
+  });
+  await writeFile(path, content);
+}
+async function rmDir(dirPath) {
+  await rm(dirPath, {
+    recursive: true,
+    force: true
+  });
+}
+async function cleanDir(dirPath) {
+  console.log('clean', dirPath);
+  try {
+    await rmDir(dirPath);
+  } finally {
+    await mkdir(dirPath, {
+      recursive: true
+    });
+  }
+}
+async function cp(from, to) {
+  return new Promise((resolve, reject) => {
+    (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(`cp -R ${from} ${to}`, err => err ? reject(err) : resolve());
+  });
+}
+async function exists(path) {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function maybeReadFile(path) {
+  try {
+    const fileContent = await readFile(path);
+    return fileContent.toString();
+  } catch {
+    return undefined;
+  }
+}
+
+/***/ }),
+/* 33 */
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
 
 /***/ })
 /******/ ]);

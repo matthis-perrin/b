@@ -304,13 +304,44 @@ function parseError(err, opts) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "readLines": () => (/* binding */ readLines)
+/* harmony export */ });
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
+
+function readLines(filePath, cb) {
+  const p = (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.spawn)('tail', ['-F', filePath], {
+    stdio: 'pipe'
+  });
+  let data = '';
+  p.stdout.on('data', chunk => {
+    data += chunk;
+    const lines = data.split('\n');
+    // eslint-disable-next-line node/callback-return
+    cb(lines.slice(0, -1));
+    data = lines.at(-1) ?? '';
+  });
+  p.on('error', err => {
+    console.log(err);
+  });
+}
+
+/***/ }),
+/* 12 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "renderErrorWarningCount": () => (/* binding */ renderErrorWarningCount),
 /* harmony export */   "renderErrors": () => (/* binding */ renderErrors),
+/* harmony export */   "renderLambdaServerEvent": () => (/* binding */ renderLambdaServerEvent),
 /* harmony export */   "renderProjectStatus": () => (/* binding */ renderProjectStatus)
 /* harmony export */ });
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(12);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(14);
+
 
 
 function renderErrors(errors) {
@@ -320,28 +351,43 @@ function renderErrors(errors) {
   } = errors;
   const blocks = [];
   for (const globalError of globalErrors) {
-    blocks.push((0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_1__.formatError)(globalError));
+    blocks.push((0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(globalError));
   }
   for (const [project, projectErrors] of errorsByProjectByFile.entries()) {
-    blocks.push((0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_1__.formatProject)(project));
+    blocks.push((0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatProject)(project));
     for (const [file, errors] of projectErrors.entries()) {
-      blocks.push([(0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_1__.formatFilePath)(file), ...errors.map(err => (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_1__.formatError)(err))].join('\n'));
+      blocks.push([(0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatFilePath)(file), ...errors.map(err => (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(err))].join('\n'));
     }
   }
   return blocks.join('\n\n');
 }
-function renderProjectStatus(name, firstRun, isRunning, errors) {
-  const out = [(0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_1__.formatProject)(name)];
+function renderProjectStatus(name, firstRun, isRunning, errors, compilationFailure, lambdaServerEvents) {
+  // First column
+  const column1 = (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatProject)(name);
+
+  // Second column
+  let column2 = '';
   const projectErrors = errors.errorsByProjectByFile.get(name);
   if (projectErrors) {
-    out.push(renderErrorWarningCount([...projectErrors.values()].flat()));
+    column2 = renderErrorWarningCount([...projectErrors.values()].flat());
   } else if (!firstRun) {
-    out.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green)('success'));
+    column2 = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green)('success');
+  } else if (isRunning) {
+    column2 = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)('in progress');
   }
-  if (isRunning) {
-    out.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)('in progress'));
+
+  // Third column
+  const column3 = [];
+  if (lambdaServerEvents.startEvent) {
+    column3.push(renderLambdaServerEvent(lambdaServerEvents.startEvent));
   }
-  return out;
+  if (compilationFailure !== undefined) {
+    column3.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red)(compilationFailure));
+  }
+  if (lambdaServerEvents.lastEvent) {
+    column3.push(renderLambdaServerEvent(lambdaServerEvents.lastEvent));
+  }
+  return [column1, column2, column3.join(' ')];
 }
 function renderErrorWarningCount(errors) {
   const errorCount = errors.filter(err => err.severity === 'error').length;
@@ -357,9 +403,42 @@ function renderErrorWarningCount(errors) {
   }
   return diag.join(' ');
 }
+function renderLambdaServerEvent(event) {
+  const type = event.event;
+  if (type === 'start') {
+    return `http://localhost:${event.port}`;
+  }
+  const req = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(`${event.method} ${event.path}`);
+  if (type === 'error') {
+    return `${req} ${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red)(event.err)}`;
+  } else if (type === 'request') {
+    return `${req} ${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)('running lambda...')}`;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === 'response') {
+    const httpCode = `[HTTP ${event.statusCode}]`;
+    const size = `[${event.byteLength.toLocaleString()}b]`;
+    const duration = `[${event.duration.toLocaleString()}ms]`;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    const color = event.statusCode >= 400 ? ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red : ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green;
+    return `${req} ${color(`${httpCode} ${size} ${duration}`)}`;
+  }
+  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_1__.neverHappens)(type);
+}
 
 /***/ }),
-/* 12 */
+/* 13 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "neverHappens": () => (/* binding */ neverHappens)
+/* harmony export */ });
+function neverHappens(value, msg) {
+  throw new Error(msg ?? `Unexpected value ${value}`);
+}
+
+/***/ }),
+/* 14 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -404,11 +483,11 @@ function formatError(err) {
   if ('type' in err) {
     return `${formatLocation(err.loc.start)} ${formatMessage(err.message, err.severity)} ${formatLabel(err.code, err.type)}`;
   }
-  return `[${err.severity}] ${err.message}`;
+  return formatMessage(`[${err.severity}] ${err.message}`, err.severity);
 }
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -534,8 +613,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);
 /* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
 /* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(10);
-/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(11);
-/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(13);
+/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(11);
+/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(12);
+/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(15);
+
 
 
 
@@ -557,7 +638,8 @@ async function runWebpacks(opts) {
     const current = statuses.get(project) ?? {
       firstRun: true,
       isRunning: true,
-      errors: []
+      errors: [],
+      lambdaServerEvents: {}
     };
     statuses.set(project, {
       ...current,
@@ -568,6 +650,7 @@ async function runWebpacks(opts) {
     }
   }
   function handleResults(project, stats) {
+    var _statuses$get, _statuses$get2;
     const errors = [...stats.compilation.errors.map(err => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_6__.parseError)(err, {
       root,
       severity: 'error'
@@ -575,10 +658,14 @@ async function runWebpacks(opts) {
       root,
       severity: 'warning'
     }))];
+    const lambdaServerEvents = ((_statuses$get = statuses.get(project)) === null || _statuses$get === void 0 ? void 0 : _statuses$get.lambdaServerEvents) ?? {};
+    const compilationFailure = (_statuses$get2 = statuses.get(project)) === null || _statuses$get2 === void 0 ? void 0 : _statuses$get2.compilationFailure;
     statuses.set(project, {
       firstRun: false,
       isRunning: false,
-      errors
+      errors,
+      compilationFailure,
+      lambdaServerEvents
     });
     if (watch) {
       redraw();
@@ -587,56 +674,109 @@ async function runWebpacks(opts) {
   function redraw() {
     const errors = [...statuses.values()].flatMap(v => v.errors);
     const groupedErrors = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_5__.groupAndSortErrors)(errors);
-    const summary = [...statuses.entries()].map(([projectPath, status]) => (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_7__.renderProjectStatus)(projectPath, status.firstRun, status.isRunning, groupedErrors));
+    const summary = [...statuses.entries()].map(([projectPath, status]) => (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_8__.renderProjectStatus)(projectPath, status.firstRun, status.isRunning, groupedErrors, status.compilationFailure, status.lambdaServerEvents));
     summary.unshift([(0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)(`Projects (${projectPaths.length})`), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Status'), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Run')]);
-    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_7__.renderErrors)(groupedErrors);
+    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_8__.renderErrors)(groupedErrors);
     if (watch) {
       process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
     }
 
-    console.log((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_8__.table)(summary));
+    console.log((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_9__.table)(summary));
     if (report.length > 0) {
-      console.log(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_7__.renderErrorWarningCount)(errors)}\n`);
+      console.log(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_8__.renderErrorWarningCount)(errors)}\n`);
       console.log(report);
     }
   }
   for (const projectPath of projectPaths.sort((p1, p2) => p1.localeCompare(p2))) {
     const projectName = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.relative)(root, projectPath);
-    statuses.set(projectName, {
+    const intialStatus = {
       firstRun: true,
       isRunning: true,
-      errors: []
-    });
+      errors: [],
+      lambdaServerEvents: {}
+    };
+    statuses.set(projectName, intialStatus);
     // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax, no-await-in-loop
     const config = await import( /*webpackIgnore: true*/(0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'webpack.config.js')).then(({
       getConfig
     }) => getConfig(projectPath));
-    const compiler = (0,webpack__WEBPACK_IMPORTED_MODULE_3__.webpack)(config);
+
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    const reportCompilationFailure = error => {
+      updateStatus(curr => {
+        curr.compilationFailure = error;
+      });
+    };
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    const updateLambdaServerEvents = fn => {
+      updateStatus(curr => fn(curr.lambdaServerEvents));
+    };
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    const updateStatus = fn => {
+      let current = statuses.get(projectName);
+      if (!current) {
+        current = intialStatus;
+        statuses.set(projectName, current);
+      }
+      fn(current);
+    };
+
+    // Read events in the lambda server logs to update the globalInfo
+    let lastProcessedLog = Date.now();
+    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_7__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
+      const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
+      let shouldRedraw = false;
+      for (const log of logs) {
+        const date = new Date(log.t).getTime();
+        if (date < lastProcessedLog) {
+          continue;
+        }
+        lastProcessedLog = date;
+        shouldRedraw = true;
+        if (log.event === 'start') {
+          updateLambdaServerEvents(curr => {
+            curr.startEvent = log;
+          });
+        } else {
+          updateLambdaServerEvents(curr => {
+            curr.lastEvent = log;
+          });
+        }
+      }
+      if (shouldRedraw) {
+        redraw();
+      }
+    });
+    const compiler = (0,webpack__WEBPACK_IMPORTED_MODULE_3__.webpack)({
+      ...config,
+      watch
+    }, (err, res) => {
+      if (err || !res) {
+        reportCompilationFailure(err ? String(err) : 'No result after compilation');
+        if (!watch) {
+          // eslint-disable-next-line node/no-process-exit
+          process.exit(1);
+        }
+      }
+      if (watch) {
+        redraw();
+      } else {
+        const allDone = [...statuses.values()].every(status => !status.isRunning);
+        if (allDone) {
+          const errors = [...statuses.values()].flatMap(v => v.errors);
+          const {
+            globalErrors
+          } = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_5__.groupAndSortErrors)(errors);
+          const noGlobalErrors = globalErrors.length === 0 && [...statuses.values()].every(status => status.compilationFailure === undefined);
+          redraw();
+          // eslint-disable-next-line node/no-process-exit
+          process.exit(noGlobalErrors ? 0 : 1);
+        }
+      }
+    });
     compiler.hooks.beforeRun.tap(name, () => handleStart(projectName));
     compiler.hooks.watchRun.tap(name, () => handleStart(projectName));
     compiler.hooks.done.tap(name, stats => handleResults(projectName, stats));
-    if (watch) {
-      compiler.watch({}, (err, res) => {
-        if (err || !res) {
-          console.log(err);
-          // eslint-disable-next-line node/no-process-exit
-          process.exit(1);
-        }
-      });
-    } else {
-      compiler.run((err, res) => {
-        if (err || !res) {
-          console.log(err);
-          // eslint-disable-next-line node/no-process-exit
-          process.exit(1);
-        }
-        if ([...statuses.values()].every(status => !status.isRunning)) {
-          redraw();
-          // eslint-disable-next-line node/no-process-exit
-          process.exit(0);
-        }
-      });
-    }
   }
 }
 async function runAllWebpacks(options) {
