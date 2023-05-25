@@ -26,6 +26,12 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("webpack");
 
 /***/ }),
 /* 5 */
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("webpack-dev-server");
+
+/***/ }),
+/* 6 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -44,13 +50,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "writeJsonFile": () => (/* binding */ writeJsonFile),
 /* harmony export */   "writeRawFile": () => (/* binding */ writeRawFile)
 /* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8);
+/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9);
 /* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(prettier__WEBPACK_IMPORTED_MODULE_3__);
 
 
@@ -146,25 +152,37 @@ async function listFiles(path) {
 }
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs");
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
 
 /***/ }),
-/* 9 */
+/* 10 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "neverHappens": () => (/* binding */ neverHappens)
+/* harmony export */ });
+function neverHappens(value, msg) {
+  throw new Error(msg ?? `Unexpected value ${value}`);
+}
+
+/***/ }),
+/* 11 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -210,7 +228,7 @@ function groupAndSortErrors(errors) {
 }
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -319,14 +337,14 @@ function parseError(err, opts) {
 }
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "readLines": () => (/* binding */ readLines)
 /* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
 
 function readLines(filePath, cb) {
@@ -347,7 +365,7 @@ function readLines(filePath, cb) {
 }
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -355,12 +373,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "renderErrorWarningCount": () => (/* binding */ renderErrorWarningCount),
 /* harmony export */   "renderErrors": () => (/* binding */ renderErrors),
 /* harmony export */   "renderLambdaServerEvent": () => (/* binding */ renderLambdaServerEvent),
-/* harmony export */   "renderProjectStatus": () => (/* binding */ renderProjectStatus)
+/* harmony export */   "renderProjectStatus": () => (/* binding */ renderProjectStatus),
+/* harmony export */   "renderWebpackDevServerEvent": () => (/* binding */ renderWebpackDevServerEvent)
 /* harmony export */ });
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
-/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(14);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(15);
 
 
 
@@ -381,7 +400,7 @@ function renderErrors(errors) {
   }
   return blocks.join('\n\n');
 }
-function renderProjectStatus(name, firstRun, isRunning, errors, compilationFailure, lambdaServerEvents) {
+function renderProjectStatus(name, firstRun, isRunning, errors, compilationFailure, lambdaServerEvents, webpackDevServerEvents) {
   // First column
   const column1 = (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatProject)(name);
 
@@ -400,6 +419,9 @@ function renderProjectStatus(name, firstRun, isRunning, errors, compilationFailu
   const column3 = [];
   if (lambdaServerEvents.startEvent) {
     column3.push(renderLambdaServerEvent(lambdaServerEvents.startEvent));
+  }
+  if (webpackDevServerEvents.startEvent) {
+    column3.push(renderWebpackDevServerEvent(webpackDevServerEvents.startEvent));
   }
   if (compilationFailure !== undefined) {
     column3.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red)(compilationFailure));
@@ -444,21 +466,31 @@ function renderLambdaServerEvent(event) {
   }
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_1__.neverHappens)(type);
 }
-
-/***/ }),
-/* 13 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "neverHappens": () => (/* binding */ neverHappens)
-/* harmony export */ });
-function neverHappens(value, msg) {
-  throw new Error(msg ?? `Unexpected value ${value}`);
+function renderWebpackDevServerEvent(event) {
+  const type = event.event;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (type === 'start') {
+    return `http://localhost:${event.port}`;
+  }
+  // const req = gray(`${event.method} ${event.path}`);
+  // if (type === 'error') {
+  //   return `${req} ${red(event.err)}`;
+  // } else if (type === 'request') {
+  //   return `${req} ${gray('running lambda...')}`;
+  //   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  // } else if (type === 'response') {
+  //   const httpCode = `[HTTP ${event.statusCode}]`;
+  //   const size = `[${event.byteLength.toLocaleString()}b]`;
+  //   const duration = `[${event.duration.toLocaleString()}ms]`;
+  //   // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+  //   const color = event.statusCode >= 400 ? red : green;
+  //   return `${req} ${color(`${httpCode} ${size} ${duration}`)}`;
+  // }
+  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_1__.neverHappens)(type);
 }
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -507,7 +539,7 @@ function formatError(err) {
 }
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -630,12 +662,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(webpack__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);
-/* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
-/* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(10);
-/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(11);
-/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(12);
-/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(15);
+/* harmony import */ var webpack_dev_server__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);
+/* harmony import */ var webpack_dev_server__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(webpack_dev_server__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(10);
+/* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(11);
+/* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(12);
+/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(13);
+/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(14);
+/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(16);
+
+
 
 
 
@@ -659,7 +696,8 @@ async function runWebpacks(opts) {
       firstRun: true,
       isRunning: true,
       errors: [],
-      lambdaServerEvents: {}
+      lambdaServerEvents: {},
+      webpackDevServerEvents: {}
     };
     statuses.set(project, {
       ...current,
@@ -668,38 +706,40 @@ async function runWebpacks(opts) {
     onChange();
   }
   function handleResults(project, stats) {
-    var _statuses$get, _statuses$get2;
-    const errors = [...stats.compilation.errors.map(err => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_6__.parseError)(err, {
+    var _statuses$get, _statuses$get2, _statuses$get3;
+    const errors = [...stats.compilation.errors.map(err => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_8__.parseError)(err, {
       root,
       severity: 'error'
-    })), ...stats.compilation.warnings.map(warn => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_6__.parseError)(warn, {
+    })), ...stats.compilation.warnings.map(warn => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_8__.parseError)(warn, {
       root,
       severity: 'warning'
     }))];
     const lambdaServerEvents = ((_statuses$get = statuses.get(project)) === null || _statuses$get === void 0 ? void 0 : _statuses$get.lambdaServerEvents) ?? {};
-    const compilationFailure = (_statuses$get2 = statuses.get(project)) === null || _statuses$get2 === void 0 ? void 0 : _statuses$get2.compilationFailure;
+    const webpackDevServerEvents = ((_statuses$get2 = statuses.get(project)) === null || _statuses$get2 === void 0 ? void 0 : _statuses$get2.webpackDevServerEvents) ?? {};
+    const compilationFailure = (_statuses$get3 = statuses.get(project)) === null || _statuses$get3 === void 0 ? void 0 : _statuses$get3.compilationFailure;
     statuses.set(project, {
       firstRun: false,
       isRunning: false,
       errors,
       compilationFailure,
-      lambdaServerEvents
+      lambdaServerEvents,
+      webpackDevServerEvents
     });
     onChange();
   }
   function redraw() {
     const errors = [...statuses.values()].flatMap(v => v.errors);
-    const groupedErrors = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_5__.groupAndSortErrors)(errors);
-    const summary = [...statuses.entries()].map(([projectPath, status]) => (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_8__.renderProjectStatus)(projectPath, status.firstRun, status.isRunning, groupedErrors, status.compilationFailure, status.lambdaServerEvents));
+    const groupedErrors = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_7__.groupAndSortErrors)(errors);
+    const summary = [...statuses.entries()].map(([projectPath, status]) => (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_10__.renderProjectStatus)(projectPath, status.firstRun, status.isRunning, groupedErrors, status.compilationFailure, status.lambdaServerEvents, status.webpackDevServerEvents));
     summary.unshift([(0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)(`Projects (${projectPaths.length})`), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Status'), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Run')]);
-    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_8__.renderErrors)(groupedErrors);
+    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_10__.renderErrors)(groupedErrors);
     if (watch) {
       process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
     }
 
-    console.log((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_9__.table)(summary));
+    console.log((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_11__.table)(summary));
     if (report.length > 0) {
-      console.log(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_8__.renderErrorWarningCount)(errors)}\n`);
+      console.log(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_10__.renderErrorWarningCount)(errors)}\n`);
       console.log(report);
     }
   }
@@ -712,7 +752,7 @@ async function runWebpacks(opts) {
         const errors = [...statuses.values()].flatMap(v => v.errors);
         const {
           globalErrors
-        } = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_5__.groupAndSortErrors)(errors);
+        } = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_7__.groupAndSortErrors)(errors);
         const noGlobalErrors = globalErrors.length === 0 && [...statuses.values()].every(status => status.compilationFailure === undefined);
         redraw();
         // eslint-disable-next-line node/no-process-exit
@@ -726,13 +766,17 @@ async function runWebpacks(opts) {
       firstRun: true,
       isRunning: true,
       errors: [],
-      lambdaServerEvents: {}
+      lambdaServerEvents: {},
+      webpackDevServerEvents: {}
     };
     statuses.set(projectName, intialStatus);
     // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax, no-await-in-loop
     const config = await import( /*webpackIgnore: true*/(0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'webpack.config.js')).then(({
       getConfig
-    }) => getConfig(projectPath));
+    }) => getConfig({
+      context: projectPath,
+      watch
+    }));
 
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const reportCompilationFailure = error => {
@@ -745,6 +789,10 @@ async function runWebpacks(opts) {
       updateStatus(curr => fn(curr.lambdaServerEvents));
     };
     // eslint-disable-next-line unicorn/consistent-function-scoping
+    const updateWebpackDevServerEvents = fn => {
+      updateStatus(curr => fn(curr.webpackDevServerEvents));
+    };
+    // eslint-disable-next-line unicorn/consistent-function-scoping
     const updateStatus = fn => {
       let current = statuses.get(projectName);
       if (!current) {
@@ -755,16 +803,16 @@ async function runWebpacks(opts) {
     };
 
     // Read events in the lambda server logs to update the globalInfo
-    let lastProcessedLog = Date.now();
-    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_7__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
+    let lastProcessedLambdaLog = Date.now();
+    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_9__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
       const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
       let shouldRedraw = false;
       for (const log of logs) {
         const date = new Date(log.t).getTime();
-        if (date < lastProcessedLog) {
+        if (date < lastProcessedLambdaLog) {
           continue;
         }
-        lastProcessedLog = date;
+        lastProcessedLambdaLog = date;
         shouldRedraw = true;
         if (log.event === 'start') {
           updateLambdaServerEvents(curr => {
@@ -776,6 +824,36 @@ async function runWebpacks(opts) {
           });
         }
       }
+      if (shouldRedraw) {
+        redraw();
+      }
+    });
+
+    // Read events in the webpack dev server logs to update the globalInfo
+    let lastProcessedDevServerLog = Date.now();
+    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_9__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
+      const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
+      let shouldRedraw = false;
+      for (const log of logs) {
+        const date = new Date(log.t).getTime();
+        if (date < lastProcessedDevServerLog) {
+          continue;
+        }
+        lastProcessedDevServerLog = date;
+        shouldRedraw = true;
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (log.event === 'start') {
+          updateWebpackDevServerEvents(curr => {
+            curr.startEvent = log;
+          });
+        } else {
+          (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.neverHappens)(log.event);
+          //   updateWebpackDevServerEvents(curr => {
+          //     curr.lastEvent = log;
+          //   });
+        }
+      }
+
       if (shouldRedraw) {
         redraw();
       }
@@ -797,6 +875,9 @@ async function runWebpacks(opts) {
     compiler.hooks.beforeRun.tap(name, () => handleStart(projectName));
     compiler.hooks.watchRun.tap(name, () => handleStart(projectName));
     compiler.hooks.done.tap(name, stats => handleResults(projectName, stats));
+    if (config.devServer) {
+      new (webpack_dev_server__WEBPACK_IMPORTED_MODULE_4___default())(config.devServer, compiler).start();
+    }
   }
 }
 async function runAllWebpacks(options) {
@@ -808,7 +889,7 @@ async function runAllWebpacks(options) {
     withFileTypes: true
   });
   const dirs = rootFiles.filter(ent => ent.isDirectory()).map(dir => (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, dir.name));
-  const packages = await Promise.all(dirs.map(async dir => (await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.exists)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dir, 'package.json'))) ? dir : undefined));
+  const packages = await Promise.all(dirs.map(async dir => (await (0,_src_fs__WEBPACK_IMPORTED_MODULE_5__.exists)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dir, 'package.json'))) ? dir : undefined));
   await runWebpacks({
     root,
     projectPaths: packages.filter(p => p !== undefined),

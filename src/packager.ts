@@ -9,7 +9,12 @@ export async function compile(
   isLib: boolean,
   packageJsonProperties: Record<string, unknown> = {}
 ): Promise<void> {
-  const baseConfig = nodeConfig({context: process.cwd(), isLib, packageJsonProperties});
+  const baseConfig = nodeConfig({
+    context: process.cwd(),
+    watch: false,
+    isLib,
+    packageJsonProperties,
+  });
   const plugins = (baseConfig.plugins ?? []).filter(
     p => !(p instanceof DefinePlugin || p instanceof YarnPlugin)
   );

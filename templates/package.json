@@ -16,6 +16,7 @@
     "@matthis/webpack-node": "file:../packages/webpack-node",
     "@matthis/webpack-node-lib": "file:../packages/webpack-node-lib",
     "@matthis/webpack-node-script": "file:../packages/webpack-node-script",
+    "@matthis/webpack-runner": "file:../packages/webpack-runner",
     "@matthis/webpack-web": "file:../packages/webpack-web"
   }
 }

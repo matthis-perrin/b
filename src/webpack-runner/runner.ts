@@ -3,13 +3,19 @@ import {join, relative} from 'node:path';
 
 import {underline} from 'ansi-colors';
 import {Configuration, Stats, webpack} from 'webpack';
+import WebpackDevServer from 'webpack-dev-server';
 
 import {exists} from '@src/fs';
+import {neverHappens} from '@src/type_utils';
 import {
   FullLambdaServerEvent,
   LambdaServerEvent,
   LambdaServerStartEvent,
 } from '@src/webpack/plugins/lambda_server_plugin';
+import {
+  FullWebpackDevServerEvent,
+  WebpackDevServerStartEvent,
+} from '@src/webpack/plugins/webpack_dev_server';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
 import {readLines} from '@src/webpack-runner/line_reader';
@@ -31,12 +37,18 @@ export interface LambdaServerEvents {
   lastEvent?: Exclude<LambdaServerEvent, LambdaServerStartEvent>;
 }
 
+export interface WebpackDevServerEvents {
+  startEvent?: WebpackDevServerStartEvent;
+  // lastEvent?: Exclude<WebpackDevServerEvent, WebpackDevServerStartEvent>;
+}
+
 interface ProjectStatus {
   firstRun: boolean;
   isRunning: boolean;
   errors: ParsedError[];
   compilationFailure?: string;
   lambdaServerEvents: LambdaServerEvents;
+  webpackDevServerEvents: WebpackDevServerEvents;
 }
 
 const name = 'WebpackRunner';
@@ -51,6 +63,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       isRunning: true,
       errors: [],
       lambdaServerEvents: {},
+      webpackDevServerEvents: {},
     };
     statuses.set(project, {...current, isRunning: true});
     onChange();
@@ -62,6 +75,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       ...stats.compilation.warnings.map(warn => parseError(warn, {root, severity: 'warning'})),
     ];
     const lambdaServerEvents = statuses.get(project)?.lambdaServerEvents ?? {};
+    const webpackDevServerEvents = statuses.get(project)?.webpackDevServerEvents ?? {};
     const compilationFailure = statuses.get(project)?.compilationFailure;
     statuses.set(project, {
       firstRun: false,
@@ -69,6 +83,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       errors,
       compilationFailure,
       lambdaServerEvents,
+      webpackDevServerEvents,
     });
     onChange();
   }
@@ -84,7 +99,8 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
         status.isRunning,
         groupedErrors,
         status.compilationFailure,
-        status.lambdaServerEvents
+        status.lambdaServerEvents,
+        status.webpackDevServerEvents
       )
     );
     summary.unshift([
@@ -125,12 +141,18 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
 
   for (const projectPath of projectPaths.sort((p1, p2) => p1.localeCompare(p2))) {
     const projectName = relative(root, projectPath);
-    const intialStatus = {firstRun: true, isRunning: true, errors: [], lambdaServerEvents: {}};
+    const intialStatus = {
+      firstRun: true,
+      isRunning: true,
+      errors: [],
+      lambdaServerEvents: {},
+      webpackDevServerEvents: {},
+    };
     statuses.set(projectName, intialStatus);
     // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax, no-await-in-loop
     const config: Configuration = await import(
       /*webpackIgnore: true*/ join(projectPath, 'webpack.config.js')
-    ).then(({getConfig}) => getConfig(projectPath));
+    ).then(({getConfig}) => getConfig({context: projectPath, watch}));
 
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const reportCompilationFailure = (error: string): void => {
@@ -143,6 +165,10 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       updateStatus(curr => fn(curr.lambdaServerEvents));
     };
     // eslint-disable-next-line unicorn/consistent-function-scoping
+    const updateWebpackDevServerEvents = (fn: (curr: WebpackDevServerEvents) => void): void => {
+      updateStatus(curr => fn(curr.webpackDevServerEvents));
+    };
+    // eslint-disable-next-line unicorn/consistent-function-scoping
     const updateStatus = (fn: (curr: ProjectStatus) => void): void => {
       let current = statuses.get(projectName);
       if (!current) {
@@ -153,7 +179,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     };
 
     // Read events in the lambda server logs to update the globalInfo
-    let lastProcessedLog = Date.now();
+    let lastProcessedLambdaLog = Date.now();
     readLines(join(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
       const logs = lines
         .map(l => l.trim())
@@ -162,10 +188,10 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       let shouldRedraw = false;
       for (const log of logs) {
         const date = new Date(log.t).getTime();
-        if (date < lastProcessedLog) {
+        if (date < lastProcessedLambdaLog) {
           continue;
         }
-        lastProcessedLog = date;
+        lastProcessedLambdaLog = date;
         shouldRedraw = true;
         if (log.event === 'start') {
           updateLambdaServerEvents(curr => {
@@ -175,6 +201,38 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
           updateLambdaServerEvents(curr => {
             curr.lastEvent = log;
           });
+        }
+      }
+      if (shouldRedraw) {
+        redraw();
+      }
+    });
+
+    // Read events in the webpack dev server logs to update the globalInfo
+    let lastProcessedDevServerLog = Date.now();
+    readLines(join(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
+      const logs = lines
+        .map(l => l.trim())
+        .filter(l => l.length > 0)
+        .map(l => JSON.parse(l) as FullWebpackDevServerEvent);
+      let shouldRedraw = false;
+      for (const log of logs) {
+        const date = new Date(log.t).getTime();
+        if (date < lastProcessedDevServerLog) {
+          continue;
+        }
+        lastProcessedDevServerLog = date;
+        shouldRedraw = true;
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (log.event === 'start') {
+          updateWebpackDevServerEvents(curr => {
+            curr.startEvent = log;
+          });
+        } else {
+          neverHappens(log.event);
+          //   updateWebpackDevServerEvents(curr => {
+          //     curr.lastEvent = log;
+          //   });
         }
       }
       if (shouldRedraw) {
@@ -196,6 +254,10 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     compiler.hooks.beforeRun.tap(name, () => handleStart(projectName));
     compiler.hooks.watchRun.tap(name, () => handleStart(projectName));
     compiler.hooks.done.tap(name, stats => handleResults(projectName, stats));
+
+    if (config.devServer) {
+      new WebpackDevServer(config.devServer, compiler).start();
+    }
   }
 }
 

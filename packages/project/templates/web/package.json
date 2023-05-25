@@ -2,10 +2,6 @@
   "name": "web",
   "license": "UNLICENSED",
   "type": "module",
-  "scripts": {
-    "build": "NODE_ENV=production ../node_modules/.bin/webpack build",
-    "start": "NODE_ENV=development ../node_modules/.bin/webpack serve"
-  },
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
     "extends": [

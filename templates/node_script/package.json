@@ -3,11 +3,6 @@
   "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
-  "scripts": {
-    "lint": "eslint --ext ts,tsx src",
-    "tsc": "tsc -p tsconfig.json",
-    "build": "NODE_ENV=development ../node_modules/.bin/webpack"
-  },
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
     "extends": [

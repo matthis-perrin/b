@@ -8,8 +8,8 @@ import {getTsConfigAlias} from '@src/webpack/plugins/ts_config_alias';
 import {YarnPlugin} from '@src/webpack/plugins/yarn_plugin';
 import {findPackageJson, isProd} from '@src/webpack/utils';
 
-export function baseConfig(contextOpt?: string): Configuration {
-  const context = contextOpt ?? process.cwd();
+export function baseConfig(opts: {context: string; watch: boolean}): Configuration {
+  const {context} = opts;
 
   return {
     mode: 'none',
@@ -26,6 +26,7 @@ export function baseConfig(contextOpt?: string): Configuration {
       assets: true,
       timings: true,
     },
+    infrastructureLogging: {level: 'error'},
     optimization: {
       minimize: isProd(),
       minimizer: [terserPlugin()],

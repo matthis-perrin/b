@@ -1,10 +1,10 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.3.5',
+  project: '1.3.7',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
-  webpack: '1.2.3',
-  runner: '1.1.2',
+  webpack: '1.2.5',
+  runner: '1.1.4',
 };
 
 export const ESLINT_VERSION = '8.23.x';

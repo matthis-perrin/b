@@ -1,15 +1,14 @@
 import {exec} from 'node:child_process';
-import {createHash, randomUUID} from 'node:crypto';
+import {randomUUID} from 'node:crypto';
 import {appendFileSync} from 'node:fs';
-import {mkdir, rm} from 'node:fs/promises';
 import {createServer, IncomingMessage, Server, ServerResponse} from 'node:http';
 import {join} from 'node:path';
 
 import {Compiler} from 'webpack';
 
-import {exists, rmDir} from '@src/fs';
 import {WebpackPlugin} from '@src/webpack/models';
 import {StandalonePlugin} from '@src/webpack/plugins/standalone_plugin';
+import {getPort, initLogFile} from '@src/webpack/utils';
 
 export interface LambdaServerStartEvent {
   event: 'start';
@@ -57,26 +56,11 @@ class LambdaServerPlugin extends StandalonePlugin {
       return;
     }
 
-    // Find the root of the project and create the log dir there
-    try {
-      const root = await this.lookupRoot(compiler.context);
-      const logDir = join(root, 'log');
-      await rmDir(logDir);
-      await mkdir(logDir, {recursive: true});
-      this.runtimeLogFile = join(logDir, 'lambda_server_runtime.txt');
-      this.appLogFile = join(logDir, 'lambda_server_log.txt');
-      if (await exists(this.runtimeLogFile)) {
-        await rm(this.runtimeLogFile);
-      }
-    } catch {
-      throw new Error(`Failure to identify project root from ${compiler.context}`);
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    const hexHash = createHash('md5').update(compiler.context).digest('hex').slice(0, 4);
-    const port = 1024 + Math.floor(parseInt(hexHash, 16) / 2);
+    this.runtimeLogFile = await initLogFile(compiler.context, 'lambda_server_runtime.txt');
+    this.appLogFile = await initLogFile(compiler.context, 'lambda_server_log.txt');
 
     return new Promise<void>((resolve, reject) => {
+      const port = getPort(compiler.context);
       this.server = createServer((req: IncomingMessage, res: ServerResponse) => {
         const url = req.url ?? '';
         const method = req.method ?? '';
@@ -228,17 +212,6 @@ class LambdaServerPlugin extends StandalonePlugin {
       }
     }
     return {logs: output.trim()};
-  }
-
-  private async lookupRoot(fromPath: string): Promise<string> {
-    if (await exists(join(fromPath, 'package.json'))) {
-      return fromPath;
-    }
-    const parent = join(fromPath, '..');
-    if (parent === fromPath) {
-      throw new Error('Failure to lookup root');
-    }
-    return this.lookupRoot(parent);
   }
 
   private runtimeLog(event: LambdaServerEvent): void {

@@ -1,5 +1,8 @@
-import {readdir, readFile, stat} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {mkdir, readdir, readFile, rm, stat} from 'node:fs/promises';
 import {join, resolve} from 'node:path';
+
+import {exists, rmDir} from '@src/fs';
 
 export interface WebpackConfigFragment {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,4 +51,39 @@ export async function findPackageJson(p: string): Promise<Record<string, unknown
     packageJsonCache.set(p, undefined);
     return undefined;
   }
+}
+
+export function getPort(context: string): number {
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+  const hexHash = createHash('md5').update(context).digest('hex').slice(0, 4);
+  const port = 1024 + Math.floor(parseInt(hexHash, 16) / 2);
+  return port;
+}
+
+export async function initLogFile(context: string, logFileName: string): Promise<string> {
+  // Find the root of the project and create the log dir there
+  try {
+    const root = await lookupRoot(context);
+    const logDir = join(root, 'log');
+    await rmDir(logDir);
+    await mkdir(logDir, {recursive: true});
+    const logFile = join(logDir, logFileName);
+    if (await exists(logFile)) {
+      await rm(logFile);
+    }
+    return logFile;
+  } catch {
+    throw new Error(`Failure to identify project root from ${context}`);
+  }
+}
+
+async function lookupRoot(fromPath: string): Promise<string> {
+  if (await exists(join(fromPath, 'package.json'))) {
+    return fromPath;
+  }
+  const parent = join(fromPath, '..');
+  if (parent === fromPath) {
+    throw new Error('Failure to lookup root');
+  }
+  return lookupRoot(parent);
 }

@@ -17,6 +17,7 @@ export async function generateTemplatesRootPackageJson(
     ...eslint.map(runtime => `eslint-config-${runtime}`),
     ...tsConfig.map(runtime => `tsconfig-${runtime}`),
     ...webpack.map(runtime => `webpack-${runtime}`),
+    'webpack-runner',
     'prettier-config',
   ].sort((d1, d2) => d1.localeCompare(d2));
 

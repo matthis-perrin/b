@@ -1,6 +1,3 @@
-// eslint-disable-next-line import/no-unassigned-import
-import 'webpack-dev-server';
-
 import {join} from 'node:path';
 
 import {Configuration} from 'webpack';
@@ -9,11 +6,11 @@ import {baseConfig} from '@src/webpack/configs/base_config';
 import {babelLoaderWeb} from '@src/webpack/loaders/babel_loader_web';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {htmlPlugin} from '@src/webpack/plugins/html_plugin';
-import {isProd} from '@src/webpack/utils';
+import {webpackDevServer} from '@src/webpack/plugins/webpack_dev_server';
 
-export function webConfig(opts: {context?: string}): Configuration {
-  const {context = process.cwd()} = opts;
-  const base = baseConfig(context);
+export function webConfig(opts: {context: string; watch: boolean}): Configuration {
+  const {context, watch} = opts;
+  const base = baseConfig({context, watch});
   return {
     ...base,
     target: 'web',
@@ -28,14 +25,7 @@ export function webConfig(opts: {context?: string}): Configuration {
       rules: [babelLoaderWeb(), sourceMapLoader()],
     },
     plugins: [...(base.plugins ?? []), htmlPlugin(context)],
-    devServer: !isProd()
-      ? {
-          static: join(context, 'dist'),
-          compress: true,
-          hot: true,
-          open: true,
-        }
-      : undefined,
+    devServer: watch ? webpackDevServer(context) : undefined,
     optimization: {
       ...base.optimization,
       splitChunks: {

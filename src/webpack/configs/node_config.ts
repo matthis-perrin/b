@@ -8,13 +8,14 @@ import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {dependencyPackerPlugin} from '@src/webpack/plugins/dependency_packer_plugin';
 
 export function nodeConfig(opts: {
-  context?: string;
+  context: string;
+  watch: boolean;
   isLib: boolean;
   noEntry?: boolean;
   packageJsonProperties?: Record<string, unknown>;
 }): Configuration {
-  const {context = process.cwd(), isLib, noEntry, packageJsonProperties} = opts;
-  const base = baseConfig(context);
+  const {context, watch, isLib, noEntry, packageJsonProperties} = opts;
+  const base = baseConfig({context, watch});
   return {
     ...base,
     target: 'node',

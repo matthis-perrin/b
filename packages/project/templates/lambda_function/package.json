@@ -2,10 +2,6 @@
   "name": "lambda_function",
   "license": "UNLICENSED",
   "type": "module",
-  "scripts": {
-    "build": "NODE_ENV=production ../node_modules/.bin/webpack build",
-    "watch": "NODE_ENV=development ../node_modules/.bin/webpack watch"
-  },
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
     "extends": [
