@@ -22,7 +22,9 @@ export function nodeConfig(opts: {
     output: {
       path: join(context, 'dist'),
       filename: `[name].js`,
-      clean: true,
+      clean: {
+        keep: fileName => fileName.startsWith('node_modules') || fileName === 'yarn.lock',
+      },
       chunkFormat: 'module',
       ...(isLib ? {library: {type: 'module'}} : {}),
     },

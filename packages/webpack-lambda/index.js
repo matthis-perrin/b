@@ -36,7 +36,9 @@ function nodeConfig(opts) {
     output: {
       path: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(context, 'dist'),
       filename: `[name].js`,
-      clean: true,
+      clean: {
+        keep: fileName => fileName.startsWith('node_modules') || fileName === 'yarn.lock'
+      },
       chunkFormat: 'module',
       ...(isLib ? {
         library: {
@@ -814,9 +816,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "dependencyPackerPlugin": () => (/* binding */ dependencyPackerPlugin)
 /* harmony export */ });
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6);
+
 
 
 class DependencyPackerPlugin {
@@ -828,7 +833,7 @@ class DependencyPackerPlugin {
     const depMap = new Map();
     compiler.resolverFactory.hooks.resolver.for('normal').tap(name, resolver => {
       resolver.hooks.result.tap(name, result => {
-        if (result.descriptionFileRoot !== undefined && result.descriptionFileRoot === compiler.context) {
+        if (result.descriptionFileRoot !== undefined && !result.descriptionFileRoot.includes('/node_modules/')) {
           return result;
         }
         if (result.descriptionFileData && 'name' in result.descriptionFileData && 'version' in result.descriptionFileData) {
@@ -891,7 +896,7 @@ class DependencyPackerPlugin {
           return;
         }
         const entryPoint = firstEntryPoint.import.at(-1);
-        const entryPackageJson = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__.findPackageJson)(entryPoint);
+        const entryPackageJson = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__.findPackageJson)(entryPoint);
         if (!entryPackageJson) {
           console.error(`Failure to retrieve entryPoint's package.json for ${entryPoint}`);
           return;
@@ -900,7 +905,7 @@ class DependencyPackerPlugin {
         version = entryPackageJson['version'];
       }
       const outputDirectory = stats.compilation.compiler.options.output.path;
-      await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.writeFile)(`${outputDirectory}/package.json`, JSON.stringify({
+      await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.writeFile)(`${outputDirectory}/package.json`, JSON.stringify({
         name,
         version,
         type: 'module',
@@ -908,8 +913,23 @@ class DependencyPackerPlugin {
         ...extraProps,
         dependencies
       }, undefined, 2));
+      await yarnInstall(outputDirectory);
     });
   }
+}
+async function yarnInstall(path) {
+  return new Promise((resolve, reject) => {
+    (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(`yarn install --non-interactive --ignore-optional --production`, {
+      cwd: path
+    }, (error, stdout, stderr) => {
+      if (!error) {
+        resolve();
+      } else {
+        console.error(`Failure to run \`yarn install\` at "${path}"\n${stderr}`);
+        reject(new Error(stderr));
+      }
+    });
+  });
 }
 function dependencyPackerPlugin(packageJsonProperties) {
   return new DependencyPackerPlugin(packageJsonProperties);
@@ -1183,6 +1203,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "cleanDir": () => (/* binding */ cleanDir),
 /* harmony export */   "cp": () => (/* binding */ cp),
 /* harmony export */   "exists": () => (/* binding */ exists),
+/* harmony export */   "listFiles": () => (/* binding */ listFiles),
 /* harmony export */   "maybeReadFile": () => (/* binding */ maybeReadFile),
 /* harmony export */   "readFile": () => (/* binding */ readFile),
 /* harmony export */   "readdir": () => (/* binding */ readdir),
@@ -1272,6 +1293,25 @@ async function maybeReadFile(path) {
   } catch {
     return undefined;
   }
+}
+async function listFiles(path) {
+  const files = [];
+  const ents = await readdir(path, {
+    withFileTypes: true
+  });
+  const promises = [];
+  for (const ent of ents) {
+    const entPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(path, ent.name);
+    if (ent.isDirectory()) {
+      promises.push(listFiles(entPath).then(subFiles => {
+        files.push(...subFiles);
+      }));
+    } else if (ent.isFile()) {
+      files.push(entPath);
+    }
+  }
+  await Promise.all(promises);
+  return files;
 }
 
 /***/ }),

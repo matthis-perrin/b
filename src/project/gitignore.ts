@@ -6,6 +6,7 @@ build
 dist
 tmp
 yarn-error.log
+.yarn-warnings.log
 yarn.lock
 terraform/.terraform
 terraform/.terraform*

@@ -1,8 +1,9 @@
 import {execSync} from 'node:child_process';
+import {writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {cp} from '@src/fs';
+import {cp, listFiles, readFile, writeJsonFile} from '@src/fs';
 import {PROJECT_TYPE_TO_METADATA, RuntimeType} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
 
@@ -12,6 +13,26 @@ export async function generateProject(dst: string, project: WorkspaceProject): P
   const {projectName, type} = project;
   // Copy template files
   await cp(join(TEMPLATES_PATH, type), dst);
+
+  // Replace name in package.json
+  const packageJsonPath = join(dst, 'package.json');
+  const packageJsonbuffer = await readFile(packageJsonPath);
+  const packageJson = JSON.parse(packageJsonbuffer.toString());
+  packageJson['name'] = projectName;
+  await writeJsonFile(packageJsonPath, packageJson);
+
+  // Replace variables
+  const files = await listFiles(dst);
+  await Promise.all(
+    files.map(async file => {
+      const buffer = await readFile(file);
+      const content = buffer.toString();
+      const newContent = content.replaceAll('{{PROJECT_NAME}}', projectName);
+      if (newContent !== content) {
+        await writeFile(file, newContent);
+      }
+    })
+  );
 
   // Post generation script for React Native project
   if (PROJECT_TYPE_TO_METADATA[type].runtimeType === RuntimeType.ReactNative) {

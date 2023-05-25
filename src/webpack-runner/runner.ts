@@ -53,9 +53,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       lambdaServerEvents: {},
     };
     statuses.set(project, {...current, isRunning: true});
-    if (watch) {
-      redraw();
-    }
+    onChange();
   }
 
   function handleResults(project: string, stats: Stats): void {
@@ -72,9 +70,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       compilationFailure,
       lambdaServerEvents,
     });
-    if (watch) {
-      redraw();
-    }
+    onChange();
   }
 
   function redraw(): void {
@@ -105,6 +101,25 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     if (report.length > 0) {
       console.log(`\nBuild completed with ${renderErrorWarningCount(errors)}\n`);
       console.log(report);
+    }
+  }
+
+  function onChange(): void {
+    if (watch) {
+      redraw();
+    } else {
+      const allDone = [...statuses.values()].every(status => !status.isRunning);
+      if (allDone) {
+        const errors = [...statuses.values()].flatMap(v => v.errors);
+        const {globalErrors} = groupAndSortErrors(errors);
+
+        const noGlobalErrors =
+          globalErrors.length === 0 &&
+          [...statuses.values()].every(status => status.compilationFailure === undefined);
+        redraw();
+        // eslint-disable-next-line node/no-process-exit
+        process.exit(noGlobalErrors ? 0 : 1);
+      }
     }
   }
 
@@ -171,26 +186,12 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       if (err || !res) {
         reportCompilationFailure(err ? String(err) : 'No result after compilation');
         if (!watch) {
+          onChange();
           // eslint-disable-next-line node/no-process-exit
           process.exit(1);
         }
       }
-      if (watch) {
-        redraw();
-      } else {
-        const allDone = [...statuses.values()].every(status => !status.isRunning);
-        if (allDone) {
-          const errors = [...statuses.values()].flatMap(v => v.errors);
-          const {globalErrors} = groupAndSortErrors(errors);
-
-          const noGlobalErrors =
-            globalErrors.length === 0 &&
-            [...statuses.values()].every(status => status.compilationFailure === undefined);
-          redraw();
-          // eslint-disable-next-line node/no-process-exit
-          process.exit(noGlobalErrors ? 0 : 1);
-        }
-      }
+      onChange();
     });
     compiler.hooks.beforeRun.tap(name, () => handleStart(projectName));
     compiler.hooks.watchRun.tap(name, () => handleStart(projectName));

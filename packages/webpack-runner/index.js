@@ -34,6 +34,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "cleanDir": () => (/* binding */ cleanDir),
 /* harmony export */   "cp": () => (/* binding */ cp),
 /* harmony export */   "exists": () => (/* binding */ exists),
+/* harmony export */   "listFiles": () => (/* binding */ listFiles),
 /* harmony export */   "maybeReadFile": () => (/* binding */ maybeReadFile),
 /* harmony export */   "readFile": () => (/* binding */ readFile),
 /* harmony export */   "readdir": () => (/* binding */ readdir),
@@ -123,6 +124,25 @@ async function maybeReadFile(path) {
   } catch {
     return undefined;
   }
+}
+async function listFiles(path) {
+  const files = [];
+  const ents = await readdir(path, {
+    withFileTypes: true
+  });
+  const promises = [];
+  for (const ent of ents) {
+    const entPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(path, ent.name);
+    if (ent.isDirectory()) {
+      promises.push(listFiles(entPath).then(subFiles => {
+        files.push(...subFiles);
+      }));
+    } else if (ent.isFile()) {
+      files.push(entPath);
+    }
+  }
+  await Promise.all(promises);
+  return files;
 }
 
 /***/ }),
@@ -645,9 +665,7 @@ async function runWebpacks(opts) {
       ...current,
       isRunning: true
     });
-    if (watch) {
-      redraw();
-    }
+    onChange();
   }
   function handleResults(project, stats) {
     var _statuses$get, _statuses$get2;
@@ -667,9 +685,7 @@ async function runWebpacks(opts) {
       compilationFailure,
       lambdaServerEvents
     });
-    if (watch) {
-      redraw();
-    }
+    onChange();
   }
   function redraw() {
     const errors = [...statuses.values()].flatMap(v => v.errors);
@@ -685,6 +701,23 @@ async function runWebpacks(opts) {
     if (report.length > 0) {
       console.log(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_8__.renderErrorWarningCount)(errors)}\n`);
       console.log(report);
+    }
+  }
+  function onChange() {
+    if (watch) {
+      redraw();
+    } else {
+      const allDone = [...statuses.values()].every(status => !status.isRunning);
+      if (allDone) {
+        const errors = [...statuses.values()].flatMap(v => v.errors);
+        const {
+          globalErrors
+        } = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_5__.groupAndSortErrors)(errors);
+        const noGlobalErrors = globalErrors.length === 0 && [...statuses.values()].every(status => status.compilationFailure === undefined);
+        redraw();
+        // eslint-disable-next-line node/no-process-exit
+        process.exit(noGlobalErrors ? 0 : 1);
+      }
     }
   }
   for (const projectPath of projectPaths.sort((p1, p2) => p1.localeCompare(p2))) {
@@ -754,25 +787,12 @@ async function runWebpacks(opts) {
       if (err || !res) {
         reportCompilationFailure(err ? String(err) : 'No result after compilation');
         if (!watch) {
+          onChange();
           // eslint-disable-next-line node/no-process-exit
           process.exit(1);
         }
       }
-      if (watch) {
-        redraw();
-      } else {
-        const allDone = [...statuses.values()].every(status => !status.isRunning);
-        if (allDone) {
-          const errors = [...statuses.values()].flatMap(v => v.errors);
-          const {
-            globalErrors
-          } = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_5__.groupAndSortErrors)(errors);
-          const noGlobalErrors = globalErrors.length === 0 && [...statuses.values()].every(status => status.compilationFailure === undefined);
-          redraw();
-          // eslint-disable-next-line node/no-process-exit
-          process.exit(noGlobalErrors ? 0 : 1);
-        }
-      }
+      onChange();
     });
     compiler.hooks.beforeRun.tap(name, () => handleStart(projectName));
     compiler.hooks.watchRun.tap(name, () => handleStart(projectName));

@@ -132,6 +132,6 @@ export async function generateWorkspace(
 
   // Run setup.js
   console.log('Running post install script');
-  const commands = [`cd ${dst}`, `node setup.js`];
+  const commands = [`cd ${dst}`, `node setup.js`, `git init`];
   execSync(commands.join(' && '), {stdio: ['ignore', 'inherit', 'inherit']});
 }

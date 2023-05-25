@@ -28,6 +28,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "cleanDir": () => (/* binding */ cleanDir),
 /* harmony export */   "cp": () => (/* binding */ cp),
 /* harmony export */   "exists": () => (/* binding */ exists),
+/* harmony export */   "listFiles": () => (/* binding */ listFiles),
 /* harmony export */   "maybeReadFile": () => (/* binding */ maybeReadFile),
 /* harmony export */   "readFile": () => (/* binding */ readFile),
 /* harmony export */   "readdir": () => (/* binding */ readdir),
@@ -117,6 +118,25 @@ async function maybeReadFile(path) {
   } catch {
     return undefined;
   }
+}
+async function listFiles(path) {
+  const files = [];
+  const ents = await readdir(path, {
+    withFileTypes: true
+  });
+  const promises = [];
+  for (const ent of ents) {
+    const entPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(path, ent.name);
+    if (ent.isDirectory()) {
+      promises.push(listFiles(entPath).then(subFiles => {
+        files.push(...subFiles);
+      }));
+    } else if (ent.isFile()) {
+      files.push(entPath);
+    }
+  }
+  await Promise.all(promises);
+  return files;
 }
 
 /***/ }),
@@ -361,7 +381,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
 
   // Run setup.js
   console.log('Running post install script');
-  const commands = [`cd ${dst}`, `node setup.js`];
+  const commands = [`cd ${dst}`, `node setup.js`, `git init`];
   (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '), {
     stdio: ['ignore', 'inherit', 'inherit']
   });
@@ -642,28 +662,49 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(14);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
 
 
 
 
 
-const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_2__.fileURLToPath)("file:///Users/matthis/git/b/src/project/generate_project.ts"), '../../../templates');
+
+const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_3__.fileURLToPath)("file:///Users/matthis/git/b/src/project/generate_project.ts"), '../../../templates');
 async function generateProject(dst, project) {
   const {
     projectName,
     type
   } = project;
   // Copy template files
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(TEMPLATES_PATH, type), dst);
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(TEMPLATES_PATH, type), dst);
+
+  // Replace name in package.json
+  const packageJsonPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'package.json');
+  const packageJsonbuffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(packageJsonPath);
+  const packageJson = JSON.parse(packageJsonbuffer.toString());
+  packageJson['name'] = projectName;
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)(packageJsonPath, packageJson);
+
+  // Replace variables
+  const files = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.listFiles)(dst);
+  await Promise.all(files.map(async file => {
+    const buffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(file);
+    const content = buffer.toString();
+    const newContent = content.replaceAll('{{PROJECT_NAME}}', projectName);
+    if (newContent !== content) {
+      await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.writeFile)(file, newContent);
+    }
+  }));
 
   // Post generation script for React Native project
-  if (_src_models__WEBPACK_IMPORTED_MODULE_4__.PROJECT_TYPE_TO_METADATA[type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_4__.RuntimeType.ReactNative) {
+  if (_src_models__WEBPACK_IMPORTED_MODULE_5__.PROJECT_TYPE_TO_METADATA[type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_5__.RuntimeType.ReactNative) {
     console.log('Running post install script');
     const commands = [`pushd ${dst}`, `npx --yes react-native init ${projectName}`, `mv ${projectName}/ios .`, `mv ${projectName}/android .`, `rm -rf ${projectName}`, `popd`];
     (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '));
@@ -692,6 +733,7 @@ build
 dist
 tmp
 yarn-error.log
+.yarn-warnings.log
 yarn.lock
 terraform/.terraform
 terraform/.terraform*
@@ -753,12 +795,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.0',
+  project: '1.3.5',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
-  webpack: '1.2.0',
-  runner: '1.1.0'
+  webpack: '1.2.3',
+  runner: '1.1.2'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';

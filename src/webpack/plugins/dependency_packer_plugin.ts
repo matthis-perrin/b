@@ -1,3 +1,4 @@
+import {exec} from 'node:child_process';
 import {writeFile} from 'node:fs/promises';
 
 import {Compiler} from 'webpack';
@@ -16,7 +17,7 @@ class DependencyPackerPlugin {
       resolver.hooks.result.tap(name, result => {
         if (
           result.descriptionFileRoot !== undefined &&
-          result.descriptionFileRoot === compiler.context
+          !result.descriptionFileRoot.includes('/node_modules/')
         ) {
           return result;
         }
@@ -108,8 +109,27 @@ class DependencyPackerPlugin {
           2
         )
       );
+
+      await yarnInstall(outputDirectory);
     });
   }
+}
+
+async function yarnInstall(path: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    exec(
+      `yarn install --non-interactive --ignore-optional --production`,
+      {cwd: path},
+      (error, stdout, stderr) => {
+        if (!error) {
+          resolve();
+        } else {
+          console.error(`Failure to run \`yarn install\` at "${path}"\n${stderr}`);
+          reject(new Error(stderr));
+        }
+      }
+    );
+  });
 }
 
 export function dependencyPackerPlugin(

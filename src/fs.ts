@@ -1,6 +1,6 @@
 import {exec} from 'node:child_process';
 import {promises} from 'node:fs';
-import {dirname} from 'node:path';
+import {dirname, join} from 'node:path';
 
 import {format} from 'prettier';
 
@@ -67,4 +67,24 @@ export async function maybeReadFile(path: string): Promise<string | undefined> {
   } catch {
     return undefined;
   }
+}
+
+export async function listFiles(path: string): Promise<string[]> {
+  const files: string[] = [];
+  const ents = await readdir(path, {withFileTypes: true});
+  const promises: Promise<void>[] = [];
+  for (const ent of ents) {
+    const entPath = join(path, ent.name);
+    if (ent.isDirectory()) {
+      promises.push(
+        listFiles(entPath).then(subFiles => {
+          files.push(...subFiles);
+        })
+      );
+    } else if (ent.isFile()) {
+      files.push(entPath);
+    }
+  }
+  await Promise.all(promises);
+  return files;
 }
