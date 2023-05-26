@@ -799,7 +799,7 @@ const PACKAGE_VERSIONS = {
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
-  webpack: '1.2.5',
+  webpack: '1.2.6',
   runner: '1.1.4'
 };
 const ESLINT_VERSION = '8.23.x';

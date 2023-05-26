@@ -6,7 +6,7 @@ import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
 import {terserPlugin} from '@src/webpack/plugins/terser_plugin';
 import {getTsConfigAlias} from '@src/webpack/plugins/ts_config_alias';
 import {YarnPlugin} from '@src/webpack/plugins/yarn_plugin';
-import {findPackageJson, isProd} from '@src/webpack/utils';
+import {isProd} from '@src/webpack/utils';
 
 export function baseConfig(opts: {context: string; watch: boolean}): Configuration {
   const {context} = opts;
@@ -30,37 +30,6 @@ export function baseConfig(opts: {context: string; watch: boolean}): Configurati
     optimization: {
       minimize: isProd(),
       minimizer: [terserPlugin()],
-    },
-    externals: (ctx, cb) => {
-      const {request, context, contextInfo, getResolve} = ctx;
-      if (request === undefined) {
-        return cb();
-      }
-      if (request.startsWith('node:')) {
-        return cb(undefined, `node-commonjs ${request}`);
-      }
-
-      const resolver = getResolve?.();
-      if (!resolver) {
-        return cb(new Error('No resolver when checking for externals'));
-      }
-      (resolver as (ctx: string, req: string) => Promise<string>)(context ?? '', request)
-        .then(res => {
-          if (!res.includes('/node_modules/')) {
-            return cb();
-          }
-          findPackageJson(res)
-            .then(packageJson => {
-              if (packageJson && packageJson['type'] === 'module') {
-                return cb(undefined, `module ${request}`);
-              }
-              cb(undefined, `node-commonjs ${request}`);
-            })
-            .catch(() => cb(undefined, `node-commonjs ${request}`));
-        })
-        .catch(() => {
-          cb(new Error(`Can't resolve '${request}' in '${contextInfo?.issuer}'`));
-        });
     },
     experiments: {
       backCompat: true,

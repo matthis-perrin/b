@@ -42,6 +42,7 @@ export function webpackDevServer(context: string): Configuration {
     port,
     client: {
       logging: 'none',
+      overlay: false,
     },
     onListening: () => log({event: 'start', port}),
   };

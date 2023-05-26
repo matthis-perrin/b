@@ -6,6 +6,7 @@ import {baseConfig} from '@src/webpack/configs/base_config';
 import {babelLoaderNode} from '@src/webpack/loaders/babel_loader_node';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {dependencyPackerPlugin} from '@src/webpack/plugins/dependency_packer_plugin';
+import {findPackageJson} from '@src/webpack/utils';
 
 export function nodeConfig(opts: {
   context: string;
@@ -33,7 +34,39 @@ export function nodeConfig(opts: {
       rules: [babelLoaderNode(), sourceMapLoader()],
     },
     plugins: [...(base.plugins ?? []), dependencyPackerPlugin(packageJsonProperties)],
+    externals: (ctx, cb) => {
+      const {request, context, contextInfo, getResolve} = ctx;
+      if (request === undefined) {
+        return cb();
+      }
+      if (request.startsWith('node:')) {
+        return cb(undefined, `node-commonjs ${request}`);
+      }
+
+      const resolver = getResolve?.();
+      if (!resolver) {
+        return cb(new Error('No resolver when checking for externals'));
+      }
+      (resolver as (ctx: string, req: string) => Promise<string>)(context ?? '', request)
+        .then(res => {
+          if (!res.includes('/node_modules/')) {
+            return cb();
+          }
+          findPackageJson(res)
+            .then(packageJson => {
+              if (packageJson && packageJson['type'] === 'module') {
+                return cb(undefined, `module ${request}`);
+              }
+              cb(undefined, `node-commonjs ${request}`);
+            })
+            .catch(() => cb(undefined, `node-commonjs ${request}`));
+        })
+        .catch(() => {
+          cb(new Error(`Can't resolve '${request}' in '${contextInfo?.issuer}'`));
+        });
+    },
     experiments: {
+      ...base.experiments,
       outputModule: true,
     },
   };

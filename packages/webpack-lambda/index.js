@@ -14,6 +14,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(24);
 /* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(29);
 /* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(31);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
+
 
 
 
@@ -54,7 +56,39 @@ function nodeConfig(opts) {
       rules: [(0,_src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__.babelLoaderNode)(), (0,_src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__.sourceMapLoader)()]
     },
     plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__.dependencyPackerPlugin)(packageJsonProperties)],
+    externals: (ctx, cb) => {
+      const {
+        request,
+        context,
+        contextInfo,
+        getResolve
+      } = ctx;
+      if (request === undefined) {
+        return cb();
+      }
+      if (request.startsWith('node:')) {
+        return cb(undefined, `node-commonjs ${request}`);
+      }
+      const resolver = getResolve === null || getResolve === void 0 ? void 0 : getResolve();
+      if (!resolver) {
+        return cb(new Error('No resolver when checking for externals'));
+      }
+      resolver(context ?? '', request).then(res => {
+        if (!res.includes('/node_modules/')) {
+          return cb();
+        }
+        (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__.findPackageJson)(res).then(packageJson => {
+          if (packageJson && packageJson['type'] === 'module') {
+            return cb(undefined, `module ${request}`);
+          }
+          cb(undefined, `node-commonjs ${request}`);
+        }).catch(() => cb(undefined, `node-commonjs ${request}`));
+      }).catch(() => {
+        cb(new Error(`Can't resolve '${request}' in '${contextInfo === null || contextInfo === void 0 ? void 0 : contextInfo.issuer}'`));
+      });
+    },
     experiments: {
+      ...base.experiments,
       outputModule: true
     }
   };
@@ -113,37 +147,6 @@ function baseConfig(opts) {
     optimization: {
       minimize: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.isProd)(),
       minimizer: [(0,_src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_3__.terserPlugin)()]
-    },
-    externals: (ctx, cb) => {
-      const {
-        request,
-        context,
-        contextInfo,
-        getResolve
-      } = ctx;
-      if (request === undefined) {
-        return cb();
-      }
-      if (request.startsWith('node:')) {
-        return cb(undefined, `node-commonjs ${request}`);
-      }
-      const resolver = getResolve === null || getResolve === void 0 ? void 0 : getResolve();
-      if (!resolver) {
-        return cb(new Error('No resolver when checking for externals'));
-      }
-      resolver(context ?? '', request).then(res => {
-        if (!res.includes('/node_modules/')) {
-          return cb();
-        }
-        (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.findPackageJson)(res).then(packageJson => {
-          if (packageJson && packageJson['type'] === 'module') {
-            return cb(undefined, `module ${request}`);
-          }
-          cb(undefined, `node-commonjs ${request}`);
-        }).catch(() => cb(undefined, `node-commonjs ${request}`));
-      }).catch(() => {
-        cb(new Error(`Can't resolve '${request}' in '${contextInfo === null || contextInfo === void 0 ? void 0 : contextInfo.issuer}'`));
-      });
     },
     experiments: {
       backCompat: true
