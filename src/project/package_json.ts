@@ -27,11 +27,12 @@ export function generateWorkspacePackageJson(
   return {
     name: workspaceName,
     license: 'UNLICENSED',
+    type: 'module',
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
-      build: 'node ./build.mjs',
-      watch: 'node ./build.mjs --watch',
+      build: 'node ./build.js',
+      watch: 'node ./build.js --watch',
     },
     eslintConfig: {
       ignorePatterns: ['**/*.js'],

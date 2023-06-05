@@ -3,9 +3,10 @@ import {basename, join} from 'node:path';
 
 import {prompt} from 'prompts';
 
-import {maybeReadFile, rmDir} from '@src/fs';
+import {rmDir} from '@src/fs';
 import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '@src/models';
 import {generateWorkspace, getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
+import {readProjectsFromWorkspace} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 
 async function cancel(workspacePath?: string): Promise<never> {
@@ -29,14 +30,10 @@ async function initProject(): Promise<void> {
   const alreadyGenerated: ProjectName[] = [];
 
   // Check if we are already in a workspace
-  const workspaceContent = await maybeReadFile(join(workspacePath, 'app.code-workspace'));
-  const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
-  const workspaceProjects = Array.isArray(workspaceJson.projects)
-    ? workspaceJson.projects
-    : undefined;
+  const workspaceProjects = await readProjectsFromWorkspace(workspacePath);
   if (workspaceProjects !== undefined) {
     workspaceName = basename(workspacePath);
-    for (const project of workspaceProjects as WorkspaceFragment[]) {
+    for (const project of workspaceProjects) {
       frags.push(project);
       const projectNames = getProjectsFromWorkspaceFragment(project).map(p => p.projectName);
       takenNames.push(...projectNames);

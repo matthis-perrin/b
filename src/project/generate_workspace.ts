@@ -109,9 +109,9 @@ export async function generateWorkspace(
     // setup.js
     await writeJsFile(join(dst, 'setup.js'), generateSetupScript(projectNames)),
     // deploy.js
-    await writeJsFile(join(dst, 'deploy.js'), generateDeployScript(workspaceFragments)),
+    await writeJsFile(join(dst, 'deploy.js'), generateDeployScript()),
     // build.js
-    await writeJsFile(join(dst, 'build.mjs'), generateBuildScript()),
+    await writeJsFile(join(dst, 'build.js'), generateBuildScript()),
   ]);
 
   // Terraform folder generation

@@ -2,8 +2,10 @@ import {ProjectName, WorkspaceName} from '@src/models';
 
 export function generateLambdaTerraform(
   workspaceName: WorkspaceName,
-  projectName: ProjectName
+  projectName: ProjectName,
+  opts: {api: boolean}
 ): string {
+  const {api} = opts;
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
@@ -13,14 +15,40 @@ data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
   }
 }
 
+resource "aws_s3_object" "${projectName}_archive" {
+  bucket       = aws_s3_bucket.code.id
+  key          = "${projectName}/dist.zip"
+  content_base64 = "UEsDBBQACAAIAGaKwlYAAAAAAAAAADYAAAAIACAAaW5kZXguanNVVA0AB3AIemRyCHpkcAh6ZHV4CwABBPUBAAAEFAAAAEutKMgvKinWy0jMS8lJLVKwVUgsrsxLVkgrzUsuyczPU9DQVKjmUlAoSi0pLcpTUFe35qq15gIAUEsHCP0ak1o4AAAANgAAAFBLAQIUAxQACAAIAGaKwlb9GpNaOAAAADYAAAAIACAAAAAAAAAAAACkgQAAAABpbmRleC5qc1VUDQAHcAh6ZHIIemRwCHpkdXgLAAEE9QEAAAQUAAAAUEsFBgAAAAABAAEAVgAAAI4AAAAAAA=="
+}
+
 resource "aws_lambda_function" "${projectName}" {
   function_name     = "${workspaceName}-${projectName}"
-  s3_bucket         = aws_s3_bucket.code.id
-  s3_key            = aws_s3_bucket_object.${projectName}_archive.id
-  source_code_hash  = data.archive_file.${projectName}_archive.output_sha
+  s3_bucket         = aws_s3_object.${projectName}_archive.bucket
+  s3_key            = aws_s3_object.${projectName}_archive.key
   handler           = "index.handler"
   runtime           = "nodejs14.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
+}
+
+output "${projectName}_function_name" {
+  value       = aws_lambda_function.${projectName}.function_name
+  description = "Function name of the \\"${workspaceName}-${projectName}\\" lambda"
+}
+
+${
+  api
+    ? `
+resource "aws_lambda_function_url" "${projectName}" {
+  function_name      = aws_lambda_function.${projectName}.function_name
+  authorization_type = "NONE"
+}
+
+output "${projectName}_function_url" {
+  value       = aws_lambda_function_url.${projectName}.function_url
+  description = "Function url of the \\"${workspaceName}-${projectName}\\" lambda"
+}
+`.trim()
+    : ''
 }
 
 resource "aws_iam_role" "${projectName}_lambda_exec" {

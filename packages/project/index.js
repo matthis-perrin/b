@@ -288,13 +288,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8);
 /* harmony import */ var _src_project_build_script__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(10);
 /* harmony import */ var _src_project_deploy_script__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(11);
-/* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(13);
-/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(15);
-/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(16);
-/* harmony import */ var _src_project_setup_script__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(18);
-/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(19);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(26);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(12);
+/* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(12);
+/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(14);
+/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(15);
+/* harmony import */ var _src_project_setup_script__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(17);
+/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(18);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(24);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(23);
 
 
 
@@ -364,9 +364,9 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
   // setup.js
   await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'setup.js'), (0,_src_project_setup_script__WEBPACK_IMPORTED_MODULE_9__.generateSetupScript)(projectNames)),
   // deploy.js
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'deploy.js'), (0,_src_project_deploy_script__WEBPACK_IMPORTED_MODULE_5__.generateDeployScript)(workspaceFragments)),
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'deploy.js'), (0,_src_project_deploy_script__WEBPACK_IMPORTED_MODULE_5__.generateDeployScript)()),
   // build.js
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'build.mjs'), (0,_src_project_build_script__WEBPACK_IMPORTED_MODULE_4__.generateBuildScript)())]);
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'build.js'), (0,_src_project_build_script__WEBPACK_IMPORTED_MODULE_4__.generateBuildScript)())]);
 
   // Terraform folder generation
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'terraform');
@@ -410,250 +410,91 @@ runAllWebpacks({root: resolve('.'), watch: process.argv.includes('--watch')}).ca
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateBuildNodeLibProjectFn": () => (/* binding */ generateBuildNodeLibProjectFn),
-/* harmony export */   "generateBuildNodeScriptProjectFn": () => (/* binding */ generateBuildNodeScriptProjectFn),
-/* harmony export */   "generateBuildSharedProjectFn": () => (/* binding */ generateBuildSharedProjectFn),
-/* harmony export */   "generateBuildStandaloneLambdaProjectFn": () => (/* binding */ generateBuildStandaloneLambdaProjectFn),
-/* harmony export */   "generateBuildStaticWebsiteProjectFn": () => (/* binding */ generateBuildStaticWebsiteProjectFn),
-/* harmony export */   "generateBuildWebAppProjectFn": () => (/* binding */ generateBuildWebAppProjectFn),
-/* harmony export */   "generateBuildWorkspaceFn": () => (/* binding */ generateBuildWorkspaceFn),
 /* harmony export */   "generateDeployScript": () => (/* binding */ generateDeployScript)
 /* harmony export */ });
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(12);
-
-
-
-function generateDeployScript(workspaceFragments) {
-  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_1__.getProjectsFromWorkspaceFragment);
+function generateDeployScript() {
   return `
-const path = require('path');
-const child_process = require('child_process');
-const fs = require('fs');
+import {execSync} from 'child_process';
+import {randomUUID} from 'crypto';
+import {accessSync, readFileSync} from 'fs';
+import {tmpdir} from 'os';
+import {join} from 'path';
 
-const terraformPath = path.join(process.cwd(), 'terraform');
+const terraformPath = join(process.cwd(), 'terraform');
 
 function runCommand(opts) {
   const {command, cwd, env} = opts;
   console.log('-----------------------------------------');
   console.log(\`Running: \\\`\${command}\\\`\`);
   console.log('-----------------------------------------');
-  child_process.execSync(command, {cwd, env, stdio: 'inherit'});
-}
-
-function ensureDistFolders(projects) {
-  for (const {dist, isLambda} of projects) {
-    try {
-      fs.accessSync(dist);
-    } catch {
-      fs.mkdirSync(dist);
-    }
-    if (isLambda) {
-      const files = fs.readdirSync(dist);
-      if (files.length === 0) {
-        fs.writeFileSync(
-          path.join(dist, 'index.js'),
-          \`exports.handler = async function() {return ''};\`
-        );
-      }
-    }
-  }
+  execSync(command, {cwd, env, stdio: 'inherit'});
 }
 
 function checkTerraformCredentials() {
-  const credentialsPath = path.join(terraformPath, '.aws-credentials');
+  const credentialsPath = join(terraformPath, '.aws-credentials');
   try {
-    fs.accessSync(credentialsPath);
+    accessSync(credentialsPath);
   } catch {
-    throw new Error(\`Missing AWS credential files at "\${credentialsPath}"\\nTo use your current credentials with this project run:\\ncp ~/.aws/credentials \${credentialsPath}\`);
+    throw new Error(
+      \`Missing AWS credential files at "\${credentialsPath}"\nTo use your current credentials with this project run:\ncp ~/.aws/credentials \${credentialsPath}\`
+    );
   }
 }
 
 function terraformOutputs() {
-  return JSON.parse(child_process.execSync(\`terraform output -json\`, {cwd: terraformPath}).toString());
+  const res = JSON.parse(execSync(\`terraform output -json\`, {cwd: terraformPath}).toString());
+  return Object.fromEntries(Object.entries(res).map(([key, obj]) => [key, obj.value]));
 }
 
-${projects.flatMap(p => [`    const ${p.projectName}Path = path.join(process.cwd(), '${p.projectName}');`, `    const ${p.projectName}Dist = path.join(${p.projectName}Path, 'dist');`]).join('\n')}
-
-${generateBuildWorkspaceFn(workspaceFragments)}
+function getProjects() {
+  const projects = JSON.parse(readFileSync('app.code-workspace').toString()).projects;
+  if (!Array.isArray(projects)) {
+    throw new Error('No projects in the workspace');
+  }
+  return projects;
+}
 
 async function run() {
-  // Initialize if needed and get terraform outputs
-  ensureDistFolders([
-${projects.map(p => {
-    const isLambda = _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_0__.RuntimeType.Lambda;
-    return `    {dist: ${p.projectName}Dist${isLambda ? ', isLambda: true' : ''}},`;
-  }).join('\n')}
-  ]);
+  // Build
+  runCommand({command: \`yarn build\`});
+
+  // Get terraform outputs
   let outputs = terraformOutputs();
   if (Object.keys(outputs).length === 0) {
     checkTerraformCredentials();
-    runCommand({command: \`terraform init\`, cwd: terraformPath});
-    runCommand({command: \`terraform apply -auto-approve\`, cwd: terraformPath});
     outputs = terraformOutputs();
   }
+  const {region, code_bucket} = outputs;
+  console.log(outputs);
 
-  // Build the projects
-  await buildWorkspace(outputs);
-
-  // Terraform
-  runCommand({command: \`terraform apply -auto-approve\`, cwd: terraformPath});
-  console.log('Done');
+  // Deploy each projects
+  const projects = getProjects();
+  const lambdaProjects = projects.map(p => p.lambdaName).filter(Boolean);
+  for (const lambdaName of lambdaProjects) {
+    const tmp = tmpdir();
+    const zipPath = join(tmp, randomUUID()) + '.zip';
+    runCommand({command: \`zip -j -r \${zipPath} \${lambdaName}/dist/*\`});
+    runCommand({
+      command: \`AWS_CONFIG_FILE=terraform/.aws-credentials aws s3 cp \${zipPath} s3://\${code_bucket}/\${lambdaName}/dist.zip\`,
+    });
+    runCommand({
+      command: \`AWS_CONFIG_FILE=terraform/.aws-credentials aws lambda update-function-code --function-name \${
+        outputs[\`\${lambdaName}_function_name\`]
+      } --s3-bucket \${code_bucket} --s3-key \${lambdaName}/dist.zip --region \${region} --publish --no-cli-pager\`,
+    });
+  }
 }
 
-run()
-  .catch(err => console.error(err))
-  .catch(() => process.exit(13));  
-  `.trim();
-}
-function generateBuildWorkspaceFn(fragments) {
-  const buildFunctions = fragments.map(fragment => {
-    const {
-      type
-    } = fragment;
-    if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.WebApp) {
-      return generateBuildWebAppProjectFn(fragment);
-    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.StaticWebsite) {
-      return generateBuildStaticWebsiteProjectFn(fragment);
-    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.StandaloneLambda) {
-      return generateBuildStandaloneLambdaProjectFn(fragment);
-    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.NodeLib) {
-      return generateBuildNodeLibProjectFn(fragment);
-    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.NodeScript) {
-      return generateBuildNodeScriptProjectFn(fragment);
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.Shared) {
-      return generateBuildSharedProjectFn();
-    }
-    return (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_2__.neverHappens)(type, `Unknown WorkspaceFragmentType "${type}"`);
-  });
-  return [...buildFunctions.map(fn => fn.sourceCode), `
-async function buildWorkspace(outputs) {
-  await Promise.all([${buildFunctions.map(fn => `${fn.name}(outputs)`).join(', ')}]);
-}
-  `.trim()].join('\n\n').trim();
-}
-function generateBuildWebAppProjectFn(fragment) {
-  const functionName = `buildWebApp_${fragment.websiteName}`;
-  return {
-    sourceCode: `
-async function ${functionName}(outputs) {
-  // Build the "${fragment.websiteName}" frontend
-  runCommand({
-    command: \`yarn build\`,
-    cwd: ${fragment.websiteName}Path,
-    env: {...process.env, PUBLIC_PATH: \`https://\${outputs.${fragment.websiteName}_cloudfront_domain_name.value}\`},
-  });
-  const INDEX_HTML = fs.readFileSync(path.join(${fragment.websiteName}Dist, 'index.html')).toString();
-
-  // Build the "${fragment.lambdaName}" backend
-  runCommand({command: 'rm -rf dist', cwd: ${fragment.lambdaName}Path});
-  runCommand({
-    command: \`yarn build\`,
-    cwd: ${fragment.lambdaName}Path,
-    env: {...process.env, MATTHIS_INDEX_HTML: JSON.stringify(INDEX_HTML)},
-  });
-  runCommand({
-    command: \`yarn install --modules-folder dist/node_modules --production --no-bin-links\`,
-    cwd: ${fragment.lambdaName}Path,
-  });
-}
-`,
-    name: functionName
-  };
-}
-function generateBuildStaticWebsiteProjectFn(fragment) {
-  const functionName = `buildStaticWebsite_${fragment.websiteName}`;
-  return {
-    sourceCode: `
-async function ${functionName}(outputs) {
-  runCommand({
-    command: \`yarn build\`,
-    cwd: ${fragment.websiteName}Path,
-    env: {...process.env, PUBLIC_PATH: \`https://\${outputs.${fragment.websiteName}_cloudfront_domain_name.value}\`},
-  });
-}
-`,
-    name: functionName
-  };
-}
-function generateBuildStandaloneLambdaProjectFn(fragment) {
-  const functionName = `buildStandaloneLambda_${fragment.lambdaName}`;
-  return {
-    sourceCode: `
-async function ${functionName}(outputs) {
-  runCommand({command: 'rm -rf dist', cwd: ${fragment.lambdaName}Path});
-  runCommand({
-    command: \`yarn build\`,
-    cwd: ${fragment.lambdaName}Path,
-  });
-  runCommand({
-    command: \`yarn install --modules-folder dist/node_modules --production --no-bin-links\`,
-    cwd: ${fragment.lambdaName}Path,
-  });
-}
-`,
-    name: functionName
-  };
-}
-function generateBuildNodeLibProjectFn(fragment) {
-  const functionName = `buildNodeLib_${fragment.libName}`;
-  return {
-    sourceCode: `
-async function ${functionName}(outputs) {
-  runCommand({
-    command: \`yarn build\`,
-    cwd: ${fragment.libName}Path,
-  });
-}
-`,
-    name: functionName
-  };
-}
-function generateBuildNodeScriptProjectFn(fragment) {
-  const functionName = `buildNodeScript_${fragment.scriptName}`;
-  return {
-    sourceCode: `
-async function ${functionName}(outputs) {
-  runCommand({
-    command: \`yarn build\`,
-    cwd: ${fragment.scriptName}Path,
-  });
-}
-`,
-    name: functionName
-  };
-}
-function generateBuildSharedProjectFn() {
-  const functionName = `buildShared`;
-  return {
-    sourceCode: `
-async function ${functionName}(outputs) {
-  runCommand({
-    command: \`yarn build\`,
-    cwd: sharedPath,
-  });
-}
-`,
-    name: functionName
-  };
+run().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
+  
+`.trim();
 }
 
 /***/ }),
 /* 12 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "neverHappens": () => (/* binding */ neverHappens)
-/* harmony export */ });
-function neverHappens(value, msg) {
-  throw new Error(msg ?? `Unexpected value ${value}`);
-}
-
-/***/ }),
-/* 13 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -666,7 +507,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
@@ -712,13 +553,13 @@ async function generateProject(dst, project) {
 }
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -745,7 +586,7 @@ terraform/archives
 }
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -753,7 +594,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "generateWorkspacePackageJson": () => (/* binding */ generateWorkspacePackageJson)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(17);
+/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(16);
 
 
 function uniq(runtimes) {
@@ -769,11 +610,12 @@ function generateWorkspacePackageJson(workspaceName, projects) {
   return {
     name: workspaceName,
     license: 'UNLICENSED',
+    type: 'module',
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
-      build: 'node ./build.mjs',
-      watch: 'node ./build.mjs --watch'
+      build: 'node ./build.js',
+      watch: 'node ./build.js --watch'
     },
     eslintConfig: {
       ignorePatterns: ['**/*.js']
@@ -783,7 +625,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
 }
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -795,12 +637,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.7',
+  project: '1.3.8',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
   webpack: '1.2.6',
-  runner: '1.1.4'
+  runner: '1.1.5'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
@@ -822,7 +664,7 @@ const LIB_VERSIONS = {
 /* eslint-enable @typescript-eslint/naming-convention */
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -831,8 +673,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 function generateSetupScript(projects) {
   return `
-const path = require('path');
-const {execSync, exec} = require('child_process');
+import {join} from 'path';
+import {execSync, exec} from 'child_process';
 
 //
 
@@ -887,7 +729,7 @@ async function installNodeModulesAtPath(path) {
 async function installNodeModules() {
   await Promise.all([
     installNodeModulesAtPath(process.cwd()),
-    ${projects.map(p => `installNodeModulesAtPath(path.join(process.cwd(), '${p}')),`).join('\n')}
+    ${projects.map(p => `installNodeModulesAtPath(join(process.cwd(), '${p}')),`).join('\n')}
   ])
   }
 
@@ -911,27 +753,20 @@ run()
 }
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "generateCommonTerraform": () => (/* binding */ generateCommonTerraform),
-/* harmony export */   "generateLambdaApiTerraform": () => (/* binding */ generateLambdaApiTerraform),
-/* harmony export */   "generateLambdaFunctionTerraform": () => (/* binding */ generateLambdaFunctionTerraform),
-/* harmony export */   "generateWebTerraform": () => (/* binding */ generateWebTerraform),
 /* harmony export */   "generateWorkspaceProjectTerraform": () => (/* binding */ generateWorkspaceProjectTerraform)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var _src_project_terraform_api_gateway__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(20);
-/* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(21);
-/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(22);
-/* harmony import */ var _src_project_terraform_output__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(23);
-/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(24);
-/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(25);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(12);
-
-
+/* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(19);
+/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(20);
+/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(21);
+/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(22);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(23);
 
 
 
@@ -939,7 +774,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function generateCommonTerraform(workspaceName, projects) {
-  return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_5__.generateAwsProviderTerraform)(workspaceName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_6__.generateS3BucketTerraform)(workspaceName, projects.filter(p => _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_0__.RuntimeType.Web).map(p => p.projectName))].join('\n\n');
+  return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__.generateAwsProviderTerraform)(workspaceName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__.generateS3BucketTerraform)(workspaceName, projects.filter(p => _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_0__.RuntimeType.Web).map(p => p.projectName))].join('\n\n');
 }
 function generateWorkspaceProjectTerraform(workspaceName, project) {
   const {
@@ -947,11 +782,15 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
     type
   } = project;
   if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web) {
-    return generateWebTerraform(workspaceName, projectName);
+    return (0,_src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__.generateCloudfrontDistributionTerraform)(workspaceName, projectName);
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaFunction) {
-    return generateLambdaFunctionTerraform(workspaceName, projectName);
+    return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
+      api: false
+    });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaApi) {
-    return generateLambdaApiTerraform(workspaceName, projectName);
+    return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
+      api: true
+    });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeLib) {
     return undefined;
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
@@ -960,102 +799,11 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Shared) {
     return undefined;
   }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_7__.neverHappens)(type, 'ProjectType');
-}
-function generateWebTerraform(workspaceName, projectName) {
-  return [(0,_src_project_terraform_output__WEBPACK_IMPORTED_MODULE_4__.generateCloudfrontDomainNameOutputTerraform)(workspaceName, projectName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_6__.generateWebFileUploadTerraform)(workspaceName, projectName), (0,_src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_2__.generateCloudfrontDistributionTerraform)(workspaceName, projectName)].join('\n\n');
-}
-function generateLambdaFunctionTerraform(workspaceName, projectName) {
-  return [(0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_3__.generateLambdaTerraform)(workspaceName, projectName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_6__.generateLambdaFileUploadTerraform)(workspaceName, projectName)].join('\n\n');
-}
-function generateLambdaApiTerraform(workspaceName, projectName) {
-  return [generateLambdaFunctionTerraform(workspaceName, projectName), (0,_src_project_terraform_output__WEBPACK_IMPORTED_MODULE_4__.generateLambdaApiOutputsTerraform)(workspaceName, projectName), (0,_src_project_terraform_api_gateway__WEBPACK_IMPORTED_MODULE_1__.generateApiGatewayTerraform)(workspaceName, projectName)].join('\n\n');
+  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_5__.neverHappens)(type, 'ProjectType');
 }
 
 /***/ }),
-/* 20 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateApiGatewayTerraform": () => (/* binding */ generateApiGatewayTerraform)
-/* harmony export */ });
-function generateApiGatewayTerraform(workspaceName, projectName) {
-  return `
-resource "aws_api_gateway_rest_api" "${projectName}" {
-  name        = "${workspaceName}-${projectName}-RestAPI"
-  description = "Rest API for the \\"${workspaceName}-${projectName}\\" app"
-}
-
-resource "aws_api_gateway_resource" "${projectName}" {
-  rest_api_id = aws_api_gateway_rest_api.${projectName}.id
-  parent_id   = aws_api_gateway_rest_api.${projectName}.root_resource_id
-  path_part   = "{proxy+}"
-}
-  
-resource "aws_api_gateway_method" "${projectName}" {
-  rest_api_id   = aws_api_gateway_rest_api.${projectName}.id
-  resource_id   = aws_api_gateway_resource.${projectName}.id
-  http_method   = "ANY"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method" "${projectName}_root" {
-    rest_api_id   = aws_api_gateway_rest_api.${projectName}.id
-    resource_id   = aws_api_gateway_rest_api.${projectName}.root_resource_id
-    http_method   = "ANY"
-    authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "${projectName}" {
-  rest_api_id = aws_api_gateway_rest_api.${projectName}.id
-  resource_id = aws_api_gateway_method.${projectName}.resource_id
-  http_method = aws_api_gateway_method.${projectName}.http_method
-  
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.${projectName}.invoke_arn
-}
-
-resource "aws_api_gateway_integration" "${projectName}_root" {
-  rest_api_id = aws_api_gateway_rest_api.${projectName}.id
-  resource_id = aws_api_gateway_method.${projectName}_root.resource_id
-  http_method = aws_api_gateway_method.${projectName}_root.http_method
-
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.${projectName}.invoke_arn
-}
-
-resource "aws_api_gateway_deployment" "${projectName}" {
-  depends_on = [
-    aws_api_gateway_integration.${projectName},
-    aws_api_gateway_integration.${projectName}_root,
-  ]
-  rest_api_id = aws_api_gateway_rest_api.${projectName}.id
-  stage_name  = "prod"
-
-  triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_integration.${projectName}))
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_lambda_permission" "${projectName}" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.${projectName}.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "\${aws_api_gateway_rest_api.${projectName}.execution_arn}/*/*"
-}      
-`.trim();
-}
-
-/***/ }),
-/* 21 */
+/* 19 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1130,14 +878,17 @@ resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
 }
 
 /***/ }),
-/* 22 */
+/* 20 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "generateLambdaTerraform": () => (/* binding */ generateLambdaTerraform)
 /* harmony export */ });
-function generateLambdaTerraform(workspaceName, projectName) {
+function generateLambdaTerraform(workspaceName, projectName, opts) {
+  const {
+    api
+  } = opts;
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
@@ -1147,15 +898,37 @@ data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
   }
 }
 
+resource "aws_s3_object" "${projectName}_archive" {
+  bucket       = aws_s3_bucket.code.id
+  key          = "${projectName}/dist.zip"
+  content_base64 = "UEsDBBQACAAIAGaKwlYAAAAAAAAAADYAAAAIACAAaW5kZXguanNVVA0AB3AIemRyCHpkcAh6ZHV4CwABBPUBAAAEFAAAAEutKMgvKinWy0jMS8lJLVKwVUgsrsxLVkgrzUsuyczPU9DQVKjmUlAoSi0pLcpTUFe35qq15gIAUEsHCP0ak1o4AAAANgAAAFBLAQIUAxQACAAIAGaKwlb9GpNaOAAAADYAAAAIACAAAAAAAAAAAACkgQAAAABpbmRleC5qc1VUDQAHcAh6ZHIIemRwCHpkdXgLAAEE9QEAAAQUAAAAUEsFBgAAAAABAAEAVgAAAI4AAAAAAA=="
+}
+
 resource "aws_lambda_function" "${projectName}" {
   function_name     = "${workspaceName}-${projectName}"
-  s3_bucket         = aws_s3_bucket.code.id
-  s3_key            = aws_s3_bucket_object.${projectName}_archive.id
-  source_code_hash  = data.archive_file.${projectName}_archive.output_sha
+  s3_bucket         = aws_s3_object.${projectName}_archive.bucket
+  s3_key            = aws_s3_object.${projectName}_archive.key
   handler           = "index.handler"
   runtime           = "nodejs14.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
 }
+
+output "${projectName}_function_name" {
+  value       = aws_lambda_function.${projectName}.function_name
+  description = "Function name of the \\"${workspaceName}-${projectName}\\" lambda"
+}
+
+${api ? `
+resource "aws_lambda_function_url" "${projectName}" {
+  function_name      = aws_lambda_function.${projectName}.function_name
+  authorization_type = "NONE"
+}
+
+output "${projectName}_function_url" {
+  value       = aws_lambda_function_url.${projectName}.function_url
+  description = "Function url of the \\"${workspaceName}-${projectName}\\" lambda"
+}
+`.trim() : ''}
 
 resource "aws_iam_role" "${projectName}_lambda_exec" {
   name = "${workspaceName}-${projectName}-assume-role"
@@ -1200,31 +973,7 @@ resource "aws_iam_role" "${projectName}_lambda_exec" {
 }
 
 /***/ }),
-/* 23 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateCloudfrontDomainNameOutputTerraform": () => (/* binding */ generateCloudfrontDomainNameOutputTerraform),
-/* harmony export */   "generateLambdaApiOutputsTerraform": () => (/* binding */ generateLambdaApiOutputsTerraform)
-/* harmony export */ });
-function generateCloudfrontDomainNameOutputTerraform(workspaceName, projectName) {
-  return `
-output "${projectName}_cloudfront_domain_name" {
-  value       = aws_cloudfront_distribution.${projectName}.domain_name
-  description = "Domain (from cloudfront) where the \\"${workspaceName}-${projectName}\\" frontend is available."
-}`.trim();
-}
-function generateLambdaApiOutputsTerraform(workspaceName, projectName) {
-  return `
-output "${projectName}_api_url" {
-  value = aws_api_gateway_deployment.${projectName}.invoke_url
-  description = "URL where the \\"${workspaceName}-${projectName}\\" lambda api can be called."
-}`.trim();
-}
-
-/***/ }),
-/* 24 */
+/* 21 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1237,65 +986,67 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.0"
+      version = "~> 5.1"
     }
   }
 }
 
 provider "aws" {
   region  = "eu-west-3"
-  shared_credentials_file = "./.aws-credentials"
+  shared_credentials_files = ["./.aws-credentials"]
   default_tags {
     tags = {
       Project = "${workspaceName}"
     }
   }
 }
+
+data "aws_region" "current" {}
+output "region" {
+  value = data.aws_region.current.id
+}
 `.trim();
 }
 
 /***/ }),
-/* 25 */
+/* 22 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateLambdaFileUploadTerraform": () => (/* binding */ generateLambdaFileUploadTerraform),
-/* harmony export */   "generateS3BucketTerraform": () => (/* binding */ generateS3BucketTerraform),
-/* harmony export */   "generateWebFileUploadTerraform": () => (/* binding */ generateWebFileUploadTerraform)
+/* harmony export */   "generateS3BucketTerraform": () => (/* binding */ generateS3BucketTerraform)
 /* harmony export */ });
 function generateS3BucketTerraform(workspaceName, webProjectNames) {
   const bucketName = workspaceName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
   const CODE_BUCKET = `
-  resource "aws_s3_bucket" "code" {
-    bucket_prefix = "${bucketName}-"
-  }
-  
-  resource "aws_s3_bucket_acl" "code_bucket_acl" {
-    bucket = aws_s3_bucket.code.id
-    acl    = "private"
-  }
+resource "aws_s3_bucket" "code" {
+  bucket_prefix = "${bucketName}-"
+}
+
+output "code_bucket" {
+  value = aws_s3_bucket.code.id
+}
 `.trim();
   const CLOUDFRONT_ACCESS = `
-  data "aws_iam_policy_document" "cloudfront_access_to_code" {
-    ${webProjectNames.map(p => `
-    statement {
-      actions   = ["s3:GetObject"]
-      resources = [
-        "\${aws_s3_bucket.code.arn}/${p}/*",
-      ]
-      principals {
-        type        = "AWS"
-        identifiers = [aws_cloudfront_origin_access_identity.${p}.iam_arn]
-      }
+data "aws_iam_policy_document" "cloudfront_access_to_code" {
+  ${webProjectNames.map(p => `
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = [
+      "\${aws_s3_bucket.code.arn}/${p}/*",
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.${p}.iam_arn]
     }
-  `.trim()).join('\n\n')}
   }
+`.trim()).join('\n\n')}
+}
 
-  resource "aws_s3_bucket_policy" "code" {
-    bucket = aws_s3_bucket.code.id
-    policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
-  }
+resource "aws_s3_bucket_policy" "code" {
+  bucket = aws_s3_bucket.code.id
+  policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
+}
 `.trim();
   const out = [CODE_BUCKET];
   if (webProjectNames.length > 0) {
@@ -1303,53 +1054,37 @@ function generateS3BucketTerraform(workspaceName, webProjectNames) {
   }
   return out.join('\n\n');
 }
-function generateWebFileUploadTerraform(workspaceName, projectName) {
-  return `
-module "${projectName}_template_files" {
-  source = "hashicorp/dir/template"
-  base_dir = "../${projectName}/dist"
-}
-
-resource "aws_s3_bucket_object" "${projectName}_files" {
-  for_each     = module.${projectName}_template_files.files
-  bucket       = aws_s3_bucket.code.id
-  key          = "${projectName}/\${each.key}"
-  content_type = each.value.content_type
-  source       = each.value.source_path
-  content      = each.value.content
-  etag         = each.value.digests.md5
-}
-`.trim();
-}
-function generateLambdaFileUploadTerraform(workspaceName, projectName) {
-  return `
-data "archive_file" "${projectName}_archive" {
-  type        = "zip"
-  source_dir  = "../${projectName}/dist"
-  output_path = "./archives/${projectName}.zip"
-}
-
-resource "aws_s3_bucket_object" "${projectName}_archive" {
-  bucket       = aws_s3_bucket.code.id
-  key          = "${projectName}/dist.zip"
-  source       = data.archive_file.${projectName}_archive.output_path
-  etag         = data.archive_file.${projectName}_archive.output_sha
-}
-`.trim();
-}
 
 /***/ }),
-/* 26 */
+/* 23 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateCodeWorkspace": () => (/* binding */ generateCodeWorkspace)
+/* harmony export */   "neverHappens": () => (/* binding */ neverHappens)
 /* harmony export */ });
-/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+function neverHappens(value, msg) {
+  throw new Error(msg ?? `Unexpected value ${value}`);
+}
+
+/***/ }),
+/* 24 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "generateCodeWorkspace": () => (/* binding */ generateCodeWorkspace),
+/* harmony export */   "readProjectsFromWorkspace": () => (/* binding */ readProjectsFromWorkspace)
+/* harmony export */ });
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
+/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9);
+
+
 
 function generateCodeWorkspace(workspaceFragments) {
-  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_0__.getProjectsFromWorkspaceFragment);
+  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__.getProjectsFromWorkspaceFragment);
   const projectNames = projects.map(p => p.projectName);
   return {
     projects: workspaceFragments,
@@ -1390,6 +1125,12 @@ function generateCodeWorkspace(workspaceFragments) {
       recommendations: ['dbaeumer.vscode-eslint', 'esbenp.prettier-vscode', 'VisualStudioExptTeam.vscodeintellicode', 'styled-components.vscode-styled-components', 'naumovs.color-highlight', 'eamodio.gitlens']
     }
   };
+}
+async function readProjectsFromWorkspace(workspacePath) {
+  const workspaceContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_1__.maybeReadFile)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(workspacePath, 'app.code-workspace'));
+  const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
+  const workspaceProjects = Array.isArray(workspaceJson.projects) ? workspaceJson.projects : undefined;
+  return workspaceProjects;
 }
 
 /***/ })
@@ -1474,7 +1215,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(12);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(24);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(23);
+
 
 
 
@@ -1500,9 +1243,7 @@ async function initProject() {
   const alreadyGenerated = [];
 
   // Check if we are already in a workspace
-  const workspaceContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.maybeReadFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(workspacePath, 'app.code-workspace'));
-  const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
-  const workspaceProjects = Array.isArray(workspaceJson.projects) ? workspaceJson.projects : undefined;
+  const workspaceProjects = await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__.readProjectsFromWorkspace)(workspacePath);
   if (workspaceProjects !== undefined) {
     workspaceName = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.basename)(workspacePath);
     for (const project of workspaceProjects) {
@@ -1611,7 +1352,7 @@ async function askForWorkspaceFragment(takenNames) {
       scriptName
     };
   }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.neverHappens)(type, `Unknown WorkspaceFragmentType "${type}"`);
+  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_7__.neverHappens)(type, `Unknown WorkspaceFragmentType "${type}"`);
 }
 const VALID_PROJECT_NAME = /^[a-zA-Z0-9_]+$/u;
 async function askForProjectName(question, defaultValue, takenNames) {

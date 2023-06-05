@@ -2,8 +2,8 @@ import {ProjectName} from '@src/models';
 
 export function generateSetupScript(projects: ProjectName[]): string {
   return `
-const path = require('path');
-const {execSync, exec} = require('child_process');
+import {join} from 'path';
+import {execSync, exec} from 'child_process';
 
 //
 
@@ -58,7 +58,7 @@ async function installNodeModulesAtPath(path) {
 async function installNodeModules() {
   await Promise.all([
     installNodeModulesAtPath(process.cwd()),
-    ${projects.map(p => `installNodeModulesAtPath(path.join(process.cwd(), '${p}')),`).join('\n')}
+    ${projects.map(p => `installNodeModulesAtPath(join(process.cwd(), '${p}')),`).join('\n')}
   ])
   }
 

@@ -1,5 +1,6 @@
-import {bgRed, bgYellow, gray, green, red} from 'ansi-colors';
+import {bgRed, bgYellow, cyan, gray, green, red} from 'ansi-colors';
 
+import {WorkspaceProject} from '@src/project/generate_workspace';
 import {neverHappens} from '@src/type_utils';
 import {LambdaServerEvent} from '@src/webpack/plugins/lambda_server_plugin';
 import {WebpackDevServerEvent} from '@src/webpack/plugins/webpack_dev_server';
@@ -16,8 +17,8 @@ export function renderErrors(errors: GroupedErrors): string {
     blocks.push(formatError(globalError));
   }
 
-  for (const [project, projectErrors] of errorsByProjectByFile.entries()) {
-    blocks.push(formatProject(project));
+  for (const [projectName, projectErrors] of errorsByProjectByFile.entries()) {
+    blocks.push(cyan(projectName));
     for (const [file, errors] of projectErrors.entries()) {
       blocks.push([formatFilePath(file), ...errors.map(err => formatError(err))].join('\n'));
     }
@@ -27,7 +28,7 @@ export function renderErrors(errors: GroupedErrors): string {
 }
 
 export function renderProjectStatus(
-  name: string,
+  project: WorkspaceProject,
   firstRun: boolean,
   isRunning: boolean,
   errors: GroupedErrors,
@@ -36,11 +37,11 @@ export function renderProjectStatus(
   webpackDevServerEvents: WebpackDevServerEvents
 ): string[] {
   // First column
-  const column1 = formatProject(name);
+  const column1 = formatProject(project);
 
   // Second column
   let column2 = '';
-  const projectErrors = errors.errorsByProjectByFile.get(name);
+  const projectErrors = errors.errorsByProjectByFile.get(project.projectName);
   if (projectErrors) {
     column2 = renderErrorWarningCount([...projectErrors.values()].flat());
   } else if (!firstRun) {

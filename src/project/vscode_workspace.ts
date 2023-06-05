@@ -1,3 +1,6 @@
+import {join} from 'node:path';
+
+import {maybeReadFile} from '@src/fs';
 import {WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
 
@@ -51,4 +54,15 @@ export function generateCodeWorkspace(
       ],
     },
   };
+}
+
+export async function readProjectsFromWorkspace(
+  workspacePath: string
+): Promise<WorkspaceFragment[] | undefined> {
+  const workspaceContent = await maybeReadFile(join(workspacePath, 'app.code-workspace'));
+  const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
+  const workspaceProjects = Array.isArray(workspaceJson.projects)
+    ? workspaceJson.projects
+    : undefined;
+  return workspaceProjects as WorkspaceFragment[] | undefined;
 }

@@ -1,11 +1,12 @@
-import {readdir} from 'node:fs/promises';
-import {join, relative} from 'node:path';
+import {join} from 'node:path';
 
 import {underline} from 'ansi-colors';
 import {Configuration, Stats, webpack} from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 
-import {exists} from '@src/fs';
+import {ProjectName, WorkspaceFragment} from '@src/models';
+import {getProjectsFromWorkspaceFragment, WorkspaceProject} from '@src/project/generate_workspace';
+import {readProjectsFromWorkspace} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 import {
   FullLambdaServerEvent,
@@ -28,7 +29,7 @@ import {table} from '@src/webpack-runner/text_table';
 
 interface RunWebpacksOptions {
   root: string;
-  projectPaths: string[];
+  workspaceFragments: WorkspaceFragment[];
   watch: boolean;
 }
 
@@ -43,6 +44,7 @@ export interface WebpackDevServerEvents {
 }
 
 interface ProjectStatus {
+  project: WorkspaceProject;
   firstRun: boolean;
   isRunning: boolean;
   errors: ParsedError[];
@@ -54,30 +56,35 @@ interface ProjectStatus {
 const name = 'WebpackRunner';
 
 export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
-  const {root, projectPaths, watch} = opts;
-  const statuses = new Map<string, ProjectStatus>();
+  const {root, workspaceFragments, watch} = opts;
+  const statuses = new Map<ProjectName, ProjectStatus>();
+  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
 
-  function handleStart(project: string): void {
-    const current = statuses.get(project) ?? {
+  function handleStart(project: WorkspaceProject): void {
+    const {projectName} = project;
+    const current = statuses.get(projectName) ?? {
+      project,
       firstRun: true,
       isRunning: true,
       errors: [],
       lambdaServerEvents: {},
       webpackDevServerEvents: {},
     };
-    statuses.set(project, {...current, isRunning: true});
+    statuses.set(projectName, {...current, isRunning: true});
     onChange();
   }
 
-  function handleResults(project: string, stats: Stats): void {
+  function handleResults(project: WorkspaceProject, stats: Stats): void {
+    const {projectName} = project;
     const errors = [
       ...stats.compilation.errors.map(err => parseError(err, {root, severity: 'error'})),
       ...stats.compilation.warnings.map(warn => parseError(warn, {root, severity: 'warning'})),
     ];
-    const lambdaServerEvents = statuses.get(project)?.lambdaServerEvents ?? {};
-    const webpackDevServerEvents = statuses.get(project)?.webpackDevServerEvents ?? {};
-    const compilationFailure = statuses.get(project)?.compilationFailure;
-    statuses.set(project, {
+    const lambdaServerEvents = statuses.get(projectName)?.lambdaServerEvents ?? {};
+    const webpackDevServerEvents = statuses.get(projectName)?.webpackDevServerEvents ?? {};
+    const compilationFailure = statuses.get(projectName)?.compilationFailure;
+    statuses.set(projectName, {
+      project,
       firstRun: false,
       isRunning: false,
       errors,
@@ -92,19 +99,19 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     const errors = [...statuses.values()].flatMap(v => v.errors);
     const groupedErrors = groupAndSortErrors(errors);
 
-    const summary = [...statuses.entries()].map(([projectPath, status]) =>
-      renderProjectStatus(
-        projectPath,
+    const summary = [...statuses.values()].map(status => {
+      return renderProjectStatus(
+        status.project,
         status.firstRun,
         status.isRunning,
         groupedErrors,
         status.compilationFailure,
         status.lambdaServerEvents,
         status.webpackDevServerEvents
-      )
-    );
+      );
+    });
     summary.unshift([
-      underline(`Projects (${projectPaths.length})`),
+      underline(`Projects (${projects.length})`),
       underline('Status'),
       underline('Run'),
     ]);
@@ -139,140 +146,143 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     }
   }
 
-  for (const projectPath of projectPaths.sort((p1, p2) => p1.localeCompare(p2))) {
-    const projectName = relative(root, projectPath);
-    const intialStatus = {
-      firstRun: true,
-      isRunning: true,
-      errors: [],
-      lambdaServerEvents: {},
-      webpackDevServerEvents: {},
-    };
-    statuses.set(projectName, intialStatus);
-    // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax, no-await-in-loop
-    const config: Configuration = await import(
-      /*webpackIgnore: true*/ join(projectPath, 'webpack.config.js')
-    ).then(({getConfig}) => getConfig({context: projectPath, watch}));
+  await Promise.all(
+    projects.map(async project => {
+      const {projectName} = project;
+      const projectPath = join(root, projectName);
+      const intialStatus = {
+        project,
+        firstRun: true,
+        isRunning: true,
+        errors: [],
+        lambdaServerEvents: {},
+        webpackDevServerEvents: {},
+      };
+      statuses.set(projectName, intialStatus);
+      // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
+      const config: Configuration = await import(
+        /*webpackIgnore: true*/ join(projectPath, 'webpack.config.js')
+      ).then(({getConfig}) => getConfig({context: projectPath, watch}));
 
-    // eslint-disable-next-line unicorn/consistent-function-scoping
-    const reportCompilationFailure = (error: string): void => {
-      updateStatus(curr => {
-        curr.compilationFailure = error;
+      const reportCompilationFailure = (error: string): void => {
+        updateStatus(curr => {
+          curr.compilationFailure = error;
+        });
+      };
+
+      const updateLambdaServerEvents = (fn: (curr: LambdaServerEvents) => void): void => {
+        updateStatus(curr => fn(curr.lambdaServerEvents));
+      };
+
+      const updateWebpackDevServerEvents = (fn: (curr: WebpackDevServerEvents) => void): void => {
+        updateStatus(curr => fn(curr.webpackDevServerEvents));
+      };
+
+      const updateStatus = (fn: (curr: ProjectStatus) => void): void => {
+        let current = statuses.get(projectName);
+        if (!current) {
+          current = intialStatus;
+          statuses.set(projectName, current);
+        }
+        fn(current);
+      };
+
+      // Read events in the lambda server logs to update the globalInfo
+      let lastProcessedLambdaLog = Date.now();
+      readLines(join(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
+        const logs = lines
+          .map(l => l.trim())
+          .filter(l => l.length > 0)
+          .map(l => JSON.parse(l) as FullLambdaServerEvent);
+        let shouldRedraw = false;
+        for (const log of logs) {
+          const date = new Date(log.t).getTime();
+          if (date < lastProcessedLambdaLog) {
+            continue;
+          }
+          lastProcessedLambdaLog = date;
+          shouldRedraw = true;
+          if (log.event === 'start') {
+            updateLambdaServerEvents(curr => {
+              curr.startEvent = log;
+            });
+          } else {
+            updateLambdaServerEvents(curr => {
+              curr.lastEvent = log;
+            });
+          }
+        }
+        if (shouldRedraw) {
+          redraw();
+        }
       });
-    };
-    // eslint-disable-next-line unicorn/consistent-function-scoping
-    const updateLambdaServerEvents = (fn: (curr: LambdaServerEvents) => void): void => {
-      updateStatus(curr => fn(curr.lambdaServerEvents));
-    };
-    // eslint-disable-next-line unicorn/consistent-function-scoping
-    const updateWebpackDevServerEvents = (fn: (curr: WebpackDevServerEvents) => void): void => {
-      updateStatus(curr => fn(curr.webpackDevServerEvents));
-    };
-    // eslint-disable-next-line unicorn/consistent-function-scoping
-    const updateStatus = (fn: (curr: ProjectStatus) => void): void => {
-      let current = statuses.get(projectName);
-      if (!current) {
-        current = intialStatus;
-        statuses.set(projectName, current);
-      }
-      fn(current);
-    };
 
-    // Read events in the lambda server logs to update the globalInfo
-    let lastProcessedLambdaLog = Date.now();
-    readLines(join(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
-      const logs = lines
-        .map(l => l.trim())
-        .filter(l => l.length > 0)
-        .map(l => JSON.parse(l) as FullLambdaServerEvent);
-      let shouldRedraw = false;
-      for (const log of logs) {
-        const date = new Date(log.t).getTime();
-        if (date < lastProcessedLambdaLog) {
-          continue;
+      // Read events in the webpack dev server logs to update the globalInfo
+      let lastProcessedDevServerLog = Date.now();
+      readLines(join(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
+        const logs = lines
+          .map(l => l.trim())
+          .filter(l => l.length > 0)
+          .map(l => JSON.parse(l) as FullWebpackDevServerEvent);
+        let shouldRedraw = false;
+        for (const log of logs) {
+          const date = new Date(log.t).getTime();
+          if (date < lastProcessedDevServerLog) {
+            continue;
+          }
+          lastProcessedDevServerLog = date;
+          shouldRedraw = true;
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          if (log.event === 'start') {
+            updateWebpackDevServerEvents(curr => {
+              curr.startEvent = log;
+            });
+          } else {
+            neverHappens(log.event);
+            //   updateWebpackDevServerEvents(curr => {
+            //     curr.lastEvent = log;
+            //   });
+          }
         }
-        lastProcessedLambdaLog = date;
-        shouldRedraw = true;
-        if (log.event === 'start') {
-          updateLambdaServerEvents(curr => {
-            curr.startEvent = log;
-          });
-        } else {
-          updateLambdaServerEvents(curr => {
-            curr.lastEvent = log;
-          });
+        if (shouldRedraw) {
+          redraw();
         }
-      }
-      if (shouldRedraw) {
-        redraw();
-      }
-    });
+      });
 
-    // Read events in the webpack dev server logs to update the globalInfo
-    let lastProcessedDevServerLog = Date.now();
-    readLines(join(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
-      const logs = lines
-        .map(l => l.trim())
-        .filter(l => l.length > 0)
-        .map(l => JSON.parse(l) as FullWebpackDevServerEvent);
-      let shouldRedraw = false;
-      for (const log of logs) {
-        const date = new Date(log.t).getTime();
-        if (date < lastProcessedDevServerLog) {
-          continue;
+      const compiler = webpack({...config, watch}, (err?: Error, res?: Stats) => {
+        if (err || !res) {
+          reportCompilationFailure(err ? String(err) : 'No result after compilation');
+          if (!watch) {
+            onChange();
+            // eslint-disable-next-line node/no-process-exit
+            process.exit(1);
+          }
         }
-        lastProcessedDevServerLog = date;
-        shouldRedraw = true;
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (log.event === 'start') {
-          updateWebpackDevServerEvents(curr => {
-            curr.startEvent = log;
-          });
-        } else {
-          neverHappens(log.event);
-          //   updateWebpackDevServerEvents(curr => {
-          //     curr.lastEvent = log;
-          //   });
-        }
-      }
-      if (shouldRedraw) {
-        redraw();
-      }
-    });
+        onChange();
+      });
+      compiler.hooks.beforeRun.tap(name, () => handleStart(project));
+      compiler.hooks.watchRun.tap(name, () => handleStart(project));
+      compiler.hooks.done.tap(name, stats => handleResults(project, stats));
 
-    const compiler = webpack({...config, watch}, (err?: Error, res?: Stats) => {
-      if (err || !res) {
-        reportCompilationFailure(err ? String(err) : 'No result after compilation');
-        if (!watch) {
-          onChange();
-          // eslint-disable-next-line node/no-process-exit
-          process.exit(1);
-        }
+      if (config.devServer) {
+        await new WebpackDevServer(config.devServer, compiler).start();
       }
-      onChange();
-    });
-    compiler.hooks.beforeRun.tap(name, () => handleStart(projectName));
-    compiler.hooks.watchRun.tap(name, () => handleStart(projectName));
-    compiler.hooks.done.tap(name, stats => handleResults(projectName, stats));
-
-    if (config.devServer) {
-      new WebpackDevServer(config.devServer, compiler).start();
-    }
-  }
+    })
+  );
 }
 
 export async function runAllWebpacks(
   options: Omit<RunWebpacksOptions, 'projectPaths'>
 ): Promise<void> {
   const {root, watch} = options;
-  const rootFiles = await readdir(root, {withFileTypes: true});
-  const dirs = rootFiles.filter(ent => ent.isDirectory()).map(dir => join(root, dir.name));
-  const packages = await Promise.all(
-    dirs.map(async dir => ((await exists(join(dir, 'package.json'))) ? dir : undefined))
-  );
+
+  const workspaceFragments = await readProjectsFromWorkspace(root);
+  if (!workspaceFragments) {
+    throw new Error(`No workspace projects at path ${root}`);
+  }
   await runWebpacks({
     root,
-    projectPaths: packages.filter((p): p is string => p !== undefined),
+    workspaceFragments,
     watch,
   });
 }

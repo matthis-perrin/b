@@ -1,9 +1,10 @@
 import {cyan, gray, red, underline, yellow} from 'ansi-colors';
 
+import {WorkspaceProject} from '@src/project/generate_workspace';
 import {ErrorSeverity, ErrorType, ParsedError} from '@src/webpack-runner/error_parser';
 
-export function formatProject(project: string): string {
-  return cyan(project);
+export function formatProject(project: WorkspaceProject): string {
+  return `${cyan(project.projectName)} ${gray(project.type)}`;
 }
 
 export function formatFilePath(filePath: string): string {
