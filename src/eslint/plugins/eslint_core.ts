@@ -345,7 +345,6 @@ export const eslintCore: EslintMetadata = {
     'no-case-declarations': 'warn',
     'no-class-assign': 'warn',
     'no-cond-assign': 'warn',
-    'no-console': 'warn',
     'no-const-assign': 'warn',
     'no-constant-binary-expression': 'warn',
     'no-constant-condition': ['warn', {checkLoops: false}],

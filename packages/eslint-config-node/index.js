@@ -127,7 +127,7 @@ module.exports = {
     'no-compare-neg-zero': 'off',
     'no-cond-assign': 'warn',
     'no-confusing-arrow': 'off',
-    'no-console': 'warn',
+    'no-console': 'off',
     'no-const-assign': 'warn',
     'no-constant-binary-expression': 'warn',
     'no-constant-condition': ['warn', {checkLoops: false}],

@@ -17,6 +17,7 @@ import {
   FullWebpackDevServerEvent,
   WebpackDevServerStartEvent,
 } from '@src/webpack/plugins/webpack_dev_server';
+import {generateEnvDefinitionFile} from '@src/webpack-runner/env_definition_file';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
 import {readLines} from '@src/webpack-runner/line_reader';
@@ -59,6 +60,12 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   const {root, workspaceFragments, watch} = opts;
   const statuses = new Map<ProjectName, ProjectStatus>();
   const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
+
+  const env = await generateEnvDefinitionFile();
+  for (const [key, val] of Object.entries(env)) {
+    // eslint-disable-next-line node/no-process-env
+    process.env[`MATTHIS_${key}`] = val;
+  }
 
   function handleStart(project: WorkspaceProject): void {
     const {projectName} = project;

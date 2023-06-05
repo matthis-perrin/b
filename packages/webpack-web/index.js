@@ -140,10 +140,10 @@ __webpack_require__.r(__webpack_exports__);
 function definePlugin() {
   const envPrefix = 'MATTHIS_';
   const extraEnv = Object.fromEntries(Object.entries(process.env) // eslint-disable-line node/no-process-env
-  .filter(([name]) => name.startsWith(envPrefix)).map(([name, value]) => [`process.env.${name.slice(envPrefix.length)}`, value]));
+  .filter(([name]) => name.startsWith(envPrefix)).map(([name, value]) => [String(name.slice(envPrefix.length)), JSON.stringify(value)]));
   return new (webpack__WEBPACK_IMPORTED_MODULE_0___default().DefinePlugin)({
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    'process.env.NODE_ENV': JSON.stringify((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__.getEnv)()),
+    NODE_ENV: JSON.stringify((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__.getEnv)()),
     ...extraEnv
   });
 }
@@ -712,10 +712,7 @@ function forkTsCheckerPlugin(context) {
         global: true
       },
       mode: 'readonly',
-      configFile: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(context, 'tsconfig.json'),
-      configOverwrite: {
-        include: ['src']
-      }
+      configFile: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(context, 'tsconfig.json')
     },
     formatter: 'basic',
     logger: {

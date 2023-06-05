@@ -46,7 +46,6 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
       headers: {
         'Content-Type': 'text/html',
       },
-      // eslint-disable-next-line node/no-process-env
       body: '<html><body><h1>INDEX.HTML</h1></body></html>',
     };
   }

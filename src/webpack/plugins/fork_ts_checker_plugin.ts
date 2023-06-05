@@ -15,9 +15,6 @@ export function forkTsCheckerPlugin(context: string): WebpackPlugin {
       },
       mode: 'readonly',
       configFile: join(context, 'tsconfig.json'),
-      configOverwrite: {
-        include: ['src'],
-      },
     },
     formatter: 'basic',
     logger: {log: () => {}, error: () => {}},
