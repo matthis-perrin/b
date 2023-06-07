@@ -1,6 +1,4 @@
-import {ProjectName} from '@src/models';
-
-export function generateSetupScript(projects: ProjectName[]): string {
+export function generateSetupScript(): string {
   return `
 import {join} from 'path';
 import {execSync, exec} from 'child_process';
@@ -56,11 +54,23 @@ async function installNodeModulesAtPath(path) {
 }
 
 async function installNodeModules() {
+  const root = process.cwd();
+  const rootEnt = await readdir(root, {withFileTypes: true});
+  const dirs = await Promise.all(
+    rootEnt
+      .filter(ent => ent.isDirectory() && ent.name !== 'node_modules')
+      .map(async ent => {
+        const files = await readdir(join(root, ent.name));
+        const hasPackageJson = files.includes('package.json');
+        return {name: ent.name, hasPackageJson};
+      })
+  );
+  const dirsToInstall = dirs.filter(d => d.hasPackageJson).map(d => d.name);
   await Promise.all([
-    installNodeModulesAtPath(process.cwd()),
-    ${projects.map(p => `installNodeModulesAtPath(join(process.cwd(), '${p}')),`).join('\n')}
-  ])
-  }
+    installNodeModulesAtPath(root),
+    ...dirsToInstall.map(dir => installNodeModulesAtPath(join(root, dir))),
+  ]);
+}
 
 async function run() {
   console.log('Checking requirements...');

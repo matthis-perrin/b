@@ -370,7 +370,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
 
   // Terraform folder generation
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'terraform');
-  await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects)), ...projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async p => {
+  await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
     const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateWorkspaceProjectTerraform)(workspaceName, p);
     if (content === undefined) {
       return;
@@ -1236,9 +1236,7 @@ async function cancel(workspacePath) {
 async function initProject() {
   let workspaceName;
   let workspacePath = process.cwd();
-  const frags = [{
-    type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.Shared
-  }];
+  const frags = [];
   const takenNames = ['terraform'];
   const alreadyGenerated = [];
 
@@ -1253,6 +1251,9 @@ async function initProject() {
       alreadyGenerated.push(...projectNames);
     }
   } else {
+    frags.push({
+      type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.Shared
+    });
     // Ask for workspace name
     const promptResponse = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({
       type: 'text',

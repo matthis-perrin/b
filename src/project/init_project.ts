@@ -21,11 +21,7 @@ async function cancel(workspacePath?: string): Promise<never> {
 async function initProject(): Promise<void> {
   let workspaceName: string;
   let workspacePath = process.cwd();
-  const frags: WorkspaceFragment[] = [
-    {
-      type: WorkspaceFragmentType.Shared,
-    },
-  ];
+  const frags: WorkspaceFragment[] = [];
   const takenNames = ['terraform'];
   const alreadyGenerated: ProjectName[] = [];
 
@@ -40,6 +36,7 @@ async function initProject(): Promise<void> {
       alreadyGenerated.push(...projectNames);
     }
   } else {
+    frags.push({type: WorkspaceFragmentType.Shared});
     // Ask for workspace name
     const promptResponse = await prompt({
       type: 'text',

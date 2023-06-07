@@ -86,7 +86,6 @@ export async function generateWorkspace(
   alreadyGenerated: ProjectName[]
 ): Promise<void> {
   const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
-  const projectNames = projects.map(p => p.projectName);
 
   // Create projects files from templates
   await Promise.all(
@@ -107,7 +106,7 @@ export async function generateWorkspace(
     // app.code-workspace
     await writeJsonFile(join(dst, 'app.code-workspace'), generateCodeWorkspace(workspaceFragments)),
     // setup.js
-    await writeJsFile(join(dst, 'setup.js'), generateSetupScript(projectNames)),
+    await writeJsFile(join(dst, 'setup.js'), generateSetupScript()),
     // deploy.js
     await writeJsFile(join(dst, 'deploy.js'), generateDeployScript()),
     // build.js
@@ -118,16 +117,14 @@ export async function generateWorkspace(
   const terraformPath = join(dst, 'terraform');
   await Promise.all([
     writeRawFile(join(terraformPath, 'base.tf'), generateCommonTerraform(workspaceName, projects)),
-    ...projects
-      .filter(p => !alreadyGenerated.includes(p.projectName))
-      .map(async p => {
-        const content = generateWorkspaceProjectTerraform(workspaceName, p);
-        if (content === undefined) {
-          return;
-        }
-        const name = `${p.projectName}_terraform`;
-        await writeRawFile(join(terraformPath, `${name}.tf`), content);
-      }),
+    ...projects.map(async p => {
+      const content = generateWorkspaceProjectTerraform(workspaceName, p);
+      if (content === undefined) {
+        return;
+      }
+      const name = `${p.projectName}_terraform`;
+      await writeRawFile(join(terraformPath, `${name}.tf`), content);
+    }),
   ]);
 
   // Run setup.js
