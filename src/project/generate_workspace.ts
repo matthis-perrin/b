@@ -1,7 +1,9 @@
 import {execSync} from 'node:child_process';
-import {join} from 'node:path';
+import {cp} from 'node:fs/promises';
+import {join, resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
 
-import {writeJsFile, writeJsonFile, writeRawFile} from '@src/fs';
+import {writeJsonFile, writeRawFile} from '@src/fs';
 import {
   ProjectName,
   ProjectType,
@@ -9,12 +11,9 @@ import {
   WorkspaceFragmentType,
   WorkspaceName,
 } from '@src/models';
-import {generateBuildScript} from '@src/project/build_script';
-import {generateDeployScript} from '@src/project/deploy_script';
 import {generateProject} from '@src/project/generate_project';
 import {generateGitIgnore} from '@src/project/gitignore';
 import {generateWorkspacePackageJson} from '@src/project/package_json';
-import {generateSetupScript} from '@src/project/setup_script';
 import {
   generateCommonTerraform,
   generateWorkspaceProjectTerraform,
@@ -95,6 +94,7 @@ export async function generateWorkspace(
   );
 
   // Generate workspace root files
+  const SCRIPTS_PATH = join(fileURLToPath(import.meta.url), '../scripts');
   await Promise.all([
     // package.json
     await writeJsonFile(
@@ -106,11 +106,11 @@ export async function generateWorkspace(
     // app.code-workspace
     await writeJsonFile(join(dst, 'app.code-workspace'), generateCodeWorkspace(workspaceFragments)),
     // setup.js
-    await writeJsFile(join(dst, 'setup.js'), generateSetupScript()),
+    await cp(join(SCRIPTS_PATH, 'setup.js'), join(dst, 'setup.js')),
     // deploy.js
-    await writeJsFile(join(dst, 'deploy.js'), generateDeployScript()),
+    await cp(join(SCRIPTS_PATH, 'deploy.js'), join(dst, 'deploy.js')),
     // build.js
-    await writeJsFile(join(dst, 'build.js'), generateBuildScript()),
+    await cp(join(SCRIPTS_PATH, 'build.js'), join(dst, 'build.js')),
   ]);
 
   // Terraform folder generation

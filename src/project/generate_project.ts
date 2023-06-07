@@ -7,7 +7,7 @@ import {cp, listFiles, readFile, writeJsonFile} from '@src/fs';
 import {PROJECT_TYPE_TO_METADATA, RuntimeType} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
 
-const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../../../templates');
+const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 
 export async function generateProject(dst: string, project: WorkspaceProject): Promise<void> {
   const {projectName, type} = project;

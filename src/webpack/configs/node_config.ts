@@ -32,6 +32,9 @@ export function nodeConfig(opts: {
     },
     module: {
       rules: [babelLoaderNode(), sourceMapLoader()],
+      parser: {
+        javascript: {importMeta: false},
+      },
     },
     plugins: [...(base.plugins ?? []), dependencyPackerPlugin(packageJsonProperties)],
     externals: (ctx, cb) => {
