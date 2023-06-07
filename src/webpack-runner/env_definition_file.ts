@@ -1,7 +1,7 @@
 import {execSync} from 'node:child_process';
 import {join} from 'node:path';
 
-import {writeJsFile} from '@src/fs';
+import {writeTsFile} from '@src/fs';
 
 export async function generateEnvDefinitionFile(): Promise<Record<string, string>> {
   const terraformPath = join(process.cwd(), 'terraform');
@@ -13,7 +13,7 @@ export async function generateEnvDefinitionFile(): Promise<Record<string, string
     ent => !ent[1].sensitive && ent[1].type === 'string' && typeof ent[1].value === 'string'
   );
 
-  await writeJsFile(
+  await writeTsFile(
     join(process.cwd(), 'shared', 'src', 'env.d.ts'),
     [...outputs, ['NODE_ENV']]
       .map(([key]) => `declare const ${key.toUpperCase()}: string;`)

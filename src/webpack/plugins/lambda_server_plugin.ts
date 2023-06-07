@@ -130,47 +130,55 @@ class LambdaServerPlugin extends StandalonePlugin {
           const command = [`node -e "eval(atob('${btoa(commandJs)}'))"`].join('');
 
           const startTs = Date.now();
-          exec(command, (error, stdout, stderr) => {
-            const duration = Date.now() - startTs;
-            const infoOutput = this.parseOutput(stdout, TOKEN);
-            const errOutput = this.parseOutput(stderr, TOKEN);
-            this.appLog(infoOutput.logs);
-            this.appLog(errOutput.logs);
+          appendFileSync('matthis.txt', `${join(this.context, '../terraform/.aws-credentials')}\n`);
+          exec(
+            command,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            {env: {AWS_CONFIG_FILE: join(this.context, '../terraform/.aws-credentials')}},
+            (error, stdout, stderr) => {
+              const duration = Date.now() - startTs;
+              const infoOutput = this.parseOutput(stdout, TOKEN);
+              const errOutput = this.parseOutput(stderr, TOKEN);
+              this.appLog(infoOutput.logs);
+              this.appLog(errOutput.logs);
 
-            const err = error ? String(error) : errOutput.result;
-            if (err !== undefined) {
-              return internalError(err.split('\n')[0] ?? err);
-            }
-
-            const stdoutRes = infoOutput.result ?? '';
-            try {
-              if (stdoutRes === 'undefined') {
-                return internalError(`Lambda returned undefined`);
-              }
-              const result = JSON.parse(stdoutRes);
-              if (typeof result === 'undefined') {
-                return internalError(`Invalid response: ${stdoutRes}`);
+              const err = error ? String(error) : errOutput.result;
+              if (err !== undefined) {
+                return internalError(err.split('\n')[0] ?? err);
               }
 
-              res.setHeader('Content-Type', 'application/json');
-              // eslint-disable-next-line no-null/no-null
-              if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
-                const {body, statusCode} = result;
-                if (!('statusCode' in result)) {
-                  return sendRes(stdoutRes, duration);
-                } else if (typeof statusCode !== 'number') {
-                  return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
+              const stdoutRes = infoOutput.result ?? '';
+              try {
+                if (stdoutRes === 'undefined') {
+                  return internalError(`Lambda returned undefined`);
                 }
-                const resBody = typeof body === 'string' ? body : JSON.stringify(body);
-                return sendRes(resBody, duration, statusCode);
-              } else if (typeof result === 'string') {
-                return sendRes(result, duration);
+                const result = JSON.parse(stdoutRes);
+                if (typeof result === 'undefined') {
+                  return internalError(`Invalid response: ${stdoutRes}`);
+                }
+
+                res.setHeader('Content-Type', 'application/json');
+                // eslint-disable-next-line no-null/no-null
+                if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
+                  const {body, statusCode} = result;
+                  if (!('statusCode' in result)) {
+                    return sendRes(stdoutRes, duration);
+                  } else if (typeof statusCode !== 'number') {
+                    return internalError(
+                      `statusCode ${JSON.stringify(statusCode)} is not a number`
+                    );
+                  }
+                  const resBody = typeof body === 'string' ? body : JSON.stringify(body);
+                  return sendRes(resBody, duration, statusCode);
+                } else if (typeof result === 'string') {
+                  return sendRes(result, duration);
+                }
+                return sendRes(stdoutRes, duration);
+              } catch (err: unknown) {
+                return internalError(String(err));
               }
-              return sendRes(stdoutRes, duration);
-            } catch (err: unknown) {
-              return internalError(String(err));
             }
-          });
+          );
         });
       })
         .listen(port)

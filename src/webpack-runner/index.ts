@@ -12,7 +12,7 @@ export async function webpackRunnerPackage(): Promise<void> {
 }
 
 async function writeScript(path: string): Promise<void> {
-  const entry = join(fileURLToPath(import.meta.url), `../runner.ts`);
+  const entry = join(fileURLToPath(import.meta.url), `../../src/webpack-runner/runner.ts`);
   const dst = join(path);
   await compile(entry, dst, true, {
     name: '@matthis/webpack-runner',

@@ -2,7 +2,7 @@ import {exec} from 'node:child_process';
 import {promises} from 'node:fs';
 import {dirname, join} from 'node:path';
 
-import {format} from 'prettier';
+import {BuiltInParserName, format} from 'prettier';
 
 export const {access, readFile, readdir, stat} = promises;
 const {writeFile, mkdir, rm} = promises;
@@ -11,11 +11,15 @@ export async function writeJsonFile(path: string, json: unknown): Promise<void> 
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
 
-export async function writeJsFile(path: string, js: string): Promise<void> {
+async function writePrettyFile(
+  parser: BuiltInParserName,
+  path: string,
+  code: string
+): Promise<void> {
   await writeRawFile(
     path,
-    `${format(js, {
-      parser: 'babel',
+    `${format(code, {
+      parser,
       printWidth: 100,
       singleQuote: true,
       trailingComma: 'es5',
@@ -24,6 +28,14 @@ export async function writeJsFile(path: string, js: string): Promise<void> {
       endOfLine: 'auto',
     })}\n`
   );
+}
+
+export async function writeJsFile(path: string, js: string): Promise<void> {
+  return writePrettyFile('babel', path, js);
+}
+
+export async function writeTsFile(path: string, ts: string): Promise<void> {
+  return writePrettyFile('typescript', path, ts);
 }
 
 export async function writeRawFile(path: string, content: string): Promise<void> {

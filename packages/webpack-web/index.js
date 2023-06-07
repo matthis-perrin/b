@@ -283,7 +283,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "stat": () => (/* binding */ stat),
 /* harmony export */   "writeJsFile": () => (/* binding */ writeJsFile),
 /* harmony export */   "writeJsonFile": () => (/* binding */ writeJsonFile),
-/* harmony export */   "writeRawFile": () => (/* binding */ writeRawFile)
+/* harmony export */   "writeRawFile": () => (/* binding */ writeRawFile),
+/* harmony export */   "writeTsFile": () => (/* binding */ writeTsFile)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
@@ -311,9 +312,9 @@ const {
 async function writeJsonFile(path, json) {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
-async function writeJsFile(path, js) {
-  await writeRawFile(path, `${(0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(js, {
-    parser: 'babel',
+async function writePrettyFile(parser, path, code) {
+  await writeRawFile(path, `${(0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, {
+    parser,
     printWidth: 100,
     singleQuote: true,
     trailingComma: 'es5',
@@ -321,6 +322,12 @@ async function writeJsFile(path, js) {
     arrowParens: 'avoid',
     endOfLine: 'auto'
   })}\n`);
+}
+async function writeJsFile(path, js) {
+  return writePrettyFile('babel', path, js);
+}
+async function writeTsFile(path, ts) {
+  return writePrettyFile('typescript', path, ts);
 }
 async function writeRawFile(path, content) {
   console.log(`write ${path}`);

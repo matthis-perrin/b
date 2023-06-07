@@ -16,25 +16,27 @@ export async function projectPackage(): Promise<void> {
     copyScript('build.js'),
     copyScript('deploy.js'),
     copyScript('setup.js'),
-    writeRawFile(
-      join(PROJECT_PACKAGE, 'index.mjs'),
-      `#!/usr/bin/env node\nimport ('${join(PROJECT_PACKAGE, 'index.js')}');`
-    ),
   ]);
 }
 
 async function writeScript(path: string): Promise<void> {
-  const entry = join(fileURLToPath(import.meta.url), `../init_project.ts`);
+  const entry = join(fileURLToPath(import.meta.url), `../../src/project/init_project.ts`);
   const dst = join(path);
   await compile(entry, dst, false, {
     name: '@matthis/project',
     version: PACKAGE_VERSIONS.project,
     license: 'UNLICENSED',
-    bin: './index.mjs',
+    bin: './index.js',
   });
+  const scriptPath = join(dst, 'index.js');
+  const scriptContent = await readFile(scriptPath);
+  await writeRawFile(
+    scriptPath,
+    `#!/usr/bin/env node --experimental-modules --no-warnings\n${scriptContent.toString()}`
+  );
 }
 
-const SCRIPTS_DIR = join(fileURLToPath(import.meta.url), '../scripts');
+const SCRIPTS_DIR = join(fileURLToPath(import.meta.url), '../../src/project/scripts');
 async function copyScript(name: string): Promise<void> {
   const content = await readFile(join(SCRIPTS_DIR, name));
   await writeRawFile(join(PROJECT_PACKAGE, 'scripts', name), content.toString());

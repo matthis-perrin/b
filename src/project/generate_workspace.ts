@@ -1,6 +1,6 @@
 import {execSync} from 'node:child_process';
 import {cp} from 'node:fs/promises';
-import {join, resolve} from 'node:path';
+import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {writeJsonFile, writeRawFile} from '@src/fs';
