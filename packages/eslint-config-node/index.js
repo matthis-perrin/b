@@ -783,4 +783,3 @@ module.exports = {
     'node/shebang': 'off',
   },
 };
-

@@ -51,7 +51,7 @@ async function run() {
     console.log(`Deploying ${lambdaName}`);
     const tmp = tmpdir();
     const zipPath = join(tmp, randomUUID()) + '.zip';
-    execSync(`zip -j -r ${zipPath} ${lambdaName}/dist/*`);
+    execSync(`pushd ${lambdaName}/dist; zip -r ${zipPath} *`);
     execSync(
       `AWS_CONFIG_FILE=terraform/.aws-credentials aws s3 cp ${zipPath} s3://${code_bucket}/${lambdaName}/dist.zip`
     );

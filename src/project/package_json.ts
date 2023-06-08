@@ -37,6 +37,7 @@ export function generateWorkspacePackageJson(
     eslintConfig: {
       ignorePatterns: ['**/*.js'],
     },
+    prettier: '@matthis/prettier-config',
     devDependencies: Object.fromEntries(
       (
         [

@@ -18,7 +18,7 @@ async function writePrettyFile(
 ): Promise<void> {
   await writeRawFile(
     path,
-    `${format(code, {
+    format(code, {
       parser,
       printWidth: 100,
       singleQuote: true,
@@ -26,7 +26,7 @@ async function writePrettyFile(
       bracketSpacing: false,
       arrowParens: 'avoid',
       endOfLine: 'auto',
-    })}\n`
+    })
   );
 }
 

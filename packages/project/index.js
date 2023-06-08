@@ -67,7 +67,7 @@ async function writeJsonFile(path, json) {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
 async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, `${(0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, {
+  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, {
     parser,
     printWidth: 100,
     singleQuote: true,
@@ -75,7 +75,7 @@ async function writePrettyFile(parser, path, code) {
     bracketSpacing: false,
     arrowParens: 'avoid',
     endOfLine: 'auto'
-  })}\n`);
+  }));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);
@@ -522,6 +522,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
     eslintConfig: {
       ignorePatterns: ['**/*.js']
     },
+    prettier: '@matthis/prettier-config',
     devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner], ['typescript', _src_versions__WEBPACK_IMPORTED_MODULE_1__.TYPESCRIPT_VERSION]].sort((d1, d2) => d1[0].localeCompare(d2[0])))
   };
 }
@@ -539,7 +540,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.13',
+  project: '1.3.14',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',

@@ -349,7 +349,7 @@ async function writeJsonFile(path, json) {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
 async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, `${(0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, {
+  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, {
     parser,
     printWidth: 100,
     singleQuote: true,
@@ -357,7 +357,7 @@ async function writePrettyFile(parser, path, code) {
     bracketSpacing: false,
     arrowParens: 'avoid',
     endOfLine: 'auto'
-  })}\n`);
+  }));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);

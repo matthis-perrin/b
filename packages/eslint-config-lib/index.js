@@ -747,4 +747,3 @@ module.exports = {
     'unicorn/prefer-array-flat': 'warn',
   },
 };
-
