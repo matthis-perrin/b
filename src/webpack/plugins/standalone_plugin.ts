@@ -1,5 +1,7 @@
 import {Compiler} from 'webpack';
 
+import {globalError} from '@src/global_error';
+
 export abstract class StandalonePlugin {
   protected abstract name: string;
   protected context: string = process.cwd();
@@ -41,13 +43,9 @@ export abstract class StandalonePlugin {
       return;
     }
     this.hasExited = true;
-    Promise.resolve(this.teardown(compiler))
-      .catch(err => {
-        console.error(`Error during teardown of plugin ${this.name}`);
-        console.error(err);
-      })
-      // eslint-disable-next-line node/no-process-exit
-      .finally(() => process.exit(0));
+    Promise.resolve(this.teardown(compiler)).catch(err => {
+      globalError(`Error during teardown of plugin ${this.name}`, err);
+    });
   }
   private async exitHandlerAsync(compiler: Compiler): Promise<void> {
     if (this.hasExited) {

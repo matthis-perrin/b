@@ -11,9 +11,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
-/* harmony import */ var _src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(24);
-/* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(29);
-/* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(31);
+/* harmony import */ var _src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(25);
+/* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
+/* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(32);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
 
 
@@ -115,10 +115,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _src_webpack_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var _src_webpack_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
-/* harmony import */ var _src_webpack_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(18);
-/* harmony import */ var _src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(20);
-/* harmony import */ var _src_webpack_plugins_ts_config_alias__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(22);
-/* harmony import */ var _src_webpack_plugins_yarn_plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(23);
+/* harmony import */ var _src_webpack_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(19);
+/* harmony import */ var _src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(21);
+/* harmony import */ var _src_webpack_plugins_ts_config_alias__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(23);
+/* harmony import */ var _src_webpack_plugins_yarn_plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(24);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
 
 
@@ -680,6 +680,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "StandalonePlugin": () => (/* binding */ StandalonePlugin)
 /* harmony export */ });
+/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(18);
+
 class StandalonePlugin {
   context = process.cwd();
 
@@ -716,11 +718,8 @@ class StandalonePlugin {
     }
     this.hasExited = true;
     Promise.resolve(this.teardown(compiler)).catch(err => {
-      console.error(`Error during teardown of plugin ${this.name}`);
-      console.error(err);
-    })
-    // eslint-disable-next-line node/no-process-exit
-    .finally(() => process.exit(0));
+      (0,_src_global_error__WEBPACK_IMPORTED_MODULE_0__.globalError)(`Error during teardown of plugin ${this.name}`, err);
+    });
   }
   async exitHandlerAsync(compiler) {
     if (this.hasExited) {
@@ -737,11 +736,35 @@ class StandalonePlugin {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "globalError": () => (/* binding */ globalError)
+/* harmony export */ });
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(11);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
+
+function globalError(...val) {
+  for (const data of val) {
+    try {
+      const str = typeof data === 'string' ? data : data instanceof Error ? data.stack ?? String(data) : JSON.stringify(data);
+      console.error(str);
+      (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', str);
+    } catch {
+      console.error(String(val));
+      (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', String(val));
+    }
+  }
+}
+
+/***/ }),
+/* 19 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "forkTsCheckerPlugin": () => (/* binding */ forkTsCheckerPlugin)
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(19);
+/* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(20);
 /* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__);
 
 
@@ -766,20 +789,20 @@ function forkTsCheckerPlugin(context) {
 }
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fork-ts-checker-webpack-plugin");
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "terserPlugin": () => (/* binding */ terserPlugin)
 /* harmony export */ });
-/* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21);
+/* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(22);
 /* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__);
 
 function terserPlugin() {
@@ -794,13 +817,13 @@ function terserPlugin() {
 }
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("terser-webpack-plugin");
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -863,7 +886,7 @@ function getTsConfigAlias(context) {
 }
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -902,20 +925,20 @@ class YarnPlugin {
 }
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "babelLoaderNode": () => (/* binding */ babelLoaderNode)
 /* harmony export */ });
-/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(25);
+/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(26);
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(26);
+/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(27);
 /* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_env__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(27);
+/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(28);
 /* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(28);
+/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(29);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(babel_loader__WEBPACK_IMPORTED_MODULE_3__);
 /* eslint-disable import/no-unassigned-import */
 
@@ -940,46 +963,46 @@ function babelLoaderNode() {
 }
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("@babel/core");
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("@babel/preset-env");
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("@babel/preset-typescript");
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("babel-loader");
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "sourceMapLoader": () => (/* binding */ sourceMapLoader)
 /* harmony export */ });
-/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(25);
+/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(26);
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(26);
+/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(27);
 /* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_env__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(27);
+/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(28);
 /* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(28);
+/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(29);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(babel_loader__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(30);
+/* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(31);
 /* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(source_map_loader__WEBPACK_IMPORTED_MODULE_4__);
 /* eslint-disable import/no-unassigned-import */
 
@@ -998,13 +1021,13 @@ function sourceMapLoader() {
 }
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("source-map-loader");
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1131,7 +1154,7 @@ function dependencyPackerPlugin(packageJsonProperties) {
 }
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1144,7 +1167,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(33);
+/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(34);
 /* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_http__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_4__);
@@ -1171,34 +1194,6 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
       this.server = (0,node_http__WEBPACK_IMPORTED_MODULE_3__.createServer)((req, res) => {
         const url = req.url ?? '';
         const method = req.method ?? '';
-
-        // Log the request
-        this.runtimeLog({
-          event: 'request',
-          path: url,
-          method
-        });
-
-        // Parse body
-        let body = '';
-        req.on('data', chunk => {
-          body += chunk;
-        });
-
-        // Parse headers
-        const headers = {};
-        while (true) {
-          const key = req.rawHeaders.shift();
-          const value = req.rawHeaders.shift();
-          if (key === undefined || value === undefined) {
-            break;
-          }
-          headers[key] = value;
-        }
-        const handlerPath = (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, 'dist/index.js');
-        const bodyParam = body === '' ? 'null' : `atob('${btoa(body)}')`;
-        // const headerParam = `JSON.parse(atob('${btoa(JSON.stringify(headers))}'))`;
-        const headerParam = "''";
         const internalError = err => {
           this.runtimeLog({
             event: 'error',
@@ -1209,27 +1204,81 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
           res.statusCode = 500;
           res.end();
         };
-
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const sendRes = (body, duration, statusCode = 200) => {
+        try {
+          // Log the request
           this.runtimeLog({
-            event: 'response',
+            event: 'request',
             path: url,
-            method,
-            statusCode,
-            duration,
-            byteLength: body.length
+            method
           });
-          res.statusCode = statusCode;
-          res.write(body);
-          res.end();
-        };
-        const TOKEN = (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)();
-        const commandJs = `
+
+          // Parse body
+          let body;
+          req.on('data', chunk => {
+            if (body === undefined) {
+              body = '';
+            }
+            body += chunk;
+          });
+
+          // Parse URL
+          const parsedUrl = new URL(`http://localhost${url}`);
+          const rawQueryString = parsedUrl.search.slice(1);
+          const queryStringParameters = Object.fromEntries(parsedUrl.searchParams.entries());
+
+          // Create the lambda event
+          const event = {
+            version: '2.0',
+            routeKey: '$default',
+            rawPath: parsedUrl.pathname,
+            rawQueryString,
+            headers: req.headers,
+            queryStringParameters,
+            requestContext: {
+              accountId: 'anonymous',
+              // apiId: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
+              // domainName: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp.lambda-url.eu-west-3.on.aws',
+              // domainPrefix: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
+              http: {
+                method,
+                path: parsedUrl.pathname,
+                // protocol: 'HTTP/1.1',
+                // sourceIp: '88.138.164.86',
+                userAgent: req.headers['user-agent']
+              },
+              requestId: (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)(),
+              routeKey: '$default',
+              stage: '$default',
+              timeEpoch: Date.now()
+            },
+            body,
+            isBase64Encoded: false
+          };
+
+          // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+          const sendRes = (body, duration, statusCode = 200, headers) => {
+            this.runtimeLog({
+              event: 'response',
+              path: url,
+              method,
+              statusCode,
+              duration,
+              byteLength: body.length
+            });
+            res.statusCode = statusCode;
+            for (const [headerName, headerValue] of Object.entries(headers ?? {})) {
+              res.setHeader(headerName, headerValue);
+            }
+            res.write(body);
+            res.end();
+          };
+          const TOKEN = (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)();
+          const handlerPath = (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, 'dist/index.js');
+          const commandJs = `
 (async () => {
   try {
     const {handler} = await import('${handlerPath}');
-    const json = await handler({httpMethod: '${method}', path: '${url}', body: ${bodyParam}, headers: ${headerParam}});
+    const json = await handler(JSON.parse(atob('${btoa(JSON.stringify(event))}')));
     process.stdout.write(\`${TOKEN}\${JSON.stringify(json)}${TOKEN}\`);
   }
   catch (err) {
@@ -1237,58 +1286,62 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
   }
 })()
         `.trim();
-        req.on('end', () => {
-          const command = [`node -e "eval(atob('${btoa(commandJs)}'))"`].join('');
-          const startTs = Date.now();
-          (0,node_fs__WEBPACK_IMPORTED_MODULE_2__.appendFileSync)('matthis.txt', `${(0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, '../terraform/.aws-credentials')}\n`);
-          (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          {
-            env: {
-              AWS_CONFIG_FILE: (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, '../terraform/.aws-credentials')
-            }
-          }, (error, stdout, stderr) => {
-            const duration = Date.now() - startTs;
-            const infoOutput = this.parseOutput(stdout, TOKEN);
-            const errOutput = this.parseOutput(stderr, TOKEN);
-            this.appLog(infoOutput.logs);
-            this.appLog(errOutput.logs);
-            const err = error ? String(error) : errOutput.result;
-            if (err !== undefined) {
-              return internalError(err.split('\n')[0] ?? err);
-            }
-            const stdoutRes = infoOutput.result ?? '';
-            try {
-              if (stdoutRes === 'undefined') {
-                return internalError(`Lambda returned undefined`);
+          req.on('end', () => {
+            const command = [`node -e "eval(atob('${btoa(commandJs)}'))"`].join('');
+            const startTs = Date.now();
+            (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {
+              /* eslint-disable @typescript-eslint/naming-convention */
+              env: {
+                AWS_CONFIG_FILE: (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, '../terraform/.aws-credentials'),
+                PATH: process.env['PATH'] // eslint-disable-line node/no-process-env
               }
-              const result = JSON.parse(stdoutRes);
-              if (typeof result === 'undefined') {
-                return internalError(`Invalid response: ${stdoutRes}`);
+              /* eslint-enable @typescript-eslint/naming-convention */
+            }, (error, stdout, stderr) => {
+              const duration = Date.now() - startTs;
+              const infoOutput = this.parseOutput(stdout, TOKEN);
+              const errOutput = this.parseOutput(stderr, TOKEN);
+              this.appLog(infoOutput.logs);
+              this.appLog(errOutput.logs);
+              const err = error ? String(error) : errOutput.result;
+              if (err !== undefined) {
+                return internalError(err.split('\n')[0] ?? err);
               }
-              res.setHeader('Content-Type', 'application/json');
-              // eslint-disable-next-line no-null/no-null
-              if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
-                const {
-                  body,
-                  statusCode
-                } = result;
-                if (!('statusCode' in result)) {
-                  return sendRes(stdoutRes, duration);
-                } else if (typeof statusCode !== 'number') {
-                  return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
+              const stdoutRes = infoOutput.result ?? '';
+              try {
+                if (stdoutRes === 'undefined') {
+                  return internalError(`Lambda returned undefined`);
                 }
-                const resBody = typeof body === 'string' ? body : JSON.stringify(body);
-                return sendRes(resBody, duration, statusCode);
-              } else if (typeof result === 'string') {
-                return sendRes(result, duration);
+                const result = JSON.parse(stdoutRes);
+                if (typeof result === 'undefined') {
+                  return internalError(`Invalid response: ${stdoutRes}`);
+                }
+                res.setHeader('Content-Type', 'application/json');
+                // eslint-disable-next-line no-null/no-null
+                if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
+                  const {
+                    body,
+                    headers,
+                    statusCode
+                  } = result;
+                  if (!('statusCode' in result)) {
+                    return sendRes(stdoutRes, duration);
+                  } else if (typeof statusCode !== 'number') {
+                    return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
+                  }
+                  const resBody = typeof body === 'string' ? body : JSON.stringify(body);
+                  return sendRes(resBody, duration, statusCode, headers);
+                } else if (typeof result === 'string') {
+                  return sendRes(result, duration);
+                }
+                return sendRes(stdoutRes, duration);
+              } catch (err) {
+                return internalError(String(err));
               }
-              return sendRes(stdoutRes, duration);
-            } catch (err) {
-              return internalError(String(err));
-            }
+            });
           });
-        });
+        } catch (err) {
+          internalError(String(err));
+        }
       }).listen(port).on('error', err => {
         reject(err);
       }).on('listening', () => {
@@ -1353,7 +1406,7 @@ function lambdaServerPlugin() {
 }
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:http");
@@ -1435,7 +1488,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "config": () => (/* binding */ config)
 /* harmony export */ });
 /* harmony import */ var _src_webpack_configs_node_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(32);
+/* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(33);
 
 
 function config(opts) {

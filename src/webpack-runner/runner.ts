@@ -4,6 +4,7 @@ import {underline} from 'ansi-colors';
 import {Configuration, Stats, webpack} from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 
+import {globalError} from '@src/global_error';
 import {ProjectName, WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment, WorkspaceProject} from '@src/project/generate_workspace';
 import {readProjectsFromWorkspace} from '@src/project/vscode_workspace';
@@ -20,6 +21,7 @@ import {
 import {generateEnvDefinitionFile} from '@src/webpack-runner/env_definition_file';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
+import {registerExitCallback} from '@src/webpack-runner/exit_handler';
 import {readLines} from '@src/webpack-runner/line_reader';
 import {
   renderErrors,
@@ -147,13 +149,16 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
           globalErrors.length === 0 &&
           [...statuses.values()].every(status => status.compilationFailure === undefined);
         redraw();
-        // eslint-disable-next-line node/no-process-exit
-        process.exit(noGlobalErrors ? 0 : 1);
+        if (noGlobalErrors) {
+          resolve();
+        } else {
+          reject();
+        }
       }
     }
   }
 
-  await Promise.all(
+  const cleanupFunctions = await Promise.all(
     projects.map(async project => {
       const {projectName} = project;
       const projectPath = join(root, projectName);
@@ -261,8 +266,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
           reportCompilationFailure(err ? String(err) : 'No result after compilation');
           if (!watch) {
             onChange();
-            // eslint-disable-next-line node/no-process-exit
-            process.exit(1);
+            resolve();
           }
         }
         onChange();
@@ -271,11 +275,59 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       compiler.hooks.watchRun.tap(name, () => handleStart(project));
       compiler.hooks.done.tap(name, stats => handleResults(project, stats));
 
+      let devServer: WebpackDevServer | undefined;
       if (config.devServer) {
-        await new WebpackDevServer(config.devServer, compiler).start();
+        devServer = new WebpackDevServer(config.devServer, compiler);
+        await devServer.start();
       }
+      return async (): Promise<void> => {
+        return new Promise<void>((resolve, reject) => {
+          const closeCompiler = (): void => compiler.close(err => (err ? reject(err) : resolve()));
+          if (devServer) {
+            devServer.stop().then(closeCompiler).catch(reject);
+          } else {
+            closeCompiler();
+          }
+        });
+      };
     })
   );
+
+  let resolvePromise: () => void;
+  let rejectPromise: (err?: unknown) => void;
+  const globalPromise = new Promise<void>((resolve, reject) => {
+    resolvePromise = resolve;
+    rejectPromise = reject;
+  });
+
+  let cleanupCalled = false;
+  const cleanup = async (): Promise<void> => {
+    if (cleanupCalled) {
+      return;
+    }
+    cleanupCalled = true;
+    await Promise.all(cleanupFunctions);
+  };
+
+  const reject = (err?: unknown): void => {
+    cleanup()
+      .then(() => rejectPromise(err))
+      .catch(cleanupErr => {
+        globalError('webpack runner cleanup error', cleanupErr);
+        rejectPromise(err);
+      });
+  };
+  const resolve = (): void => {
+    cleanup()
+      .then(resolvePromise)
+      .catch(cleanupErr => {
+        globalError('webpack runner cleanup error', cleanupErr);
+        resolvePromise();
+      });
+  };
+
+  registerExitCallback(cleanup);
+  return globalPromise;
 }
 
 export async function runAllWebpacks(

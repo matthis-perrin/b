@@ -65,59 +65,90 @@ class LambdaServerPlugin extends StandalonePlugin {
         const url = req.url ?? '';
         const method = req.method ?? '';
 
-        // Log the request
-        this.runtimeLog({event: 'request', path: url, method});
-
-        // Parse body
-        let body = '';
-        req.on('data', chunk => {
-          body += chunk;
-        });
-
-        // Parse headers
-        const headers: Record<string, string> = {};
-        while (true) {
-          const key = req.rawHeaders.shift();
-          const value = req.rawHeaders.shift();
-          if (key === undefined || value === undefined) {
-            break;
-          }
-          headers[key] = value;
-        }
-
-        const handlerPath = join(this.context, 'dist/index.js');
-        const bodyParam = body === '' ? 'null' : `atob('${btoa(body)}')`;
-        // const headerParam = `JSON.parse(atob('${btoa(JSON.stringify(headers))}'))`;
-        const headerParam = "''";
-
         const internalError = (err: string): void => {
           this.runtimeLog({event: 'error', err, path: url, method});
           res.statusCode = 500;
           res.end();
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const sendRes = (body: string, duration: number, statusCode = 200): void => {
-          this.runtimeLog({
-            event: 'response',
-            path: url,
-            method,
-            statusCode,
-            duration,
-            byteLength: body.length,
+        try {
+          // Log the request
+          this.runtimeLog({event: 'request', path: url, method});
+
+          // Parse body
+          let body: string | undefined;
+          req.on('data', chunk => {
+            if (body === undefined) {
+              body = '';
+            }
+            body += chunk;
           });
-          res.statusCode = statusCode;
-          res.write(body);
-          res.end();
-        };
 
-        const TOKEN = randomUUID();
+          // Parse URL
+          const parsedUrl = new URL(`http://localhost${url}`);
+          const rawQueryString = parsedUrl.search.slice(1);
+          const queryStringParameters = Object.fromEntries(parsedUrl.searchParams.entries());
 
-        const commandJs = `
+          // Create the lambda event
+          const event = {
+            version: '2.0',
+            routeKey: '$default',
+            rawPath: parsedUrl.pathname,
+            rawQueryString,
+            headers: req.headers,
+            queryStringParameters,
+            requestContext: {
+              accountId: 'anonymous',
+              // apiId: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
+              // domainName: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp.lambda-url.eu-west-3.on.aws',
+              // domainPrefix: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
+              http: {
+                method,
+                path: parsedUrl.pathname,
+                // protocol: 'HTTP/1.1',
+                // sourceIp: '88.138.164.86',
+                userAgent: req.headers['user-agent'],
+              },
+              requestId: randomUUID(),
+              routeKey: '$default',
+              stage: '$default',
+              timeEpoch: Date.now(),
+            },
+            body,
+            isBase64Encoded: false,
+          };
+
+          const sendRes = (
+            body: string,
+            duration: number,
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            statusCode = 200,
+            headers?: Record<string, string>
+          ): void => {
+            this.runtimeLog({
+              event: 'response',
+              path: url,
+              method,
+              statusCode,
+              duration,
+              byteLength: body.length,
+            });
+            res.statusCode = statusCode;
+            for (const [headerName, headerValue] of Object.entries(headers ?? {})) {
+              res.setHeader(headerName, headerValue);
+            }
+            res.write(body);
+            res.end();
+          };
+
+          const TOKEN = randomUUID();
+
+          const handlerPath = join(this.context, 'dist/index.js');
+          const commandJs = `
 (async () => {
   try {
     const {handler} = await import('${handlerPath}');
-    const json = await handler({httpMethod: '${method}', path: '${url}', body: ${bodyParam}, headers: ${headerParam}});
+    const json = await handler(JSON.parse(atob('${btoa(JSON.stringify(event))}')));
     process.stdout.write(\`${TOKEN}\${JSON.stringify(json)}${TOKEN}\`);
   }
   catch (err) {
@@ -126,60 +157,69 @@ class LambdaServerPlugin extends StandalonePlugin {
 })()
         `.trim();
 
-        req.on('end', () => {
-          const command = [`node -e "eval(atob('${btoa(commandJs)}'))"`].join('');
+          req.on('end', () => {
+            const command = [`node -e "eval(atob('${btoa(commandJs)}'))"`].join('');
 
-          const startTs = Date.now();
-          appendFileSync('matthis.txt', `${join(this.context, '../terraform/.aws-credentials')}\n`);
-          exec(
-            command,
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            {env: {AWS_CONFIG_FILE: join(this.context, '../terraform/.aws-credentials')}},
-            (error, stdout, stderr) => {
-              const duration = Date.now() - startTs;
-              const infoOutput = this.parseOutput(stdout, TOKEN);
-              const errOutput = this.parseOutput(stderr, TOKEN);
-              this.appLog(infoOutput.logs);
-              this.appLog(errOutput.logs);
+            const startTs = Date.now();
+            exec(
+              command,
+              {
+                /* eslint-disable @typescript-eslint/naming-convention */
+                env: {
+                  AWS_CONFIG_FILE: join(this.context, '../terraform/.aws-credentials'),
+                  PATH: process.env['PATH'], // eslint-disable-line node/no-process-env
+                },
+                /* eslint-enable @typescript-eslint/naming-convention */
+              },
+              (error, stdout, stderr) => {
+                const duration = Date.now() - startTs;
+                const infoOutput = this.parseOutput(stdout, TOKEN);
+                const errOutput = this.parseOutput(stderr, TOKEN);
+                this.appLog(infoOutput.logs);
+                this.appLog(errOutput.logs);
 
-              const err = error ? String(error) : errOutput.result;
-              if (err !== undefined) {
-                return internalError(err.split('\n')[0] ?? err);
-              }
-
-              const stdoutRes = infoOutput.result ?? '';
-              try {
-                if (stdoutRes === 'undefined') {
-                  return internalError(`Lambda returned undefined`);
-                }
-                const result = JSON.parse(stdoutRes);
-                if (typeof result === 'undefined') {
-                  return internalError(`Invalid response: ${stdoutRes}`);
+                const err = error ? String(error) : errOutput.result;
+                if (err !== undefined) {
+                  return internalError(err.split('\n')[0] ?? err);
                 }
 
-                res.setHeader('Content-Type', 'application/json');
-                // eslint-disable-next-line no-null/no-null
-                if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
-                  const {body, statusCode} = result;
-                  if (!('statusCode' in result)) {
-                    return sendRes(stdoutRes, duration);
-                  } else if (typeof statusCode !== 'number') {
-                    return internalError(
-                      `statusCode ${JSON.stringify(statusCode)} is not a number`
-                    );
+                const stdoutRes = infoOutput.result ?? '';
+                try {
+                  if (stdoutRes === 'undefined') {
+                    return internalError(`Lambda returned undefined`);
                   }
-                  const resBody = typeof body === 'string' ? body : JSON.stringify(body);
-                  return sendRes(resBody, duration, statusCode);
-                } else if (typeof result === 'string') {
-                  return sendRes(result, duration);
+                  const result = JSON.parse(stdoutRes);
+                  if (typeof result === 'undefined') {
+                    return internalError(`Invalid response: ${stdoutRes}`);
+                  }
+
+                  res.setHeader('Content-Type', 'application/json');
+                  // eslint-disable-next-line no-null/no-null
+                  if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
+                    const {body, headers, statusCode} = result;
+                    if (!('statusCode' in result)) {
+                      return sendRes(stdoutRes, duration);
+                    } else if (typeof statusCode !== 'number') {
+                      return internalError(
+                        `statusCode ${JSON.stringify(statusCode)} is not a number`
+                      );
+                    }
+                    const resBody = typeof body === 'string' ? body : JSON.stringify(body);
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                    return sendRes(resBody, duration, statusCode, headers);
+                  } else if (typeof result === 'string') {
+                    return sendRes(result, duration);
+                  }
+                  return sendRes(stdoutRes, duration);
+                } catch (err: unknown) {
+                  return internalError(String(err));
                 }
-                return sendRes(stdoutRes, duration);
-              } catch (err: unknown) {
-                return internalError(String(err));
               }
-            }
-          );
-        });
+            );
+          });
+        } catch (err: unknown) {
+          internalError(String(err));
+        }
       })
         .listen(port)
         .on('error', err => {
