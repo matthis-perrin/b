@@ -21,11 +21,7 @@ export function baseConfig(opts: {context: string; watch: boolean}): Configurati
       alias: getTsConfigAlias(context),
     },
     plugins: [new YarnPlugin(), forkTsCheckerPlugin(context), eslintPlugin(), definePlugin()],
-    stats: {
-      preset: 'errors-warnings',
-      assets: true,
-      timings: true,
-    },
+    stats: false,
     infrastructureLogging: {level: 'error'},
     optimization: {
       minimize: isProd(),
