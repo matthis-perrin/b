@@ -44,6 +44,9 @@ export function webpackDevServer(context: string): Configuration {
       logging: 'none',
       overlay: false,
     },
+    devMiddleware: {
+      writeToDisk: true,
+    },
     onListening: () => log({event: 'start', port}),
   };
 }

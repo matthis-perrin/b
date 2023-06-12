@@ -15,7 +15,7 @@ export function baseConfig(opts: {context: string; watch: boolean}): Configurati
     mode: 'none',
     context,
     entry: {},
-    // devtool: isProd() ? 'source-map' : 'eval',
+    devtool: isProd() ? 'source-map' : 'eval',
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       alias: getTsConfigAlias(context),

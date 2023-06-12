@@ -1,6 +1,19 @@
+/*
+ * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
 import { createRequire as __WEBPACK_EXTERNAL_createRequire } from "module";
 /******/ var __webpack_modules__ = ([
-/* 0 */,
+/* 0 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"runAllWebpacks\": () => (/* binding */ runAllWebpacks),\n/* harmony export */   \"runWebpacks\": () => (/* binding */ runWebpacks)\n/* harmony export */ });\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);\n/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);\n/* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(webpack__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var webpack_dev_server__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);\n/* harmony import */ var webpack_dev_server__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(webpack_dev_server__WEBPACK_IMPORTED_MODULE_3__);\n/* harmony import */ var _src_exit_handler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);\n/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);\n/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(8);\n/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(25);\n/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(24);\n/* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(26);\n/* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(27);\n/* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(28);\n/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(29);\n/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(30);\n/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(32);\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nconst name = 'WebpackRunner';\nasync function runWebpacks(opts) {\n  const {\n    root,\n    workspaceFragments,\n    watch\n  } = opts;\n  const statuses = new Map();\n  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_6__.getProjectsFromWorkspaceFragment);\n  const env = await (0,_src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_9__.generateEnvDefinitionFile)();\n  for (const [key, val] of Object.entries(env)) {\n    // eslint-disable-next-line node/no-process-env\n    process.env[`MATTHIS_${key}`] = val;\n  }\n  function handleStart(project) {\n    const {\n      projectName\n    } = project;\n    const current = statuses.get(projectName) ?? {\n      project,\n      firstRun: true,\n      isRunning: true,\n      errors: [],\n      lambdaServerEvents: {},\n      webpackDevServerEvents: {}\n    };\n    statuses.set(projectName, {\n      ...current,\n      isRunning: true\n    });\n    onChange();\n  }\n  function handleResults(project, stats) {\n    var _statuses$get, _statuses$get2, _statuses$get3;\n    const {\n      projectName\n    } = project;\n    const errors = [...stats.compilation.errors.map(err => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_11__.parseError)(err, {\n      root,\n      severity: 'error'\n    })), ...stats.compilation.warnings.map(warn => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_11__.parseError)(warn, {\n      root,\n      severity: 'warning'\n    }))];\n    const lambdaServerEvents = ((_statuses$get = statuses.get(projectName)) === null || _statuses$get === void 0 ? void 0 : _statuses$get.lambdaServerEvents) ?? {};\n    const webpackDevServerEvents = ((_statuses$get2 = statuses.get(projectName)) === null || _statuses$get2 === void 0 ? void 0 : _statuses$get2.webpackDevServerEvents) ?? {};\n    const compilationFailure = (_statuses$get3 = statuses.get(projectName)) === null || _statuses$get3 === void 0 ? void 0 : _statuses$get3.compilationFailure;\n    statuses.set(projectName, {\n      project,\n      firstRun: false,\n      isRunning: false,\n      errors,\n      compilationFailure,\n      lambdaServerEvents,\n      webpackDevServerEvents\n    });\n    onChange();\n  }\n  function redraw() {\n    const errors = [...statuses.values()].flatMap(v => v.errors);\n    const groupedErrors = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_10__.groupAndSortErrors)(errors);\n    const summary = [...statuses.values()].map(status => {\n      return (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_13__.renderProjectStatus)(status.project, status.firstRun, status.isRunning, groupedErrors, status.compilationFailure, status.lambdaServerEvents, status.webpackDevServerEvents);\n    });\n    summary.unshift([(0,ansi_colors__WEBPACK_IMPORTED_MODULE_1__.underline)(`Projects (${projects.length})`), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_1__.underline)('Status'), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_1__.underline)('Run')]);\n    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_13__.renderErrors)(groupedErrors);\n    if (watch) {\n      process.stdout.write('\\u001B[2J\\u001B[3J\\u001B[H'); // clear terminal\n    }\n\n    console.log((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_14__.table)(summary));\n    if (report.length > 0) {\n      console.log(`\\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_13__.renderErrorWarningCount)(errors)}\\n`);\n      console.log(report);\n    }\n  }\n  function onChange() {\n    if (watch) {\n      redraw();\n    } else {\n      const allDone = [...statuses.values()].every(status => !status.isRunning);\n      if (allDone) {\n        const errors = [...statuses.values()].flatMap(v => v.errors);\n        const {\n          globalErrors\n        } = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_10__.groupAndSortErrors)(errors);\n        const noGlobalErrors = globalErrors.length === 0 && [...statuses.values()].every(status => status.compilationFailure === undefined);\n        redraw();\n        if (noGlobalErrors) {\n          resolve();\n        } else {\n          reject();\n        }\n      }\n    }\n  }\n  const cleanupFunctions = await Promise.all(projects.map(async project => {\n    const {\n      projectName\n    } = project;\n    const projectPath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(root, projectName);\n    const intialStatus = {\n      project,\n      firstRun: true,\n      isRunning: true,\n      errors: [],\n      lambdaServerEvents: {},\n      webpackDevServerEvents: {}\n    };\n    statuses.set(projectName, intialStatus);\n    // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax\n    const config = await import( /*webpackIgnore: true*/(0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'webpack.config.js')).then(({\n      getConfig\n    }) => getConfig({\n      context: projectPath,\n      watch\n    }));\n    const reportCompilationFailure = error => {\n      updateStatus(curr => {\n        curr.compilationFailure = error;\n      });\n    };\n    const updateLambdaServerEvents = fn => {\n      updateStatus(curr => fn(curr.lambdaServerEvents));\n    };\n    const updateWebpackDevServerEvents = fn => {\n      updateStatus(curr => fn(curr.webpackDevServerEvents));\n    };\n    const updateStatus = fn => {\n      let current = statuses.get(projectName);\n      if (!current) {\n        current = intialStatus;\n        statuses.set(projectName, current);\n      }\n      fn(current);\n    };\n\n    // Read events in the lambda server logs to update the globalInfo\n    let lastProcessedLambdaLog = Date.now();\n    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {\n      const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));\n      let shouldRedraw = false;\n      for (const log of logs) {\n        const date = new Date(log.t).getTime();\n        if (date < lastProcessedLambdaLog) {\n          continue;\n        }\n        lastProcessedLambdaLog = date;\n        shouldRedraw = true;\n        if (log.event === 'start') {\n          updateLambdaServerEvents(curr => {\n            curr.startEvent = log;\n          });\n        } else {\n          updateLambdaServerEvents(curr => {\n            curr.lastEvent = log;\n          });\n        }\n      }\n      if (shouldRedraw) {\n        redraw();\n      }\n    });\n\n    // Read events in the webpack dev server logs to update the globalInfo\n    let lastProcessedDevServerLog = Date.now();\n    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'log', 'webpack_dev_server.txt'), lines => {\n      const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));\n      let shouldRedraw = false;\n      for (const log of logs) {\n        const date = new Date(log.t).getTime();\n        if (date < lastProcessedDevServerLog) {\n          continue;\n        }\n        lastProcessedDevServerLog = date;\n        shouldRedraw = true;\n        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\n        if (log.event === 'start') {\n          updateWebpackDevServerEvents(curr => {\n            curr.startEvent = log;\n          });\n        } else {\n          (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_8__.neverHappens)(log.event);\n          //   updateWebpackDevServerEvents(curr => {\n          //     curr.lastEvent = log;\n          //   });\n        }\n      }\n\n      if (shouldRedraw) {\n        redraw();\n      }\n    });\n    const compiler = (0,webpack__WEBPACK_IMPORTED_MODULE_2__.webpack)({\n      ...config,\n      watch\n    }, (err, res) => {\n      if (err || !res) {\n        reportCompilationFailure(err ? String(err) : 'No result after compilation');\n        if (!watch) {\n          onChange();\n          resolve();\n        }\n      }\n      onChange();\n    });\n    compiler.hooks.beforeRun.tap(name, () => handleStart(project));\n    compiler.hooks.watchRun.tap(name, () => handleStart(project));\n    compiler.hooks.done.tap(name, stats => handleResults(project, stats));\n    let devServer;\n    if (config.devServer) {\n      devServer = new (webpack_dev_server__WEBPACK_IMPORTED_MODULE_3___default())(config.devServer, compiler);\n      await devServer.start();\n    }\n    return async () => {\n      return new Promise((resolve, reject) => {\n        const closeCompiler = () => compiler.close(err => err ? reject(err) : resolve());\n        if (devServer) {\n          devServer.stop().then(closeCompiler).catch(reject);\n        } else {\n          closeCompiler();\n        }\n      });\n    };\n  }));\n  let resolvePromise;\n  let rejectPromise;\n  const globalPromise = new Promise((resolve, reject) => {\n    resolvePromise = resolve;\n    rejectPromise = reject;\n  });\n  let cleanupCalled = false;\n  const cleanup = async () => {\n    if (cleanupCalled) {\n      return;\n    }\n    cleanupCalled = true;\n    await Promise.all(cleanupFunctions);\n  };\n  const reject = err => {\n    cleanup().then(() => rejectPromise(err)).catch(cleanupErr => {\n      (0,_src_global_error__WEBPACK_IMPORTED_MODULE_5__.globalError)('webpack runner cleanup error', cleanupErr);\n      rejectPromise(err);\n    });\n  };\n  const resolve = () => {\n    cleanup().then(resolvePromise).catch(cleanupErr => {\n      (0,_src_global_error__WEBPACK_IMPORTED_MODULE_5__.globalError)('webpack runner cleanup error', cleanupErr);\n      resolvePromise();\n    });\n  };\n  (0,_src_exit_handler__WEBPACK_IMPORTED_MODULE_4__.registerExitCallback)(cleanup);\n  return globalPromise;\n}\nasync function runAllWebpacks(options) {\n  const {\n    root,\n    watch\n  } = options;\n  const workspaceFragments = await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_7__.readProjectsFromWorkspace)(root);\n  if (!workspaceFragments) {\n    throw new Error(`No workspace projects at path ${root}`);\n  }\n  await runWebpacks({\n    root,\n    workspaceFragments,\n    watch\n  });\n}\n\n//# sourceURL=webpack://b/./src/webpack-runner/runner.ts?");
+
+/***/ }),
 /* 1 */
 /***/ ((module) => {
 
@@ -28,1421 +41,169 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("webpack-dev-
 /* 5 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "globalError": () => (/* binding */ globalError)
-/* harmony export */ });
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
-
-function globalError(...val) {
-  for (const data of val) {
-    try {
-      const str = typeof data === 'string' ? data : data instanceof Error ? data.stack ?? String(data) : JSON.stringify(data);
-      console.error(str);
-      (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', str);
-    } catch {
-      console.error(String(val));
-      (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', String(val));
-    }
-  }
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"registerExitCallback\": () => (/* binding */ registerExitCallback)\n/* harmony export */ });\n/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);\n\nlet called = false;\nconst callbacks = [];\nfunction runCallbacks() {\n  if (called) {\n    return;\n  }\n  called = true;\n  for (const fn of callbacks) {\n    Promise.resolve(fn()).catch(err => (0,_src_global_error__WEBPACK_IMPORTED_MODULE_0__.globalError)('Failure to run exit cleanup callback', err));\n  }\n}\nprocess.on('beforeExit', () => runCallbacks());\nprocess.on('exit', () => runCallbacks());\nprocess.on('SIGTERM', () => runCallbacks());\nprocess.on('SIGINT', () => runCallbacks());\nprocess.on('uncaughtException', err => {\n  (0,_src_global_error__WEBPACK_IMPORTED_MODULE_0__.globalError)('uncaughtException', err);\n  runCallbacks();\n});\nfunction registerExitCallback(cb) {\n  callbacks.push(cb);\n}\n\n//# sourceURL=webpack://b/./src/exit_handler.ts?");
 
 /***/ }),
 /* 6 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"globalError\": () => (/* binding */ globalError)\n/* harmony export */ });\n/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);\n/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);\n\nfunction globalError(...val) {\n  for (const data of val) {\n    try {\n      const str = typeof data === 'string' ? data : data instanceof Error ? data.stack ?? String(data) : JSON.stringify(data);\n      console.error(str);\n      (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', str);\n    } catch {\n      console.error(String(val));\n      (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', String(val));\n    }\n  }\n}\n\n//# sourceURL=webpack://b/./src/global_error.ts?");
+
+/***/ }),
+/* 7 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs");
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateWorkspace": () => (/* binding */ generateWorkspace),
-/* harmony export */   "getProjectsFromWorkspaceFragment": () => (/* binding */ getProjectsFromWorkspaceFragment)
-/* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(10);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(11);
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(13);
-/* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(14);
-/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(15);
-/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(16);
-/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(18);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(24);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(23);
-
-
-
-
-
-
-
-
-
-
-
-
-function getProjectsFromWorkspaceFragment(fragment) {
-  if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StaticWebsite) {
-    return [{
-      projectName: fragment.websiteName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Web
-    }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StandaloneLambda) {
-    return [{
-      projectName: fragment.lambdaName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaFunction
-    }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.WebApp) {
-    return [{
-      projectName: fragment.websiteName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Web
-    }, {
-      projectName: fragment.lambdaName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaApi
-    }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeLib) {
-    return [{
-      projectName: fragment.libName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeLib
-    }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeScript) {
-    return [{
-      projectName: fragment.scriptName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeScript
-    }];
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.Shared) {
-    return [{
-      projectName: 'shared',
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Shared
-    }];
-  }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_11__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
-}
-async function generateWorkspace(dst, workspaceName, workspaceFragments, alreadyGenerated) {
-  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
-
-  // Create projects files from templates
-  await Promise.all(projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__.generateProject)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, project.projectName), project)));
-
-  // Generate workspace root files
-  const SCRIPTS_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_3__.fileURLToPath)(import.meta.url), '../scripts');
-  await Promise.all([
-  // package.json
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'package.json'), (0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_8__.generateWorkspacePackageJson)(workspaceName, projects)),
-  // .gitignore
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, '.gitignore'), (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__.generateGitIgnore)()),
-  // app.code-workspace
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'app.code-workspace'), (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__.generateCodeWorkspace)(workspaceFragments)),
-  // setup.js
-  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'setup.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'setup.js')),
-  // deploy.js
-  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'deploy.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'deploy.js')),
-  // build.js
-  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'build.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'build.js'))]);
-
-  // Terraform folder generation
-  const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'terraform');
-  await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
-    const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateWorkspaceProjectTerraform)(workspaceName, p);
-    if (content === undefined) {
-      return;
-    }
-    const name = `${p.projectName}_terraform`;
-    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, `${name}.tf`), content);
-  })]);
-
-  // Run setup.js
-  console.log('Running post install script');
-  const commands = [`cd ${dst}`, `node setup.js`, `git init`];
-  (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '), {
-    stdio: ['ignore', 'inherit', 'inherit']
-  });
-}
-
-/***/ }),
-/* 8 */
-/***/ ((module) => {
-
-module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateWorkspace\": () => (/* binding */ generateWorkspace),\n/* harmony export */   \"getProjectsFromWorkspaceFragment\": () => (/* binding */ getProjectsFromWorkspaceFragment)\n/* harmony export */ });\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);\n/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);\n/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);\n/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(12);\n/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(14);\n/* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(15);\n/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(16);\n/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(17);\n/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(19);\n/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(25);\n/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(24);\n\n\n\n\n\n\n\n\n\n\n\n\nfunction getProjectsFromWorkspaceFragment(fragment) {\n  if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StaticWebsite) {\n    return [{\n      projectName: fragment.websiteName,\n      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Web\n    }];\n  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StandaloneLambda) {\n    return [{\n      projectName: fragment.lambdaName,\n      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaFunction\n    }];\n  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.WebApp) {\n    return [{\n      projectName: fragment.websiteName,\n      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Web\n    }, {\n      projectName: fragment.lambdaName,\n      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaApi\n    }];\n  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeLib) {\n    return [{\n      projectName: fragment.libName,\n      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeLib\n    }];\n  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeScript) {\n    return [{\n      projectName: fragment.scriptName,\n      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeScript\n    }];\n    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\n  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.Shared) {\n    return [{\n      projectName: 'shared',\n      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Shared\n    }];\n  }\n  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_11__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);\n}\nasync function generateWorkspace(dst, workspaceName, workspaceFragments, alreadyGenerated) {\n  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);\n\n  // Create projects files from templates\n  await Promise.all(projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__.generateProject)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, project.projectName), project)));\n\n  // Generate workspace root files\n  const SCRIPTS_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_3__.fileURLToPath)(import.meta.url), '../scripts');\n  await Promise.all([\n  // package.json\n  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'package.json'), (0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_8__.generateWorkspacePackageJson)(workspaceName, projects)),\n  // .gitignore\n  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, '.gitignore'), (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__.generateGitIgnore)()),\n  // app.code-workspace\n  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'app.code-workspace'), (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__.generateCodeWorkspace)(workspaceFragments)),\n  // setup.js\n  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'setup.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'setup.js')),\n  // deploy.js\n  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'deploy.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'deploy.js')),\n  // build.js\n  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'build.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'build.js'))]);\n\n  // Terraform folder generation\n  const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'terraform');\n  await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {\n    const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateWorkspaceProjectTerraform)(workspaceName, p);\n    if (content === undefined) {\n      return;\n    }\n    const name = `${p.projectName}_terraform`;\n    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, `${name}.tf`), content);\n  })]);\n\n  // Run setup.js\n  console.log('Running post install script');\n  const commands = [`cd ${dst}`, `node setup.js`, `git init`];\n  (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '), {\n    stdio: ['ignore', 'inherit', 'inherit']\n  });\n}\n\n//# sourceURL=webpack://b/./src/project/generate_workspace.ts?");
 
 /***/ }),
 /* 9 */
 /***/ ((module) => {
 
-module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs/promises");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
 
 /***/ }),
 /* 10 */
 /***/ ((module) => {
 
-module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs/promises");
 
 /***/ }),
 /* 11 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ ((module) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "access": () => (/* binding */ access),
-/* harmony export */   "cleanDir": () => (/* binding */ cleanDir),
-/* harmony export */   "cp": () => (/* binding */ cp),
-/* harmony export */   "exists": () => (/* binding */ exists),
-/* harmony export */   "listFiles": () => (/* binding */ listFiles),
-/* harmony export */   "maybeReadFile": () => (/* binding */ maybeReadFile),
-/* harmony export */   "readFile": () => (/* binding */ readFile),
-/* harmony export */   "readdir": () => (/* binding */ readdir),
-/* harmony export */   "rmDir": () => (/* binding */ rmDir),
-/* harmony export */   "stat": () => (/* binding */ stat),
-/* harmony export */   "writeJsFile": () => (/* binding */ writeJsFile),
-/* harmony export */   "writeJsonFile": () => (/* binding */ writeJsonFile),
-/* harmony export */   "writeRawFile": () => (/* binding */ writeRawFile),
-/* harmony export */   "writeTsFile": () => (/* binding */ writeTsFile)
-/* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(12);
-/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(prettier__WEBPACK_IMPORTED_MODULE_3__);
-
-
-
-
-const {
-  access,
-  readFile,
-  readdir,
-  stat
-} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
-const {
-  writeFile,
-  mkdir,
-  rm
-} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
-async function writeJsonFile(path, json) {
-  await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
-}
-async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, {
-    parser,
-    printWidth: 100,
-    singleQuote: true,
-    trailingComma: 'es5',
-    bracketSpacing: false,
-    arrowParens: 'avoid',
-    endOfLine: 'auto'
-  }));
-}
-async function writeJsFile(path, js) {
-  return writePrettyFile('babel', path, js);
-}
-async function writeTsFile(path, ts) {
-  return writePrettyFile('typescript', path, ts);
-}
-async function writeRawFile(path, content) {
-  console.log(`write ${path}`);
-  await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
-    recursive: true
-  });
-  await writeFile(path, content);
-}
-async function rmDir(dirPath) {
-  await rm(dirPath, {
-    recursive: true,
-    force: true
-  });
-}
-async function cleanDir(dirPath) {
-  console.log('clean', dirPath);
-  try {
-    await rmDir(dirPath);
-  } finally {
-    await mkdir(dirPath, {
-      recursive: true
-    });
-  }
-}
-async function cp(from, to) {
-  return new Promise((resolve, reject) => {
-    (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(`cp -R ${from} ${to}`, err => err ? reject(err) : resolve());
-  });
-}
-async function exists(path) {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
-async function maybeReadFile(path) {
-  try {
-    const fileContent = await readFile(path);
-    return fileContent.toString();
-  } catch {
-    return undefined;
-  }
-}
-async function listFiles(path) {
-  const files = [];
-  const ents = await readdir(path, {
-    withFileTypes: true
-  });
-  const promises = [];
-  for (const ent of ents) {
-    const entPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(path, ent.name);
-    if (ent.isDirectory()) {
-      promises.push(listFiles(entPath).then(subFiles => {
-        files.push(...subFiles);
-      }));
-    } else if (ent.isFile()) {
-      files.push(entPath);
-    }
-  }
-  await Promise.all(promises);
-  return files;
-}
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
 
 /***/ }),
 /* 12 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"access\": () => (/* binding */ access),\n/* harmony export */   \"cleanDir\": () => (/* binding */ cleanDir),\n/* harmony export */   \"cp\": () => (/* binding */ cp),\n/* harmony export */   \"exists\": () => (/* binding */ exists),\n/* harmony export */   \"listFiles\": () => (/* binding */ listFiles),\n/* harmony export */   \"maybeReadFile\": () => (/* binding */ maybeReadFile),\n/* harmony export */   \"readFile\": () => (/* binding */ readFile),\n/* harmony export */   \"readdir\": () => (/* binding */ readdir),\n/* harmony export */   \"rmDir\": () => (/* binding */ rmDir),\n/* harmony export */   \"stat\": () => (/* binding */ stat),\n/* harmony export */   \"writeJsFile\": () => (/* binding */ writeJsFile),\n/* harmony export */   \"writeJsonFile\": () => (/* binding */ writeJsonFile),\n/* harmony export */   \"writeRawFile\": () => (/* binding */ writeRawFile),\n/* harmony export */   \"writeTsFile\": () => (/* binding */ writeTsFile)\n/* harmony export */ });\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);\n/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);\n/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(prettier__WEBPACK_IMPORTED_MODULE_3__);\n\n\n\n\nconst {\n  access,\n  readFile,\n  readdir,\n  stat\n} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;\nconst {\n  writeFile,\n  mkdir,\n  rm\n} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;\nasync function writeJsonFile(path, json) {\n  await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\\n`);\n}\nasync function writePrettyFile(parser, path, code) {\n  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, {\n    parser,\n    printWidth: 100,\n    singleQuote: true,\n    trailingComma: 'es5',\n    bracketSpacing: false,\n    arrowParens: 'avoid',\n    endOfLine: 'auto'\n  }));\n}\nasync function writeJsFile(path, js) {\n  return writePrettyFile('babel', path, js);\n}\nasync function writeTsFile(path, ts) {\n  return writePrettyFile('typescript', path, ts);\n}\nasync function writeRawFile(path, content) {\n  console.log(`write ${path}`);\n  await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {\n    recursive: true\n  });\n  await writeFile(path, content);\n}\nasync function rmDir(dirPath) {\n  await rm(dirPath, {\n    recursive: true,\n    force: true\n  });\n}\nasync function cleanDir(dirPath) {\n  console.log('clean', dirPath);\n  try {\n    await rmDir(dirPath);\n  } finally {\n    await mkdir(dirPath, {\n      recursive: true\n    });\n  }\n}\nasync function cp(from, to) {\n  return new Promise((resolve, reject) => {\n    (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(`cp -R ${from} ${to}`, err => err ? reject(err) : resolve());\n  });\n}\nasync function exists(path) {\n  try {\n    await access(path);\n    return true;\n  } catch {\n    return false;\n  }\n}\nasync function maybeReadFile(path) {\n  try {\n    const fileContent = await readFile(path);\n    return fileContent.toString();\n  } catch {\n    return undefined;\n  }\n}\nasync function listFiles(path) {\n  const files = [];\n  const ents = await readdir(path, {\n    withFileTypes: true\n  });\n  const promises = [];\n  for (const ent of ents) {\n    const entPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(path, ent.name);\n    if (ent.isDirectory()) {\n      promises.push(listFiles(entPath).then(subFiles => {\n        files.push(...subFiles);\n      }));\n    } else if (ent.isFile()) {\n      files.push(entPath);\n    }\n  }\n  await Promise.all(promises);\n  return files;\n}\n\n//# sourceURL=webpack://b/./src/fs.ts?");
+
+/***/ }),
+/* 13 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
 
 /***/ }),
-/* 13 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "PROJECT_TYPE_TO_METADATA": () => (/* binding */ PROJECT_TYPE_TO_METADATA),
-/* harmony export */   "ProjectType": () => (/* binding */ ProjectType),
-/* harmony export */   "RUNTIME_TYPE_TO_METADATA": () => (/* binding */ RUNTIME_TYPE_TO_METADATA),
-/* harmony export */   "RuntimeType": () => (/* binding */ RuntimeType),
-/* harmony export */   "WorkspaceFragmentType": () => (/* binding */ WorkspaceFragmentType)
-/* harmony export */ });
-//
-// Runtime types
-//
-let RuntimeType = /*#__PURE__*/function (RuntimeType) {
-  RuntimeType["Web"] = "web";
-  RuntimeType["Node"] = "node";
-  RuntimeType["Lib"] = "lib";
-  RuntimeType["Lambda"] = "lambda";
-  RuntimeType["ReactNative"] = "react-native";
-  RuntimeType["NodeLib"] = "node-lib";
-  RuntimeType["NodeScript"] = "node-script";
-  return RuntimeType;
-}({});
-const RUNTIME_TYPE_TO_METADATA = {
-  [RuntimeType.Web]: {
-    eslint: RuntimeType.Web,
-    tsconfig: RuntimeType.Web,
-    webpack: RuntimeType.Web
-  },
-  [RuntimeType.Node]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.Node
-  },
-  [RuntimeType.Lib]: {
-    eslint: RuntimeType.Lib,
-    tsconfig: RuntimeType.Lib,
-    webpack: RuntimeType.Lib
-  },
-  [RuntimeType.Lambda]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.Lambda
-  },
-  [RuntimeType.ReactNative]: {
-    eslint: RuntimeType.ReactNative,
-    tsconfig: RuntimeType.ReactNative
-  },
-  [RuntimeType.NodeLib]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.NodeLib
-  },
-  [RuntimeType.NodeScript]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.NodeScript
-  }
-};
-
-//
-// Project type
-//
-
-let ProjectType = /*#__PURE__*/function (ProjectType) {
-  ProjectType["Web"] = "web";
-  ProjectType["LambdaFunction"] = "lambda_function";
-  ProjectType["LambdaApi"] = "lambda_api";
-  ProjectType["NodeLib"] = "node_lib";
-  ProjectType["NodeScript"] = "node_script";
-  ProjectType["Shared"] = "shared";
-  return ProjectType;
-}({});
-const PROJECT_TYPE_TO_METADATA = {
-  [ProjectType.Web]: {
-    runtimeType: RuntimeType.Web
-  },
-  [ProjectType.LambdaFunction]: {
-    runtimeType: RuntimeType.Lambda
-  },
-  [ProjectType.LambdaApi]: {
-    runtimeType: RuntimeType.Lambda
-  },
-  [ProjectType.NodeLib]: {
-    runtimeType: RuntimeType.NodeLib
-  },
-  [ProjectType.NodeScript]: {
-    runtimeType: RuntimeType.NodeScript
-  },
-  [ProjectType.Shared]: {
-    runtimeType: RuntimeType.Lib
-  }
-};
-
-//
-// Workspace Fragment type
-//
-
-let WorkspaceFragmentType = /*#__PURE__*/function (WorkspaceFragmentType) {
-  WorkspaceFragmentType["StaticWebsite"] = "static-website";
-  WorkspaceFragmentType["StandaloneLambda"] = "standalone-lambda";
-  WorkspaceFragmentType["WebApp"] = "web-app";
-  WorkspaceFragmentType["NodeLib"] = "node-lib";
-  WorkspaceFragmentType["NodeScript"] = "node-script";
-  WorkspaceFragmentType["Shared"] = "shared";
-  return WorkspaceFragmentType;
-}({});
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function validateRegistry() {
-  return true;
-}
-
-/***/ }),
 /* 14 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateProject": () => (/* binding */ generateProject)
-/* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(10);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(11);
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(13);
-
-
-
-
-
-
-const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_3__.fileURLToPath)(import.meta.url), '../templates');
-async function generateProject(dst, project) {
-  const {
-    projectName,
-    type
-  } = project;
-  // Copy template files
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(TEMPLATES_PATH, type), dst);
-
-  // Replace name in package.json
-  const packageJsonPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'package.json');
-  const packageJsonbuffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(packageJsonPath);
-  const packageJson = JSON.parse(packageJsonbuffer.toString());
-  packageJson['name'] = projectName;
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)(packageJsonPath, packageJson);
-
-  // Replace variables
-  const files = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.listFiles)(dst);
-  await Promise.all(files.map(async file => {
-    const buffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(file);
-    const content = buffer.toString();
-    const newContent = content.replaceAll('{{PROJECT_NAME}}', projectName);
-    if (newContent !== content) {
-      await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.writeFile)(file, newContent);
-    }
-  }));
-
-  // Post generation script for React Native project
-  if (_src_models__WEBPACK_IMPORTED_MODULE_5__.PROJECT_TYPE_TO_METADATA[type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_5__.RuntimeType.ReactNative) {
-    console.log('Running post install script');
-    const commands = [`pushd ${dst}`, `npx --yes react-native init ${projectName}`, `mv ${projectName}/ios .`, `mv ${projectName}/android .`, `rm -rf ${projectName}`, `popd`];
-    (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '));
-  }
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"PROJECT_TYPE_TO_METADATA\": () => (/* binding */ PROJECT_TYPE_TO_METADATA),\n/* harmony export */   \"ProjectType\": () => (/* binding */ ProjectType),\n/* harmony export */   \"RUNTIME_TYPE_TO_METADATA\": () => (/* binding */ RUNTIME_TYPE_TO_METADATA),\n/* harmony export */   \"RuntimeType\": () => (/* binding */ RuntimeType),\n/* harmony export */   \"WorkspaceFragmentType\": () => (/* binding */ WorkspaceFragmentType)\n/* harmony export */ });\n//\n// Runtime types\n//\nlet RuntimeType = /*#__PURE__*/function (RuntimeType) {\n  RuntimeType[\"Web\"] = \"web\";\n  RuntimeType[\"Node\"] = \"node\";\n  RuntimeType[\"Lib\"] = \"lib\";\n  RuntimeType[\"Lambda\"] = \"lambda\";\n  RuntimeType[\"ReactNative\"] = \"react-native\";\n  RuntimeType[\"NodeLib\"] = \"node-lib\";\n  RuntimeType[\"NodeScript\"] = \"node-script\";\n  return RuntimeType;\n}({});\nconst RUNTIME_TYPE_TO_METADATA = {\n  [RuntimeType.Web]: {\n    eslint: RuntimeType.Web,\n    tsconfig: RuntimeType.Web,\n    webpack: RuntimeType.Web\n  },\n  [RuntimeType.Node]: {\n    eslint: RuntimeType.Node,\n    tsconfig: RuntimeType.Node,\n    webpack: RuntimeType.Node\n  },\n  [RuntimeType.Lib]: {\n    eslint: RuntimeType.Lib,\n    tsconfig: RuntimeType.Lib,\n    webpack: RuntimeType.Lib\n  },\n  [RuntimeType.Lambda]: {\n    eslint: RuntimeType.Node,\n    tsconfig: RuntimeType.Node,\n    webpack: RuntimeType.Lambda\n  },\n  [RuntimeType.ReactNative]: {\n    eslint: RuntimeType.ReactNative,\n    tsconfig: RuntimeType.ReactNative\n  },\n  [RuntimeType.NodeLib]: {\n    eslint: RuntimeType.Node,\n    tsconfig: RuntimeType.Node,\n    webpack: RuntimeType.NodeLib\n  },\n  [RuntimeType.NodeScript]: {\n    eslint: RuntimeType.Node,\n    tsconfig: RuntimeType.Node,\n    webpack: RuntimeType.NodeScript\n  }\n};\n\n//\n// Project type\n//\n\nlet ProjectType = /*#__PURE__*/function (ProjectType) {\n  ProjectType[\"Web\"] = \"web\";\n  ProjectType[\"LambdaFunction\"] = \"lambda_function\";\n  ProjectType[\"LambdaApi\"] = \"lambda_api\";\n  ProjectType[\"NodeLib\"] = \"node_lib\";\n  ProjectType[\"NodeScript\"] = \"node_script\";\n  ProjectType[\"Shared\"] = \"shared\";\n  return ProjectType;\n}({});\nconst PROJECT_TYPE_TO_METADATA = {\n  [ProjectType.Web]: {\n    runtimeType: RuntimeType.Web\n  },\n  [ProjectType.LambdaFunction]: {\n    runtimeType: RuntimeType.Lambda\n  },\n  [ProjectType.LambdaApi]: {\n    runtimeType: RuntimeType.Lambda\n  },\n  [ProjectType.NodeLib]: {\n    runtimeType: RuntimeType.NodeLib\n  },\n  [ProjectType.NodeScript]: {\n    runtimeType: RuntimeType.NodeScript\n  },\n  [ProjectType.Shared]: {\n    runtimeType: RuntimeType.Lib\n  }\n};\n\n//\n// Workspace Fragment type\n//\n\nlet WorkspaceFragmentType = /*#__PURE__*/function (WorkspaceFragmentType) {\n  WorkspaceFragmentType[\"StaticWebsite\"] = \"static-website\";\n  WorkspaceFragmentType[\"StandaloneLambda\"] = \"standalone-lambda\";\n  WorkspaceFragmentType[\"WebApp\"] = \"web-app\";\n  WorkspaceFragmentType[\"NodeLib\"] = \"node-lib\";\n  WorkspaceFragmentType[\"NodeScript\"] = \"node-script\";\n  WorkspaceFragmentType[\"Shared\"] = \"shared\";\n  return WorkspaceFragmentType;\n}({});\n// eslint-disable-next-line @typescript-eslint/no-unused-vars\nfunction validateRegistry() {\n  return true;\n}\n\n//# sourceURL=webpack://b/./src/models.ts?");
 
 /***/ }),
 /* 15 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateGitIgnore": () => (/* binding */ generateGitIgnore)
-/* harmony export */ });
-function generateGitIgnore() {
-  return `
-.DS_Store
-node_modules
-build
-dist
-tmp
-yarn-error.log
-.yarn-warnings.log
-yarn.lock
-terraform/.terraform
-terraform/.terraform*
-terraform/*.tfstate.backup
-terraform/.aws-credentials
-terraform/archives
-*/log
-    `.trim();
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateProject\": () => (/* binding */ generateProject)\n/* harmony export */ });\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);\n/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);\n/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);\n/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(12);\n/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(14);\n\n\n\n\n\n\nconst TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_3__.fileURLToPath)(import.meta.url), '../templates');\nasync function generateProject(dst, project) {\n  const {\n    projectName,\n    type\n  } = project;\n  // Copy template files\n  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(TEMPLATES_PATH, type), dst);\n\n  // Replace name in package.json\n  const packageJsonPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'package.json');\n  const packageJsonbuffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(packageJsonPath);\n  const packageJson = JSON.parse(packageJsonbuffer.toString());\n  packageJson['name'] = projectName;\n  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)(packageJsonPath, packageJson);\n\n  // Replace variables\n  const files = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.listFiles)(dst);\n  await Promise.all(files.map(async file => {\n    const buffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(file);\n    const content = buffer.toString();\n    const newContent = content.replaceAll('{{PROJECT_NAME}}', projectName);\n    if (newContent !== content) {\n      await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.writeFile)(file, newContent);\n    }\n  }));\n\n  // Post generation script for React Native project\n  if (_src_models__WEBPACK_IMPORTED_MODULE_5__.PROJECT_TYPE_TO_METADATA[type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_5__.RuntimeType.ReactNative) {\n    console.log('Running post install script');\n    const commands = [`pushd ${dst}`, `npx --yes react-native init ${projectName}`, `mv ${projectName}/ios .`, `mv ${projectName}/android .`, `rm -rf ${projectName}`, `popd`];\n    (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '));\n  }\n}\n\n//# sourceURL=webpack://b/./src/project/generate_project.ts?");
 
 /***/ }),
 /* 16 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateWorkspacePackageJson": () => (/* binding */ generateWorkspacePackageJson)
-/* harmony export */ });
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(13);
-/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(17);
-
-
-function uniq(runtimes) {
-  return [...new Set(runtimes.filter(r => r !== undefined)).values()];
-}
-function projectMetadata(p) {
-  return _src_models__WEBPACK_IMPORTED_MODULE_0__.RUNTIME_TYPE_TO_METADATA[_src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType];
-}
-function generateWorkspacePackageJson(workspaceName, projects) {
-  const eslintRuntimes = uniq(projects.map(p => projectMetadata(p).eslint));
-  const tsconfigRuntimes = uniq(projects.map(p => projectMetadata(p).tsconfig));
-  const webpackRuntimes = uniq(projects.map(p => projectMetadata(p).webpack));
-  return {
-    name: workspaceName,
-    license: 'UNLICENSED',
-    type: 'module',
-    scripts: {
-      setup: 'node ./setup.js',
-      deploy: 'node ./deploy.js',
-      build: 'node ./build.js',
-      watch: 'node ./build.js --watch'
-    },
-    eslintConfig: {
-      ignorePatterns: ['**/*.js']
-    },
-    prettier: '@matthis/prettier-config',
-    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner], ['typescript', _src_versions__WEBPACK_IMPORTED_MODULE_1__.TYPESCRIPT_VERSION]].sort((d1, d2) => d1[0].localeCompare(d2[0])))
-  };
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateGitIgnore\": () => (/* binding */ generateGitIgnore)\n/* harmony export */ });\nfunction generateGitIgnore() {\n  return `\n.DS_Store\nnode_modules\nbuild\ndist\ntmp\nyarn-error.log\n.yarn-warnings.log\nyarn.lock\nterraform/.terraform\nterraform/.terraform*\nterraform/*.tfstate.backup\nterraform/.aws-credentials\nterraform/archives\n*/log\n    `.trim();\n}\n\n//# sourceURL=webpack://b/./src/project/gitignore.ts?");
 
 /***/ }),
 /* 17 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ESLINT_VERSION": () => (/* binding */ ESLINT_VERSION),
-/* harmony export */   "LIB_VERSIONS": () => (/* binding */ LIB_VERSIONS),
-/* harmony export */   "PACKAGE_VERSIONS": () => (/* binding */ PACKAGE_VERSIONS),
-/* harmony export */   "PRETTIER_VERSION": () => (/* binding */ PRETTIER_VERSION),
-/* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
-/* harmony export */ });
-const PACKAGE_VERSIONS = {
-  project: '1.3.21',
-  eslint: '1.1.4',
-  prettier: '1.1.1',
-  tsconfig: '1.1.7',
-  webpack: '1.2.14',
-  runner: '1.1.10'
-};
-const ESLINT_VERSION = '8.23.x';
-const PRETTIER_VERSION = '2.7.x';
-const TYPESCRIPT_VERSION = '4.8.x';
-
-/* eslint-disable @typescript-eslint/naming-convention */
-const LIB_VERSIONS = {
-  '@types/react': '17.0.x',
-  '@types/react-dom': '17.0.x',
-  react: '17.0.x',
-  'react-dom': '17.0.x',
-  '@types/react-native': '0.66.x',
-  'react-native': '0.66.x',
-  '@types/styled-components': '5.1.x',
-  'styled-components': '5.1.x',
-  'react-router': '5.2.x',
-  'react-router-dom': '5.2.x'
-};
-/* eslint-enable @typescript-eslint/naming-convention */
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateWorkspacePackageJson\": () => (/* binding */ generateWorkspacePackageJson)\n/* harmony export */ });\n/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);\n/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(18);\n\n\nfunction uniq(runtimes) {\n  return [...new Set(runtimes.filter(r => r !== undefined)).values()];\n}\nfunction projectMetadata(p) {\n  return _src_models__WEBPACK_IMPORTED_MODULE_0__.RUNTIME_TYPE_TO_METADATA[_src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType];\n}\nfunction generateWorkspacePackageJson(workspaceName, projects) {\n  const eslintRuntimes = uniq(projects.map(p => projectMetadata(p).eslint));\n  const tsconfigRuntimes = uniq(projects.map(p => projectMetadata(p).tsconfig));\n  const webpackRuntimes = uniq(projects.map(p => projectMetadata(p).webpack));\n  return {\n    name: workspaceName,\n    license: 'UNLICENSED',\n    type: 'module',\n    scripts: {\n      setup: 'node ./setup.js',\n      deploy: 'node ./deploy.js',\n      build: 'node ./build.js',\n      watch: 'node ./build.js --watch'\n    },\n    eslintConfig: {\n      ignorePatterns: ['**/*.js']\n    },\n    prettier: '@matthis/prettier-config',\n    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner], ['typescript', _src_versions__WEBPACK_IMPORTED_MODULE_1__.TYPESCRIPT_VERSION]].sort((d1, d2) => d1[0].localeCompare(d2[0])))\n  };\n}\n\n//# sourceURL=webpack://b/./src/project/package_json.ts?");
 
 /***/ }),
 /* 18 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateCommonTerraform": () => (/* binding */ generateCommonTerraform),
-/* harmony export */   "generateWorkspaceProjectTerraform": () => (/* binding */ generateWorkspaceProjectTerraform)
-/* harmony export */ });
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(13);
-/* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(19);
-/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(20);
-/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(21);
-/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(22);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(23);
-
-
-
-
-
-
-function generateCommonTerraform(workspaceName, projects) {
-  return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__.generateAwsProviderTerraform)(workspaceName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__.generateS3BucketTerraform)(workspaceName, projects.filter(p => _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_0__.RuntimeType.Web).map(p => p.projectName))].join('\n\n');
-}
-function generateWorkspaceProjectTerraform(workspaceName, project) {
-  const {
-    projectName,
-    type
-  } = project;
-  if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web) {
-    return (0,_src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__.generateCloudfrontDistributionTerraform)(workspaceName, projectName);
-  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaFunction) {
-    return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
-      api: false
-    });
-  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaApi) {
-    return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
-      api: true
-    });
-  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeLib) {
-    return undefined;
-  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
-    return undefined;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Shared) {
-    return undefined;
-  }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_5__.neverHappens)(type, 'ProjectType');
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"ESLINT_VERSION\": () => (/* binding */ ESLINT_VERSION),\n/* harmony export */   \"LIB_VERSIONS\": () => (/* binding */ LIB_VERSIONS),\n/* harmony export */   \"PACKAGE_VERSIONS\": () => (/* binding */ PACKAGE_VERSIONS),\n/* harmony export */   \"PRETTIER_VERSION\": () => (/* binding */ PRETTIER_VERSION),\n/* harmony export */   \"TYPESCRIPT_VERSION\": () => (/* binding */ TYPESCRIPT_VERSION)\n/* harmony export */ });\nconst PACKAGE_VERSIONS = {\n  project: '1.3.23',\n  eslint: '1.1.4',\n  prettier: '1.1.1',\n  tsconfig: '1.1.7',\n  webpack: '1.2.16',\n  runner: '1.1.11'\n};\nconst ESLINT_VERSION = '8.23.x';\nconst PRETTIER_VERSION = '2.7.x';\nconst TYPESCRIPT_VERSION = '4.8.x';\n\n/* eslint-disable @typescript-eslint/naming-convention */\nconst LIB_VERSIONS = {\n  '@types/react': '17.0.x',\n  '@types/react-dom': '17.0.x',\n  react: '17.0.x',\n  'react-dom': '17.0.x',\n  '@types/react-native': '0.66.x',\n  'react-native': '0.66.x',\n  '@types/styled-components': '5.1.x',\n  'styled-components': '5.1.x',\n  'react-router': '5.2.x',\n  'react-router-dom': '5.2.x'\n};\n/* eslint-enable @typescript-eslint/naming-convention */\n\n//# sourceURL=webpack://b/./src/versions.ts?");
 
 /***/ }),
 /* 19 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateCloudfrontDistributionTerraform": () => (/* binding */ generateCloudfrontDistributionTerraform)
-/* harmony export */ });
-function generateCloudfrontDistributionTerraform(workspaceName, projectName) {
-  const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
-  const originId = `${bucketName}-origin-id`;
-  return `
-resource "aws_cloudfront_distribution" "${projectName}" {
-  origin {
-    domain_name = aws_s3_bucket.code.bucket_regional_domain_name
-    origin_id   = "${originId}"
-    origin_path = "/${projectName}"
-
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.${projectName}.cloudfront_access_identity_path
-    }
-  }
-  
-  enabled             = true
-  wait_for_deployment = false
-  is_ipv6_enabled     = true
-  price_class         = "PriceClass_100"
-  
-  default_root_object   = "/index.html"
-  custom_error_response {
-    error_code         = 400
-    response_code      = 200
-    response_page_path = "/index.html"
-  }
-  custom_error_response {
-    error_code         = 403
-    response_code      = 200
-    response_page_path = "/index.html"
-  }
-  custom_error_response {
-    error_code         = 404
-    response_code      = 200
-    response_page_path = "/index.html"
-  }
-
-  default_cache_behavior {
-    allowed_methods  = ["HEAD", "GET"]
-    cached_methods   = ["HEAD", "GET"]
-    compress         = true
-    target_origin_id = "${originId}"
-    viewer_protocol_policy = "redirect-to-https"
-    
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
-  }
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-
-  viewer_certificate {
-    cloudfront_default_certificate = true
-  }
-}
-
-resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
-  `.trim();
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateCommonTerraform\": () => (/* binding */ generateCommonTerraform),\n/* harmony export */   \"generateWorkspaceProjectTerraform\": () => (/* binding */ generateWorkspaceProjectTerraform)\n/* harmony export */ });\n/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);\n/* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(20);\n/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(21);\n/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(22);\n/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(23);\n/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(24);\n\n\n\n\n\n\nfunction generateCommonTerraform(workspaceName, projects) {\n  return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__.generateAwsProviderTerraform)(workspaceName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__.generateS3BucketTerraform)(workspaceName, projects.filter(p => _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_0__.RuntimeType.Web).map(p => p.projectName))].join('\\n\\n');\n}\nfunction generateWorkspaceProjectTerraform(workspaceName, project) {\n  const {\n    projectName,\n    type\n  } = project;\n  if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web) {\n    return (0,_src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__.generateCloudfrontDistributionTerraform)(workspaceName, projectName);\n  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaFunction) {\n    return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {\n      api: false\n    });\n  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaApi) {\n    return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {\n      api: true\n    });\n  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeLib) {\n    return undefined;\n  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {\n    return undefined;\n    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\n  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Shared) {\n    return undefined;\n  }\n  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_5__.neverHappens)(type, 'ProjectType');\n}\n\n//# sourceURL=webpack://b/./src/project/terraform/all.ts?");
 
 /***/ }),
 /* 20 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateLambdaTerraform": () => (/* binding */ generateLambdaTerraform)
-/* harmony export */ });
-function generateLambdaTerraform(workspaceName, projectName, opts) {
-  const {
-    api
-  } = opts;
-  return `
-# Define any extra role for the lambda here
-data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
-  statement {
-    actions   = ["s3:ListAllMyBuckets"]
-    resources = ["*"]
-  }
-}
-
-resource "aws_s3_object" "${projectName}_archive" {
-  bucket       = aws_s3_bucket.code.id
-  key          = "${projectName}/dist.zip"
-  content_base64 = "UEsDBBQACAAIAGaKwlYAAAAAAAAAADYAAAAIACAAaW5kZXguanNVVA0AB3AIemRyCHpkcAh6ZHV4CwABBPUBAAAEFAAAAEutKMgvKinWy0jMS8lJLVKwVUgsrsxLVkgrzUsuyczPU9DQVKjmUlAoSi0pLcpTUFe35qq15gIAUEsHCP0ak1o4AAAANgAAAFBLAQIUAxQACAAIAGaKwlb9GpNaOAAAADYAAAAIACAAAAAAAAAAAACkgQAAAABpbmRleC5qc1VUDQAHcAh6ZHIIemRwCHpkdXgLAAEE9QEAAAQUAAAAUEsFBgAAAAABAAEAVgAAAI4AAAAAAA=="
-}
-
-resource "aws_lambda_function" "${projectName}" {
-  function_name     = "${workspaceName}-${projectName}"
-  s3_bucket         = aws_s3_object.${projectName}_archive.bucket
-  s3_key            = aws_s3_object.${projectName}_archive.key
-  handler           = "index.handler"
-  runtime           = "nodejs14.x"
-  role              = aws_iam_role.${projectName}_lambda_exec.arn
-}
-
-output "${projectName}_function_name" {
-  value       = aws_lambda_function.${projectName}.function_name
-  description = "Function name of the \\"${workspaceName}-${projectName}\\" lambda"
-}
-
-${api ? `
-resource "aws_lambda_function_url" "${projectName}" {
-  function_name      = aws_lambda_function.${projectName}.function_name
-  authorization_type = "NONE"
-}
-
-output "${projectName}_function_url" {
-  value       = aws_lambda_function_url.${projectName}.function_url
-  description = "Function url of the \\"${workspaceName}-${projectName}\\" lambda"
-}
-`.trim() : ''}
-
-resource "aws_iam_role" "${projectName}_lambda_exec" {
-  name = "${workspaceName}-${projectName}-assume-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action    = "sts:AssumeRole"
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-        Effect    = "Allow"
-        Sid       = ""
-      },
-    ]
-  })
-
-  inline_policy {
-    name = "${workspaceName}-${projectName}-cloudwatch-role"
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action   = [
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-          ]
-          Effect   = "Allow"
-          Resource = "arn:aws:logs:*:*:*"
-        },
-      ]
-    })
-  }
-  
-  inline_policy {
-    name = "${workspaceName}-${projectName}-extra-role"
-    policy = data.aws_iam_policy_document.${projectName}_lambda_extra_role.json
-  }
-}
-`.trim();
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateCloudfrontDistributionTerraform\": () => (/* binding */ generateCloudfrontDistributionTerraform)\n/* harmony export */ });\nfunction generateCloudfrontDistributionTerraform(workspaceName, projectName) {\n  const bucketName = projectName.toLowerCase().replace(/[^\\d.a-z-]+/gu, '-');\n  const originId = `${bucketName}-origin-id`;\n  return `\nresource \"aws_cloudfront_distribution\" \"${projectName}\" {\n  origin {\n    domain_name = aws_s3_bucket.code.bucket_regional_domain_name\n    origin_id   = \"${originId}\"\n    origin_path = \"/${projectName}\"\n\n    s3_origin_config {\n      origin_access_identity = aws_cloudfront_origin_access_identity.${projectName}.cloudfront_access_identity_path\n    }\n  }\n  \n  enabled             = true\n  wait_for_deployment = false\n  is_ipv6_enabled     = true\n  price_class         = \"PriceClass_100\"\n  \n  default_root_object   = \"/index.html\"\n  custom_error_response {\n    error_code         = 400\n    response_code      = 200\n    response_page_path = \"/index.html\"\n  }\n  custom_error_response {\n    error_code         = 403\n    response_code      = 200\n    response_page_path = \"/index.html\"\n  }\n  custom_error_response {\n    error_code         = 404\n    response_code      = 200\n    response_page_path = \"/index.html\"\n  }\n\n  default_cache_behavior {\n    allowed_methods  = [\"HEAD\", \"GET\"]\n    cached_methods   = [\"HEAD\", \"GET\"]\n    compress         = true\n    target_origin_id = \"${originId}\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    \n    forwarded_values {\n      query_string = false\n      cookies {\n        forward = \"none\"\n      }\n    }\n  }\n\n  restrictions {\n    geo_restriction {\n      restriction_type = \"none\"\n    }\n  }\n\n  viewer_certificate {\n    cloudfront_default_certificate = true\n  }\n}\n\nresource \"aws_cloudfront_origin_access_identity\" \"${projectName}\" {}\n  `.trim();\n}\n\n//# sourceURL=webpack://b/./src/project/terraform/cloudfront.ts?");
 
 /***/ }),
 /* 21 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateAwsProviderTerraform": () => (/* binding */ generateAwsProviderTerraform)
-/* harmony export */ });
-function generateAwsProviderTerraform(workspaceName) {
-  return `
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.1"
-    }
-  }
-}
-
-provider "aws" {
-  region  = "eu-west-3"
-  shared_credentials_files = ["./.aws-credentials"]
-  default_tags {
-    tags = {
-      Project = "${workspaceName}"
-    }
-  }
-}
-
-data "aws_region" "current" {}
-output "region" {
-  value = data.aws_region.current.id
-}
-`.trim();
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateLambdaTerraform\": () => (/* binding */ generateLambdaTerraform)\n/* harmony export */ });\nfunction generateLambdaTerraform(workspaceName, projectName, opts) {\n  const {\n    api\n  } = opts;\n  return `\n# Define any extra role for the lambda here\ndata \"aws_iam_policy_document\" \"${projectName}_lambda_extra_role\" {\n  statement {\n    actions   = [\"s3:ListAllMyBuckets\"]\n    resources = [\"*\"]\n  }\n}\n\nresource \"aws_s3_object\" \"${projectName}_archive\" {\n  bucket       = aws_s3_bucket.code.id\n  key          = \"${projectName}/dist.zip\"\n  content_base64 = \"UEsDBBQACAAIAGaKwlYAAAAAAAAAADYAAAAIACAAaW5kZXguanNVVA0AB3AIemRyCHpkcAh6ZHV4CwABBPUBAAAEFAAAAEutKMgvKinWy0jMS8lJLVKwVUgsrsxLVkgrzUsuyczPU9DQVKjmUlAoSi0pLcpTUFe35qq15gIAUEsHCP0ak1o4AAAANgAAAFBLAQIUAxQACAAIAGaKwlb9GpNaOAAAADYAAAAIACAAAAAAAAAAAACkgQAAAABpbmRleC5qc1VUDQAHcAh6ZHIIemRwCHpkdXgLAAEE9QEAAAQUAAAAUEsFBgAAAAABAAEAVgAAAI4AAAAAAA==\"\n}\n\nresource \"aws_lambda_function\" \"${projectName}\" {\n  function_name     = \"${workspaceName}-${projectName}\"\n  s3_bucket         = aws_s3_object.${projectName}_archive.bucket\n  s3_key            = aws_s3_object.${projectName}_archive.key\n  handler           = \"index.handler\"\n  runtime           = \"nodejs14.x\"\n  role              = aws_iam_role.${projectName}_lambda_exec.arn\n}\n\noutput \"${projectName}_function_name\" {\n  value       = aws_lambda_function.${projectName}.function_name\n  description = \"Function name of the \\\\\"${workspaceName}-${projectName}\\\\\" lambda\"\n}\n\n${api ? `\nresource \"aws_lambda_function_url\" \"${projectName}\" {\n  function_name      = aws_lambda_function.${projectName}.function_name\n  authorization_type = \"NONE\"\n}\n\noutput \"${projectName}_function_url\" {\n  value       = aws_lambda_function_url.${projectName}.function_url\n  description = \"Function url of the \\\\\"${workspaceName}-${projectName}\\\\\" lambda\"\n}\n`.trim() : ''}\n\nresource \"aws_iam_role\" \"${projectName}_lambda_exec\" {\n  name = \"${workspaceName}-${projectName}-assume-role\"\n  assume_role_policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [\n      {\n        Action    = \"sts:AssumeRole\"\n        Principal = {\n          Service = \"lambda.amazonaws.com\"\n        }\n        Effect    = \"Allow\"\n        Sid       = \"\"\n      },\n    ]\n  })\n\n  inline_policy {\n    name = \"${workspaceName}-${projectName}-cloudwatch-role\"\n    policy = jsonencode({\n      Version = \"2012-10-17\"\n      Statement = [\n        {\n          Action   = [\n            \"logs:CreateLogGroup\",\n            \"logs:CreateLogStream\",\n            \"logs:PutLogEvents\"\n          ]\n          Effect   = \"Allow\"\n          Resource = \"arn:aws:logs:*:*:*\"\n        },\n      ]\n    })\n  }\n  \n  inline_policy {\n    name = \"${workspaceName}-${projectName}-extra-role\"\n    policy = data.aws_iam_policy_document.${projectName}_lambda_extra_role.json\n  }\n}\n`.trim();\n}\n\n//# sourceURL=webpack://b/./src/project/terraform/lambda.ts?");
 
 /***/ }),
 /* 22 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateS3BucketTerraform": () => (/* binding */ generateS3BucketTerraform)
-/* harmony export */ });
-function generateS3BucketTerraform(workspaceName, webProjectNames) {
-  const bucketName = workspaceName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
-  const CODE_BUCKET = `
-resource "aws_s3_bucket" "code" {
-  bucket_prefix = "${bucketName}-"
-}
-
-output "code_bucket" {
-  value = aws_s3_bucket.code.id
-}
-`.trim();
-  const CLOUDFRONT_ACCESS = `
-data "aws_iam_policy_document" "cloudfront_access_to_code" {
-  ${webProjectNames.map(p => `
-  statement {
-    actions   = ["s3:GetObject"]
-    resources = [
-      "\${aws_s3_bucket.code.arn}/${p}/*",
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.${p}.iam_arn]
-    }
-  }
-`.trim()).join('\n\n')}
-}
-
-resource "aws_s3_bucket_policy" "code" {
-  bucket = aws_s3_bucket.code.id
-  policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
-}
-`.trim();
-  const out = [CODE_BUCKET];
-  if (webProjectNames.length > 0) {
-    out.push(CLOUDFRONT_ACCESS);
-  }
-  return out.join('\n\n');
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateAwsProviderTerraform\": () => (/* binding */ generateAwsProviderTerraform)\n/* harmony export */ });\nfunction generateAwsProviderTerraform(workspaceName) {\n  return `\nterraform {\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.1\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region  = \"eu-west-3\"\n  shared_credentials_files = [\"./.aws-credentials\"]\n  default_tags {\n    tags = {\n      Project = \"${workspaceName}\"\n    }\n  }\n}\n\ndata \"aws_region\" \"current\" {}\noutput \"region\" {\n  value = data.aws_region.current.id\n}\n`.trim();\n}\n\n//# sourceURL=webpack://b/./src/project/terraform/provider.ts?");
 
 /***/ }),
 /* 23 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "neverHappens": () => (/* binding */ neverHappens)
-/* harmony export */ });
-function neverHappens(value, msg) {
-  throw new Error(msg ?? `Unexpected value ${value}`);
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateS3BucketTerraform\": () => (/* binding */ generateS3BucketTerraform)\n/* harmony export */ });\nfunction generateS3BucketTerraform(workspaceName, webProjectNames) {\n  const bucketName = workspaceName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');\n  const CODE_BUCKET = `\nresource \"aws_s3_bucket\" \"code\" {\n  bucket_prefix = \"${bucketName}-\"\n}\n\noutput \"code_bucket\" {\n  value = aws_s3_bucket.code.id\n}\n`.trim();\n  const CLOUDFRONT_ACCESS = `\ndata \"aws_iam_policy_document\" \"cloudfront_access_to_code\" {\n  ${webProjectNames.map(p => `\n  statement {\n    actions   = [\"s3:GetObject\"]\n    resources = [\n      \"\\${aws_s3_bucket.code.arn}/${p}/*\",\n    ]\n    principals {\n      type        = \"AWS\"\n      identifiers = [aws_cloudfront_origin_access_identity.${p}.iam_arn]\n    }\n  }\n`.trim()).join('\\n\\n')}\n}\n\nresource \"aws_s3_bucket_policy\" \"code\" {\n  bucket = aws_s3_bucket.code.id\n  policy = data.aws_iam_policy_document.cloudfront_access_to_code.json\n}\n`.trim();\n  const out = [CODE_BUCKET];\n  if (webProjectNames.length > 0) {\n    out.push(CLOUDFRONT_ACCESS);\n  }\n  return out.join('\\n\\n');\n}\n\n//# sourceURL=webpack://b/./src/project/terraform/s3.ts?");
 
 /***/ }),
 /* 24 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateCodeWorkspace": () => (/* binding */ generateCodeWorkspace),
-/* harmony export */   "readProjectsFromWorkspace": () => (/* binding */ readProjectsFromWorkspace)
-/* harmony export */ });
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
-/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
-
-
-
-function generateCodeWorkspace(workspaceFragments) {
-  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__.getProjectsFromWorkspaceFragment);
-  const projectNames = projects.map(p => p.projectName);
-  return {
-    projects: workspaceFragments,
-    folders: [...projectNames.map(p => ({
-      path: p
-    })), {
-      path: 'terraform'
-    }, {
-      path: '.',
-      name: 'root'
-    }],
-    settings: {
-      /* eslint-disable @typescript-eslint/naming-convention */
-      'files.exclude': Object.fromEntries([...projectNames.map(p => [p, true]), ['terraform', true]]),
-      'editor.acceptSuggestionOnCommitCharacter': false,
-      'editor.suggestSelection': 'first',
-      'vsintellicode.modify.editor.suggestSelection': 'automaticallyOverrodeDefaultValue',
-      'explorer.confirmDelete': false,
-      'git.autofetch': true,
-      'git.confirmSync': false,
-      'typescript.preferences.importModuleSpecifier': 'non-relative',
-      'eslint.lintTask.enable': true,
-      'eslint.useESLintClass': true,
-      'eslint.options': {
-        reportUnusedDisableDirectives: 'warn'
-      },
-      'editor.formatOnSave': true,
-      'editor.codeActionsOnSave': {
-        'source.fixAll': false,
-        'source.fixAll.eslint': true
-      },
-      'editor.defaultFormatter': 'esbenp.prettier-vscode',
-      'emmet.showExpandedAbbreviation': 'never'
-      /* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */
-    },
-
-    extensions: {
-      recommendations: ['dbaeumer.vscode-eslint', 'esbenp.prettier-vscode', 'VisualStudioExptTeam.vscodeintellicode', 'styled-components.vscode-styled-components', 'naumovs.color-highlight', 'eamodio.gitlens']
-    }
-  };
-}
-async function readProjectsFromWorkspace(workspacePath) {
-  const workspaceContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_1__.maybeReadFile)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(workspacePath, 'app.code-workspace'));
-  const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
-  const workspaceProjects = Array.isArray(workspaceJson.projects) ? workspaceJson.projects : undefined;
-  return workspaceProjects;
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"neverHappens\": () => (/* binding */ neverHappens)\n/* harmony export */ });\nfunction neverHappens(value, msg) {\n  throw new Error(msg ?? `Unexpected value ${value}`);\n}\n\n//# sourceURL=webpack://b/./src/type_utils.ts?");
 
 /***/ }),
 /* 25 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "generateEnvDefinitionFile": () => (/* binding */ generateEnvDefinitionFile)
-/* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
-
-
-
-async function generateEnvDefinitionFile() {
-  const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'terraform');
-  const res = JSON.parse((0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(`terraform output -json`, {
-    cwd: terraformPath
-  }).toString());
-  const outputs = Object.entries(res).filter(ent => !ent[1].sensitive && ent[1].type === 'string' && typeof ent[1].value === 'string');
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.d.ts'), [...outputs, ['NODE_ENV']].map(([key]) => `declare const ${key.toUpperCase()}: string;`).join('\n'));
-  return Object.fromEntries(outputs.map(([key, obj]) => [key.toUpperCase(), obj.value]));
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateCodeWorkspace\": () => (/* binding */ generateCodeWorkspace),\n/* harmony export */   \"readProjectsFromWorkspace\": () => (/* binding */ readProjectsFromWorkspace)\n/* harmony export */ });\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(12);\n/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);\n\n\n\nfunction generateCodeWorkspace(workspaceFragments) {\n  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__.getProjectsFromWorkspaceFragment);\n  const projectNames = projects.map(p => p.projectName);\n  return {\n    projects: workspaceFragments,\n    folders: [...projectNames.map(p => ({\n      path: p\n    })), {\n      path: 'terraform'\n    }, {\n      path: '.',\n      name: 'root'\n    }],\n    settings: {\n      /* eslint-disable @typescript-eslint/naming-convention */\n      'files.exclude': Object.fromEntries([...projectNames.map(p => [p, true]), ['terraform', true]]),\n      'editor.acceptSuggestionOnCommitCharacter': false,\n      'editor.suggestSelection': 'first',\n      'vsintellicode.modify.editor.suggestSelection': 'automaticallyOverrodeDefaultValue',\n      'explorer.confirmDelete': false,\n      'git.autofetch': true,\n      'git.confirmSync': false,\n      'typescript.preferences.importModuleSpecifier': 'non-relative',\n      'eslint.lintTask.enable': true,\n      'eslint.useESLintClass': true,\n      'eslint.options': {\n        reportUnusedDisableDirectives: 'warn'\n      },\n      'editor.formatOnSave': true,\n      'editor.codeActionsOnSave': {\n        'source.fixAll': false,\n        'source.fixAll.eslint': true\n      },\n      'editor.defaultFormatter': 'esbenp.prettier-vscode',\n      'emmet.showExpandedAbbreviation': 'never'\n      /* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */\n    },\n\n    extensions: {\n      recommendations: ['dbaeumer.vscode-eslint', 'esbenp.prettier-vscode', 'VisualStudioExptTeam.vscodeintellicode', 'styled-components.vscode-styled-components', 'naumovs.color-highlight', 'eamodio.gitlens']\n    }\n  };\n}\nasync function readProjectsFromWorkspace(workspacePath) {\n  const workspaceContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_1__.maybeReadFile)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(workspacePath, 'app.code-workspace'));\n  const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);\n  const workspaceProjects = Array.isArray(workspaceJson.projects) ? workspaceJson.projects : undefined;\n  return workspaceProjects;\n}\n\n//# sourceURL=webpack://b/./src/project/vscode_workspace.ts?");
 
 /***/ }),
 /* 26 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "groupAndSortErrors": () => (/* binding */ groupAndSortErrors)
-/* harmony export */ });
-function groupAndSortErrors(errors) {
-  const errorsByProjectByFile = new Map();
-  const globalErrors = [];
-  for (const err of errors) {
-    if (!('type' in err)) {
-      globalErrors.push(err);
-    } else {
-      let projectErrors = errorsByProjectByFile.get(err.project);
-      if (!projectErrors) {
-        projectErrors = new Map();
-        errorsByProjectByFile.set(err.project, projectErrors);
-      }
-      let fileErrors = projectErrors.get(err.loc.absolutePath);
-      if (!fileErrors) {
-        fileErrors = [];
-        projectErrors.set(err.loc.absolutePath, fileErrors);
-      }
-      fileErrors.push(err);
-    }
-  }
-  for (const byFile of errorsByProjectByFile.values()) {
-    for (const errors of byFile.values()) {
-      errors.sort((err1, err2) => {
-        if (!err1.loc.start) {
-          return -1;
-        } else if (!err2.loc.start) {
-          return 1;
-        }
-        return err1.loc.start.line - err2.loc.start.line;
-      });
-    }
-  }
-  return {
-    errorsByProjectByFile,
-    globalErrors
-  };
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"generateEnvDefinitionFile\": () => (/* binding */ generateEnvDefinitionFile)\n/* harmony export */ });\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(12);\n\n\n\nasync function generateEnvDefinitionFile() {\n  const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'terraform');\n  const res = JSON.parse((0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(`terraform output -json`, {\n    cwd: terraformPath\n  }).toString());\n  const outputs = Object.entries(res).filter(ent => !ent[1].sensitive && ent[1].type === 'string' && typeof ent[1].value === 'string');\n  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.d.ts'), [...outputs, ['NODE_ENV']].map(([key]) => `declare const ${key.toUpperCase()}: string;`).join('\\n'));\n  return Object.fromEntries(outputs.map(([key, obj]) => [key.toUpperCase(), obj.value]));\n}\n\n//# sourceURL=webpack://b/./src/webpack-runner/env_definition_file.ts?");
 
 /***/ }),
 /* 27 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "parseError": () => (/* binding */ parseError)
-/* harmony export */ });
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-
-function parseFilePath(root, path) {
-  const relativePath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.relative)(root, path);
-  const project = relativePath.split(node_path__WEBPACK_IMPORTED_MODULE_0__.sep)[0] ?? '';
-  return {
-    project,
-    relativePath
-  };
-}
-function parseError(err, opts) {
-  const {
-    root,
-    severity
-  } = opts;
-  if (err.name === 'EslintWebpackError') {
-    const eslintError = err;
-    const absolutePath = err.file;
-    const {
-      relativePath,
-      project
-    } = parseFilePath(root, absolutePath);
-    return {
-      project,
-      type: 'eslint',
-      severity,
-      message: err.message,
-      code: eslintError.ruleId,
-      loc: {
-        relativePath,
-        absolutePath,
-        start: 'start' in err.loc ? err.loc.start : undefined,
-        end: 'end' in err.loc ? err.loc.end : undefined
-      }
-    };
-  } else if ('issue' in err) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const issue = err['issue'];
-    const absolutePath = issue.file;
-    if (absolutePath === undefined) {
-      return {
-        severity,
-        message: err.message
-      };
-    }
-    const {
-      relativePath,
-      project
-    } = parseFilePath(root, absolutePath);
-    return {
-      project,
-      type: 'tsc',
-      severity,
-      message: issue.message,
-      code: issue.code,
-      loc: {
-        relativePath,
-        absolutePath,
-        ...issue.location
-      }
-    };
-  } else if (err.name === 'ModuleNotFoundError') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const msg = err.error.message;
-    const match = /(?<msg>Can't resolve '[^']+') in '(?<file>[^']+)'/u.exec(msg);
-    if (!match) {
-      return {
-        severity,
-        message: err.message
-      };
-    }
-    const absolutePath = match[2];
-    const message = match[1];
-    if (absolutePath === undefined || message === undefined) {
-      return {
-        severity,
-        message: err.message
-      };
-    }
-    const {
-      relativePath,
-      project
-    } = parseFilePath(root, absolutePath);
-    return {
-      project,
-      type: 'tsc',
-      severity,
-      message,
-      loc: {
-        relativePath,
-        absolutePath
-      }
-    };
-  }
-  return {
-    severity,
-    message: err.message
-  };
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"groupAndSortErrors\": () => (/* binding */ groupAndSortErrors)\n/* harmony export */ });\nfunction groupAndSortErrors(errors) {\n  const errorsByProjectByFile = new Map();\n  const globalErrors = [];\n  for (const err of errors) {\n    if (!('type' in err)) {\n      globalErrors.push(err);\n    } else {\n      let projectErrors = errorsByProjectByFile.get(err.project);\n      if (!projectErrors) {\n        projectErrors = new Map();\n        errorsByProjectByFile.set(err.project, projectErrors);\n      }\n      let fileErrors = projectErrors.get(err.loc.absolutePath);\n      if (!fileErrors) {\n        fileErrors = [];\n        projectErrors.set(err.loc.absolutePath, fileErrors);\n      }\n      fileErrors.push(err);\n    }\n  }\n  for (const byFile of errorsByProjectByFile.values()) {\n    for (const errors of byFile.values()) {\n      errors.sort((err1, err2) => {\n        if (!err1.loc.start) {\n          return -1;\n        } else if (!err2.loc.start) {\n          return 1;\n        }\n        return err1.loc.start.line - err2.loc.start.line;\n      });\n    }\n  }\n  return {\n    errorsByProjectByFile,\n    globalErrors\n  };\n}\n\n//# sourceURL=webpack://b/./src/webpack-runner/error_grouper.ts?");
 
 /***/ }),
 /* 28 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "registerExitCallback": () => (/* binding */ registerExitCallback)
-/* harmony export */ });
-/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-
-let called = false;
-const callbacks = [];
-function runCallbacks() {
-  if (called) {
-    return;
-  }
-  called = true;
-  for (const fn of callbacks) {
-    Promise.resolve(fn()).catch(err => (0,_src_global_error__WEBPACK_IMPORTED_MODULE_0__.globalError)('Failure to run exit cleanup callback', err));
-  }
-}
-process.on('beforeExit', () => runCallbacks());
-process.on('exit', () => runCallbacks());
-process.on('SIGTERM', () => runCallbacks());
-process.on('SIGINT', () => runCallbacks());
-process.on('uncaughtException', err => {
-  (0,_src_global_error__WEBPACK_IMPORTED_MODULE_0__.globalError)('uncaughtException', err);
-  runCallbacks();
-});
-function registerExitCallback(cb) {
-  callbacks.push(cb);
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"parseError\": () => (/* binding */ parseError)\n/* harmony export */ });\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);\n/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);\n\nfunction parseFilePath(root, path) {\n  const relativePath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.relative)(root, path);\n  const project = relativePath.split(node_path__WEBPACK_IMPORTED_MODULE_0__.sep)[0] ?? '';\n  return {\n    project,\n    relativePath\n  };\n}\nfunction parseError(err, opts) {\n  const {\n    root,\n    severity\n  } = opts;\n  if (err.name === 'EslintWebpackError') {\n    const eslintError = err;\n    const absolutePath = err.file;\n    const {\n      relativePath,\n      project\n    } = parseFilePath(root, absolutePath);\n    return {\n      project,\n      type: 'eslint',\n      severity,\n      message: err.message,\n      code: eslintError.ruleId,\n      loc: {\n        relativePath,\n        absolutePath,\n        start: 'start' in err.loc ? err.loc.start : undefined,\n        end: 'end' in err.loc ? err.loc.end : undefined\n      }\n    };\n  } else if ('issue' in err) {\n    // eslint-disable-next-line @typescript-eslint/no-explicit-any\n    const issue = err['issue'];\n    const absolutePath = issue.file;\n    if (absolutePath === undefined) {\n      return {\n        severity,\n        message: err.message\n      };\n    }\n    const {\n      relativePath,\n      project\n    } = parseFilePath(root, absolutePath);\n    return {\n      project,\n      type: 'tsc',\n      severity,\n      message: issue.message,\n      code: issue.code,\n      loc: {\n        relativePath,\n        absolutePath,\n        ...issue.location\n      }\n    };\n  } else if (err.name === 'ModuleNotFoundError') {\n    // eslint-disable-next-line @typescript-eslint/no-explicit-any\n    const msg = err.error.message;\n    const match = /(?<msg>Can't resolve '[^']+') in '(?<file>[^']+)'/u.exec(msg);\n    if (!match) {\n      return {\n        severity,\n        message: err.message\n      };\n    }\n    const absolutePath = match[2];\n    const message = match[1];\n    if (absolutePath === undefined || message === undefined) {\n      return {\n        severity,\n        message: err.message\n      };\n    }\n    const {\n      relativePath,\n      project\n    } = parseFilePath(root, absolutePath);\n    return {\n      project,\n      type: 'tsc',\n      severity,\n      message,\n      loc: {\n        relativePath,\n        absolutePath\n      }\n    };\n  }\n  return {\n    severity,\n    message: err.message\n  };\n}\n\n//# sourceURL=webpack://b/./src/webpack-runner/error_parser.ts?");
 
 /***/ }),
 /* 29 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "readLines": () => (/* binding */ readLines)
-/* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_webpack_runner_exit_handler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(28);
-
-
-function readLines(filePath, cb) {
-  const p = (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.spawn)('tail', ['-F', filePath], {
-    stdio: 'pipe'
-  });
-  (0,_src_webpack_runner_exit_handler__WEBPACK_IMPORTED_MODULE_1__.registerExitCallback)(() => {
-    if (!p.killed) {
-      p.kill();
-    }
-  });
-  let data = '';
-  p.stdout.on('data', chunk => {
-    data += chunk;
-    const lines = data.split('\n');
-    // eslint-disable-next-line node/callback-return
-    cb(lines.slice(0, -1));
-    data = lines.at(-1) ?? '';
-  });
-  p.on('error', err => {
-    console.log(err);
-  });
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"readLines\": () => (/* binding */ readLines)\n/* harmony export */ });\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);\n/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _src_exit_handler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);\n\n\nfunction readLines(filePath, cb) {\n  const p = (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.spawn)('tail', ['-F', filePath], {\n    stdio: 'pipe'\n  });\n  (0,_src_exit_handler__WEBPACK_IMPORTED_MODULE_1__.registerExitCallback)(() => {\n    if (!p.killed) {\n      p.kill();\n    }\n  });\n  let data = '';\n  p.stdout.on('data', chunk => {\n    data += chunk;\n    const lines = data.split('\\n');\n    // eslint-disable-next-line node/callback-return\n    cb(lines.slice(0, -1));\n    data = lines.at(-1) ?? '';\n  });\n  p.on('error', err => {\n    console.log(err);\n  });\n}\n\n//# sourceURL=webpack://b/./src/webpack-runner/line_reader.ts?");
 
 /***/ }),
 /* 30 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "renderErrorWarningCount": () => (/* binding */ renderErrorWarningCount),
-/* harmony export */   "renderErrors": () => (/* binding */ renderErrors),
-/* harmony export */   "renderLambdaServerEvent": () => (/* binding */ renderLambdaServerEvent),
-/* harmony export */   "renderProjectStatus": () => (/* binding */ renderProjectStatus),
-/* harmony export */   "renderWebpackDevServerEvent": () => (/* binding */ renderWebpackDevServerEvent)
-/* harmony export */ });
-/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(23);
-/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(31);
-
-
-
-function renderErrors(errors) {
-  const {
-    errorsByProjectByFile,
-    globalErrors
-  } = errors;
-  const blocks = [];
-  for (const globalError of globalErrors) {
-    blocks.push((0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(globalError));
-  }
-  for (const [projectName, projectErrors] of errorsByProjectByFile.entries()) {
-    blocks.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.cyan)(projectName));
-    for (const [file, errors] of projectErrors.entries()) {
-      blocks.push([(0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatFilePath)(file), ...errors.map(err => (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(err))].join('\n'));
-    }
-  }
-  return blocks.join('\n\n');
-}
-function renderProjectStatus(project, firstRun, isRunning, errors, compilationFailure, lambdaServerEvents, webpackDevServerEvents) {
-  // First column
-  const column1 = (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatProject)(project);
-
-  // Second column
-  let column2 = '';
-  const projectErrors = errors.errorsByProjectByFile.get(project.projectName);
-  if (projectErrors) {
-    column2 = renderErrorWarningCount([...projectErrors.values()].flat());
-  } else if (!firstRun) {
-    column2 = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green)('success');
-  } else if (isRunning) {
-    column2 = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)('in progress');
-  }
-
-  // Third column
-  const column3 = [];
-  if (lambdaServerEvents.startEvent) {
-    column3.push(renderLambdaServerEvent(lambdaServerEvents.startEvent));
-  }
-  if (webpackDevServerEvents.startEvent) {
-    column3.push(renderWebpackDevServerEvent(webpackDevServerEvents.startEvent));
-  }
-  if (compilationFailure !== undefined) {
-    column3.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red)(compilationFailure));
-  }
-  if (lambdaServerEvents.lastEvent) {
-    column3.push(renderLambdaServerEvent(lambdaServerEvents.lastEvent));
-  }
-  return [column1, column2, column3.join(' ')];
-}
-function renderErrorWarningCount(errors) {
-  const errorCount = errors.filter(err => err.severity === 'error').length;
-  const warnCount = errors.filter(err => err.severity === 'warning').length;
-  const diag = [];
-  if (errorCount > 0) {
-    const plural = errorCount > 1 ? 's' : '';
-    diag.push(ansi_colors__WEBPACK_IMPORTED_MODULE_0__.bgRed.whiteBright(` ${errorCount} error${plural} `));
-  }
-  if (warnCount > 0) {
-    const plural = warnCount > 1 ? 's' : '';
-    diag.push(ansi_colors__WEBPACK_IMPORTED_MODULE_0__.bgYellow.whiteBright(` ${warnCount} warning${plural} `));
-  }
-  return diag.join(' ');
-}
-function renderLambdaServerEvent(event) {
-  const type = event.event;
-  if (type === 'start') {
-    return `http://localhost:${event.port}`;
-  }
-  const req = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(`${event.method} ${event.path}`);
-  if (type === 'error') {
-    return `${req} ${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red)(event.err)}`;
-  } else if (type === 'request') {
-    return `${req} ${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)('running lambda...')}`;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  } else if (type === 'response') {
-    const httpCode = `[HTTP ${event.statusCode}]`;
-    const size = `[${event.byteLength.toLocaleString()}b]`;
-    const duration = `[${event.duration.toLocaleString()}ms]`;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    const color = event.statusCode >= 400 ? ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red : ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green;
-    return `${req} ${color(`${httpCode} ${size} ${duration}`)}`;
-  }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_1__.neverHappens)(type);
-}
-function renderWebpackDevServerEvent(event) {
-  const type = event.event;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (type === 'start') {
-    return `http://localhost:${event.port}`;
-  }
-  // const req = gray(`${event.method} ${event.path}`);
-  // if (type === 'error') {
-  //   return `${req} ${red(event.err)}`;
-  // } else if (type === 'request') {
-  //   return `${req} ${gray('running lambda...')}`;
-  //   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  // } else if (type === 'response') {
-  //   const httpCode = `[HTTP ${event.statusCode}]`;
-  //   const size = `[${event.byteLength.toLocaleString()}b]`;
-  //   const duration = `[${event.duration.toLocaleString()}ms]`;
-  //   // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-  //   const color = event.statusCode >= 400 ? red : green;
-  //   return `${req} ${color(`${httpCode} ${size} ${duration}`)}`;
-  // }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_1__.neverHappens)(type);
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"renderErrorWarningCount\": () => (/* binding */ renderErrorWarningCount),\n/* harmony export */   \"renderErrors\": () => (/* binding */ renderErrors),\n/* harmony export */   \"renderLambdaServerEvent\": () => (/* binding */ renderLambdaServerEvent),\n/* harmony export */   \"renderProjectStatus\": () => (/* binding */ renderProjectStatus),\n/* harmony export */   \"renderWebpackDevServerEvent\": () => (/* binding */ renderWebpackDevServerEvent)\n/* harmony export */ });\n/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);\n/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(24);\n/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(31);\n\n\n\nfunction renderErrors(errors) {\n  const {\n    errorsByProjectByFile,\n    globalErrors\n  } = errors;\n  const blocks = [];\n  for (const globalError of globalErrors) {\n    blocks.push((0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(globalError));\n  }\n  for (const [projectName, projectErrors] of errorsByProjectByFile.entries()) {\n    blocks.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.cyan)(projectName));\n    for (const [file, errors] of projectErrors.entries()) {\n      blocks.push([(0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatFilePath)(file), ...errors.map(err => (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(err))].join('\\n'));\n    }\n  }\n  return blocks.join('\\n\\n');\n}\nfunction renderProjectStatus(project, firstRun, isRunning, errors, compilationFailure, lambdaServerEvents, webpackDevServerEvents) {\n  // First column\n  const column1 = (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatProject)(project);\n\n  // Second column\n  let column2 = '';\n  const projectErrors = errors.errorsByProjectByFile.get(project.projectName);\n  if (projectErrors) {\n    column2 = renderErrorWarningCount([...projectErrors.values()].flat());\n  } else if (!firstRun) {\n    column2 = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green)('success');\n  } else if (isRunning) {\n    column2 = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)('in progress');\n  }\n\n  // Third column\n  const column3 = [];\n  if (lambdaServerEvents.startEvent) {\n    column3.push(renderLambdaServerEvent(lambdaServerEvents.startEvent));\n  }\n  if (webpackDevServerEvents.startEvent) {\n    column3.push(renderWebpackDevServerEvent(webpackDevServerEvents.startEvent));\n  }\n  if (compilationFailure !== undefined) {\n    column3.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red)(compilationFailure));\n  }\n  if (lambdaServerEvents.lastEvent) {\n    column3.push(renderLambdaServerEvent(lambdaServerEvents.lastEvent));\n  }\n  return [column1, column2, column3.join(' ')];\n}\nfunction renderErrorWarningCount(errors) {\n  const errorCount = errors.filter(err => err.severity === 'error').length;\n  const warnCount = errors.filter(err => err.severity === 'warning').length;\n  const diag = [];\n  if (errorCount > 0) {\n    const plural = errorCount > 1 ? 's' : '';\n    diag.push(ansi_colors__WEBPACK_IMPORTED_MODULE_0__.bgRed.whiteBright(` ${errorCount} error${plural} `));\n  }\n  if (warnCount > 0) {\n    const plural = warnCount > 1 ? 's' : '';\n    diag.push(ansi_colors__WEBPACK_IMPORTED_MODULE_0__.bgYellow.whiteBright(` ${warnCount} warning${plural} `));\n  }\n  return diag.join(' ');\n}\nfunction renderLambdaServerEvent(event) {\n  const type = event.event;\n  if (type === 'start') {\n    return `http://localhost:${event.port}`;\n  }\n  const req = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(`${event.method} ${event.path}`);\n  if (type === 'error') {\n    return `${req} ${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red)(event.err)}`;\n  } else if (type === 'request') {\n    return `${req} ${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)('running lambda...')}`;\n    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\n  } else if (type === 'response') {\n    const httpCode = `[HTTP ${event.statusCode}]`;\n    const size = `[${event.byteLength.toLocaleString()}b]`;\n    const duration = `[${event.duration.toLocaleString()}ms]`;\n    // eslint-disable-next-line @typescript-eslint/no-magic-numbers\n    const color = event.statusCode >= 400 ? ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red : ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green;\n    return `${req} ${color(`${httpCode} ${size} ${duration}`)}`;\n  }\n  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_1__.neverHappens)(type);\n}\nfunction renderWebpackDevServerEvent(event) {\n  const type = event.event;\n  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\n  if (type === 'start') {\n    return `http://localhost:${event.port}`;\n  }\n  // const req = gray(`${event.method} ${event.path}`);\n  // if (type === 'error') {\n  //   return `${req} ${red(event.err)}`;\n  // } else if (type === 'request') {\n  //   return `${req} ${gray('running lambda...')}`;\n  //   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\n  // } else if (type === 'response') {\n  //   const httpCode = `[HTTP ${event.statusCode}]`;\n  //   const size = `[${event.byteLength.toLocaleString()}b]`;\n  //   const duration = `[${event.duration.toLocaleString()}ms]`;\n  //   // eslint-disable-next-line @typescript-eslint/no-magic-numbers\n  //   const color = event.statusCode >= 400 ? red : green;\n  //   return `${req} ${color(`${httpCode} ${size} ${duration}`)}`;\n  // }\n  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_1__.neverHappens)(type);\n}\n\n//# sourceURL=webpack://b/./src/webpack-runner/renderer.ts?");
 
 /***/ }),
 /* 31 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "formatError": () => (/* binding */ formatError),
-/* harmony export */   "formatFilePath": () => (/* binding */ formatFilePath),
-/* harmony export */   "formatProject": () => (/* binding */ formatProject)
-/* harmony export */ });
-/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);
-
-function formatProject(project) {
-  return `${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.cyan)(project.projectName)} ${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(project.type)}`;
-}
-function formatFilePath(filePath) {
-  return (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.underline)(filePath);
-}
-function formatMessage(msg, severity) {
-  return severity === 'warning' ? (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.yellow)(msg) : (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red)(msg);
-}
-const padLeft = (value, size) => value.length >= size ? value : padLeft(` ${value}`, size);
-const padRight = (value, size) => value.length >= size ? value : padRight(`${value} `, size);
-function formatLocation(loc) {
-  const {
-    line,
-    column
-  } = loc ?? {};
-  const padValue = 3;
-  const lineStr = String(line ?? '');
-  const columnStr = String(column ?? '');
-  if (lineStr.length === 0 && columnStr.length === 0) {
-    return padLeft('', 2 * padValue + 1);
-  }
-  return (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(`${padLeft(lineStr, padValue)}:${padRight(columnStr, padValue)}`);
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function formatLabel(code, type) {
-  return (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(code);
-}
-function formatError(err) {
-  if ('type' in err) {
-    return `${formatLocation(err.loc.start)} ${formatMessage(err.message, err.severity)} ${formatLabel(err.code, err.type)}`;
-  }
-  return formatMessage(`[${err.severity}] ${err.message}`, err.severity);
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"formatError\": () => (/* binding */ formatError),\n/* harmony export */   \"formatFilePath\": () => (/* binding */ formatFilePath),\n/* harmony export */   \"formatProject\": () => (/* binding */ formatProject)\n/* harmony export */ });\n/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);\n/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);\n\nfunction formatProject(project) {\n  return `${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.cyan)(project.projectName)} ${(0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(project.type)}`;\n}\nfunction formatFilePath(filePath) {\n  return (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.underline)(filePath);\n}\nfunction formatMessage(msg, severity) {\n  return severity === 'warning' ? (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.yellow)(msg) : (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red)(msg);\n}\nconst padLeft = (value, size) => value.length >= size ? value : padLeft(` ${value}`, size);\nconst padRight = (value, size) => value.length >= size ? value : padRight(`${value} `, size);\nfunction formatLocation(loc) {\n  const {\n    line,\n    column\n  } = loc ?? {};\n  const padValue = 3;\n  const lineStr = String(line ?? '');\n  const columnStr = String(column ?? '');\n  if (lineStr.length === 0 && columnStr.length === 0) {\n    return padLeft('', 2 * padValue + 1);\n  }\n  return (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(`${padLeft(lineStr, padValue)}:${padRight(columnStr, padValue)}`);\n}\n\n// eslint-disable-next-line @typescript-eslint/no-unused-vars\nfunction formatLabel(code, type) {\n  return (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(code);\n}\nfunction formatError(err) {\n  if ('type' in err) {\n    return `${formatLocation(err.loc.start)} ${formatMessage(err.message, err.severity)} ${formatLabel(err.code, err.type)}`;\n  }\n  return formatMessage(`[${err.severity}] ${err.message}`, err.severity);\n}\n\n//# sourceURL=webpack://b/./src/webpack-runner/error_formatter.ts?");
 
 /***/ }),
 /* 32 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "table": () => (/* binding */ table)
-/* harmony export */ });
-const ansiRegex = new RegExp(['[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)', '(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))'].join('|'), 'gu');
-const stripAnsi = s => s.replace(ansiRegex, '');
-function formatCell(cell) {
-  return typeof cell === 'string' ? cell : cell.toLocaleString();
-}
-function padString(value, indent, right) {
-  let valueStr = value;
-  for (let i = 0; i < indent; i++) {
-    valueStr = right ? `${valueStr} ` : ` ${valueStr}`;
-  }
-  return valueStr;
-}
-function table(data, options) {
-  if (data.length === 0) {
-    return '';
-  }
-  const {
-    align = []
-  } = options ?? {};
-  const maxWidths = [];
-  for (const line of data) {
-    for (const [columnIndex, cell] of line.entries()) {
-      maxWidths[columnIndex] = Math.max(maxWidths[columnIndex] ?? 0, stripAnsi(formatCell(cell)).length);
-    }
-  }
-  return data.map(line => line.map((cell, colIndex) => {
-    const content = formatCell(cell);
-    return padString(content, (maxWidths[colIndex] ?? 0) - stripAnsi(content).length, align[colIndex] !== 'l');
-  }).join(' ')).join('\n');
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"table\": () => (/* binding */ table)\n/* harmony export */ });\nconst ansiRegex = new RegExp(['[\\\\u001B\\\\u009B][[\\\\]()#;?]*(?:(?:(?:[a-zA-Z\\\\d]*(?:;[-a-zA-Z\\\\d\\\\/#&.:=?%@~_]*)*)?\\\\u0007)', '(?:(?:\\\\d{1,4}(?:;\\\\d{0,4})*)?[\\\\dA-PR-TZcf-ntqry=><~]))'].join('|'), 'gu');\nconst stripAnsi = s => s.replace(ansiRegex, '');\nfunction formatCell(cell) {\n  return typeof cell === 'string' ? cell : cell.toLocaleString();\n}\nfunction padString(value, indent, right) {\n  let valueStr = value;\n  for (let i = 0; i < indent; i++) {\n    valueStr = right ? `${valueStr} ` : ` ${valueStr}`;\n  }\n  return valueStr;\n}\nfunction table(data, options) {\n  if (data.length === 0) {\n    return '';\n  }\n  const {\n    align = []\n  } = options ?? {};\n  const maxWidths = [];\n  for (const line of data) {\n    for (const [columnIndex, cell] of line.entries()) {\n      maxWidths[columnIndex] = Math.max(maxWidths[columnIndex] ?? 0, stripAnsi(formatCell(cell)).length);\n    }\n  }\n  return data.map(line => line.map((cell, colIndex) => {\n    const content = formatCell(cell);\n    return padString(content, (maxWidths[colIndex] ?? 0) - stripAnsi(content).length, align[colIndex] !== 'l');\n  }).join(' ')).join('\\n');\n}\n\n//# sourceURL=webpack://b/./src/webpack-runner/text_table.ts?");
 
 /***/ })
 /******/ ]);
@@ -1513,319 +274,12 @@ function table(data, options) {
 /******/ })();
 /******/ 
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "runAllWebpacks": () => (/* binding */ runAllWebpacks),
-/* harmony export */   "runWebpacks": () => (/* binding */ runWebpacks)
-/* harmony export */ });
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
-/* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(webpack__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var webpack_dev_server__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
-/* harmony import */ var webpack_dev_server__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(webpack_dev_server__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);
-/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(24);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(23);
-/* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(25);
-/* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(26);
-/* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(27);
-/* harmony import */ var _src_webpack_runner_exit_handler__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(28);
-/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(29);
-/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(30);
-/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(32);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const name = 'WebpackRunner';
-async function runWebpacks(opts) {
-  const {
-    root,
-    workspaceFragments,
-    watch
-  } = opts;
-  const statuses = new Map();
-  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.getProjectsFromWorkspaceFragment);
-  const env = await (0,_src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_8__.generateEnvDefinitionFile)();
-  for (const [key, val] of Object.entries(env)) {
-    // eslint-disable-next-line node/no-process-env
-    process.env[`MATTHIS_${key}`] = val;
-  }
-  function handleStart(project) {
-    const {
-      projectName
-    } = project;
-    const current = statuses.get(projectName) ?? {
-      project,
-      firstRun: true,
-      isRunning: true,
-      errors: [],
-      lambdaServerEvents: {},
-      webpackDevServerEvents: {}
-    };
-    statuses.set(projectName, {
-      ...current,
-      isRunning: true
-    });
-    onChange();
-  }
-  function handleResults(project, stats) {
-    var _statuses$get, _statuses$get2, _statuses$get3;
-    const {
-      projectName
-    } = project;
-    const errors = [...stats.compilation.errors.map(err => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_10__.parseError)(err, {
-      root,
-      severity: 'error'
-    })), ...stats.compilation.warnings.map(warn => (0,_src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_10__.parseError)(warn, {
-      root,
-      severity: 'warning'
-    }))];
-    const lambdaServerEvents = ((_statuses$get = statuses.get(projectName)) === null || _statuses$get === void 0 ? void 0 : _statuses$get.lambdaServerEvents) ?? {};
-    const webpackDevServerEvents = ((_statuses$get2 = statuses.get(projectName)) === null || _statuses$get2 === void 0 ? void 0 : _statuses$get2.webpackDevServerEvents) ?? {};
-    const compilationFailure = (_statuses$get3 = statuses.get(projectName)) === null || _statuses$get3 === void 0 ? void 0 : _statuses$get3.compilationFailure;
-    statuses.set(projectName, {
-      project,
-      firstRun: false,
-      isRunning: false,
-      errors,
-      compilationFailure,
-      lambdaServerEvents,
-      webpackDevServerEvents
-    });
-    onChange();
-  }
-  function redraw() {
-    const errors = [...statuses.values()].flatMap(v => v.errors);
-    const groupedErrors = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_9__.groupAndSortErrors)(errors);
-    const summary = [...statuses.values()].map(status => {
-      return (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_13__.renderProjectStatus)(status.project, status.firstRun, status.isRunning, groupedErrors, status.compilationFailure, status.lambdaServerEvents, status.webpackDevServerEvents);
-    });
-    summary.unshift([(0,ansi_colors__WEBPACK_IMPORTED_MODULE_1__.underline)(`Projects (${projects.length})`), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_1__.underline)('Status'), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_1__.underline)('Run')]);
-    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_13__.renderErrors)(groupedErrors);
-    if (watch) {
-      process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
-    }
-
-    console.log((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_14__.table)(summary));
-    if (report.length > 0) {
-      console.log(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_13__.renderErrorWarningCount)(errors)}\n`);
-      console.log(report);
-    }
-  }
-  function onChange() {
-    if (watch) {
-      redraw();
-    } else {
-      const allDone = [...statuses.values()].every(status => !status.isRunning);
-      if (allDone) {
-        const errors = [...statuses.values()].flatMap(v => v.errors);
-        const {
-          globalErrors
-        } = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_9__.groupAndSortErrors)(errors);
-        const noGlobalErrors = globalErrors.length === 0 && [...statuses.values()].every(status => status.compilationFailure === undefined);
-        redraw();
-        if (noGlobalErrors) {
-          resolve();
-        } else {
-          reject();
-        }
-      }
-    }
-  }
-  const cleanupFunctions = await Promise.all(projects.map(async project => {
-    const {
-      projectName
-    } = project;
-    const projectPath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(root, projectName);
-    const intialStatus = {
-      project,
-      firstRun: true,
-      isRunning: true,
-      errors: [],
-      lambdaServerEvents: {},
-      webpackDevServerEvents: {}
-    };
-    statuses.set(projectName, intialStatus);
-    // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
-    const config = await import( /*webpackIgnore: true*/(0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'webpack.config.js')).then(({
-      getConfig
-    }) => getConfig({
-      context: projectPath,
-      watch
-    }));
-    const reportCompilationFailure = error => {
-      updateStatus(curr => {
-        curr.compilationFailure = error;
-      });
-    };
-    const updateLambdaServerEvents = fn => {
-      updateStatus(curr => fn(curr.lambdaServerEvents));
-    };
-    const updateWebpackDevServerEvents = fn => {
-      updateStatus(curr => fn(curr.webpackDevServerEvents));
-    };
-    const updateStatus = fn => {
-      let current = statuses.get(projectName);
-      if (!current) {
-        current = intialStatus;
-        statuses.set(projectName, current);
-      }
-      fn(current);
-    };
-
-    // Read events in the lambda server logs to update the globalInfo
-    let lastProcessedLambdaLog = Date.now();
-    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
-      const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
-      let shouldRedraw = false;
-      for (const log of logs) {
-        const date = new Date(log.t).getTime();
-        if (date < lastProcessedLambdaLog) {
-          continue;
-        }
-        lastProcessedLambdaLog = date;
-        shouldRedraw = true;
-        if (log.event === 'start') {
-          updateLambdaServerEvents(curr => {
-            curr.startEvent = log;
-          });
-        } else {
-          updateLambdaServerEvents(curr => {
-            curr.lastEvent = log;
-          });
-        }
-      }
-      if (shouldRedraw) {
-        redraw();
-      }
-    });
-
-    // Read events in the webpack dev server logs to update the globalInfo
-    let lastProcessedDevServerLog = Date.now();
-    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
-      const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
-      let shouldRedraw = false;
-      for (const log of logs) {
-        const date = new Date(log.t).getTime();
-        if (date < lastProcessedDevServerLog) {
-          continue;
-        }
-        lastProcessedDevServerLog = date;
-        shouldRedraw = true;
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (log.event === 'start') {
-          updateWebpackDevServerEvents(curr => {
-            curr.startEvent = log;
-          });
-        } else {
-          (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_7__.neverHappens)(log.event);
-          //   updateWebpackDevServerEvents(curr => {
-          //     curr.lastEvent = log;
-          //   });
-        }
-      }
-
-      if (shouldRedraw) {
-        redraw();
-      }
-    });
-    const compiler = (0,webpack__WEBPACK_IMPORTED_MODULE_2__.webpack)({
-      ...config,
-      watch
-    }, (err, res) => {
-      if (err || !res) {
-        reportCompilationFailure(err ? String(err) : 'No result after compilation');
-        if (!watch) {
-          onChange();
-          resolve();
-        }
-      }
-      onChange();
-    });
-    compiler.hooks.beforeRun.tap(name, () => handleStart(project));
-    compiler.hooks.watchRun.tap(name, () => handleStart(project));
-    compiler.hooks.done.tap(name, stats => handleResults(project, stats));
-    let devServer;
-    if (config.devServer) {
-      devServer = new (webpack_dev_server__WEBPACK_IMPORTED_MODULE_3___default())(config.devServer, compiler);
-      await devServer.start();
-    }
-    return async () => {
-      return new Promise((resolve, reject) => {
-        const closeCompiler = () => compiler.close(err => err ? reject(err) : resolve());
-        if (devServer) {
-          devServer.stop().then(closeCompiler).catch(reject);
-        } else {
-          closeCompiler();
-        }
-      });
-    };
-  }));
-  let resolvePromise;
-  let rejectPromise;
-  const globalPromise = new Promise((resolve, reject) => {
-    resolvePromise = resolve;
-    rejectPromise = reject;
-  });
-  let cleanupCalled = false;
-  const cleanup = async () => {
-    if (cleanupCalled) {
-      return;
-    }
-    cleanupCalled = true;
-    await Promise.all(cleanupFunctions);
-  };
-  const reject = err => {
-    cleanup().then(() => rejectPromise(err)).catch(cleanupErr => {
-      (0,_src_global_error__WEBPACK_IMPORTED_MODULE_4__.globalError)('webpack runner cleanup error', cleanupErr);
-      rejectPromise(err);
-    });
-  };
-  const resolve = () => {
-    cleanup().then(resolvePromise).catch(cleanupErr => {
-      (0,_src_global_error__WEBPACK_IMPORTED_MODULE_4__.globalError)('webpack runner cleanup error', cleanupErr);
-      resolvePromise();
-    });
-  };
-  (0,_src_webpack_runner_exit_handler__WEBPACK_IMPORTED_MODULE_11__.registerExitCallback)(cleanup);
-  return globalPromise;
-}
-async function runAllWebpacks(options) {
-  const {
-    root,
-    watch
-  } = options;
-  const workspaceFragments = await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__.readProjectsFromWorkspace)(root);
-  if (!workspaceFragments) {
-    throw new Error(`No workspace projects at path ${root}`);
-  }
-  await runWebpacks({
-    root,
-    workspaceFragments,
-    watch
-  });
-}
-})();
-
-var __webpack_exports__runAllWebpacks = __webpack_exports__.runAllWebpacks;
-var __webpack_exports__runWebpacks = __webpack_exports__.runWebpacks;
-export { __webpack_exports__runAllWebpacks as runAllWebpacks, __webpack_exports__runWebpacks as runWebpacks };
+/******/ 
+/******/ // startup
+/******/ // Load entry module and return exports
+/******/ // This entry module can't be inlined because the eval devtool is used.
+/******/ var __webpack_exports__ = __webpack_require__(0);
+/******/ var __webpack_exports__runAllWebpacks = __webpack_exports__.runAllWebpacks;
+/******/ var __webpack_exports__runWebpacks = __webpack_exports__.runWebpacks;
+/******/ export { __webpack_exports__runAllWebpacks as runAllWebpacks, __webpack_exports__runWebpacks as runWebpacks };
+/******/ 
