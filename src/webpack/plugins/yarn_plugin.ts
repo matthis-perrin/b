@@ -14,6 +14,7 @@ export class YarnPlugin {
         '--check-files',
         '--ignore-optional',
         '--non-interactive',
+        '--production=false',
       ].join(' ');
       exec(command, {cwd: compiler.context}, (error, stdout, stderr) => {
         if (error) {

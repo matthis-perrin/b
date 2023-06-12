@@ -835,7 +835,7 @@ __webpack_require__.r(__webpack_exports__);
 class YarnPlugin {
   apply(compiler) {
     compiler.hooks.beforeRun.tapAsync('YarnPlugin', (compiler, cb) => {
-      const command = ['yarn', 'install', '--audit', '--check-files', '--ignore-optional', '--non-interactive'].join(' ');
+      const command = ['yarn', 'install', '--audit', '--check-files', '--ignore-optional', '--non-interactive', '--production=false'].join(' ');
       (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {
         cwd: compiler.context
       }, (error, stdout, stderr) => {
