@@ -1,5 +1,6 @@
 import {Compiler} from 'webpack';
 
+import {registerExitCallback} from '@src/exit_handler';
 import {globalError} from '@src/global_error';
 
 export abstract class StandalonePlugin {
@@ -13,12 +14,7 @@ export abstract class StandalonePlugin {
     compiler.hooks.beforeRun.tapPromise(this.name, async () => this.setupHandler(compiler));
     compiler.hooks.watchRun.tapPromise(this.name, async () => this.setupHandler(compiler));
     compiler.hooks.shutdown.tapPromise(this.name, async () => this.exitHandlerAsync(compiler));
-
-    process.on('beforeExit', () => this.exitHandler(compiler));
-    process.on('exit', () => this.exitHandler(compiler));
-    process.on('SIGTERM', () => this.exitHandler(compiler));
-    process.on('SIGINT', () => this.exitHandler(compiler));
-    process.on('uncaughtException', () => this.exitHandler(compiler));
+    registerExitCallback(() => this.exitHandler(compiler));
   }
 
   protected abstract setup(compiler: Compiler): void | Promise<void>;

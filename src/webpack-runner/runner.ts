@@ -4,6 +4,7 @@ import {underline} from 'ansi-colors';
 import {Configuration, Stats, webpack} from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 
+import {registerExitCallback} from '@src/exit_handler';
 import {globalError} from '@src/global_error';
 import {ProjectName, WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment, WorkspaceProject} from '@src/project/generate_workspace';
@@ -21,7 +22,6 @@ import {
 import {generateEnvDefinitionFile} from '@src/webpack-runner/env_definition_file';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
-import {registerExitCallback} from '@src/webpack-runner/exit_handler';
 import {readLines} from '@src/webpack-runner/line_reader';
 import {
   renderErrors,
