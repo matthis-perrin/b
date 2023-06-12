@@ -516,8 +516,8 @@ function generateWorkspacePackageJson(workspaceName, projects) {
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
-      build: 'node ./build.js',
-      watch: 'node ./build.js --watch'
+      build: 'NODE_ENV=production node ./build.js',
+      watch: 'NODE_ENV=development node ./build.js --watch'
     },
     eslintConfig: {
       ignorePatterns: ['**/*.js']
@@ -540,12 +540,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.25',
+  project: '1.3.27',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
   webpack: '1.2.18',
-  runner: '1.1.11'
+  runner: '1.1.13'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';

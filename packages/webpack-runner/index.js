@@ -584,8 +584,8 @@ function generateWorkspacePackageJson(workspaceName, projects) {
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
-      build: 'node ./build.js',
-      watch: 'node ./build.js --watch'
+      build: 'NODE_ENV=production node ./build.js',
+      watch: 'NODE_ENV=development node ./build.js --watch'
     },
     eslintConfig: {
       ignorePatterns: ['**/*.js']
@@ -608,12 +608,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.25',
+  project: '1.3.27',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
   webpack: '1.2.18',
-  runner: '1.1.11'
+  runner: '1.1.13'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
@@ -1213,11 +1213,12 @@ function readLines(filePath, cb) {
   const p = (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.spawn)('tail', ['-F', filePath], {
     stdio: 'pipe'
   });
-  (0,_src_exit_handler__WEBPACK_IMPORTED_MODULE_1__.registerExitCallback)(() => {
+  const cleanup = () => {
     if (!p.killed) {
       p.kill();
     }
-  });
+  };
+  (0,_src_exit_handler__WEBPACK_IMPORTED_MODULE_1__.registerExitCallback)(cleanup);
   let data = '';
   p.stdout.on('data', chunk => {
     data += chunk;
@@ -1229,6 +1230,7 @@ function readLines(filePath, cb) {
   p.on('error', err => {
     console.log(err);
   });
+  return cleanup;
 }
 
 /***/ }),
@@ -1694,7 +1696,7 @@ async function runWebpacks(opts) {
 
     // Read events in the lambda server logs to update the globalInfo
     let lastProcessedLambdaLog = Date.now();
-    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
+    const tailLambdaServerCleanup = (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
       const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
       let shouldRedraw = false;
       for (const log of logs) {
@@ -1721,7 +1723,7 @@ async function runWebpacks(opts) {
 
     // Read events in the webpack dev server logs to update the globalInfo
     let lastProcessedDevServerLog = Date.now();
-    (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
+    const tailWebpackServerCleanup = (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_12__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
       const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
       let shouldRedraw = false;
       for (const log of logs) {
@@ -1771,7 +1773,11 @@ async function runWebpacks(opts) {
     }
     return async () => {
       return new Promise((resolve, reject) => {
-        const closeCompiler = () => compiler.close(err => err ? reject(err) : resolve());
+        const closeCompiler = () => {
+          tailLambdaServerCleanup();
+          tailWebpackServerCleanup();
+          compiler.close(err => err ? reject(err) : resolve());
+        };
         if (devServer) {
           devServer.stop().then(closeCompiler).catch(reject);
         } else {
@@ -1792,7 +1798,7 @@ async function runWebpacks(opts) {
       return;
     }
     cleanupCalled = true;
-    await Promise.all(cleanupFunctions);
+    await Promise.all(cleanupFunctions.map(async fn => fn()));
   };
   const reject = err => {
     cleanup().then(() => rejectPromise(err)).catch(cleanupErr => {

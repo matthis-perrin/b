@@ -201,65 +201,71 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
 
       // Read events in the lambda server logs to update the globalInfo
       let lastProcessedLambdaLog = Date.now();
-      readLines(join(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
-        const logs = lines
-          .map(l => l.trim())
-          .filter(l => l.length > 0)
-          .map(l => JSON.parse(l) as FullLambdaServerEvent);
-        let shouldRedraw = false;
-        for (const log of logs) {
-          const date = new Date(log.t).getTime();
-          if (date < lastProcessedLambdaLog) {
-            continue;
+      const tailLambdaServerCleanup = readLines(
+        join(projectPath, 'log', 'lambda_server_runtime.txt'),
+        lines => {
+          const logs = lines
+            .map(l => l.trim())
+            .filter(l => l.length > 0)
+            .map(l => JSON.parse(l) as FullLambdaServerEvent);
+          let shouldRedraw = false;
+          for (const log of logs) {
+            const date = new Date(log.t).getTime();
+            if (date < lastProcessedLambdaLog) {
+              continue;
+            }
+            lastProcessedLambdaLog = date;
+            shouldRedraw = true;
+            if (log.event === 'start') {
+              updateLambdaServerEvents(curr => {
+                curr.startEvent = log;
+              });
+            } else {
+              updateLambdaServerEvents(curr => {
+                curr.lastEvent = log;
+              });
+            }
           }
-          lastProcessedLambdaLog = date;
-          shouldRedraw = true;
-          if (log.event === 'start') {
-            updateLambdaServerEvents(curr => {
-              curr.startEvent = log;
-            });
-          } else {
-            updateLambdaServerEvents(curr => {
-              curr.lastEvent = log;
-            });
+          if (shouldRedraw) {
+            redraw();
           }
         }
-        if (shouldRedraw) {
-          redraw();
-        }
-      });
+      );
 
       // Read events in the webpack dev server logs to update the globalInfo
       let lastProcessedDevServerLog = Date.now();
-      readLines(join(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
-        const logs = lines
-          .map(l => l.trim())
-          .filter(l => l.length > 0)
-          .map(l => JSON.parse(l) as FullWebpackDevServerEvent);
-        let shouldRedraw = false;
-        for (const log of logs) {
-          const date = new Date(log.t).getTime();
-          if (date < lastProcessedDevServerLog) {
-            continue;
+      const tailWebpackServerCleanup = readLines(
+        join(projectPath, 'log', 'webpack_dev_server.txt'),
+        lines => {
+          const logs = lines
+            .map(l => l.trim())
+            .filter(l => l.length > 0)
+            .map(l => JSON.parse(l) as FullWebpackDevServerEvent);
+          let shouldRedraw = false;
+          for (const log of logs) {
+            const date = new Date(log.t).getTime();
+            if (date < lastProcessedDevServerLog) {
+              continue;
+            }
+            lastProcessedDevServerLog = date;
+            shouldRedraw = true;
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (log.event === 'start') {
+              updateWebpackDevServerEvents(curr => {
+                curr.startEvent = log;
+              });
+            } else {
+              neverHappens(log.event);
+              //   updateWebpackDevServerEvents(curr => {
+              //     curr.lastEvent = log;
+              //   });
+            }
           }
-          lastProcessedDevServerLog = date;
-          shouldRedraw = true;
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          if (log.event === 'start') {
-            updateWebpackDevServerEvents(curr => {
-              curr.startEvent = log;
-            });
-          } else {
-            neverHappens(log.event);
-            //   updateWebpackDevServerEvents(curr => {
-            //     curr.lastEvent = log;
-            //   });
+          if (shouldRedraw) {
+            redraw();
           }
         }
-        if (shouldRedraw) {
-          redraw();
-        }
-      });
+      );
 
       const compiler = webpack({...config, watch}, (err?: Error, res?: Stats) => {
         if (err || !res) {
@@ -282,7 +288,11 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       }
       return async (): Promise<void> => {
         return new Promise<void>((resolve, reject) => {
-          const closeCompiler = (): void => compiler.close(err => (err ? reject(err) : resolve()));
+          const closeCompiler = (): void => {
+            tailLambdaServerCleanup();
+            tailWebpackServerCleanup();
+            compiler.close(err => (err ? reject(err) : resolve()));
+          };
           if (devServer) {
             devServer.stop().then(closeCompiler).catch(reject);
           } else {
@@ -306,7 +316,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       return;
     }
     cleanupCalled = true;
-    await Promise.all(cleanupFunctions);
+    await Promise.all(cleanupFunctions.map(async fn => fn()));
   };
 
   const reject = (err?: unknown): void => {

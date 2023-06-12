@@ -2,13 +2,14 @@ import {spawn} from 'node:child_process';
 
 import {registerExitCallback} from '@src/exit_handler';
 
-export function readLines(filePath: string, cb: (newLines: string[]) => void): void {
+export function readLines(filePath: string, cb: (newLines: string[]) => void): () => void {
   const p = spawn('tail', ['-F', filePath], {stdio: 'pipe'});
-  registerExitCallback(() => {
+  const cleanup = (): void => {
     if (!p.killed) {
       p.kill();
     }
-  });
+  };
+  registerExitCallback(cleanup);
   let data = '';
   p.stdout.on('data', chunk => {
     data += chunk;
@@ -20,4 +21,5 @@ export function readLines(filePath: string, cb: (newLines: string[]) => void): v
   p.on('error', err => {
     console.log(err);
   });
+  return cleanup;
 }
