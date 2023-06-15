@@ -7,6 +7,11 @@ import {BuiltInParserName, format} from 'prettier';
 export const {access, readFile, readdir, stat} = promises;
 const {writeFile, mkdir, rm} = promises;
 
+let logEnabled = true;
+export const setLogging = (enabled: boolean): void => {
+  logEnabled = enabled;
+};
+
 export async function writeJsonFile(path: string, json: unknown): Promise<void> {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
@@ -39,7 +44,9 @@ export async function writeTsFile(path: string, ts: string): Promise<void> {
 }
 
 export async function writeRawFile(path: string, content: string): Promise<void> {
-  console.log(`write ${path}`);
+  if (logEnabled) {
+    console.log(`write ${path}`);
+  }
   await mkdir(dirname(path), {recursive: true});
   await writeFile(path, content);
 }
@@ -49,7 +56,9 @@ export async function rmDir(dirPath: string): Promise<void> {
 }
 
 export async function cleanDir(dirPath: string): Promise<void> {
-  console.log('clean', dirPath);
+  if (logEnabled) {
+    console.log('clean', dirPath);
+  }
   try {
     await rmDir(dirPath);
   } finally {

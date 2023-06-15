@@ -215,6 +215,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "readFile": () => (/* binding */ readFile),
 /* harmony export */   "readdir": () => (/* binding */ readdir),
 /* harmony export */   "rmDir": () => (/* binding */ rmDir),
+/* harmony export */   "setLogging": () => (/* binding */ setLogging),
 /* harmony export */   "stat": () => (/* binding */ stat),
 /* harmony export */   "writeJsFile": () => (/* binding */ writeJsFile),
 /* harmony export */   "writeJsonFile": () => (/* binding */ writeJsonFile),
@@ -244,6 +245,10 @@ const {
   mkdir,
   rm
 } = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
+let logEnabled = true;
+const setLogging = enabled => {
+  logEnabled = enabled;
+};
 async function writeJsonFile(path, json) {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
@@ -265,7 +270,9 @@ async function writeTsFile(path, ts) {
   return writePrettyFile('typescript', path, ts);
 }
 async function writeRawFile(path, content) {
-  console.log(`write ${path}`);
+  if (logEnabled) {
+    console.log(`write ${path}`);
+  }
   await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
     recursive: true
   });
@@ -278,7 +285,9 @@ async function rmDir(dirPath) {
   });
 }
 async function cleanDir(dirPath) {
-  console.log('clean', dirPath);
+  if (logEnabled) {
+    console.log('clean', dirPath);
+  }
   try {
     await rmDir(dirPath);
   } finally {
