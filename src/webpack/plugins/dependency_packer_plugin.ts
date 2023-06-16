@@ -3,6 +3,7 @@ import {writeFile} from 'node:fs/promises';
 
 import {Compiler} from 'webpack';
 
+import {globalError} from '@src/global_error';
 import {WebpackPlugin} from '@src/webpack/models';
 import {findPackageJson} from '@src/webpack/utils';
 
@@ -67,9 +68,6 @@ class DependencyPackerPlugin {
     //   // });
     // });
     compiler.hooks.done.tapPromise(name, async stats => {
-      if (stats.hasErrors()) {
-        return;
-      }
       const dependencies = Object.fromEntries(
         [...depMap.entries()].sort((e1, e2) => e1[0].localeCompare(e2[0]))
       );
@@ -85,7 +83,7 @@ class DependencyPackerPlugin {
         const entryPoint = firstEntryPoint.import.at(-1) as string;
         const entryPackageJson = await findPackageJson(entryPoint);
         if (!entryPackageJson) {
-          console.error(`Failure to retrieve entryPoint's package.json for ${entryPoint}`);
+          globalError(`Failure to retrieve entryPoint's package.json for ${entryPoint}`);
           return;
         }
 

@@ -34,7 +34,9 @@ function getProjects() {
 
 async function run() {
   // Build
+  console.log('----------------------------------------')
   execSync(`yarn build`, {stdio: 'inherit'});
+  console.log('----------------------------------------')
 
   // Get terraform outputs
   checkTerraformCredentials();

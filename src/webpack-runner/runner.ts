@@ -101,7 +101,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       webpackDevServerEvents: {},
     };
     statuses.set(projectName, {...current, isRunning: true});
-    onChange();
+    onChange({isCompleted: false, projectName});
   }
 
   function handleResults(project: WorkspaceProject, stats: Stats): void {
@@ -122,7 +122,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       lambdaServerEvents,
       webpackDevServerEvents,
     });
-    onChange();
+    onChange({isCompleted: false, projectName});
   }
 
   function redraw(): void {
@@ -157,13 +157,18 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     }
   }
 
-  function onChange(): void {
+  const completed = new Set<ProjectName>();
+  function onChange(opts: {projectName: ProjectName; isCompleted: boolean}): void {
     if (watch) {
       redraw();
       return;
     }
 
-    const allDone = [...statuses.values()].every(status => !status.isRunning);
+    const {projectName, isCompleted} = opts;
+    if (isCompleted) {
+      completed.add(projectName);
+    }
+    const allDone = [...statuses.keys()].every(projectName => completed.has(projectName));
     if (!allDone) {
       return;
     }
@@ -292,12 +297,12 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
         if (err || !res) {
           reportCompilationFailure(err ? String(err) : 'No result after compilation');
           if (!watch) {
-            onChange();
+            onChange({isCompleted: true, projectName});
             resolve();
             return;
           }
         }
-        onChange();
+        onChange({isCompleted: true, projectName});
       });
       compiler.hooks.beforeRun.tap(name, () => handleStart(project));
       compiler.hooks.watchRun.tap(name, () => handleStart(project));

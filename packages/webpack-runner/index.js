@@ -639,12 +639,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.33',
+  project: '1.3.35',
   eslint: '1.1.5',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
-  webpack: '1.2.18',
-  runner: '1.1.19'
+  webpack: '1.2.20',
+  runner: '1.1.20'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
@@ -1761,7 +1761,10 @@ async function runWebpacks(opts) {
       ...current,
       isRunning: true
     });
-    onChange();
+    onChange({
+      isCompleted: false,
+      projectName
+    });
   }
   function handleResults(project, stats) {
     var _statuses$get, _statuses$get2, _statuses$get3;
@@ -1787,7 +1790,10 @@ async function runWebpacks(opts) {
       lambdaServerEvents,
       webpackDevServerEvents
     });
-    onChange();
+    onChange({
+      isCompleted: false,
+      projectName
+    });
   }
   function redraw() {
     const errors = [...statuses.values()].flatMap(v => v.errors);
@@ -1807,12 +1813,20 @@ async function runWebpacks(opts) {
       console.log(report);
     }
   }
-  function onChange() {
+  const completed = new Set();
+  function onChange(opts) {
     if (watch) {
       redraw();
       return;
     }
-    const allDone = [...statuses.values()].every(status => !status.isRunning);
+    const {
+      projectName,
+      isCompleted
+    } = opts;
+    if (isCompleted) {
+      completed.add(projectName);
+    }
+    const allDone = [...statuses.keys()].every(projectName => completed.has(projectName));
     if (!allDone) {
       return;
     }
@@ -1932,12 +1946,18 @@ async function runWebpacks(opts) {
       if (err || !res) {
         reportCompilationFailure(err ? String(err) : 'No result after compilation');
         if (!watch) {
-          onChange();
+          onChange({
+            isCompleted: true,
+            projectName
+          });
           resolve();
           return;
         }
       }
-      onChange();
+      onChange({
+        isCompleted: true,
+        projectName
+      });
     });
     compiler.hooks.beforeRun.tap(name, () => handleStart(project));
     compiler.hooks.watchRun.tap(name, () => handleStart(project));

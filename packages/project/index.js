@@ -571,12 +571,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.33',
+  project: '1.3.35',
   eslint: '1.1.5',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
-  webpack: '1.2.18',
-  runner: '1.1.19'
+  webpack: '1.2.20',
+  runner: '1.1.20'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
