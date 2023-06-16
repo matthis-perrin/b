@@ -7,10 +7,10 @@ import WebpackDevServer from 'webpack-dev-server';
 import {registerExitCallback} from '@src/exit_handler';
 import {setLogging} from '@src/fs';
 import {globalError} from '@src/global_error';
-import {ProjectName, WorkspaceFragment} from '@src/models';
+import {ProjectName, ProjectType, WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment, WorkspaceProject} from '@src/project/generate_workspace';
 import {readProjectsFromWorkspace} from '@src/project/vscode_workspace';
-import {neverHappens} from '@src/type_utils';
+import {neverHappens, removeUndefined} from '@src/type_utils';
 import {
   FullLambdaServerEvent,
   LambdaServerEvent,
@@ -20,7 +20,7 @@ import {
   FullWebpackDevServerEvent,
   WebpackDevServerStartEvent,
 } from '@src/webpack/plugins/webpack_dev_server';
-import {generateEnvDefinitionFile} from '@src/webpack-runner/env_definition_file';
+import {generateEnvFile} from '@src/webpack-runner/env_definition_file';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
 import {readLines} from '@src/webpack-runner/line_reader';
@@ -66,11 +66,23 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   const statuses = new Map<ProjectName, ProjectStatus>();
   const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
 
-  const env = await generateEnvDefinitionFile();
-  for (const [key, val] of Object.entries(env)) {
-    // eslint-disable-next-line node/no-process-env
-    process.env[`MATTHIS_${key}`] = val;
+  async function regenerateEnvFile(): Promise<void> {
+    const overrides = Object.fromEntries(
+      removeUndefined(
+        [...statuses.values()].map(({project, lambdaServerEvents}) => {
+          if (project.type !== ProjectType.LambdaApi || !lambdaServerEvents.startEvent) {
+            return undefined;
+          }
+          return [
+            `${project.projectName.toUpperCase()}_FUNCTION_URL`,
+            `http://localhost:${lambdaServerEvents.startEvent.port}/`,
+          ];
+        })
+      )
+    );
+    await generateEnvFile(overrides);
   }
+  await regenerateEnvFile();
 
   function handleStart(project: WorkspaceProject): void {
     const {projectName} = project;
@@ -223,6 +235,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
                 updateLambdaServerEvents(curr => {
                   curr.startEvent = log;
                 });
+                regenerateEnvFile().catch(err => globalError('Failure to update env', err));
               } else {
                 updateLambdaServerEvents(curr => {
                   curr.lastEvent = log;

@@ -549,12 +549,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.29',
+  project: '1.3.32',
   eslint: '1.1.4',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
   webpack: '1.2.18',
-  runner: '1.1.15'
+  runner: '1.1.18'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
@@ -884,10 +884,17 @@ resource "aws_s3_bucket_policy" "code" {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "neverHappens": () => (/* binding */ neverHappens)
+/* harmony export */   "neverHappens": () => (/* binding */ neverHappens),
+/* harmony export */   "removeUndefined": () => (/* binding */ removeUndefined)
 /* harmony export */ });
 function neverHappens(value, msg) {
   throw new Error(msg ?? `Unexpected value ${value}`);
+}
+function notUndefined(val) {
+  return val !== undefined;
+}
+function removeUndefined(arr) {
+  return arr.filter(notUndefined);
 }
 
 /***/ }),
