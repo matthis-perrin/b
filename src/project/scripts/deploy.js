@@ -34,9 +34,9 @@ function getProjects() {
 
 async function run() {
   // Build
-  console.log('----------------------------------------')
+  console.log('--------------------------------------------------------------------------------')
   execSync(`yarn build`, {stdio: 'inherit'});
-  console.log('----------------------------------------')
+  console.log('--------------------------------------------------------------------------------')
 
   // Get terraform outputs
   checkTerraformCredentials();
@@ -74,6 +74,8 @@ async function run() {
       `AWS_CONFIG_FILE=terraform/.aws-credentials aws s3 sync ${websiteName}/dist s3://${code_bucket}/${websiteName}`
     );
   }
+
+  console.log('--------------------------------------------------------------------------------')
 }
 
 run().catch(err => {

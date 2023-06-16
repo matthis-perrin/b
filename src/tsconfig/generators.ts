@@ -88,7 +88,7 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
       target: 'esnext',
       paths: makePaths(['shared', 'shared-web']),
       //
-      jsx: 'react',
+      jsx: 'react-jsx',
     };
   } else if (type === RuntimeType.Node) {
     additionalCompilerOptions = {

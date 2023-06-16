@@ -29,7 +29,7 @@ export function generateEnvFile(overrides: Record<string, string>): void {
   writeTsFileSync(
     join(process.cwd(), 'shared', 'src', 'env.ts'),
     Object.entries(envConstants)
-      .map(([key, value]) => `export const ${key} = ${JSON.stringify(value)};`)
+      .map(([key, value]) => `export const ${key} = ${JSON.stringify(value)} as string;`)
       .join('\n')
   );
 }

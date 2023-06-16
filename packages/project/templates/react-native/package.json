@@ -21,14 +21,14 @@
     ]
   },
   "dependencies": {
-    "react": "17.0.x",
+    "react": "18.2.x",
     "react-native": "0.66.x",
     "styled-components": "5.1.x"
   },
   "devDependencies": {
     "@babel/core": "7.12.x",
     "@babel/runtime": "7.12.x",
-    "@types/react": "17.0.x",
+    "@types/react": "18.2.x",
     "@types/react-native": "0.66.x",
     "@types/styled-components": "5.1.x",
     "metro-react-native-babel-preset": "0.66.x"

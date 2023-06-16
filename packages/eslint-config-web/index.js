@@ -8,7 +8,7 @@ module.exports = {
     'import/parsers': {'@typescript-eslint/parser': ['.ts', '.tsx']},
     'import/extensions': ['.ts', '.tsx'],
     'import/resolver': {typescript: {project: './tsconfig.json'}},
-    react: {version: '17.0.x'},
+    react: {version: '18.2.x'},
   },
   plugins: [
     'eslint-comments',

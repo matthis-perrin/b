@@ -639,12 +639,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.35',
-  eslint: '1.1.5',
+  project: '1.3.36',
+  eslint: '1.1.6',
   prettier: '1.1.1',
-  tsconfig: '1.1.7',
+  tsconfig: '1.1.8',
   webpack: '1.2.20',
-  runner: '1.1.20'
+  runner: '1.1.21'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
@@ -652,10 +652,10 @@ const TYPESCRIPT_VERSION = '4.8.x';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 const LIB_VERSIONS = {
-  '@types/react': '17.0.x',
-  '@types/react-dom': '17.0.x',
-  react: '17.0.x',
-  'react-dom': '17.0.x',
+  '@types/react': '18.2.x',
+  '@types/react-dom': '18.2.x',
+  react: '18.2.x',
+  'react-dom': '18.2.x',
   '@types/react-native': '0.66.x',
   'react-native': '0.66.x',
   '@types/styled-components': '5.1.x',
@@ -1090,7 +1090,7 @@ function generateEnvFile(overrides) {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     NODE_ENV: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__.getEnv)()
   };
-  (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFileSync)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.ts'), Object.entries(envConstants).map(([key, value]) => `export const ${key} = ${JSON.stringify(value)};`).join('\n'));
+  (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFileSync)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.ts'), Object.entries(envConstants).map(([key, value]) => `export const ${key} = ${JSON.stringify(value)} as string;`).join('\n'));
 }
 
 /***/ }),
