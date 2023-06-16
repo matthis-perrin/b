@@ -490,7 +490,10 @@ module.exports = {
       {
         selector: 'property',
         format: null,
-        filter: {regex: '^Content-Type|User-Agent|__html|__brand$', match: true},
+        filter: {
+          regex: '^Content-Type|Access-Control-Allow-Origin|User-Agent|__html|__brand$',
+          match: true,
+        },
       },
       {
         selector: 'property',

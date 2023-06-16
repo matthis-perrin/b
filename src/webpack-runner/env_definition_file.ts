@@ -1,11 +1,11 @@
 import {execSync} from 'node:child_process';
 import {join} from 'node:path';
 
-import {writeTsFile} from '@src/fs';
+import {writeTsFileSync} from '@src/fs';
 import {removeUndefined} from '@src/type_utils';
 import {getEnv} from '@src/webpack/utils';
 
-export async function generateEnvFile(overrides: Record<string, string>): Promise<void> {
+export function generateEnvFile(overrides: Record<string, string>): void {
   const terraformPath = join(process.cwd(), 'terraform');
   const res: Record<string, {type: string; value: unknown; sensitive: boolean}> = JSON.parse(
     execSync(`terraform output -json`, {cwd: terraformPath}).toString()
@@ -26,7 +26,7 @@ export async function generateEnvFile(overrides: Record<string, string>): Promis
     NODE_ENV: getEnv(),
   };
 
-  await writeTsFile(
+  writeTsFileSync(
     join(process.cwd(), 'shared', 'src', 'env.ts'),
     Object.entries(envConstants)
       .map(([key, value]) => `export const ${key} = ${JSON.stringify(value)};`)

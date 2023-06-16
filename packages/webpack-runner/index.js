@@ -105,9 +105,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "setLogging": () => (/* binding */ setLogging),
 /* harmony export */   "stat": () => (/* binding */ stat),
 /* harmony export */   "writeJsFile": () => (/* binding */ writeJsFile),
+/* harmony export */   "writeJsFileSync": () => (/* binding */ writeJsFileSync),
 /* harmony export */   "writeJsonFile": () => (/* binding */ writeJsonFile),
 /* harmony export */   "writeRawFile": () => (/* binding */ writeRawFile),
-/* harmony export */   "writeTsFile": () => (/* binding */ writeTsFile)
+/* harmony export */   "writeRawFileSync": () => (/* binding */ writeRawFileSync),
+/* harmony export */   "writeTsFile": () => (/* binding */ writeTsFile),
+/* harmony export */   "writeTsFileSync": () => (/* binding */ writeTsFileSync)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
@@ -139,22 +142,32 @@ const setLogging = enabled => {
 async function writeJsonFile(path, json) {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
+const prettierConfig = parser => ({
+  parser,
+  printWidth: 100,
+  singleQuote: true,
+  trailingComma: 'es5',
+  bracketSpacing: false,
+  arrowParens: 'avoid',
+  endOfLine: 'auto'
+});
 async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, {
-    parser,
-    printWidth: 100,
-    singleQuote: true,
-    trailingComma: 'es5',
-    bracketSpacing: false,
-    arrowParens: 'avoid',
-    endOfLine: 'auto'
-  }));
+  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, prettierConfig(parser)));
+}
+function writePrettyFileSync(parser, path, code) {
+  writeRawFileSync(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, prettierConfig(parser)));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);
 }
+function writeJsFileSync(path, js) {
+  return writePrettyFileSync('babel', path, js);
+}
 async function writeTsFile(path, ts) {
   return writePrettyFile('typescript', path, ts);
+}
+function writeTsFileSync(path, ts) {
+  return writePrettyFileSync('typescript', path, ts);
 }
 async function writeRawFile(path, content) {
   if (logEnabled) {
@@ -164,6 +177,15 @@ async function writeRawFile(path, content) {
     recursive: true
   });
   await writeFile(path, content);
+}
+function writeRawFileSync(path, content) {
+  if (logEnabled) {
+    console.log(`write ${path}`);
+  }
+  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.mkdirSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
+    recursive: true
+  });
+  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(path, content);
 }
 async function rmDir(dirPath) {
   await rm(dirPath, {
@@ -617,12 +639,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TYPESCRIPT_VERSION": () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.3.32',
-  eslint: '1.1.4',
+  project: '1.3.33',
+  eslint: '1.1.5',
   prettier: '1.1.1',
   tsconfig: '1.1.7',
   webpack: '1.2.18',
-  runner: '1.1.18'
+  runner: '1.1.19'
 };
 const ESLINT_VERSION = '8.23.x';
 const PRETTIER_VERSION = '2.7.x';
@@ -1051,7 +1073,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-async function generateEnvFile(overrides) {
+function generateEnvFile(overrides) {
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'terraform');
   const res = JSON.parse((0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(`terraform output -json`, {
     cwd: terraformPath
@@ -1068,7 +1090,7 @@ async function generateEnvFile(overrides) {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     NODE_ENV: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__.getEnv)()
   };
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.ts'), Object.entries(envConstants).map(([key, value]) => `export const ${key} = ${JSON.stringify(value)};`).join('\n'));
+  (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFileSync)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.ts'), Object.entries(envConstants).map(([key, value]) => `export const ${key} = ${JSON.stringify(value)};`).join('\n'));
 }
 
 /***/ }),
@@ -1706,19 +1728,23 @@ async function runWebpacks(opts) {
   } = opts;
   const statuses = new Map();
   const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_8__.getProjectsFromWorkspaceFragment);
-  async function regenerateEnvFile() {
+  function regenerateEnvFile() {
     const overrides = Object.fromEntries((0,_src_type_utils__WEBPACK_IMPORTED_MODULE_10__.removeUndefined)([...statuses.values()].map(({
       project,
-      lambdaServerEvents
+      lambdaServerEvents,
+      webpackDevServerEvents
     }) => {
-      if (project.type !== _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.LambdaApi || !lambdaServerEvents.startEvent) {
-        return undefined;
+      if (project.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.LambdaApi && lambdaServerEvents.startEvent) {
+        return [`${project.projectName.toUpperCase()}_FUNCTION_URL`, `http://localhost:${lambdaServerEvents.startEvent.port}/`];
       }
-      return [`${project.projectName.toUpperCase()}_FUNCTION_URL`, `http://localhost:${lambdaServerEvents.startEvent.port}/`];
+      if (project.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.Web && webpackDevServerEvents.startEvent) {
+        return [`${project.projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`, `localhost:${webpackDevServerEvents.startEvent.port}`];
+      }
+      return undefined;
     })));
-    await (0,_src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_11__.generateEnvFile)(overrides);
+    (0,_src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_11__.generateEnvFile)(overrides);
   }
-  await regenerateEnvFile();
+  regenerateEnvFile();
   function handleStart(project) {
     const {
       projectName
@@ -1858,7 +1884,7 @@ async function runWebpacks(opts) {
           updateLambdaServerEvents(curr => {
             curr.startEvent = log;
           });
-          regenerateEnvFile().catch(err => (0,_src_global_error__WEBPACK_IMPORTED_MODULE_6__.globalError)('Failure to update env', err));
+          regenerateEnvFile();
         } else {
           updateLambdaServerEvents(curr => {
             curr.lastEvent = log;

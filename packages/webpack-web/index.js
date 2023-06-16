@@ -793,9 +793,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "setLogging": () => (/* binding */ setLogging),
 /* harmony export */   "stat": () => (/* binding */ stat),
 /* harmony export */   "writeJsFile": () => (/* binding */ writeJsFile),
+/* harmony export */   "writeJsFileSync": () => (/* binding */ writeJsFileSync),
 /* harmony export */   "writeJsonFile": () => (/* binding */ writeJsonFile),
 /* harmony export */   "writeRawFile": () => (/* binding */ writeRawFile),
-/* harmony export */   "writeTsFile": () => (/* binding */ writeTsFile)
+/* harmony export */   "writeRawFileSync": () => (/* binding */ writeRawFileSync),
+/* harmony export */   "writeTsFile": () => (/* binding */ writeTsFile),
+/* harmony export */   "writeTsFileSync": () => (/* binding */ writeTsFileSync)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
@@ -827,22 +830,32 @@ const setLogging = enabled => {
 async function writeJsonFile(path, json) {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
+const prettierConfig = parser => ({
+  parser,
+  printWidth: 100,
+  singleQuote: true,
+  trailingComma: 'es5',
+  bracketSpacing: false,
+  arrowParens: 'avoid',
+  endOfLine: 'auto'
+});
 async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, {
-    parser,
-    printWidth: 100,
-    singleQuote: true,
-    trailingComma: 'es5',
-    bracketSpacing: false,
-    arrowParens: 'avoid',
-    endOfLine: 'auto'
-  }));
+  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, prettierConfig(parser)));
+}
+function writePrettyFileSync(parser, path, code) {
+  writeRawFileSync(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, prettierConfig(parser)));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);
 }
+function writeJsFileSync(path, js) {
+  return writePrettyFileSync('babel', path, js);
+}
 async function writeTsFile(path, ts) {
   return writePrettyFile('typescript', path, ts);
+}
+function writeTsFileSync(path, ts) {
+  return writePrettyFileSync('typescript', path, ts);
 }
 async function writeRawFile(path, content) {
   if (logEnabled) {
@@ -852,6 +865,15 @@ async function writeRawFile(path, content) {
     recursive: true
   });
   await writeFile(path, content);
+}
+function writeRawFileSync(path, content) {
+  if (logEnabled) {
+    console.log(`write ${path}`);
+  }
+  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.mkdirSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
+    recursive: true
+  });
+  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(path, content);
 }
 async function rmDir(dirPath) {
   await rm(dirPath, {

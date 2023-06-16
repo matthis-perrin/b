@@ -66,23 +66,29 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   const statuses = new Map<ProjectName, ProjectStatus>();
   const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
 
-  async function regenerateEnvFile(): Promise<void> {
+  function regenerateEnvFile(): void {
     const overrides = Object.fromEntries(
       removeUndefined(
-        [...statuses.values()].map(({project, lambdaServerEvents}) => {
-          if (project.type !== ProjectType.LambdaApi || !lambdaServerEvents.startEvent) {
-            return undefined;
+        [...statuses.values()].map(({project, lambdaServerEvents, webpackDevServerEvents}) => {
+          if (project.type === ProjectType.LambdaApi && lambdaServerEvents.startEvent) {
+            return [
+              `${project.projectName.toUpperCase()}_FUNCTION_URL`,
+              `http://localhost:${lambdaServerEvents.startEvent.port}/`,
+            ];
           }
-          return [
-            `${project.projectName.toUpperCase()}_FUNCTION_URL`,
-            `http://localhost:${lambdaServerEvents.startEvent.port}/`,
-          ];
+          if (project.type === ProjectType.Web && webpackDevServerEvents.startEvent) {
+            return [
+              `${project.projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`,
+              `localhost:${webpackDevServerEvents.startEvent.port}`,
+            ];
+          }
+          return undefined;
         })
       )
     );
-    await generateEnvFile(overrides);
+    generateEnvFile(overrides);
   }
-  await regenerateEnvFile();
+  regenerateEnvFile();
 
   function handleStart(project: WorkspaceProject): void {
     const {projectName} = project;
@@ -235,7 +241,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
                 updateLambdaServerEvents(curr => {
                   curr.startEvent = log;
                 });
-                regenerateEnvFile().catch(err => globalError('Failure to update env', err));
+                regenerateEnvFile();
               } else {
                 updateLambdaServerEvents(curr => {
                   curr.lastEvent = log;

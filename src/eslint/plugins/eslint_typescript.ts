@@ -167,7 +167,7 @@ export const eslintTypescript: EslintMetadata = {
         selector: 'property',
         format: null,
         filter: {
-          regex: '^Content-Type|User-Agent|__html|__brand$',
+          regex: '^Content-Type|Access-Control-Allow-Origin|User-Agent|__html|__brand$',
           match: true,
         },
       },

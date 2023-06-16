@@ -1,5 +1,5 @@
 import {exec} from 'node:child_process';
-import {promises} from 'node:fs';
+import {mkdirSync, promises, writeFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 
 import {BuiltInParserName, format} from 'prettier';
@@ -16,31 +16,43 @@ export async function writeJsonFile(path: string, json: unknown): Promise<void> 
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
 
+const prettierConfig = (parser: BuiltInParserName) =>
+  ({
+    parser,
+    printWidth: 100,
+    singleQuote: true,
+    trailingComma: 'es5',
+    bracketSpacing: false,
+    arrowParens: 'avoid',
+    endOfLine: 'auto',
+  } as const);
+
 async function writePrettyFile(
   parser: BuiltInParserName,
   path: string,
   code: string
 ): Promise<void> {
-  await writeRawFile(
-    path,
-    format(code, {
-      parser,
-      printWidth: 100,
-      singleQuote: true,
-      trailingComma: 'es5',
-      bracketSpacing: false,
-      arrowParens: 'avoid',
-      endOfLine: 'auto',
-    })
-  );
+  await writeRawFile(path, format(code, prettierConfig(parser)));
+}
+
+function writePrettyFileSync(parser: BuiltInParserName, path: string, code: string): void {
+  writeRawFileSync(path, format(code, prettierConfig(parser)));
 }
 
 export async function writeJsFile(path: string, js: string): Promise<void> {
   return writePrettyFile('babel', path, js);
 }
 
+export function writeJsFileSync(path: string, js: string): void {
+  return writePrettyFileSync('babel', path, js);
+}
+
 export async function writeTsFile(path: string, ts: string): Promise<void> {
   return writePrettyFile('typescript', path, ts);
+}
+
+export function writeTsFileSync(path: string, ts: string): void {
+  return writePrettyFileSync('typescript', path, ts);
 }
 
 export async function writeRawFile(path: string, content: string): Promise<void> {
@@ -49,6 +61,14 @@ export async function writeRawFile(path: string, content: string): Promise<void>
   }
   await mkdir(dirname(path), {recursive: true});
   await writeFile(path, content);
+}
+
+export function writeRawFileSync(path: string, content: string): void {
+  if (logEnabled) {
+    console.log(`write ${path}`);
+  }
+  mkdirSync(dirname(path), {recursive: true});
+  writeFileSync(path, content);
 }
 
 export async function rmDir(dirPath: string): Promise<void> {
