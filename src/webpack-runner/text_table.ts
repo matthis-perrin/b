@@ -49,7 +49,7 @@ export function table(data: Cell[][], options?: TextTableOptions): string {
           return padString(
             content,
             (maxWidths[colIndex] ?? 0) - stripAnsi(content).length,
-            align[colIndex] !== 'l'
+            align[colIndex] !== 'r'
           );
         })
         .join(' ')

@@ -1,9 +1,25 @@
+/* eslint-disable import/no-named-as-default-member */
+import {readdir, readFile} from 'node:fs/promises';
 import {join, resolve} from 'node:path';
 
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports, node/file-extension-in-import
+import {removeUndefined} from './type_utils.js';
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports, node/file-extension-in-import
+import {table} from './webpack-runner/text_table.js';
+// eslint-disable-next-line import/default
+import colors from 'ansi-colors';
 import packageMetadata from 'package-json';
 import {satisfies} from 'semver';
 
-import {readdir, readFile} from '@src/fs';
+function sameVersion(v1: string, v2: string): boolean {
+  // eslint-disable-next-line unicorn/no-for-loop
+  for (let index = 0; index < v1.length; index++) {
+    if (v1[index] !== 'x' && v2[index] !== 'x' && v1[index] !== v2[index]) {
+      return false;
+    }
+  }
+  return true;
+}
 
 export async function check(): Promise<void> {
   const packagePath = join(resolve('.'), 'packages');
@@ -19,7 +35,7 @@ export async function check(): Promise<void> {
   for (const [index, deps] of Object.entries(dependencies)) {
     for (const [name, version] of Object.entries(deps)) {
       const current = flatDependencies[name];
-      if (current !== undefined && current[0] !== version) {
+      if (current !== undefined && !sameVersion(current[0], version)) {
         errors.push(
           `Package ${name} has version ${version} in ${
             packageDirs[parseFloat(index)]
@@ -39,23 +55,17 @@ export async function check(): Promise<void> {
   const res = await Promise.all(
     Object.entries(flatDependencies).map(async ([name, version]) => checkPackage(name, version[0]))
   );
-  const outdated = res.filter(r => r !== undefined) as [string, string, string][];
+  const outdated = removeUndefined(res).sort(([name1], [name2]) => name1.localeCompare(name2));
   if (outdated.length === 0) {
     console.log('Everything is up-to-date');
   } else {
-    const maxNameLength = Math.max(...outdated.map(o => o[0].length));
     console.log(
-      `\n${outdated.map(o => `${padRight(o[0], maxNameLength)} ${o[1]} -> ${o[2]}`).join('\n')}\n`
+      table(
+        outdated.map(([name, v1, v2]) => [name, v1, '->', v2]),
+        {align: ['l', 'r', 'l', 'l']}
+      )
     );
   }
-}
-
-function padRight(str: string, len: number): string {
-  let res = str;
-  while (res.length < len) {
-    res = `${res} `;
-  }
-  return res;
 }
 
 async function checkPackage(
@@ -65,9 +75,14 @@ async function checkPackage(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const latest = ((await packageMetadata(name)) as any).version as string;
   if (!satisfies(latest, version)) {
-    return [name, version, latest];
+    return [
+      name,
+      [...version].map((c, i) => (latest[i] !== c ? colors.red(c) : c)).join(''),
+      [...latest].map((c, i) => (version[i] !== c ? colors.green(c) : c)).join(''),
+    ];
   }
   return undefined;
 }
 
 check().catch(console.error);
+/* eslint-enable import/no-named-as-default-member */
