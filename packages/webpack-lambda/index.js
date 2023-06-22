@@ -6,7 +6,7 @@ import { createRequire as __WEBPACK_EXTERNAL_createRequire } from "module";
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "nodeConfig": () => (/* binding */ nodeConfig)
+/* harmony export */   nodeConfig: () => (/* binding */ nodeConfig)
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
@@ -111,7 +111,7 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "baseConfig": () => (/* binding */ baseConfig)
+/* harmony export */   baseConfig: () => (/* binding */ baseConfig)
 /* harmony export */ });
 /* harmony import */ var _src_webpack_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var _src_webpack_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
@@ -161,7 +161,7 @@ function baseConfig(opts) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "definePlugin": () => (/* binding */ definePlugin)
+/* harmony export */   definePlugin: () => (/* binding */ definePlugin)
 /* harmony export */ });
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(webpack__WEBPACK_IMPORTED_MODULE_0__);
@@ -193,12 +193,12 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("webpack");
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "findPackageJson": () => (/* binding */ findPackageJson),
-/* harmony export */   "getEnv": () => (/* binding */ getEnv),
-/* harmony export */   "getPort": () => (/* binding */ getPort),
-/* harmony export */   "initLogFile": () => (/* binding */ initLogFile),
-/* harmony export */   "isProd": () => (/* binding */ isProd),
-/* harmony export */   "isSelenium": () => (/* binding */ isSelenium)
+/* harmony export */   findPackageJson: () => (/* binding */ findPackageJson),
+/* harmony export */   getEnv: () => (/* binding */ getEnv),
+/* harmony export */   getPort: () => (/* binding */ getPort),
+/* harmony export */   initLogFile: () => (/* binding */ initLogFile),
+/* harmony export */   isProd: () => (/* binding */ isProd),
+/* harmony export */   isSelenium: () => (/* binding */ isSelenium)
 /* harmony export */ });
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
@@ -304,24 +304,24 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs/prom
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "access": () => (/* binding */ access),
-/* harmony export */   "cleanDir": () => (/* binding */ cleanDir),
-/* harmony export */   "cp": () => (/* binding */ cp),
-/* harmony export */   "exists": () => (/* binding */ exists),
-/* harmony export */   "listFiles": () => (/* binding */ listFiles),
-/* harmony export */   "maybeReadFile": () => (/* binding */ maybeReadFile),
-/* harmony export */   "readFile": () => (/* binding */ readFile),
-/* harmony export */   "readdir": () => (/* binding */ readdir),
-/* harmony export */   "rmDir": () => (/* binding */ rmDir),
-/* harmony export */   "setLogging": () => (/* binding */ setLogging),
-/* harmony export */   "stat": () => (/* binding */ stat),
-/* harmony export */   "writeJsFile": () => (/* binding */ writeJsFile),
-/* harmony export */   "writeJsFileSync": () => (/* binding */ writeJsFileSync),
-/* harmony export */   "writeJsonFile": () => (/* binding */ writeJsonFile),
-/* harmony export */   "writeRawFile": () => (/* binding */ writeRawFile),
-/* harmony export */   "writeRawFileSync": () => (/* binding */ writeRawFileSync),
-/* harmony export */   "writeTsFile": () => (/* binding */ writeTsFile),
-/* harmony export */   "writeTsFileSync": () => (/* binding */ writeTsFileSync)
+/* harmony export */   access: () => (/* binding */ access),
+/* harmony export */   cleanDir: () => (/* binding */ cleanDir),
+/* harmony export */   cp: () => (/* binding */ cp),
+/* harmony export */   exists: () => (/* binding */ exists),
+/* harmony export */   listFiles: () => (/* binding */ listFiles),
+/* harmony export */   maybeReadFile: () => (/* binding */ maybeReadFile),
+/* harmony export */   readFile: () => (/* binding */ readFile),
+/* harmony export */   readdir: () => (/* binding */ readdir),
+/* harmony export */   rmDir: () => (/* binding */ rmDir),
+/* harmony export */   setLogging: () => (/* binding */ setLogging),
+/* harmony export */   stat: () => (/* binding */ stat),
+/* harmony export */   writeJsFile: () => (/* binding */ writeJsFile),
+/* harmony export */   writeJsFileSync: () => (/* binding */ writeJsFileSync),
+/* harmony export */   writeJsonFile: () => (/* binding */ writeJsonFile),
+/* harmony export */   writeRawFile: () => (/* binding */ writeRawFile),
+/* harmony export */   writeRawFileSync: () => (/* binding */ writeRawFileSync),
+/* harmony export */   writeTsFile: () => (/* binding */ writeTsFile),
+/* harmony export */   writeTsFileSync: () => (/* binding */ writeTsFileSync)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
@@ -481,8 +481,8 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "EslintWebpackError": () => (/* binding */ EslintWebpackError),
-/* harmony export */   "eslintPlugin": () => (/* binding */ eslintPlugin)
+/* harmony export */   EslintWebpackError: () => (/* binding */ EslintWebpackError),
+/* harmony export */   eslintPlugin: () => (/* binding */ eslintPlugin)
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
@@ -695,7 +695,7 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("eslint");
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "stripAnsi": () => (/* binding */ stripAnsi)
+/* harmony export */   stripAnsi: () => (/* binding */ stripAnsi)
 /* harmony export */ });
 const ansiRegex = new RegExp(['[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)', '(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))'].join('|'), 'gu');
 const stripAnsi = s => s.replace(ansiRegex, '');
@@ -706,7 +706,7 @@ const stripAnsi = s => s.replace(ansiRegex, '');
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "StandalonePlugin": () => (/* binding */ StandalonePlugin)
+/* harmony export */   StandalonePlugin: () => (/* binding */ StandalonePlugin)
 /* harmony export */ });
 /* harmony import */ var _src_exit_handler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(18);
 /* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(19);
@@ -762,7 +762,7 @@ class StandalonePlugin {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "registerExitCallback": () => (/* binding */ registerExitCallback)
+/* harmony export */   registerExitCallback: () => (/* binding */ registerExitCallback)
 /* harmony export */ });
 /* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
 
@@ -795,7 +795,7 @@ function registerExitCallback(cb) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "globalError": () => (/* binding */ globalError)
+/* harmony export */   globalError: () => (/* binding */ globalError)
 /* harmony export */ });
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(11);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
@@ -819,7 +819,7 @@ function globalError(...val) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "forkTsCheckerPlugin": () => (/* binding */ forkTsCheckerPlugin)
+/* harmony export */   forkTsCheckerPlugin: () => (/* binding */ forkTsCheckerPlugin)
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
@@ -859,7 +859,7 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fork-ts-chec
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "terserPlugin": () => (/* binding */ terserPlugin)
+/* harmony export */   terserPlugin: () => (/* binding */ terserPlugin)
 /* harmony export */ });
 /* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(23);
 /* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__);
@@ -887,7 +887,7 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("terser-webpa
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "getTsConfigAlias": () => (/* binding */ getTsConfigAlias)
+/* harmony export */   getTsConfigAlias: () => (/* binding */ getTsConfigAlias)
 /* harmony export */ });
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(11);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
@@ -950,7 +950,7 @@ function getTsConfigAlias(context) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "YarnPlugin": () => (/* binding */ YarnPlugin)
+/* harmony export */   YarnPlugin: () => (/* binding */ YarnPlugin)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
@@ -989,7 +989,7 @@ class YarnPlugin {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "babelLoaderNode": () => (/* binding */ babelLoaderNode)
+/* harmony export */   babelLoaderNode: () => (/* binding */ babelLoaderNode)
 /* harmony export */ });
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(27);
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_core__WEBPACK_IMPORTED_MODULE_0__);
@@ -1051,7 +1051,7 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("babel-loader
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "sourceMapLoader": () => (/* binding */ sourceMapLoader)
+/* harmony export */   sourceMapLoader: () => (/* binding */ sourceMapLoader)
 /* harmony export */ });
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(27);
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_core__WEBPACK_IMPORTED_MODULE_0__);
@@ -1091,7 +1091,7 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("source-map-l
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "dependencyPackerPlugin": () => (/* binding */ dependencyPackerPlugin)
+/* harmony export */   dependencyPackerPlugin: () => (/* binding */ dependencyPackerPlugin)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
@@ -1217,7 +1217,7 @@ function dependencyPackerPlugin(packageJsonProperties) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "lambdaServerPlugin": () => (/* binding */ lambdaServerPlugin)
+/* harmony export */   lambdaServerPlugin: () => (/* binding */ lambdaServerPlugin)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
@@ -1370,7 +1370,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
                   return internalError(`Lambda returned undefined`);
                 }
                 const result = JSON.parse(stdoutRes);
-                if (typeof result === 'undefined') {
+                if (result === undefined) {
                   return internalError(`Invalid response: ${stdoutRes}`);
                 }
                 res.setHeader('Content-Type', 'application/json');
@@ -1544,7 +1544,7 @@ var __webpack_exports__ = {};
 (() => {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "config": () => (/* binding */ config)
+/* harmony export */   config: () => (/* binding */ config)
 /* harmony export */ });
 /* harmony import */ var _src_webpack_configs_node_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(34);

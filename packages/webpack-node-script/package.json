@@ -1,19 +1,19 @@
 {
   "name": "@matthis/webpack-node-script",
-  "version": "1.2.20",
+  "version": "1.3.1",
   "type": "module",
   "main": "index.js",
   "dependencies": {
-    "@babel/core": "7.19.6",
-    "@babel/preset-env": "7.19.4",
-    "@babel/preset-typescript": "7.18.6",
-    "babel-loader": "8.2.5",
+    "@babel/core": "7.22.5",
+    "@babel/preset-env": "7.22.5",
+    "@babel/preset-typescript": "7.22.5",
+    "babel-loader": "9.1.2",
     "chokidar": "3.5.3",
-    "eslint": "8.23.1",
-    "fork-ts-checker-webpack-plugin": "7.2.14",
-    "prettier": "2.7.1",
+    "eslint": "8.43.0",
+    "fork-ts-checker-webpack-plugin": "8.0.0",
+    "prettier": "2.8.8",
     "source-map-loader": "4.0.1",
-    "terser-webpack-plugin": "5.3.7",
-    "webpack": "5.74.0"
+    "terser-webpack-plugin": "5.3.9",
+    "webpack": "5.87.0"
   }
 }

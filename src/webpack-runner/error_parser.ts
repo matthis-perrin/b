@@ -49,6 +49,9 @@ export function parseError(
   if (err.name === 'EslintWebpackError') {
     const eslintError = err as EslintWebpackError;
     const absolutePath = err.file;
+    if (absolutePath === undefined) {
+      return {severity, message: err.message};
+    }
     const {relativePath, project} = parseFilePath(root, absolutePath);
     return {
       project,
@@ -59,8 +62,8 @@ export function parseError(
       loc: {
         relativePath,
         absolutePath,
-        start: 'start' in err.loc ? err.loc.start : undefined,
-        end: 'end' in err.loc ? err.loc.end : undefined,
+        start: err.loc && 'start' in err.loc ? err.loc.start : undefined,
+        end: err.loc && 'end' in err.loc ? err.loc.end : undefined,
       },
     };
   } else if ('issue' in err) {

@@ -1,15 +1,15 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.3.36',
-  eslint: '1.1.6',
-  prettier: '1.1.1',
-  tsconfig: '1.1.8',
-  webpack: '1.2.20',
-  runner: '1.1.21',
+  project: '1.4.7',
+  eslint: '1.2.5',
+  prettier: '1.2.0',
+  tsconfig: '1.2.6',
+  webpack: '1.3.1',
+  runner: '1.2.0',
 };
 
-export const ESLINT_VERSION = '8.23.x';
-export const PRETTIER_VERSION = '2.7.x';
-export const TYPESCRIPT_VERSION = '4.8.x';
+export const ESLINT_VERSION = '8.43.x';
+export const PRETTIER_VERSION = '2.8.x';
+export const TYPESCRIPT_VERSION = '5.0.4';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export const LIB_VERSIONS = {

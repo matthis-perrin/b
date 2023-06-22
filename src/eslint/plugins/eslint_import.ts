@@ -4,7 +4,7 @@ import {EslintMetadata} from '@src/eslint/models';
 export const eslintImport: EslintMetadata = {
   plugin: ['import'],
   dependencies: {
-    'eslint-plugin-import': '2.26.x',
+    'eslint-plugin-import': '2.27.x',
     'eslint-import-resolver-typescript': '3.5.x',
   },
   settings: {
@@ -19,6 +19,7 @@ export const eslintImport: EslintMetadata = {
     },
   },
   allOff: {
+    'import/consistent-type-specifier-style': 'off',
     'import/default': 'off',
     'import/dynamic-import-chunkname': 'off',
     'import/export': 'off',
@@ -39,6 +40,7 @@ export const eslintImport: EslintMetadata = {
     'import/no-deprecated': 'off',
     'import/no-duplicates': 'off',
     'import/no-dynamic-require': 'off',
+    'import/no-empty-named-blocks': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-internal-modules': 'off',
     'import/no-import-module-exports': 'off',
@@ -64,6 +66,7 @@ export const eslintImport: EslintMetadata = {
     'import/unambiguous': 'off',
   },
   onlyOn: {
+    'import/consistent-type-specifier-style': ['warn', 'prefer-inline'],
     'import/default': 'warn',
     'import/dynamic-import-chunkname': 'warn',
     'import/export': 'warn',
@@ -73,6 +76,7 @@ export const eslintImport: EslintMetadata = {
     'import/no-default-export': 'warn',
     'import/no-deprecated': 'warn',
     'import/no-duplicates': 'warn',
+    'import/no-empty-named-blocks': 'warn',
     'import/no-import-module-exports': 'warn',
     'import/no-mutable-exports': 'warn',
     'import/no-named-as-default-member': 'warn',

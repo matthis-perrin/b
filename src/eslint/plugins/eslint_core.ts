@@ -76,6 +76,7 @@ export const eslintCore: EslintMetadata = {
     'lines-around-directive': 'off',
     // Use @typescript-eslint/lines-between-class-members
     'lines-between-class-members': 'off',
+    'logical-assignment-operators': 'off',
     'max-classes-per-file': 'off',
     'max-depth': 'off',
     'max-len': 'off',
@@ -129,6 +130,7 @@ export const eslintCore: EslintMetadata = {
     // Use @typescript-eslint/no-empty-function
     'no-empty-function': 'off',
     'no-empty-pattern': 'off',
+    'no-empty-static-block': 'off',
     'no-empty': 'off',
     'no-eq-null': 'off',
     'no-eval': 'off',
@@ -180,6 +182,7 @@ export const eslintCore: EslintMetadata = {
     // Use unicorn/no-nested-ternary
     'no-nested-ternary': 'off',
     'no-new-func': 'off',
+    'no-new-native-nonconstructor': 'off',
     'no-new-object': 'off',
     'no-new-require': 'off',
     'no-new-symbol': 'off',
@@ -338,6 +341,7 @@ export const eslintCore: EslintMetadata = {
     'getter-return': 'warn',
     'guard-for-in': 'warn',
     'id-match': 'warn',
+    'logical-assignment-operators': ['warn', 'never'],
     'no-async-promise-executor': 'warn',
     'no-await-in-loop': 'warn',
     'no-bitwise': 'warn',
@@ -360,6 +364,7 @@ export const eslintCore: EslintMetadata = {
     'no-else-return': 'warn',
     'no-empty-character-class': 'warn',
     'no-empty-pattern': 'warn',
+    'no-empty-static-block': 'warn',
     'no-empty': 'warn',
     'no-eval': 'warn',
     'no-ex-assign': 'warn',

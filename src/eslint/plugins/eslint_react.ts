@@ -11,7 +11,7 @@ const forbiddenProps = [
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
-    'eslint-plugin-react': '7.31.x',
+    'eslint-plugin-react': '7.32.x',
   },
   settings: {
     react: {
@@ -63,7 +63,6 @@ export const eslintReact: EslintMetadata = {
     'react/jsx-pascal-case': 'off',
     'react/jsx-props-no-multi-spaces': 'off',
     'react/jsx-props-no-spreading': 'off',
-    'react/jsx-sort-default-props': 'off',
     'react/jsx-sort-props': 'off',
     'react/jsx-space-before-closing': 'off',
     'react/jsx-tag-spacing': 'off',
@@ -84,6 +83,7 @@ export const eslintReact: EslintMetadata = {
     'react/no-is-mounted': 'off',
     'react/no-multi-comp': 'off',
     'react/no-namespace': 'off',
+    'react/no-object-type-as-default-prop': 'off',
     'react/no-redundant-should-component-update': 'off',
     'react/no-render-return-value': 'off',
     'react/no-set-state': 'off',
@@ -107,6 +107,7 @@ export const eslintReact: EslintMetadata = {
     'react/require-render-return': 'off',
     'react/self-closing-comp': 'off',
     'react/sort-comp': 'off',
+    'react/sort-default-props': 'off',
     'react/sort-prop-types': 'off',
     'react/state-in-constructor': 'off',
     'react/static-property-placement': 'off',
@@ -124,9 +125,9 @@ export const eslintReact: EslintMetadata = {
       {namedComponents: 'arrow-function', unnamedComponents: 'arrow-function'},
     ],
     'react/iframe-missing-sandbox': 'warn',
-    'react/hook-use-state': 'warn',
+    'react/hook-use-state': ['warn', {allowDestructuredState: true}],
     'react/jsx-boolean-value': 'warn',
-    'react/jsx-fragments': ['warn', 'element'],
+    'react/jsx-fragments': ['warn', 'syntax'],
     'react/jsx-handler-names': [
       'warn',
       {
@@ -160,6 +161,7 @@ export const eslintReact: EslintMetadata = {
     'react/no-is-mounted': 'warn',
     'react/no-multi-comp': 'warn',
     'react/no-namespace': 'warn',
+    'react/no-object-type-as-default-prop': 'warn',
     'react/no-redundant-should-component-update': 'warn',
     'react/no-render-return-value': 'warn',
     'react/no-string-refs': 'warn',

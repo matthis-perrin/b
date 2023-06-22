@@ -189,7 +189,7 @@ class LambdaServerPlugin extends StandalonePlugin {
                     return internalError(`Lambda returned undefined`);
                   }
                   const result = JSON.parse(stdoutRes);
-                  if (typeof result === 'undefined') {
+                  if (result === undefined) {
                     return internalError(`Invalid response: ${stdoutRes}`);
                   }
 

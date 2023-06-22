@@ -7,7 +7,7 @@
     "build": "NODE_ENV=development webpack build",
     "watch": "NODE_ENV=development webpack watch",
     "project": "yarn build && yarn start && cd packages/project/ && yarn install && cd ../../ && node packages/project/index.js",
-    "start": "node dist/index.js",
+    "start": "node dist/index.js --max_old_space_size=16384",
     "postinstall": "node install.js",
     "clean": "node clean.js"
   },
@@ -29,10 +29,10 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "7.19.x",
-    "@babel/preset-env": "7.19.x",
-    "@babel/preset-react": "7.18.x",
-    "@babel/preset-typescript": "7.18.x",
+    "@babel/core": "7.22.x",
+    "@babel/preset-env": "7.22.x",
+    "@babel/preset-react": "7.22.x",
+    "@babel/preset-typescript": "7.22.x",
     "@matthis/eslint-config-node": "latest",
     "@matthis/prettier-config": "latest",
     "@matthis/tsconfig-node": "latest",
@@ -42,18 +42,18 @@
     "@types/prompts": "^2.0.14",
     "@types/semver": "7.3.x",
     "ansi-colors": "4.1.x",
-    "babel-loader": "8.2.x",
+    "babel-loader": "9.1.x",
     "babel-plugin-react-remove-properties": "0.3.x",
     "chokidar": "3.5.x",
-    "fork-ts-checker-webpack-plugin": "7.2.x",
+    "fork-ts-checker-webpack-plugin": "8.0.x",
     "html-webpack-plugin": "5.5.x",
     "package-json": "8.1.x",
     "semver": "7.3.x",
     "source-map-loader": "4.0.x",
     "terser-webpack-plugin": "5.3.x",
-    "webpack": "5.74.x",
+    "webpack": "5.87.x",
     "webpack-cli": "4.10.x",
-    "webpack-dev-server": "4.11.x"
+    "webpack-dev-server": "4.15.x"
   },
   "dependencies": {
     "prompts": "2.4.x"

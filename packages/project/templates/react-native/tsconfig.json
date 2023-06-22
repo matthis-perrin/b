@@ -1,7 +1,0 @@
-{
-  "extends": "@matthis/tsconfig-react-native/tsconfig",
-  "compilerOptions": {
-    "baseUrl": "."
-  },
-  "include": ["src", "../shared"]
-}
