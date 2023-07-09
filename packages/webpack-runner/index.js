@@ -639,12 +639,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.4.7',
-  eslint: '1.2.5',
+  project: '1.4.10',
+  eslint: '1.2.7',
   prettier: '1.2.0',
   tsconfig: '1.2.6',
-  webpack: '1.3.1',
-  runner: '1.2.0'
+  webpack: '1.3.2',
+  runner: '1.2.1'
 };
 const ESLINT_VERSION = '8.43.x';
 const PRETTIER_VERSION = '2.8.x';
@@ -1490,7 +1490,7 @@ function renderLambdaServerEvent(event) {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === 'response') {
     const httpCode = `[HTTP ${event.statusCode}]`;
-    const size = `[${event.byteLength.toLocaleString()}b]`;
+    const size = `[${event.body.length.toLocaleString()}b]`;
     const duration = `[${event.duration.toLocaleString()}ms]`;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     const color = event.statusCode >= 400 ? ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red : ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green;

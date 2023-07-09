@@ -26,6 +26,7 @@ export interface LambdaServerRequestEvent {
   event: 'request';
   path: string;
   method: string;
+  body?: string;
 }
 
 export interface LambdaServerResponseEvent {
@@ -34,7 +35,8 @@ export interface LambdaServerResponseEvent {
   method: string;
   duration: number;
   statusCode: number;
-  byteLength: number;
+  headers: Record<string, string>;
+  body: string;
 }
 
 export type LambdaServerEvent =
@@ -72,15 +74,9 @@ class LambdaServerPlugin extends StandalonePlugin {
         };
 
         try {
-          // Log the request
-          this.runtimeLog({event: 'request', path: url, method});
-
           // Parse body
-          let body: string | undefined;
+          let body = '';
           req.on('data', chunk => {
-            if (body === undefined) {
-              body = '';
-            }
             body += chunk;
           });
 
@@ -89,41 +85,12 @@ class LambdaServerPlugin extends StandalonePlugin {
           const rawQueryString = parsedUrl.search.slice(1);
           const queryStringParameters = Object.fromEntries(parsedUrl.searchParams.entries());
 
-          // Create the lambda event
-          const event = {
-            version: '2.0',
-            routeKey: '$default',
-            rawPath: parsedUrl.pathname,
-            rawQueryString,
-            headers: req.headers,
-            queryStringParameters,
-            requestContext: {
-              accountId: 'anonymous',
-              // apiId: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
-              // domainName: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp.lambda-url.eu-west-3.on.aws',
-              // domainPrefix: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
-              http: {
-                method,
-                path: parsedUrl.pathname,
-                // protocol: 'HTTP/1.1',
-                // sourceIp: '88.138.164.86',
-                userAgent: req.headers['user-agent'],
-              },
-              requestId: randomUUID(),
-              routeKey: '$default',
-              stage: '$default',
-              timeEpoch: Date.now(),
-            },
-            body,
-            isBase64Encoded: false,
-          };
-
           const sendRes = (
             body: string,
             duration: number,
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             statusCode = 200,
-            headers?: Record<string, string>
+            headers: Record<string, string> = {}
           ): void => {
             this.runtimeLog({
               event: 'response',
@@ -131,20 +98,54 @@ class LambdaServerPlugin extends StandalonePlugin {
               method,
               statusCode,
               duration,
-              byteLength: body.length,
+              headers,
+              body,
             });
             res.statusCode = statusCode;
-            for (const [headerName, headerValue] of Object.entries(headers ?? {})) {
+            for (const [headerName, headerValue] of Object.entries(headers)) {
               res.setHeader(headerName, headerValue);
             }
             res.write(body);
             res.end();
           };
 
-          const TOKEN = randomUUID();
+          req.on('end', () => {
+            // Log the request
+            this.runtimeLog({event: 'request', path: url, method, body});
 
-          const handlerPath = join(this.context, 'dist/index.js');
-          const commandJs = `
+            // Create the lambda event
+            const event = {
+              version: '2.0',
+              routeKey: '$default',
+              rawPath: parsedUrl.pathname,
+              rawQueryString,
+              headers: req.headers,
+              queryStringParameters,
+              requestContext: {
+                accountId: 'anonymous',
+                // apiId: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
+                // domainName: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp.lambda-url.eu-west-3.on.aws',
+                // domainPrefix: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
+                http: {
+                  method,
+                  path: parsedUrl.pathname,
+                  // protocol: 'HTTP/1.1',
+                  // sourceIp: '88.138.164.86',
+                  userAgent: req.headers['user-agent'],
+                },
+                requestId: randomUUID(),
+                routeKey: '$default',
+                stage: '$default',
+                timeEpoch: Date.now(),
+              },
+              body,
+              isBase64Encoded: false,
+            };
+
+            const TOKEN = randomUUID();
+
+            const handlerPath = join(this.context, 'dist/index.js');
+            const commandJs = `
 (async () => {
   try {
     const {handler} = await import('${handlerPath}');
@@ -156,8 +157,6 @@ class LambdaServerPlugin extends StandalonePlugin {
   }
 })()
         `.trim();
-
-          req.on('end', () => {
             const command = [`node -e "eval(atob('${btoa(commandJs)}'))"`].join('');
 
             const startTs = Date.now();

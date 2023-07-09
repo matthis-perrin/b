@@ -496,19 +496,6 @@ module.exports = {
       'warn',
       {selector: 'variable', format: ['strictCamelCase', 'StrictPascalCase', 'UPPER_CASE']},
       {
-        selector: 'property',
-        format: null,
-        filter: {
-          regex: '^Content-Type|Access-Control-Allow-Origin|User-Agent|__html|__brand$',
-          match: true,
-        },
-      },
-      {
-        selector: 'property',
-        format: null,
-        custom: {regex: '^([a-zA-Z]([a-z]+)?((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?)$', match: true},
-      },
-      {
         selector: ['function', 'parameter', 'parameterProperty', 'method', 'accessor'],
         format: ['strictCamelCase'],
       },

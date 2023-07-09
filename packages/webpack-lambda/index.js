@@ -1263,19 +1263,9 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
           res.end();
         };
         try {
-          // Log the request
-          this.runtimeLog({
-            event: 'request',
-            path: url,
-            method
-          });
-
           // Parse body
-          let body;
+          let body = '';
           req.on('data', chunk => {
-            if (body === undefined) {
-              body = '';
-            }
             body += chunk;
           });
 
@@ -1283,56 +1273,65 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
           const parsedUrl = new URL(`http://localhost${url}`);
           const rawQueryString = parsedUrl.search.slice(1);
           const queryStringParameters = Object.fromEntries(parsedUrl.searchParams.entries());
-
-          // Create the lambda event
-          const event = {
-            version: '2.0',
-            routeKey: '$default',
-            rawPath: parsedUrl.pathname,
-            rawQueryString,
-            headers: req.headers,
-            queryStringParameters,
-            requestContext: {
-              accountId: 'anonymous',
-              // apiId: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
-              // domainName: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp.lambda-url.eu-west-3.on.aws',
-              // domainPrefix: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
-              http: {
-                method,
-                path: parsedUrl.pathname,
-                // protocol: 'HTTP/1.1',
-                // sourceIp: '88.138.164.86',
-                userAgent: req.headers['user-agent']
-              },
-              requestId: (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)(),
-              routeKey: '$default',
-              stage: '$default',
-              timeEpoch: Date.now()
-            },
-            body,
-            isBase64Encoded: false
-          };
           const sendRes = (body, duration,
           // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-          statusCode = 200, headers) => {
+          statusCode = 200, headers = {}) => {
             this.runtimeLog({
               event: 'response',
               path: url,
               method,
               statusCode,
               duration,
-              byteLength: body.length
+              headers,
+              body
             });
             res.statusCode = statusCode;
-            for (const [headerName, headerValue] of Object.entries(headers ?? {})) {
+            for (const [headerName, headerValue] of Object.entries(headers)) {
               res.setHeader(headerName, headerValue);
             }
             res.write(body);
             res.end();
           };
-          const TOKEN = (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)();
-          const handlerPath = (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, 'dist/index.js');
-          const commandJs = `
+          req.on('end', () => {
+            // Log the request
+            this.runtimeLog({
+              event: 'request',
+              path: url,
+              method,
+              body
+            });
+
+            // Create the lambda event
+            const event = {
+              version: '2.0',
+              routeKey: '$default',
+              rawPath: parsedUrl.pathname,
+              rawQueryString,
+              headers: req.headers,
+              queryStringParameters,
+              requestContext: {
+                accountId: 'anonymous',
+                // apiId: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
+                // domainName: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp.lambda-url.eu-west-3.on.aws',
+                // domainPrefix: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
+                http: {
+                  method,
+                  path: parsedUrl.pathname,
+                  // protocol: 'HTTP/1.1',
+                  // sourceIp: '88.138.164.86',
+                  userAgent: req.headers['user-agent']
+                },
+                requestId: (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)(),
+                routeKey: '$default',
+                stage: '$default',
+                timeEpoch: Date.now()
+              },
+              body,
+              isBase64Encoded: false
+            };
+            const TOKEN = (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)();
+            const handlerPath = (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, 'dist/index.js');
+            const commandJs = `
 (async () => {
   try {
     const {handler} = await import('${handlerPath}');
@@ -1344,7 +1343,6 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
   }
 })()
         `.trim();
-          req.on('end', () => {
             const command = [`node -e "eval(atob('${btoa(commandJs)}'))"`].join('');
             const startTs = Date.now();
             (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {

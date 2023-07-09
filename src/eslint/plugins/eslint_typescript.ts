@@ -1,7 +1,7 @@
 import {EslintMetadata} from '@src/eslint/models';
 import {TYPESCRIPT_VERSION} from '@src/versions';
 
-/* eslint-disable @typescript-eslint/naming-convention, no-null/no-null */
+/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintTypescript: EslintMetadata = {
   plugin: ['@typescript-eslint'],
   dependencies: {
@@ -169,23 +169,6 @@ export const eslintTypescript: EslintMetadata = {
       'warn',
       {selector: 'variable', format: ['strictCamelCase', 'StrictPascalCase', 'UPPER_CASE']},
       {
-        selector: 'property',
-        format: null,
-        filter: {
-          regex: '^Content-Type|Access-Control-Allow-Origin|User-Agent|__html|__brand$',
-          match: true,
-        },
-      },
-      {
-        selector: 'property',
-
-        format: null,
-        custom: {
-          regex: '^([a-zA-Z]([a-z]+)?((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?)$',
-          match: true,
-        },
-      },
-      {
         selector: ['function', 'parameter', 'parameterProperty', 'method', 'accessor'],
         format: ['strictCamelCase'],
       },
@@ -331,4 +314,4 @@ export const eslintTypescript: EslintMetadata = {
     '@typescript-eslint/unified-signatures': ['warn', {ignoreDifferentlyNamedParameters: true}],
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */
+/* eslint-enable @typescript-eslint/naming-convention */

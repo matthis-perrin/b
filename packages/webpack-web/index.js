@@ -991,7 +991,9 @@ function babelLoaderWeb() {
         corejs: {
           version: '3.10'
         }
-      }], ['@babel/preset-react'], ['@babel/preset-typescript']],
+      }], ['@babel/preset-react', {
+        runtime: 'automatic'
+      }], ['@babel/preset-typescript']],
       plugins: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.isSelenium)() ? [] : [['react-remove-properties', {
         properties: ['data-test-id']
       }]]
