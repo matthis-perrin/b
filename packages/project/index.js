@@ -571,7 +571,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.4.10',
+  project: '1.4.11',
   eslint: '1.2.7',
   prettier: '1.2.0',
   tsconfig: '1.2.6',
@@ -590,10 +590,9 @@ const LIB_VERSIONS = {
   'react-dom': '18.2.x',
   '@types/react-native': '0.66.x',
   'react-native': '0.66.x',
-  '@types/styled-components': '5.1.x',
-  'styled-components': '5.1.x',
-  'react-router': '5.2.x',
-  'react-router-dom': '5.2.x'
+  'styled-components': '6.0.x',
+  'react-router': '6.4.x',
+  'react-router-dom': '6.4.x'
 };
 /* eslint-enable @typescript-eslint/naming-convention */
 
