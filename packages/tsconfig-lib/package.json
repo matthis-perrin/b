@@ -1,6 +1,6 @@
 {
   "name": "@matthis/tsconfig-lib",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "license": "UNLICENSED",
   "type": "module",
   "main": "tsconfig.json",

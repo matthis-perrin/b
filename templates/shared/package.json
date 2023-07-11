@@ -8,13 +8,6 @@
     "extends": [
       "@matthis/eslint-config-lib"
     ],
-    "rules": {
-      "no-restricted-imports": [
-        "warn",
-        {"patterns": [
-          {"group": ["@src/*"], "message": "Import with @shared/ instead"}
-        ]}
-      ]
-    }
+    "rules": {}
   }
 }

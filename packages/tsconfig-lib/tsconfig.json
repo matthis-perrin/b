@@ -33,9 +33,6 @@
     ],
     "target": "es2022",
     "paths": {
-      "@src/*": [
-        "./src/*"
-      ],
       "*": [
         "./node_modules/*",
         "./node_modules/@types/*",

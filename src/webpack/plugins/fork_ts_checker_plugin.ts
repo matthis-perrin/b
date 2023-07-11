@@ -10,7 +10,7 @@ export function forkTsCheckerPlugin(context: string): WebpackPlugin {
       diagnosticOptions: {
         syntactic: true,
         semantic: true,
-        declaration: true,
+        declaration: false,
         global: true,
       },
       mode: 'readonly',

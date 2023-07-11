@@ -58,9 +58,10 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
       })
     | undefined;
 
-  const makePaths = (projects: string[]): Record<string, string[]> =>
-    Object.fromEntries([
-      ['@src/*', ['./src/*']],
+  const makePaths = (projects: string[], opts?: {noSrc?: boolean}): Record<string, string[]> => {
+    const {noSrc} = opts ?? {};
+    return Object.fromEntries([
+      ...(noSrc ? [] : [['@src/*', ['./src/*']]]),
       [
         '*',
         [
@@ -71,6 +72,7 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
       ],
       ...projects.flatMap(name => [[`@${name}/*`, [`../${name}/src/*`]]]),
     ]);
+  };
 
   if (type === RuntimeType.Lib) {
     additionalCompilerOptions = {
@@ -78,7 +80,7 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
       moduleResolution: 'node',
       lib: ['es2022'],
       target: 'es2022',
-      paths: makePaths(['shared']),
+      paths: makePaths(['shared'], {noSrc: true}),
     };
   } else if (type === RuntimeType.Web) {
     additionalCompilerOptions = {

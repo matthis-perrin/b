@@ -33,7 +33,20 @@ export function groupAndSortErrors(errors: ParsedError[]): GroupedErrors {
         } else if (!err2.loc.start) {
           return 1;
         }
-        return err1.loc.start.line - err2.loc.start.line;
+        const diffLine = err1.loc.start.line - err2.loc.start.line;
+        if (diffLine !== 0) {
+          return diffLine;
+        }
+        if (err1.loc.start.column === undefined) {
+          return -1;
+        } else if (err2.loc.start.column === undefined) {
+          return 1;
+        }
+        const diffColumn = err1.loc.start.column - err2.loc.start.column;
+        if (diffColumn !== 0) {
+          return diffColumn;
+        }
+        return err1.message.localeCompare(err2.message);
       });
     }
   }

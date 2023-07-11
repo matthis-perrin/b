@@ -797,7 +797,7 @@ function forkTsCheckerPlugin(context) {
       diagnosticOptions: {
         syntactic: true,
         semantic: true,
-        declaration: true,
+        declaration: false,
         global: true
       },
       mode: 'readonly',

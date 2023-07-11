@@ -639,12 +639,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.4.11',
+  project: '1.4.12',
   eslint: '1.2.7',
   prettier: '1.2.0',
-  tsconfig: '1.2.6',
-  webpack: '1.3.2',
-  runner: '1.2.1'
+  tsconfig: '1.2.7',
+  webpack: '1.3.3',
+  runner: '1.2.2'
 };
 const ESLINT_VERSION = '8.43.x';
 const PRETTIER_VERSION = '2.8.x';
@@ -1233,7 +1233,20 @@ function groupAndSortErrors(errors) {
         } else if (!err2.loc.start) {
           return 1;
         }
-        return err1.loc.start.line - err2.loc.start.line;
+        const diffLine = err1.loc.start.line - err2.loc.start.line;
+        if (diffLine !== 0) {
+          return diffLine;
+        }
+        if (err1.loc.start.column === undefined) {
+          return -1;
+        } else if (err2.loc.start.column === undefined) {
+          return 1;
+        }
+        const diffColumn = err1.loc.start.column - err2.loc.start.column;
+        if (diffColumn !== 0) {
+          return diffColumn;
+        }
+        return err1.message.localeCompare(err2.message);
       });
     }
   }
