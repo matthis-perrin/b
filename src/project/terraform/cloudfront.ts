@@ -7,6 +7,11 @@ export function generateCloudfrontDistributionTerraform(
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
   const originId = `${bucketName}-origin-id`;
   return `
+output "${projectName}_cloudfront_domain_name" {
+  value       = aws_cloudfront_distribution.${projectName}.domain_name
+  description = "Domain (from cloudfront) where the \\"${workspaceName}-${projectName}\\" frontend is available."
+}
+  
 resource "aws_cloudfront_distribution" "${projectName}" {
   origin {
     domain_name = aws_s3_bucket.code.bucket_regional_domain_name

@@ -26,7 +26,7 @@ resource "aws_lambda_function" "${projectName}" {
   s3_bucket         = aws_s3_object.${projectName}_archive.bucket
   s3_key            = aws_s3_object.${projectName}_archive.key
   handler           = "index.handler"
-  runtime           = "nodejs14.x"
+  runtime           = "nodejs18.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
 }
 
@@ -81,6 +81,25 @@ resource "aws_iam_role" "${projectName}_lambda_exec" {
           Effect   = "Allow"
           Resource = "arn:aws:logs:*:*:*"
         },
+      ]
+    })
+  }
+
+  inline_policy {
+    name = "${workspaceName}-${projectName}-s3-code-bucket"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action   = [
+            "s3:GetObject",
+            "s3:GetObjectTagging"
+          ]
+          Effect   = "Allow"
+          Resource = [
+            "\${aws_s3_bucket.code.arn}/*",
+          ]
+        }
       ]
     })
   }

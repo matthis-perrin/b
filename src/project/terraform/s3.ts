@@ -8,7 +8,7 @@ export function generateS3BucketTerraform(
 
   const CODE_BUCKET = `
 resource "aws_s3_bucket" "code" {
-  bucket_prefix = "${bucketName}-"
+  bucket_prefix = "${bucketName}-code-"
 }
 
 output "code_bucket" {

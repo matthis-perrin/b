@@ -639,11 +639,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.4.12',
-  eslint: '1.2.7',
+  project: '1.4.15',
+  eslint: '1.2.8',
   prettier: '1.2.0',
   tsconfig: '1.2.7',
-  webpack: '1.3.3',
+  webpack: '1.3.5',
   runner: '1.2.2'
 };
 const ESLINT_VERSION = '8.43.x';
@@ -726,6 +726,11 @@ function generateCloudfrontDistributionTerraform(workspaceName, projectName) {
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
   const originId = `${bucketName}-origin-id`;
   return `
+output "${projectName}_cloudfront_domain_name" {
+  value       = aws_cloudfront_distribution.${projectName}.domain_name
+  description = "Domain (from cloudfront) where the \\"${workspaceName}-${projectName}\\" frontend is available."
+}
+  
 resource "aws_cloudfront_distribution" "${projectName}" {
   origin {
     domain_name = aws_s3_bucket.code.bucket_regional_domain_name
@@ -821,7 +826,7 @@ resource "aws_lambda_function" "${projectName}" {
   s3_bucket         = aws_s3_object.${projectName}_archive.bucket
   s3_key            = aws_s3_object.${projectName}_archive.key
   handler           = "index.handler"
-  runtime           = "nodejs14.x"
+  runtime           = "nodejs18.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
 }
 
@@ -872,6 +877,25 @@ resource "aws_iam_role" "${projectName}_lambda_exec" {
           Effect   = "Allow"
           Resource = "arn:aws:logs:*:*:*"
         },
+      ]
+    })
+  }
+
+  inline_policy {
+    name = "${workspaceName}-${projectName}-s3-code-bucket"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action   = [
+            "s3:GetObject",
+            "s3:GetObjectTagging"
+          ]
+          Effect   = "Allow"
+          Resource = [
+            "\${aws_s3_bucket.code.arn}/*",
+          ]
+        }
       ]
     })
   }
@@ -932,7 +956,7 @@ function generateS3BucketTerraform(workspaceName, webProjectNames) {
   const bucketName = workspaceName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
   const CODE_BUCKET = `
 resource "aws_s3_bucket" "code" {
-  bucket_prefix = "${bucketName}-"
+  bucket_prefix = "${bucketName}-code-"
 }
 
 output "code_bucket" {

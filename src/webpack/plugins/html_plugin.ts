@@ -8,6 +8,7 @@ import {isProd} from '@src/webpack/utils';
 export function htmlPlugin(context: string): WebpackPlugin {
   return new HtmlWebpackPlugin({
     template: join(context, 'src/index.html'),
+    publicPath: '{{PUBLIC_PATH}}',
     minify: isProd(),
   });
 }

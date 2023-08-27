@@ -24,7 +24,8 @@ __webpack_require__.r(__webpack_exports__);
 function webConfig(opts) {
   const {
     context,
-    watch
+    watch,
+    publicPath
   } = opts;
   const base = (0,_src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)({
     context,
@@ -45,7 +46,10 @@ function webConfig(opts) {
     module: {
       rules: [(0,_src_webpack_loaders_babel_loader_web__WEBPACK_IMPORTED_MODULE_2__.babelLoaderWeb)(), (0,_src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__.sourceMapLoader)()]
     },
-    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_html_plugin__WEBPACK_IMPORTED_MODULE_4__.htmlPlugin)(context)],
+    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_html_plugin__WEBPACK_IMPORTED_MODULE_4__.htmlPlugin)({
+      context,
+      publicPath
+    })],
     devServer: watch ? (0,_src_webpack_plugins_webpack_dev_server__WEBPACK_IMPORTED_MODULE_5__.webpackDevServer)(context) : undefined,
     optimization: {
       ...base.optimization,
@@ -1096,6 +1100,7 @@ __webpack_require__.r(__webpack_exports__);
 function htmlPlugin(context) {
   return new (html_webpack_plugin__WEBPACK_IMPORTED_MODULE_1___default())({
     template: (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(context, 'src/index.html'),
+    publicPath: '{{PUBLIC_PATH}}',
     minify: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__.isProd)()
   });
 }
