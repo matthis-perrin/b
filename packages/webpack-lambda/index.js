@@ -1283,7 +1283,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
               statusCode,
               duration,
               headers,
-              body
+              body: typeof body === 'string' ? body : 'Buffer'
             });
             res.statusCode = statusCode;
             for (const [headerName, headerValue] of Object.entries(headers)) {
@@ -1343,7 +1343,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
   }
 })()
         `.trim();
-            const command = [`node -e "eval(atob('${btoa(commandJs)}'))"`].join('');
+            const command = [`node --enable-source-maps -e "eval(atob('${btoa(commandJs)}'))"`].join('');
             const startTs = Date.now();
             (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {
               /* eslint-disable @typescript-eslint/naming-convention */
@@ -1377,14 +1377,15 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
                   const {
                     body,
                     headers,
-                    statusCode
+                    statusCode,
+                    isBase64Encoded
                   } = result;
                   if (!('statusCode' in result)) {
                     return sendRes(stdoutRes, duration);
                   } else if (typeof statusCode !== 'number') {
                     return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
                   }
-                  const resBody = typeof body === 'string' ? body : JSON.stringify(body);
+                  const resBody = typeof body === 'string' ? typeof isBase64Encoded === 'boolean' && isBase64Encoded ? Buffer.from(body, 'base64') : body : JSON.stringify(body);
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                   return sendRes(resBody, duration, statusCode, headers);
                 } else if (typeof result === 'string') {

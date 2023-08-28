@@ -571,11 +571,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.4.15',
+  project: '1.4.17',
   eslint: '1.2.8',
   prettier: '1.2.0',
   tsconfig: '1.2.7',
-  webpack: '1.3.5',
+  webpack: '1.3.7',
   runner: '1.2.2'
 };
 const ESLINT_VERSION = '8.43.x';
@@ -760,6 +760,11 @@ resource "aws_lambda_function" "${projectName}" {
   handler           = "index.handler"
   runtime           = "nodejs18.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
+  environment {
+    variables = {
+      NODE_OPTIONS = "--enable-source-maps"
+    }
+  }
 }
 
 output "${projectName}_function_name" {
