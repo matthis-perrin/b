@@ -5,12 +5,11 @@ import {Configuration, Stats, webpack} from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 
 import {registerExitCallback} from '@src/exit_handler';
-import {setLogging} from '@src/fs';
 import {globalError} from '@src/global_error';
 import {ProjectName, ProjectType, WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment, WorkspaceProject} from '@src/project/generate_workspace';
-import {readProjectsFromWorkspace} from '@src/project/vscode_workspace';
-import {neverHappens, removeUndefined} from '@src/type_utils';
+import {readWorkspaceFragments} from '@src/project/vscode_workspace';
+import {neverHappens} from '@src/type_utils';
 import {
   FullLambdaServerEvent,
   LambdaServerEvent,
@@ -20,6 +19,7 @@ import {
   FullWebpackDevServerEvent,
   WebpackDevServerStartEvent,
 } from '@src/webpack/plugins/webpack_dev_server';
+import {getEnv, getPort} from '@src/webpack/utils';
 import {generateEnvFile} from '@src/webpack-runner/env_definition_file';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
@@ -30,8 +30,6 @@ import {
   renderProjectStatus,
 } from '@src/webpack-runner/renderer';
 import {table} from '@src/webpack-runner/text_table';
-
-setLogging(false);
 
 interface RunWebpacksOptions {
   root: string;
@@ -64,28 +62,28 @@ const name = 'WebpackRunner';
 export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   const {root, workspaceFragments, watch} = opts;
   const statuses = new Map<ProjectName, ProjectStatus>();
-  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
+  const projects = workspaceFragments.flatMap(f =>
+    getProjectsFromWorkspaceFragment(f, workspaceFragments)
+  );
 
   function regenerateEnvFile(): void {
-    const overrides = Object.fromEntries(
-      removeUndefined(
-        [...statuses.values()].map(({project, lambdaServerEvents, webpackDevServerEvents}) => {
-          if (project.type === ProjectType.LambdaApi && lambdaServerEvents.startEvent) {
-            return [
-              `${project.projectName.toUpperCase()}_FUNCTION_URL`,
-              `http://localhost:${lambdaServerEvents.startEvent.port}/`,
-            ];
-          }
-          if (project.type === ProjectType.Web && webpackDevServerEvents.startEvent) {
-            return [
-              `${project.projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`,
-              `localhost:${webpackDevServerEvents.startEvent.port}`,
-            ];
-          }
-          return undefined;
-        })
-      )
-    );
+    const overrides: Record<string, string> = {};
+    if (getEnv() === 'development') {
+      for (const {projectName, type} of projects) {
+        if (type === ProjectType.LambdaApi) {
+          const status = statuses.get(projectName);
+          const port =
+            status?.lambdaServerEvents.startEvent?.port ?? getPort(join(root, projectName));
+          overrides[`${projectName.toUpperCase()}_FUNCTION_URL`] = `http://localhost:${port}/`;
+        }
+        if (type === ProjectType.Web) {
+          const status = statuses.get(projectName);
+          const port =
+            status?.webpackDevServerEvents.startEvent?.port ?? getPort(join(root, projectName));
+          overrides[`${projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`] = `localhost:${port}`;
+        }
+      }
+    }
     generateEnvFile(overrides);
   }
   regenerateEnvFile();
@@ -373,7 +371,7 @@ export async function runAllWebpacks(
 ): Promise<void> {
   const {root, watch} = options;
 
-  const workspaceFragments = await readProjectsFromWorkspace(root);
+  const workspaceFragments = await readWorkspaceFragments(root);
   if (!workspaceFragments) {
     throw new Error(`No workspace projects at path ${root}`);
   }

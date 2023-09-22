@@ -1,3 +1,4 @@
+import {existsSync, readdirSync} from 'node:fs';
 import {join} from 'node:path';
 
 import {FSWatcher, watch} from 'chokidar';
@@ -69,20 +70,41 @@ class EslintPlugin extends StandalonePlugin {
   private readonly fileStates = new Map<string, FileState>();
   private compilation: Compilation | undefined;
   private resolveAwaitIdlePromise: (() => void) | undefined;
+  private shouldRun = false;
 
   protected async setup(compiler: Compiler): Promise<void> {
     return new Promise<void>(resolve => {
       this.runEslintInterval = setInterval(() => this.runEslint(), RUN_ESLINT_INTERVAL);
-      this.watcher = watch(['src/**/*.ts', 'src/**/*.tsx'].map(p => join(this.context, p)));
+
+      // Generate the patterns of all the files across the workspace
+      const projectPath = this.context;
+      const workspacePath = join(projectPath, '..');
+      const workspaceDirs = readdirSync(workspacePath, {withFileTypes: true})
+        .filter(e => e.isDirectory() && existsSync(join(workspacePath, e.name, 'package.json')))
+        .map(e => join(workspacePath, e.name));
+      const patterns = ['src/**/*.ts', 'src/**/*.tsx'].flatMap(pattern =>
+        workspaceDirs.map(dir => join(dir, pattern))
+      );
+
+      this.watcher = watch(patterns);
       this.watcher
         .on('add', path => {
-          this.fileStates.set(path, {status: 'queued'});
+          this.shouldRun = true;
+          if (path.startsWith(projectPath)) {
+            this.fileStates.set(path, {status: 'queued'});
+          }
         })
         .on('change', path => {
-          this.fileStates.set(path, {status: 'queued'});
+          this.shouldRun = true;
+          if (path.startsWith(projectPath)) {
+            this.fileStates.set(path, {status: 'queued'});
+          }
         })
         .on('unlink', path => {
-          this.fileStates.delete(path);
+          this.shouldRun = true;
+          if (path.startsWith(projectPath)) {
+            this.fileStates.delete(path);
+          }
         })
         .on('ready', () => {
           this.runEslint();
@@ -101,7 +123,11 @@ class EslintPlugin extends StandalonePlugin {
   }
 
   private runEslint(): void {
-    const filesQueued = [...this.fileStates.entries()].filter(e => e[1].status === 'queued');
+    if (!this.shouldRun) {
+      return;
+    }
+    this.shouldRun = false;
+    const filesQueued = [...this.fileStates.entries()];
     if (filesQueued.length === 0) {
       return;
     }

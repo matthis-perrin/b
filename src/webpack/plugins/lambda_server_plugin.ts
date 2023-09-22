@@ -83,7 +83,9 @@ class LambdaServerPlugin extends StandalonePlugin {
           // Parse URL
           const parsedUrl = new URL(`http://localhost${url}`);
           const rawQueryString = parsedUrl.search.slice(1);
-          const queryStringParameters = Object.fromEntries(parsedUrl.searchParams.entries());
+          const queryStringParameters = Object.fromEntries([
+            ...new URLSearchParams(decodeURIComponent(rawQueryString)).entries(),
+          ]);
 
           const sendRes = (
             body: string | Buffer,

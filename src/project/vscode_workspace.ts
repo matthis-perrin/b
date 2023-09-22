@@ -7,7 +7,9 @@ import {getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace'
 export function generateCodeWorkspace(
   workspaceFragments: WorkspaceFragment[]
 ): Record<string, unknown> {
-  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
+  const projects = workspaceFragments.flatMap(f =>
+    getProjectsFromWorkspaceFragment(f, workspaceFragments)
+  );
   const projectNames = projects.map(p => p.projectName);
   return {
     projects: workspaceFragments,
@@ -56,7 +58,7 @@ export function generateCodeWorkspace(
   };
 }
 
-export async function readProjectsFromWorkspace(
+export async function readWorkspaceFragments(
   workspacePath: string
 ): Promise<WorkspaceFragment[] | undefined> {
   const workspaceContent = await maybeReadFile(join(workspacePath, 'app.code-workspace'));

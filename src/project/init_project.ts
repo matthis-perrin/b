@@ -6,7 +6,7 @@ import {prompt} from 'prompts';
 import {rmDir} from '@src/fs';
 import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '@src/models';
 import {generateWorkspace, getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
-import {readProjectsFromWorkspace} from '@src/project/vscode_workspace';
+import {readWorkspaceFragments} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 
 async function cancel(workspacePath?: string): Promise<never> {
@@ -26,12 +26,14 @@ async function initProject(): Promise<void> {
   const alreadyGenerated: ProjectName[] = [];
 
   // Check if we are already in a workspace
-  const workspaceProjects = await readProjectsFromWorkspace(workspacePath);
-  if (workspaceProjects !== undefined) {
+  const workspaceFragments = await readWorkspaceFragments(workspacePath);
+  if (workspaceFragments !== undefined) {
     workspaceName = basename(workspacePath);
-    for (const project of workspaceProjects) {
-      frags.push(project);
-      const projectNames = getProjectsFromWorkspaceFragment(project).map(p => p.projectName);
+    for (const fragment of workspaceFragments) {
+      frags.push(fragment);
+      const projectNames = getProjectsFromWorkspaceFragment(fragment, workspaceFragments).map(
+        p => p.projectName
+      );
       takenNames.push(...projectNames);
       alreadyGenerated.push(...projectNames);
     }
@@ -66,7 +68,7 @@ async function initProject(): Promise<void> {
       }
       if (frag) {
         frags.push(frag);
-        takenNames.push(...getProjectsFromWorkspaceFragment(frag).map(p => p.projectName));
+        takenNames.push(...getProjectsFromWorkspaceFragment(frag, frags).map(p => p.projectName));
       } else {
         break;
       }

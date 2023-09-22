@@ -93,177 +93,6 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs");
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   access: () => (/* binding */ access),
-/* harmony export */   cleanDir: () => (/* binding */ cleanDir),
-/* harmony export */   cp: () => (/* binding */ cp),
-/* harmony export */   exists: () => (/* binding */ exists),
-/* harmony export */   listFiles: () => (/* binding */ listFiles),
-/* harmony export */   maybeReadFile: () => (/* binding */ maybeReadFile),
-/* harmony export */   readFile: () => (/* binding */ readFile),
-/* harmony export */   readdir: () => (/* binding */ readdir),
-/* harmony export */   rmDir: () => (/* binding */ rmDir),
-/* harmony export */   setLogging: () => (/* binding */ setLogging),
-/* harmony export */   stat: () => (/* binding */ stat),
-/* harmony export */   writeJsFile: () => (/* binding */ writeJsFile),
-/* harmony export */   writeJsFileSync: () => (/* binding */ writeJsFileSync),
-/* harmony export */   writeJsonFile: () => (/* binding */ writeJsonFile),
-/* harmony export */   writeRawFile: () => (/* binding */ writeRawFile),
-/* harmony export */   writeRawFileSync: () => (/* binding */ writeRawFileSync),
-/* harmony export */   writeTsFile: () => (/* binding */ writeTsFile),
-/* harmony export */   writeTsFileSync: () => (/* binding */ writeTsFileSync)
-/* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(10);
-/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(prettier__WEBPACK_IMPORTED_MODULE_3__);
-
-
-
-
-const {
-  access,
-  readFile,
-  readdir,
-  stat
-} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
-const {
-  writeFile,
-  mkdir,
-  rm
-} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
-let logEnabled = true;
-const setLogging = enabled => {
-  logEnabled = enabled;
-};
-async function writeJsonFile(path, json) {
-  await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
-}
-const prettierConfig = parser => ({
-  parser,
-  printWidth: 100,
-  singleQuote: true,
-  trailingComma: 'es5',
-  bracketSpacing: false,
-  arrowParens: 'avoid',
-  endOfLine: 'auto'
-});
-async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, prettierConfig(parser)));
-}
-function writePrettyFileSync(parser, path, code) {
-  writeRawFileSync(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, prettierConfig(parser)));
-}
-async function writeJsFile(path, js) {
-  return writePrettyFile('babel', path, js);
-}
-function writeJsFileSync(path, js) {
-  return writePrettyFileSync('babel', path, js);
-}
-async function writeTsFile(path, ts) {
-  return writePrettyFile('typescript', path, ts);
-}
-function writeTsFileSync(path, ts) {
-  return writePrettyFileSync('typescript', path, ts);
-}
-async function writeRawFile(path, content) {
-  if (logEnabled) {
-    console.log(`write ${path}`);
-  }
-  await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
-    recursive: true
-  });
-  await writeFile(path, content);
-}
-function writeRawFileSync(path, content) {
-  if (logEnabled) {
-    console.log(`write ${path}`);
-  }
-  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.mkdirSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
-    recursive: true
-  });
-  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(path, content);
-}
-async function rmDir(dirPath) {
-  await rm(dirPath, {
-    recursive: true,
-    force: true
-  });
-}
-async function cleanDir(dirPath) {
-  if (logEnabled) {
-    console.log('clean', dirPath);
-  }
-  try {
-    await rmDir(dirPath);
-  } finally {
-    await mkdir(dirPath, {
-      recursive: true
-    });
-  }
-}
-async function cp(from, to) {
-  return new Promise((resolve, reject) => {
-    (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(`cp -R ${from} ${to}`, err => err ? reject(err) : resolve());
-  });
-}
-async function exists(path) {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
-async function maybeReadFile(path) {
-  try {
-    const fileContent = await readFile(path);
-    return fileContent.toString();
-  } catch {
-    return undefined;
-  }
-}
-async function listFiles(path) {
-  const files = [];
-  const ents = await readdir(path, {
-    withFileTypes: true
-  });
-  const promises = [];
-  for (const ent of ents) {
-    const entPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(path, ent.name);
-    if (ent.isDirectory()) {
-      promises.push(listFiles(entPath).then(subFiles => {
-        files.push(...subFiles);
-      }));
-    } else if (ent.isFile()) {
-      files.push(entPath);
-    }
-  }
-  await Promise.all(promises);
-  return files;
-}
-
-/***/ }),
-/* 9 */
-/***/ ((module) => {
-
-module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
-
-/***/ }),
-/* 10 */
-/***/ ((module) => {
-
-module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
-
-/***/ }),
-/* 11 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   PROJECT_TYPE_TO_METADATA: () => (/* binding */ PROJECT_TYPE_TO_METADATA),
 /* harmony export */   ProjectType: () => (/* binding */ ProjectType),
 /* harmony export */   RUNTIME_TYPE_TO_METADATA: () => (/* binding */ RUNTIME_TYPE_TO_METADATA),
@@ -373,7 +202,7 @@ function validateRegistry() {
 }
 
 /***/ }),
-/* 12 */
+/* 9 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -381,16 +210,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   generateWorkspace: () => (/* binding */ generateWorkspace),
 /* harmony export */   getProjectsFromWorkspaceFragment: () => (/* binding */ getProjectsFromWorkspaceFragment)
 /* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(12);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(11);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(13);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
 /* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(15);
 /* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(16);
 /* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(17);
@@ -409,46 +238,82 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function getProjectsFromWorkspaceFragment(fragment) {
+function getProjectsFromWorkspaceFragment(fragment, allFragments) {
+  /* eslint-disable @typescript-eslint/naming-convention */
   if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StaticWebsite) {
     return [{
       projectName: fragment.websiteName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Web
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Web,
+      vars: {
+        __PROJECT_NAME__: fragment.websiteName
+      }
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StandaloneLambda) {
     return [{
       projectName: fragment.lambdaName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaFunction
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaFunction,
+      vars: {
+        __PROJECT_NAME__: fragment.lambdaName
+      }
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.WebApp) {
     return [{
       projectName: fragment.websiteName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Web
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Web,
+      vars: {
+        __PROJECT_NAME__: fragment.websiteName,
+        __BACKEND_NAME__: fragment.lambdaName,
+        __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase()
+      }
     }, {
       projectName: fragment.lambdaName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaApi
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaApi,
+      vars: {
+        __PROJECT_NAME__: fragment.lambdaName,
+        __FRONTEND_NAME__: fragment.websiteName,
+        __FRONTEND_NAME_UPPERCASE__: fragment.websiteName.toUpperCase()
+      }
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeLib) {
     return [{
       projectName: fragment.libName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeLib
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeLib,
+      vars: {
+        __PROJECT_NAME__: fragment.libName
+      }
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeScript) {
     return [{
       projectName: fragment.scriptName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeScript
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeScript,
+      vars: {
+        __PROJECT_NAME__: fragment.scriptName
+      }
     }];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.Shared) {
+    const projectName = 'shared';
+    const otherVars = {};
+    for (const f of allFragments) {
+      if (f.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.WebApp) {
+        otherVars['__BACKEND_NAME__'] = f.lambdaName;
+        otherVars['__BACKEND_NAME_UPPERCASE__'] = f.lambdaName.toUpperCase();
+      }
+    }
     return [{
-      projectName: 'shared',
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Shared
+      projectName,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.Shared,
+      vars: {
+        __PROJECT_NAME__: projectName,
+        ...otherVars
+      }
     }];
   }
+  /* eslint-enable @typescript-eslint/naming-convention */
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_11__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
 }
 async function generateWorkspace(dst, workspaceName, workspaceFragments, alreadyGenerated) {
-  const projects = workspaceFragments.flatMap(getProjectsFromWorkspaceFragment);
+  const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f, workspaceFragments));
 
   // Create projects files from templates
   await Promise.all(projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__.generateProject)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, project.projectName), project)));
@@ -486,19 +351,182 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
   (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '), {
     stdio: ['ignore', 'inherit', 'inherit']
   });
+
+  // Final instructions
+  console.log(`Run the following to get started:`);
+  console.log(`cd ${(0,node_path__WEBPACK_IMPORTED_MODULE_2__.relative)(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
 }
 
 /***/ }),
-/* 13 */
+/* 10 */
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:child_process");
+
+/***/ }),
+/* 11 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs/promises");
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
+
+/***/ }),
+/* 13 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   access: () => (/* binding */ access),
+/* harmony export */   cleanDir: () => (/* binding */ cleanDir),
+/* harmony export */   cp: () => (/* binding */ cp),
+/* harmony export */   exists: () => (/* binding */ exists),
+/* harmony export */   listFiles: () => (/* binding */ listFiles),
+/* harmony export */   maybeReadFile: () => (/* binding */ maybeReadFile),
+/* harmony export */   prettierFormat: () => (/* binding */ prettierFormat),
+/* harmony export */   readFile: () => (/* binding */ readFile),
+/* harmony export */   readdir: () => (/* binding */ readdir),
+/* harmony export */   rmDir: () => (/* binding */ rmDir),
+/* harmony export */   stat: () => (/* binding */ stat),
+/* harmony export */   writeJsFile: () => (/* binding */ writeJsFile),
+/* harmony export */   writeJsFileSync: () => (/* binding */ writeJsFileSync),
+/* harmony export */   writeJsonFile: () => (/* binding */ writeJsonFile),
+/* harmony export */   writeRawFile: () => (/* binding */ writeRawFile),
+/* harmony export */   writeRawFileSync: () => (/* binding */ writeRawFileSync),
+/* harmony export */   writeTsFile: () => (/* binding */ writeTsFile),
+/* harmony export */   writeTsFileSync: () => (/* binding */ writeTsFileSync)
+/* harmony export */ });
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(prettier__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+const {
+  access,
+  readFile,
+  readdir,
+  stat
+} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
+const {
+  writeFile,
+  mkdir,
+  rm
+} = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
+async function writeJsonFile(path, json) {
+  await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
+}
+const prettierConfig = parser => ({
+  parser,
+  printWidth: 100,
+  singleQuote: true,
+  trailingComma: 'es5',
+  bracketSpacing: false,
+  arrowParens: 'avoid',
+  endOfLine: 'auto'
+});
+const prettierFormat = (str, parser) => (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
+async function writePrettyFile(parser, path, code) {
+  await writeRawFile(path, prettierFormat(code, parser));
+}
+function writePrettyFileSync(parser, path, code) {
+  writeRawFileSync(path, prettierFormat(code, parser));
+}
+async function writeJsFile(path, js) {
+  return writePrettyFile('babel', path, js);
+}
+function writeJsFileSync(path, js) {
+  return writePrettyFileSync('babel', path, js);
+}
+async function writeTsFile(path, ts) {
+  return writePrettyFile('typescript', path, ts);
+}
+function writeTsFileSync(path, ts) {
+  return writePrettyFileSync('typescript', path, ts);
+}
+async function writeRawFile(path, content) {
+  await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
+    recursive: true
+  });
+  await writeFile(path, content);
+}
+function writeRawFileSync(path, content) {
+  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.mkdirSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
+    recursive: true
+  });
+  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(path, content);
+}
+async function rmDir(dirPath) {
+  await rm(dirPath, {
+    recursive: true,
+    force: true
+  });
+}
+async function cleanDir(dirPath) {
+  try {
+    await rmDir(dirPath);
+  } finally {
+    await mkdir(dirPath, {
+      recursive: true
+    });
+  }
+}
+async function cp(from, to) {
+  return new Promise((resolve, reject) => {
+    (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(`cp -R ${from} ${to}`, err => err ? reject(err) : resolve());
+  });
+}
+async function exists(path) {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function maybeReadFile(path) {
+  try {
+    const fileContent = await readFile(path);
+    return fileContent.toString();
+  } catch {
+    return undefined;
+  }
+}
+async function listFiles(path) {
+  const files = [];
+  const ents = await readdir(path, {
+    withFileTypes: true
+  });
+  const promises = [];
+  for (const ent of ents) {
+    const entPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(path, ent.name);
+    if (ent.isDirectory()) {
+      promises.push(listFiles(entPath).then(subFiles => {
+        files.push(...subFiles);
+      }));
+    } else if (ent.isFile()) {
+      files.push(entPath);
+    }
+  }
+  await Promise.all(promises);
+  return files;
+}
+
+/***/ }),
+/* 14 */
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
 
 /***/ }),
 /* 15 */
@@ -508,16 +536,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateProject: () => (/* binding */ generateProject)
 /* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(12);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(11);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(13);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
 
 
 
@@ -528,7 +556,8 @@ const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)((0,node_u
 async function generateProject(dst, project) {
   const {
     projectName,
-    type
+    type,
+    vars
   } = project;
   // Copy template files
   await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(TEMPLATES_PATH, type), dst);
@@ -545,7 +574,13 @@ async function generateProject(dst, project) {
   await Promise.all(files.map(async file => {
     const buffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(file);
     const content = buffer.toString();
-    const newContent = content.replaceAll('{{PROJECT_NAME}}', projectName);
+    let newContent = content;
+    for (const [varName, varValue] of Object.entries(vars)) {
+      newContent = newContent.replaceAll(varName, varValue);
+    }
+    if (file.endsWith('.ts') || file.endsWith('.tsx')) {
+      newContent = (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.prettierFormat)(newContent, 'typescript');
+    }
     if (newContent !== content) {
       await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.writeFile)(file, newContent);
     }
@@ -594,7 +629,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateWorkspacePackageJson: () => (/* binding */ generateWorkspacePackageJson)
 /* harmony export */ });
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(11);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
 /* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(18);
 
 
@@ -622,7 +657,13 @@ function generateWorkspacePackageJson(workspaceName, projects) {
       ignorePatterns: ['**/*.js']
     },
     prettier: '@matthis/prettier-config',
-    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner], ['typescript', _src_versions__WEBPACK_IMPORTED_MODULE_1__.TYPESCRIPT_VERSION]].sort((d1, d2) => d1[0].localeCompare(d2[0])))
+    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner], ['typescript', _src_versions__WEBPACK_IMPORTED_MODULE_1__.TYPESCRIPT_VERSION]].sort((d1, d2) => d1[0].localeCompare(d2[0]))),
+    resolutions: {
+      // We have to manually specify the version of get-tsconfig because
+      // the version 4.7.1 breaks the resolution of aliases when the baseUrl
+      // is defined in a tsconfig.json that extends from another.
+      'get-tsconfig': '4.7.0' // eslint-disable-line @typescript-eslint/naming-convention
+    }
   };
 }
 
@@ -639,12 +680,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.4.17',
-  eslint: '1.2.8',
+  project: '1.5.0',
+  eslint: '1.3.0',
   prettier: '1.2.0',
-  tsconfig: '1.2.7',
-  webpack: '1.3.7',
-  runner: '1.2.2'
+  tsconfig: '1.3.0',
+  webpack: '1.4.0',
+  runner: '1.3.0'
 };
 const ESLINT_VERSION = '8.43.x';
 const PRETTIER_VERSION = '2.8.x';
@@ -673,7 +714,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   generateCommonTerraform: () => (/* binding */ generateCommonTerraform),
 /* harmony export */   generateWorkspaceProjectTerraform: () => (/* binding */ generateWorkspaceProjectTerraform)
 /* harmony export */ });
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(11);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
 /* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(20);
 /* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(21);
 /* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(22);
@@ -1022,17 +1063,17 @@ function removeUndefined(arr) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateCodeWorkspace: () => (/* binding */ generateCodeWorkspace),
-/* harmony export */   readProjectsFromWorkspace: () => (/* binding */ readProjectsFromWorkspace)
+/* harmony export */   readWorkspaceFragments: () => (/* binding */ readWorkspaceFragments)
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
-/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(12);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9);
 
 
 
 function generateCodeWorkspace(workspaceFragments) {
-  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__.getProjectsFromWorkspaceFragment);
+  const projects = workspaceFragments.flatMap(f => (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__.getProjectsFromWorkspaceFragment)(f, workspaceFragments));
   const projectNames = projects.map(p => p.projectName);
   return {
     projects: workspaceFragments,
@@ -1074,7 +1115,7 @@ function generateCodeWorkspace(workspaceFragments) {
     }
   };
 }
-async function readProjectsFromWorkspace(workspacePath) {
+async function readWorkspaceFragments(workspacePath) {
   const workspaceContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_1__.maybeReadFile)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(workspacePath, 'app.code-workspace'));
   const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
   const workspaceProjects = Array.isArray(workspaceJson.projects) ? workspaceJson.projects : undefined;
@@ -1087,46 +1128,6 @@ async function readProjectsFromWorkspace(workspacePath) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   generateEnvFile: () => (/* binding */ generateEnvFile)
-/* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(24);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(27);
-
-
-
-
-
-function generateEnvFile(overrides) {
-  const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'terraform');
-  const res = JSON.parse((0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(`terraform output -json`, {
-    cwd: terraformPath
-  }).toString());
-  const outputsEntries = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.removeUndefined)(Object.entries(res).map(([key, value]) => {
-    if (value.sensitive || value.type !== 'string' || typeof value.value !== 'string') {
-      return undefined;
-    }
-    return [key.toUpperCase(), value.value];
-  }));
-  const envConstants = {
-    ...Object.fromEntries(outputsEntries),
-    ...overrides,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    NODE_ENV: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__.getEnv)()
-  };
-  (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFileSync)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.ts'), Object.entries(envConstants).map(([key, value]) => `export const ${key} = ${JSON.stringify(value)} as string;`).join('\n'));
-}
-
-/***/ }),
-/* 27 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   findPackageJson: () => (/* binding */ findPackageJson),
 /* harmony export */   getEnv: () => (/* binding */ getEnv),
 /* harmony export */   getPort: () => (/* binding */ getPort),
@@ -1134,13 +1135,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   isProd: () => (/* binding */ isProd),
 /* harmony export */   isSelenium: () => (/* binding */ isSelenium)
 /* harmony export */ });
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(28);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(27);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
 
 
 
@@ -1221,10 +1222,54 @@ async function lookupRoot(fromPath) {
 }
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
+
+/***/ }),
+/* 28 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   generateEnvFile: () => (/* binding */ generateEnvFile)
+/* harmony export */ });
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(24);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(26);
+
+
+
+
+
+function generateEnvFile(overrides) {
+  const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'terraform');
+  const res = JSON.parse((0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(`terraform output -json`, {
+    cwd: terraformPath
+  }).toString());
+  const outputsEntries = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.removeUndefined)(Object.entries(res).map(([key, value]) => {
+    if (value.sensitive || value.type !== 'string' || typeof value.value !== 'string') {
+      return undefined;
+    }
+    return [key.toUpperCase(), value.value];
+  }));
+  const envConstants = {
+    /* eslint-disable @typescript-eslint/naming-convention */
+    REGION: 'RUN_TERRAFORM_APPLY',
+    CODE_BUCKET: 'RUN_TERRAFORM_APPLY',
+    ...Object.fromEntries(outputsEntries),
+    ...overrides,
+    NODE_ENV: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__.getEnv)()
+    /* eslint-enable @typescript-eslint/naming-convention */
+  };
+
+  (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFileSync)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.ts'), Object.entries(envConstants).map(([key, value]) => `export const ${key} = ${JSON.stringify(value)} as string;`).join('\n'));
+}
 
 /***/ }),
 /* 29 */
@@ -1408,7 +1453,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   readLines: () => (/* binding */ readLines)
 /* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_exit_handler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
 
@@ -1736,13 +1781,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var webpack_dev_server__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
 /* harmony import */ var webpack_dev_server__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(webpack_dev_server__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _src_exit_handler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
-/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(11);
-/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(12);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(25);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(24);
-/* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(26);
+/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(8);
+/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(25);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(24);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(26);
+/* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(28);
 /* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(29);
 /* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(30);
 /* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(31);
@@ -1765,7 +1810,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-(0,_src_fs__WEBPACK_IMPORTED_MODULE_5__.setLogging)(false);
 const name = 'WebpackRunner';
 async function runWebpacks(opts) {
   const {
@@ -1774,21 +1818,28 @@ async function runWebpacks(opts) {
     watch
   } = opts;
   const statuses = new Map();
-  const projects = workspaceFragments.flatMap(_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_8__.getProjectsFromWorkspaceFragment);
+  const projects = workspaceFragments.flatMap(f => (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_7__.getProjectsFromWorkspaceFragment)(f, workspaceFragments));
   function regenerateEnvFile() {
-    const overrides = Object.fromEntries((0,_src_type_utils__WEBPACK_IMPORTED_MODULE_10__.removeUndefined)([...statuses.values()].map(({
-      project,
-      lambdaServerEvents,
-      webpackDevServerEvents
-    }) => {
-      if (project.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.LambdaApi && lambdaServerEvents.startEvent) {
-        return [`${project.projectName.toUpperCase()}_FUNCTION_URL`, `http://localhost:${lambdaServerEvents.startEvent.port}/`];
+    const overrides = {};
+    if ((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_10__.getEnv)() === 'development') {
+      for (const {
+        projectName,
+        type
+      } of projects) {
+        if (type === _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.LambdaApi) {
+          var _status$lambdaServerE;
+          const status = statuses.get(projectName);
+          const port = (status === null || status === void 0 ? void 0 : (_status$lambdaServerE = status.lambdaServerEvents.startEvent) === null || _status$lambdaServerE === void 0 ? void 0 : _status$lambdaServerE.port) ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_10__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(root, projectName));
+          overrides[`${projectName.toUpperCase()}_FUNCTION_URL`] = `http://localhost:${port}/`;
+        }
+        if (type === _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.Web) {
+          var _status$webpackDevSer;
+          const status = statuses.get(projectName);
+          const port = (status === null || status === void 0 ? void 0 : (_status$webpackDevSer = status.webpackDevServerEvents.startEvent) === null || _status$webpackDevSer === void 0 ? void 0 : _status$webpackDevSer.port) ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_10__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(root, projectName));
+          overrides[`${projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`] = `localhost:${port}`;
+        }
       }
-      if (project.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.Web && webpackDevServerEvents.startEvent) {
-        return [`${project.projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`, `localhost:${webpackDevServerEvents.startEvent.port}`];
-      }
-      return undefined;
-    })));
+    }
     (0,_src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_11__.generateEnvFile)(overrides);
   }
   regenerateEnvFile();
@@ -1975,7 +2026,7 @@ async function runWebpacks(opts) {
             curr.startEvent = log;
           });
         } else {
-          (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_10__.neverHappens)(log.event);
+          (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_9__.neverHappens)(log.event);
           //   updateWebpackDevServerEvents(curr => {
           //     curr.lastEvent = log;
           //   });
@@ -2046,13 +2097,13 @@ async function runWebpacks(opts) {
   };
   const reject = err => {
     cleanup().then(() => rejectPromise(err)).catch(cleanupErr => {
-      (0,_src_global_error__WEBPACK_IMPORTED_MODULE_6__.globalError)('webpack runner cleanup error', cleanupErr);
+      (0,_src_global_error__WEBPACK_IMPORTED_MODULE_5__.globalError)('webpack runner cleanup error', cleanupErr);
       rejectPromise(err);
     });
   };
   const resolve = () => {
     cleanup().then(resolvePromise).catch(cleanupErr => {
-      (0,_src_global_error__WEBPACK_IMPORTED_MODULE_6__.globalError)('webpack runner cleanup error', cleanupErr);
+      (0,_src_global_error__WEBPACK_IMPORTED_MODULE_5__.globalError)('webpack runner cleanup error', cleanupErr);
       resolvePromise();
     });
   };
@@ -2064,7 +2115,7 @@ async function runAllWebpacks(options) {
     root,
     watch
   } = options;
-  const workspaceFragments = await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_9__.readProjectsFromWorkspace)(root);
+  const workspaceFragments = await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_8__.readWorkspaceFragments)(root);
   if (!workspaceFragments) {
     throw new Error(`No workspace projects at path ${root}`);
   }

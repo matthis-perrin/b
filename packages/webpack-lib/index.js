@@ -211,10 +211,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   exists: () => (/* binding */ exists),
 /* harmony export */   listFiles: () => (/* binding */ listFiles),
 /* harmony export */   maybeReadFile: () => (/* binding */ maybeReadFile),
+/* harmony export */   prettierFormat: () => (/* binding */ prettierFormat),
 /* harmony export */   readFile: () => (/* binding */ readFile),
 /* harmony export */   readdir: () => (/* binding */ readdir),
 /* harmony export */   rmDir: () => (/* binding */ rmDir),
-/* harmony export */   setLogging: () => (/* binding */ setLogging),
 /* harmony export */   stat: () => (/* binding */ stat),
 /* harmony export */   writeJsFile: () => (/* binding */ writeJsFile),
 /* harmony export */   writeJsFileSync: () => (/* binding */ writeJsFileSync),
@@ -247,10 +247,6 @@ const {
   mkdir,
   rm
 } = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
-let logEnabled = true;
-const setLogging = enabled => {
-  logEnabled = enabled;
-};
 async function writeJsonFile(path, json) {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
@@ -263,11 +259,12 @@ const prettierConfig = parser => ({
   arrowParens: 'avoid',
   endOfLine: 'auto'
 });
+const prettierFormat = (str, parser) => (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
 async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, prettierConfig(parser)));
+  await writeRawFile(path, prettierFormat(code, parser));
 }
 function writePrettyFileSync(parser, path, code) {
-  writeRawFileSync(path, (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(code, prettierConfig(parser)));
+  writeRawFileSync(path, prettierFormat(code, parser));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);
@@ -282,18 +279,12 @@ function writeTsFileSync(path, ts) {
   return writePrettyFileSync('typescript', path, ts);
 }
 async function writeRawFile(path, content) {
-  if (logEnabled) {
-    console.log(`write ${path}`);
-  }
   await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
     recursive: true
   });
   await writeFile(path, content);
 }
 function writeRawFileSync(path, content) {
-  if (logEnabled) {
-    console.log(`write ${path}`);
-  }
   (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.mkdirSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
     recursive: true
   });
@@ -306,9 +297,6 @@ async function rmDir(dirPath) {
   });
 }
 async function cleanDir(dirPath) {
-  if (logEnabled) {
-    console.log('clean', dirPath);
-  }
   try {
     await rmDir(dirPath);
   } finally {
@@ -385,23 +373,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   EslintWebpackError: () => (/* binding */ EslintWebpackError),
 /* harmony export */   eslintPlugin: () => (/* binding */ eslintPlugin)
 /* harmony export */ });
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
-/* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(chokidar__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(14);
-/* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(eslint__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
-/* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(webpack__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(15);
-/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(16);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
+/* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(chokidar__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+/* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(eslint__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(3);
+/* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(webpack__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(15);
+/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(16);
 
 
 
 
 
 
-class EslintWebpackError extends webpack__WEBPACK_IMPORTED_MODULE_3__.WebpackError {
+
+class EslintWebpackError extends webpack__WEBPACK_IMPORTED_MODULE_4__.WebpackError {
   name = 'EslintWebpackError';
   constructor(eslintRunId, message, filePath, loc, ruleId) {
     super(message);
@@ -416,23 +407,41 @@ class EslintWebpackError extends webpack__WEBPACK_IMPORTED_MODULE_3__.WebpackErr
   }
 }
 const RUN_ESLINT_INTERVAL = 500;
-class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_5__.StandalonePlugin {
+class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_6__.StandalonePlugin {
   name = 'EslintPlugin';
   fileStates = new Map();
+  shouldRun = false;
   async setup(compiler) {
     return new Promise(resolve => {
       this.runEslintInterval = setInterval(() => this.runEslint(), RUN_ESLINT_INTERVAL);
-      this.watcher = (0,chokidar__WEBPACK_IMPORTED_MODULE_1__.watch)(['src/**/*.ts', 'src/**/*.tsx'].map(p => (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(this.context, p)));
+
+      // Generate the patterns of all the files across the workspace
+      const projectPath = this.context;
+      const workspacePath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, '..');
+      const workspaceDirs = (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.readdirSync)(workspacePath, {
+        withFileTypes: true
+      }).filter(e => e.isDirectory() && (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.existsSync)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(workspacePath, e.name, 'package.json'))).map(e => (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(workspacePath, e.name));
+      const patterns = ['src/**/*.ts', 'src/**/*.tsx'].flatMap(pattern => workspaceDirs.map(dir => (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dir, pattern)));
+      this.watcher = (0,chokidar__WEBPACK_IMPORTED_MODULE_2__.watch)(patterns);
       this.watcher.on('add', path => {
-        this.fileStates.set(path, {
-          status: 'queued'
-        });
+        this.shouldRun = true;
+        if (path.startsWith(projectPath)) {
+          this.fileStates.set(path, {
+            status: 'queued'
+          });
+        }
       }).on('change', path => {
-        this.fileStates.set(path, {
-          status: 'queued'
-        });
+        this.shouldRun = true;
+        if (path.startsWith(projectPath)) {
+          this.fileStates.set(path, {
+            status: 'queued'
+          });
+        }
       }).on('unlink', path => {
-        this.fileStates.delete(path);
+        this.shouldRun = true;
+        if (path.startsWith(projectPath)) {
+          this.fileStates.delete(path);
+        }
       }).on('ready', () => {
         this.runEslint();
         resolve();
@@ -449,7 +458,11 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
     });
   }
   runEslint() {
-    const filesQueued = [...this.fileStates.entries()].filter(e => e[1].status === 'queued');
+    if (!this.shouldRun) {
+      return;
+    }
+    this.shouldRun = false;
+    const filesQueued = [...this.fileStates.entries()];
     if (filesQueued.length === 0) {
       return;
     }
@@ -474,8 +487,8 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
       }
     };
     try {
-      const tsConfigPath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(this.context, 'tsconfig.json');
-      const eslint = new eslint__WEBPACK_IMPORTED_MODULE_2__.ESLint({
+      const tsConfigPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(this.context, 'tsconfig.json');
+      const eslint = new eslint__WEBPACK_IMPORTED_MODULE_3__.ESLint({
         cwd: this.context,
         overrideConfig: {
           settings: {
@@ -539,7 +552,7 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
       if (fileState.status !== 'failed') {
         return [];
       }
-      return fileState.messages.map(msg => new EslintWebpackError(fileState.eslintRunId, (0,_src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_4__.stripAnsi)(msg.message), filePath, {
+      return fileState.messages.map(msg => new EslintWebpackError(fileState.eslintRunId, (0,_src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_5__.stripAnsi)(msg.message), filePath, {
         start: {
           line: msg.line,
           column: msg.column

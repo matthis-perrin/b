@@ -7,11 +7,6 @@ import {BuiltInParserName, format} from 'prettier';
 export const {access, readFile, readdir, stat} = promises;
 const {writeFile, mkdir, rm} = promises;
 
-let logEnabled = true;
-export const setLogging = (enabled: boolean): void => {
-  logEnabled = enabled;
-};
-
 export async function writeJsonFile(path: string, json: unknown): Promise<void> {
   await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
 }
@@ -27,16 +22,19 @@ const prettierConfig = (parser: BuiltInParserName) =>
     endOfLine: 'auto',
   } as const);
 
+export const prettierFormat = (str: string, parser: BuiltInParserName): string =>
+  format(str, prettierConfig(parser));
+
 async function writePrettyFile(
   parser: BuiltInParserName,
   path: string,
   code: string
 ): Promise<void> {
-  await writeRawFile(path, format(code, prettierConfig(parser)));
+  await writeRawFile(path, prettierFormat(code, parser));
 }
 
 function writePrettyFileSync(parser: BuiltInParserName, path: string, code: string): void {
-  writeRawFileSync(path, format(code, prettierConfig(parser)));
+  writeRawFileSync(path, prettierFormat(code, parser));
 }
 
 export async function writeJsFile(path: string, js: string): Promise<void> {
@@ -56,17 +54,11 @@ export function writeTsFileSync(path: string, ts: string): void {
 }
 
 export async function writeRawFile(path: string, content: string): Promise<void> {
-  if (logEnabled) {
-    console.log(`write ${path}`);
-  }
   await mkdir(dirname(path), {recursive: true});
   await writeFile(path, content);
 }
 
 export function writeRawFileSync(path: string, content: string): void {
-  if (logEnabled) {
-    console.log(`write ${path}`);
-  }
   mkdirSync(dirname(path), {recursive: true});
   writeFileSync(path, content);
 }
@@ -76,9 +68,6 @@ export async function rmDir(dirPath: string): Promise<void> {
 }
 
 export async function cleanDir(dirPath: string): Promise<void> {
-  if (logEnabled) {
-    console.log('clean', dirPath);
-  }
   try {
     await rmDir(dirPath);
   } finally {

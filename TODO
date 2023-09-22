@@ -21,3 +21,4 @@
 - For asynchronous lambda are retried 2 times (remove or allow configuration)
 - babelLoader (Node version is hardcoded, corejs too)
 - eslint-simple-import-sort don't group @shared-web for node version
+- Remove ts-config dependency version resolutions

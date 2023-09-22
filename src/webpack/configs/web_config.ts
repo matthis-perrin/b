@@ -8,12 +8,8 @@ import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {htmlPlugin} from '@src/webpack/plugins/html_plugin';
 import {webpackDevServer} from '@src/webpack/plugins/webpack_dev_server';
 
-export function webConfig(opts: {
-  context: string;
-  watch: boolean;
-  publicPath: string;
-}): Configuration {
-  const {context, watch, publicPath} = opts;
+export function webConfig(opts: {context: string; watch: boolean}): Configuration {
+  const {context, watch} = opts;
   const base = baseConfig({context, watch});
   return {
     ...base,
@@ -28,7 +24,7 @@ export function webConfig(opts: {
     module: {
       rules: [babelLoaderWeb(), sourceMapLoader()],
     },
-    plugins: [...(base.plugins ?? []), htmlPlugin({context, publicPath})],
+    plugins: [...(base.plugins ?? []), htmlPlugin(context)],
     devServer: watch ? webpackDevServer(context) : undefined,
     optimization: {
       ...base.optimization,
