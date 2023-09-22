@@ -2,7 +2,7 @@ import {ALL, API_CONFIGS} from '@shared/api/api';
 import {parseSchema} from '@shared/api/core/api_parser';
 import {AllApiSchema} from '@shared/api/core/api_schema';
 import {ApiName, FlatApi} from '@shared/api/core/api_types';
-import {asJson, asString} from '@shared/type_utils';
+import {asJson, asString} from '@shared/lib/type_utils';
 
 interface RequestInit {
   method?: string;

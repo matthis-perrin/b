@@ -10,7 +10,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+/* harmony import */ var _src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 /* harmony import */ var _src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(26);
 /* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(31);
 /* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(33);
@@ -29,7 +29,7 @@ function nodeConfig(opts) {
     noEntry,
     packageJsonProperties
   } = opts;
-  const base = (0,_src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)({
+  const base = (0,_src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)({
     context,
     watch
   });
@@ -524,21 +524,21 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
       this.watcher = (0,chokidar__WEBPACK_IMPORTED_MODULE_2__.watch)(patterns);
       this.watcher.on('add', path => {
         this.shouldRun = true;
-        if (path.startsWith(projectPath)) {
+        if (path.startsWith(`${projectPath}/`)) {
           this.fileStates.set(path, {
             status: 'queued'
           });
         }
       }).on('change', path => {
         this.shouldRun = true;
-        if (path.startsWith(projectPath)) {
+        if (path.startsWith(`${projectPath}/`)) {
           this.fileStates.set(path, {
             status: 'queued'
           });
         }
       }).on('unlink', path => {
         this.shouldRun = true;
-        if (path.startsWith(projectPath)) {
+        if (path.startsWith(`${projectPath}/`)) {
           this.fileStates.delete(path);
         }
       }).on('ready', () => {
@@ -1361,7 +1361,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
             (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {
               /* eslint-disable @typescript-eslint/naming-convention */
               env: {
-                AWS_CONFIG_FILE: (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, '../terraform/.aws-credentials'),
+                AWS_SHARED_CREDENTIALS_FILE: (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, '../terraform/.aws-credentials'),
                 PATH: process.env['PATH'] // eslint-disable-line node/no-process-env
               }
               /* eslint-enable @typescript-eslint/naming-convention */
@@ -1558,12 +1558,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   config: () => (/* binding */ config)
 /* harmony export */ });
-/* harmony import */ var _src_webpack_configs_node_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _src_webpack_common_configs_node_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(34);
 
 
 function config(opts) {
-  const baseConfig = (0,_src_webpack_configs_node_config__WEBPACK_IMPORTED_MODULE_0__.nodeConfig)({
+  const baseConfig = (0,_src_webpack_common_configs_node_config__WEBPACK_IMPORTED_MODULE_0__.nodeConfig)({
     ...opts,
     isLib: true
   });

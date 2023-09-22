@@ -4,17 +4,13 @@
   "devDependencies": {
     "@matthis/eslint-config-lib": "file:../packages/eslint-config-lib",
     "@matthis/eslint-config-node": "file:../packages/eslint-config-node",
-    "@matthis/eslint-config-react-native": "file:../packages/eslint-config-react-native",
     "@matthis/eslint-config-web": "file:../packages/eslint-config-web",
     "@matthis/prettier-config": "file:../packages/prettier-config",
     "@matthis/tsconfig-lib": "file:../packages/tsconfig-lib",
     "@matthis/tsconfig-node": "file:../packages/tsconfig-node",
-    "@matthis/tsconfig-react-native": "file:../packages/tsconfig-react-native",
     "@matthis/tsconfig-web": "file:../packages/tsconfig-web",
     "@matthis/webpack-lambda": "file:../packages/webpack-lambda",
     "@matthis/webpack-lib": "file:../packages/webpack-lib",
-    "@matthis/webpack-node": "file:../packages/webpack-node",
-    "@matthis/webpack-node-lib": "file:../packages/webpack-node-lib",
     "@matthis/webpack-node-script": "file:../packages/webpack-node-script",
     "@matthis/webpack-runner": "file:../packages/webpack-runner",
     "@matthis/webpack-web": "file:../packages/webpack-web"

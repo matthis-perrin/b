@@ -1,10 +1,11 @@
 import {join} from 'node:path';
 
 import {cleanDir, writeJsonFile} from '@src/fs';
-import {RuntimeType} from '@src/models';
+import {TsConfigType} from '@src/models';
+import {neverHappens} from '@src/type_utils';
 import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '@src/versions';
 
-export async function generateForType(path: string, type: RuntimeType): Promise<void> {
+export async function generateForType(path: string, type: TsConfigType): Promise<void> {
   await cleanDir(path);
   await Promise.all([
     writeJsonFile(join(path, 'package.json'), generatePackageJson(type)),
@@ -12,7 +13,7 @@ export async function generateForType(path: string, type: RuntimeType): Promise<
   ]);
 }
 
-function generateTsConfig(type: RuntimeType): Record<string, unknown> {
+function generateTsConfig(type: TsConfigType): Record<string, unknown> {
   const baseCompilerOptions = {
     // Type Checking
     allowUnreachableCode: false,
@@ -54,72 +55,43 @@ function generateTsConfig(type: RuntimeType): Record<string, unknown> {
         moduleResolution: string;
         lib: string[];
         target: string;
-        paths: Record<string, string[]>;
       })
     | undefined;
 
-  const makePaths = (projects: string[], opts?: {noSrc?: boolean}): Record<string, string[]> => {
-    const {noSrc} = opts ?? {};
-    return Object.fromEntries([
-      ...(noSrc ? [] : [['@src/*', ['./src/*']]]),
-      [
-        '*',
-        [
-          './node_modules/*',
-          './node_modules/@types/*',
-          ...projects.flatMap(p => [`../${p}/node_modules/*`, `../${p}/node_modules/@types/*`]),
-        ],
-      ],
-      ...projects.flatMap(name => [[`@${name}/*`, [`../${name}/src/*`]]]),
-    ]);
-  };
-
-  if (type === RuntimeType.Lib) {
+  if (type === TsConfigType.Lib) {
     additionalCompilerOptions = {
       module: 'none',
       moduleResolution: 'node',
       lib: ['es2022'],
       target: 'es2022',
-      paths: makePaths(['shared'], {noSrc: true}),
     };
-  } else if (type === RuntimeType.Web) {
+  } else if (type === TsConfigType.Web) {
     additionalCompilerOptions = {
       module: 'esnext',
       moduleResolution: 'node',
       lib: ['es2022', 'dom', 'dom.iterable'],
       target: 'esnext',
-      paths: makePaths(['shared', 'shared-web']),
       //
       jsx: 'react-jsx',
     };
-  } else if (type === RuntimeType.Node) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  } else if (type === TsConfigType.Node) {
     additionalCompilerOptions = {
       module: 'commonjs',
       moduleResolution: 'node',
       lib: ['es2022'],
       target: 'es2022',
-      paths: makePaths(['shared', 'shared-node']),
       //
       types: ['node'],
     };
-  } else if (type === RuntimeType.ReactNative) {
-    additionalCompilerOptions = {
-      module: 'esnext',
-      moduleResolution: 'node',
-      lib: ['es2022'],
-      target: 'esnext',
-      paths: makePaths(['shared', 'shared-web']),
-      //
-      jsx: 'react-native',
-    };
   } else {
-    throw new Error(`Unknown project type ${type}`);
+    neverHappens(type, `Unknown project type ${type}`);
   }
 
   return {compilerOptions: {...baseCompilerOptions, ...additionalCompilerOptions}};
 }
 
-function generatePackageJson(type: RuntimeType): Record<string, unknown> {
+function generatePackageJson(type: TsConfigType): Record<string, unknown> {
   return {
     name: `@matthis/tsconfig-${type}`,
     version: PACKAGE_VERSIONS.tsconfig,

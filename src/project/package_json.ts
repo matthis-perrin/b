@@ -1,28 +1,18 @@
-import {
-  PROJECT_TYPE_TO_METADATA,
-  RUNTIME_TYPE_TO_METADATA,
-  RuntimeType,
-  RuntimeTypeMetadata,
-  WorkspaceName,
-} from '@src/models';
+import {PROJECT_TYPE_TO_METADATA, WorkspaceName} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
 import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '@src/versions';
 
-function uniq(runtimes: (RuntimeType | undefined)[]): RuntimeType[] {
-  return [...new Set(runtimes.filter((r): r is RuntimeType => r !== undefined)).values()];
-}
-
-function projectMetadata(p: WorkspaceProject): RuntimeTypeMetadata {
-  return RUNTIME_TYPE_TO_METADATA[PROJECT_TYPE_TO_METADATA[p.type].runtimeType];
+function uniq<T>(val: T[]): T[] {
+  return [...new Set(val).values()];
 }
 
 export function generateWorkspacePackageJson(
   workspaceName: WorkspaceName,
   projects: WorkspaceProject[]
 ): Record<string, unknown> {
-  const eslintRuntimes = uniq(projects.map(p => projectMetadata(p).eslint));
-  const tsconfigRuntimes = uniq(projects.map(p => projectMetadata(p).tsconfig));
-  const webpackRuntimes = uniq(projects.map(p => projectMetadata(p).webpack));
+  const eslintRuntimes = uniq(projects.map(p => PROJECT_TYPE_TO_METADATA[p.type].eslint));
+  const tsconfigRuntimes = uniq(projects.map(p => PROJECT_TYPE_TO_METADATA[p.type].tsconfig));
+  const webpackRuntimes = uniq(projects.map(p => PROJECT_TYPE_TO_METADATA[p.type].webpack));
 
   return {
     name: workspaceName,

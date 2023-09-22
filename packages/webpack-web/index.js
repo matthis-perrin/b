@@ -10,7 +10,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+/* harmony import */ var _src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 /* harmony import */ var _src_webpack_loaders_babel_loader_web__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(26);
 /* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(33);
 /* harmony import */ var _src_webpack_plugins_html_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(35);
@@ -26,7 +26,7 @@ function webConfig(opts) {
     context,
     watch
   } = opts;
-  const base = (0,_src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)({
+  const base = (0,_src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)({
     context,
     watch
   });
@@ -488,21 +488,21 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
       this.watcher = (0,chokidar__WEBPACK_IMPORTED_MODULE_2__.watch)(patterns);
       this.watcher.on('add', path => {
         this.shouldRun = true;
-        if (path.startsWith(projectPath)) {
+        if (path.startsWith(`${projectPath}/`)) {
           this.fileStates.set(path, {
             status: 'queued'
           });
         }
       }).on('change', path => {
         this.shouldRun = true;
-        if (path.startsWith(projectPath)) {
+        if (path.startsWith(`${projectPath}/`)) {
           this.fileStates.set(path, {
             status: 'queued'
           });
         }
       }).on('unlink', path => {
         this.shouldRun = true;
-        if (path.startsWith(projectPath)) {
+        if (path.startsWith(`${projectPath}/`)) {
           this.fileStates.delete(path);
         }
       }).on('ready', () => {
@@ -1316,10 +1316,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   config: () => (/* binding */ config)
 /* harmony export */ });
-/* harmony import */ var _src_webpack_configs_web_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _src_webpack_common_configs_web_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
 function config(opts) {
-  return (0,_src_webpack_configs_web_config__WEBPACK_IMPORTED_MODULE_0__.webConfig)(opts);
+  return (0,_src_webpack_common_configs_web_config__WEBPACK_IMPORTED_MODULE_0__.webConfig)(opts);
 }
 })();
 

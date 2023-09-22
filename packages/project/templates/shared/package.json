@@ -1,6 +1,5 @@
 {
-  "name": "shared",
-  "version": "1.0.0",
+  "name": "__PROJECT_NAME__",
   "license": "UNLICENSED",
   "type": "module",
   "prettier": "@matthis/prettier-config",

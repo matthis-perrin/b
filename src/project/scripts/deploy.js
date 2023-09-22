@@ -34,9 +34,9 @@ function getProjects() {
 
 async function run() {
   // Build
-  console.log('--------------------------------------------------------------------------------')
+  console.log('--------------------------------------------------------------------------------');
   execSync(`yarn build`, {stdio: 'inherit'});
-  console.log('--------------------------------------------------------------------------------')
+  console.log('--------------------------------------------------------------------------------');
 
   // Get terraform outputs
   checkTerraformCredentials();
@@ -55,13 +55,14 @@ async function run() {
     const tmp = tmpdir();
     const zipPath = join(tmp, randomUUID()) + '.zip';
     execSync(`pushd ${lambdaName}/dist; zip -r ${zipPath} *`);
+    execSync(`aws s3 cp ${zipPath} s3://${code_bucket}/${lambdaName}/dist.zip`, {
+      env: {AWS_SHARED_CREDENTIALS_FILE: 'terraform/.aws-credentials'},
+    });
     execSync(
-      `AWS_CONFIG_FILE=terraform/.aws-credentials aws s3 cp ${zipPath} s3://${code_bucket}/${lambdaName}/dist.zip`
-    );
-    execSync(
-      `AWS_CONFIG_FILE=terraform/.aws-credentials aws lambda update-function-code --function-name ${
+      `aws lambda update-function-code --function-name ${
         outputs[`${lambdaName}_function_name`]
-      } --s3-bucket ${code_bucket} --s3-key ${lambdaName}/dist.zip --region ${region} --publish --no-cli-pager`
+      } --s3-bucket ${code_bucket} --s3-key ${lambdaName}/dist.zip --region ${region} --publish --no-cli-pager`,
+      {env: {AWS_SHARED_CREDENTIALS_FILE: 'terraform/.aws-credentials'}}
     );
   }
 
@@ -70,12 +71,12 @@ async function run() {
   for (const websiteName of websiteProjects) {
     const websiteUrl = outputs[`${websiteName}_cloudfront_domain_name`];
     console.log(`Deploying website ${websiteName}`, websiteUrl);
-    execSync(
-      `AWS_CONFIG_FILE=terraform/.aws-credentials aws s3 sync ${websiteName}/dist s3://${code_bucket}/${websiteName}`
-    );
+    execSync(`aws s3 sync ${websiteName}/dist s3://${code_bucket}/${websiteName}`, {
+      env: {AWS_SHARED_CREDENTIALS_FILE: 'terraform/.aws-credentials'},
+    });
   }
 
-  console.log('--------------------------------------------------------------------------------')
+  console.log('--------------------------------------------------------------------------------');
 }
 
 run().catch(err => {

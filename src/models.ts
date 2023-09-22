@@ -4,63 +4,6 @@ export type WorkspaceName = Brand<string, 'WorkspaceName'>;
 export type ProjectName = Brand<string, 'ProjectName'>;
 
 //
-// Runtime types
-//
-
-export enum RuntimeType {
-  Web = 'web',
-  Node = 'node',
-  Lib = 'lib',
-  Lambda = 'lambda',
-  ReactNative = 'react-native',
-  NodeLib = 'node-lib',
-  NodeScript = 'node-script',
-}
-
-export interface RuntimeTypeMetadata {
-  eslint: RuntimeType;
-  tsconfig: RuntimeType;
-  webpack?: RuntimeType;
-}
-
-export const RUNTIME_TYPE_TO_METADATA: Record<RuntimeType, RuntimeTypeMetadata> = {
-  [RuntimeType.Web]: {
-    eslint: RuntimeType.Web,
-    tsconfig: RuntimeType.Web,
-    webpack: RuntimeType.Web,
-  },
-  [RuntimeType.Node]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.Node,
-  },
-  [RuntimeType.Lib]: {
-    eslint: RuntimeType.Lib,
-    tsconfig: RuntimeType.Lib,
-    webpack: RuntimeType.Lib,
-  },
-  [RuntimeType.Lambda]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.Lambda,
-  },
-  [RuntimeType.ReactNative]: {
-    eslint: RuntimeType.ReactNative,
-    tsconfig: RuntimeType.ReactNative,
-  },
-  [RuntimeType.NodeLib]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.NodeLib,
-  },
-  [RuntimeType.NodeScript]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.NodeScript,
-  },
-};
-
-//
 // Project type
 //
 
@@ -68,23 +11,67 @@ export enum ProjectType {
   Web = 'web',
   LambdaFunction = 'lambda_function',
   LambdaApi = 'lambda_api',
-  NodeLib = 'node_lib',
   NodeScript = 'node_script',
   Shared = 'shared',
+  SharedNode = 'shared-node',
 }
 
-interface ProjectTypeMetadata {
-  runtimeType: RuntimeType;
+export enum EslintType {
+  Web = 'web',
+  Node = 'node',
+  Lib = 'lib',
 }
 
-export const PROJECT_TYPE_TO_METADATA: Record<ProjectType, ProjectTypeMetadata> = {
-  [ProjectType.Web]: {runtimeType: RuntimeType.Web},
-  [ProjectType.LambdaFunction]: {runtimeType: RuntimeType.Lambda},
-  [ProjectType.LambdaApi]: {runtimeType: RuntimeType.Lambda},
-  [ProjectType.NodeLib]: {runtimeType: RuntimeType.NodeLib},
-  [ProjectType.NodeScript]: {runtimeType: RuntimeType.NodeScript},
-  [ProjectType.Shared]: {runtimeType: RuntimeType.Lib},
-};
+export enum TsConfigType {
+  Web = 'web',
+  Node = 'node',
+  Lib = 'lib',
+}
+export enum WebpackType {
+  Web = 'web',
+  Lib = 'lib', // shared
+  Lambda = 'lambda',
+  NodeScript = 'node-script',
+}
+
+export interface ProjectTypeMetadata {
+  eslint: EslintType;
+  tsconfig: TsConfigType;
+  webpack?: WebpackType;
+}
+
+export const PROJECT_TYPE_TO_METADATA = {
+  [ProjectType.Web]: {
+    eslint: EslintType.Web,
+    tsconfig: TsConfigType.Web,
+    webpack: WebpackType.Web,
+  },
+  [ProjectType.LambdaFunction]: {
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.Lambda,
+  },
+  [ProjectType.LambdaApi]: {
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.Lambda,
+  },
+  [ProjectType.NodeScript]: {
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.NodeScript,
+  },
+  [ProjectType.Shared]: {
+    eslint: EslintType.Lib,
+    tsconfig: TsConfigType.Lib,
+    webpack: WebpackType.Lib,
+  },
+  [ProjectType.SharedNode]: {
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.Lib,
+  },
+} satisfies Record<ProjectType, ProjectTypeMetadata>;
 
 //
 // Workspace Fragment type
@@ -94,9 +81,9 @@ export enum WorkspaceFragmentType {
   StaticWebsite = 'static-website',
   StandaloneLambda = 'standalone-lambda',
   WebApp = 'web-app',
-  NodeLib = 'node-lib',
   NodeScript = 'node-script',
   Shared = 'shared',
+  SharedNode = 'shared-node',
 }
 
 interface WorkspaceFragmentBase {
@@ -117,16 +104,15 @@ export interface WorkspaceFragmentRegistry {
     websiteName: ProjectName;
     lambdaName: ProjectName;
   };
-  [WorkspaceFragmentType.NodeLib]: {
-    type: WorkspaceFragmentType.NodeLib;
-    libName: ProjectName;
-  };
   [WorkspaceFragmentType.NodeScript]: {
     type: WorkspaceFragmentType.NodeScript;
     scriptName: ProjectName;
   };
   [WorkspaceFragmentType.Shared]: {
     type: WorkspaceFragmentType.Shared;
+  };
+  [WorkspaceFragmentType.SharedNode]: {
+    type: WorkspaceFragmentType.SharedNode;
   };
 }
 

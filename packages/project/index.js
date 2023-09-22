@@ -190,93 +190,74 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   EslintType: () => (/* binding */ EslintType),
 /* harmony export */   PROJECT_TYPE_TO_METADATA: () => (/* binding */ PROJECT_TYPE_TO_METADATA),
 /* harmony export */   ProjectType: () => (/* binding */ ProjectType),
-/* harmony export */   RUNTIME_TYPE_TO_METADATA: () => (/* binding */ RUNTIME_TYPE_TO_METADATA),
-/* harmony export */   RuntimeType: () => (/* binding */ RuntimeType),
+/* harmony export */   TsConfigType: () => (/* binding */ TsConfigType),
+/* harmony export */   WebpackType: () => (/* binding */ WebpackType),
 /* harmony export */   WorkspaceFragmentType: () => (/* binding */ WorkspaceFragmentType)
 /* harmony export */ });
 //
-// Runtime types
-//
-let RuntimeType = /*#__PURE__*/function (RuntimeType) {
-  RuntimeType["Web"] = "web";
-  RuntimeType["Node"] = "node";
-  RuntimeType["Lib"] = "lib";
-  RuntimeType["Lambda"] = "lambda";
-  RuntimeType["ReactNative"] = "react-native";
-  RuntimeType["NodeLib"] = "node-lib";
-  RuntimeType["NodeScript"] = "node-script";
-  return RuntimeType;
-}({});
-const RUNTIME_TYPE_TO_METADATA = {
-  [RuntimeType.Web]: {
-    eslint: RuntimeType.Web,
-    tsconfig: RuntimeType.Web,
-    webpack: RuntimeType.Web
-  },
-  [RuntimeType.Node]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.Node
-  },
-  [RuntimeType.Lib]: {
-    eslint: RuntimeType.Lib,
-    tsconfig: RuntimeType.Lib,
-    webpack: RuntimeType.Lib
-  },
-  [RuntimeType.Lambda]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.Lambda
-  },
-  [RuntimeType.ReactNative]: {
-    eslint: RuntimeType.ReactNative,
-    tsconfig: RuntimeType.ReactNative
-  },
-  [RuntimeType.NodeLib]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.NodeLib
-  },
-  [RuntimeType.NodeScript]: {
-    eslint: RuntimeType.Node,
-    tsconfig: RuntimeType.Node,
-    webpack: RuntimeType.NodeScript
-  }
-};
-
-//
 // Project type
 //
-
 let ProjectType = /*#__PURE__*/function (ProjectType) {
   ProjectType["Web"] = "web";
   ProjectType["LambdaFunction"] = "lambda_function";
   ProjectType["LambdaApi"] = "lambda_api";
-  ProjectType["NodeLib"] = "node_lib";
   ProjectType["NodeScript"] = "node_script";
   ProjectType["Shared"] = "shared";
+  ProjectType["SharedNode"] = "shared-node";
   return ProjectType;
+}({});
+let EslintType = /*#__PURE__*/function (EslintType) {
+  EslintType["Web"] = "web";
+  EslintType["Node"] = "node";
+  EslintType["Lib"] = "lib";
+  return EslintType;
+}({});
+let TsConfigType = /*#__PURE__*/function (TsConfigType) {
+  TsConfigType["Web"] = "web";
+  TsConfigType["Node"] = "node";
+  TsConfigType["Lib"] = "lib";
+  return TsConfigType;
+}({});
+let WebpackType = /*#__PURE__*/function (WebpackType) {
+  WebpackType["Web"] = "web";
+  WebpackType["Lib"] = "lib";
+  WebpackType["Lambda"] = "lambda";
+  WebpackType["NodeScript"] = "node-script";
+  return WebpackType;
 }({});
 const PROJECT_TYPE_TO_METADATA = {
   [ProjectType.Web]: {
-    runtimeType: RuntimeType.Web
+    eslint: EslintType.Web,
+    tsconfig: TsConfigType.Web,
+    webpack: WebpackType.Web
   },
   [ProjectType.LambdaFunction]: {
-    runtimeType: RuntimeType.Lambda
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.Lambda
   },
   [ProjectType.LambdaApi]: {
-    runtimeType: RuntimeType.Lambda
-  },
-  [ProjectType.NodeLib]: {
-    runtimeType: RuntimeType.NodeLib
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.Lambda
   },
   [ProjectType.NodeScript]: {
-    runtimeType: RuntimeType.NodeScript
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.NodeScript
   },
   [ProjectType.Shared]: {
-    runtimeType: RuntimeType.Lib
+    eslint: EslintType.Lib,
+    tsconfig: TsConfigType.Lib,
+    webpack: WebpackType.Lib
+  },
+  [ProjectType.SharedNode]: {
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.Lib
   }
 };
 
@@ -288,9 +269,9 @@ let WorkspaceFragmentType = /*#__PURE__*/function (WorkspaceFragmentType) {
   WorkspaceFragmentType["StaticWebsite"] = "static-website";
   WorkspaceFragmentType["StandaloneLambda"] = "standalone-lambda";
   WorkspaceFragmentType["WebApp"] = "web-app";
-  WorkspaceFragmentType["NodeLib"] = "node-lib";
   WorkspaceFragmentType["NodeScript"] = "node-script";
   WorkspaceFragmentType["Shared"] = "shared";
+  WorkspaceFragmentType["SharedNode"] = "shared-node";
   return WorkspaceFragmentType;
 }({});
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -371,20 +352,21 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
         __FRONTEND_NAME_UPPERCASE__: fragment.websiteName.toUpperCase()
       }
     }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeLib) {
-    return [{
-      projectName: fragment.libName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeLib,
-      vars: {
-        __PROJECT_NAME__: fragment.libName
-      }
-    }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeScript) {
     return [{
       projectName: fragment.scriptName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.NodeScript,
       vars: {
         __PROJECT_NAME__: fragment.scriptName
+      }
+    }];
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.SharedNode) {
+    const projectName = 'shared-node';
+    return [{
+      projectName,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.SharedNode,
+      vars: {
+        __PROJECT_NAME__: projectName
       }
     }];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -468,23 +450,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateProject: () => (/* binding */ generateProject)
 /* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(10);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4);
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(10);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
 
 
 
 
-
-
-const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_3__.fileURLToPath)(import.meta.url), '../templates');
+const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_2__.fileURLToPath)(import.meta.url), '../templates');
 async function generateProject(dst, project) {
   const {
     projectName,
@@ -492,38 +469,34 @@ async function generateProject(dst, project) {
     vars
   } = project;
   // Copy template files
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(TEMPLATES_PATH, type), dst);
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(TEMPLATES_PATH, type), dst);
 
   // Replace name in package.json
-  const packageJsonPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'package.json');
-  const packageJsonbuffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(packageJsonPath);
+  const packageJsonPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'package.json');
+  const packageJsonbuffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)(packageJsonPath);
   const packageJson = JSON.parse(packageJsonbuffer.toString());
   packageJson['name'] = projectName;
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)(packageJsonPath, packageJson);
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.writeJsonFile)(packageJsonPath, packageJson);
 
   // Replace variables
-  const files = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.listFiles)(dst);
+  const files = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.listFiles)(dst);
   await Promise.all(files.map(async file => {
-    const buffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(file);
+    const buffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)(file);
     const content = buffer.toString();
     let newContent = content;
     for (const [varName, varValue] of Object.entries(vars)) {
       newContent = newContent.replaceAll(varName, varValue);
     }
     if (file.endsWith('.ts') || file.endsWith('.tsx')) {
-      newContent = (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.prettierFormat)(newContent, 'typescript');
+      newContent = (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettierFormat)(newContent, 'typescript');
+    }
+    if (file.endsWith('.json')) {
+      newContent = (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettierFormat)(newContent, 'json');
     }
     if (newContent !== content) {
-      await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.writeFile)(file, newContent);
+      await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.writeFile)(file, newContent);
     }
   }));
-
-  // Post generation script for React Native project
-  if (_src_models__WEBPACK_IMPORTED_MODULE_5__.PROJECT_TYPE_TO_METADATA[type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_5__.RuntimeType.ReactNative) {
-    console.log('Running post install script');
-    const commands = [`pushd ${dst}`, `npx --yes react-native init ${projectName}`, `mv ${projectName}/ios .`, `mv ${projectName}/android .`, `rm -rf ${projectName}`, `popd`];
-    (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '));
-  }
 }
 
 /***/ }),
@@ -565,16 +538,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(14);
 
 
-function uniq(runtimes) {
-  return [...new Set(runtimes.filter(r => r !== undefined)).values()];
-}
-function projectMetadata(p) {
-  return _src_models__WEBPACK_IMPORTED_MODULE_0__.RUNTIME_TYPE_TO_METADATA[_src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType];
+function uniq(val) {
+  return [...new Set(val).values()];
 }
 function generateWorkspacePackageJson(workspaceName, projects) {
-  const eslintRuntimes = uniq(projects.map(p => projectMetadata(p).eslint));
-  const tsconfigRuntimes = uniq(projects.map(p => projectMetadata(p).tsconfig));
-  const webpackRuntimes = uniq(projects.map(p => projectMetadata(p).webpack));
+  const eslintRuntimes = uniq(projects.map(p => _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].eslint));
+  const tsconfigRuntimes = uniq(projects.map(p => _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].tsconfig));
+  const webpackRuntimes = uniq(projects.map(p => _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].webpack));
   return {
     name: workspaceName,
     license: 'UNLICENSED',
@@ -612,16 +582,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.5.0',
-  eslint: '1.3.0',
+  project: '1.6.0',
+  eslint: '1.4.0',
   prettier: '1.2.0',
-  tsconfig: '1.3.0',
-  webpack: '1.4.0',
-  runner: '1.3.0'
+  tsconfig: '1.4.0',
+  webpack: '1.5.0',
+  runner: '1.4.0'
 };
 const ESLINT_VERSION = '8.43.x';
 const PRETTIER_VERSION = '2.8.x';
-const TYPESCRIPT_VERSION = '5.0.4';
+const TYPESCRIPT_VERSION = '5.0.x';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 const LIB_VERSIONS = {
@@ -629,8 +599,6 @@ const LIB_VERSIONS = {
   '@types/react-dom': '18.2.x',
   react: '18.2.x',
   'react-dom': '18.2.x',
-  '@types/react-native': '0.66.x',
-  'react-native': '0.66.x',
   'styled-components': '6.0.x',
   'react-router': '6.4.x',
   'react-router-dom': '6.4.x'
@@ -659,7 +627,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function generateCommonTerraform(workspaceName, projects) {
-  return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__.generateAwsProviderTerraform)(workspaceName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__.generateS3BucketTerraform)(workspaceName, projects.filter(p => _src_models__WEBPACK_IMPORTED_MODULE_0__.PROJECT_TYPE_TO_METADATA[p.type].runtimeType === _src_models__WEBPACK_IMPORTED_MODULE_0__.RuntimeType.Web).map(p => p.projectName))].join('\n\n');
+  return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__.generateAwsProviderTerraform)(workspaceName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__.generateS3BucketTerraform)(workspaceName, projects.filter(p => p.type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web).map(p => p.projectName))].join('\n\n');
 }
 function generateWorkspaceProjectTerraform(workspaceName, project) {
   const {
@@ -676,9 +644,9 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
     return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
       api: true
     });
-  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeLib) {
-    return undefined;
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
+    return undefined;
+  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.SharedNode) {
     return undefined;
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Shared) {
@@ -1174,6 +1142,8 @@ async function initProject() {
   } else {
     frags.push({
       type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.Shared
+    }, {
+      type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.SharedNode
     });
     // Ask for workspace name
     const promptResponse = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({
@@ -1217,7 +1187,6 @@ const WorkspaceFragmentTypeToString = {
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.WebApp]: 'Web App',
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StaticWebsite]: 'Static Website',
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StandaloneLambda]: 'Standalone Lambda',
-  [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeLib]: 'Node Lib',
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeScript]: 'Node Script'
 };
 async function askForWorkspaceFragment(takenNames) {
@@ -1259,12 +1228,6 @@ async function askForWorkspaceFragment(takenNames) {
       type,
       websiteName,
       lambdaName
-    };
-  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeLib) {
-    const libName = await askForProjectName('Lib project name', 'lib', takenNames);
-    return {
-      type,
-      libName
     };
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeScript) {

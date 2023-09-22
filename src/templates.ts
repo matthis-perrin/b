@@ -3,15 +3,15 @@ import {join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {cleanDir, cp, readdir, readFile, writeJsonFile, writeRawFile} from '@src/fs';
-import {RuntimeType} from '@src/models';
+import {EslintType, TsConfigType, WebpackType} from '@src/models';
 import {LIB_VERSIONS} from '@src/versions';
 
 const TEMPLATES_DIR = join(fileURLToPath(import.meta.url), '../../templates');
 
 export async function generateTemplatesRootPackageJson(
-  eslint: RuntimeType[],
-  tsConfig: RuntimeType[],
-  webpack: RuntimeType[]
+  eslint: EslintType[],
+  tsConfig: TsConfigType[],
+  webpack: WebpackType[]
 ): Promise<void> {
   const deps = [
     ...eslint.map(runtime => `eslint-config-${runtime}`),

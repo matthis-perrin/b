@@ -90,19 +90,19 @@ class EslintPlugin extends StandalonePlugin {
       this.watcher
         .on('add', path => {
           this.shouldRun = true;
-          if (path.startsWith(projectPath)) {
+          if (path.startsWith(`${projectPath}/`)) {
             this.fileStates.set(path, {status: 'queued'});
           }
         })
         .on('change', path => {
           this.shouldRun = true;
-          if (path.startsWith(projectPath)) {
+          if (path.startsWith(`${projectPath}/`)) {
             this.fileStates.set(path, {status: 'queued'});
           }
         })
         .on('unlink', path => {
           this.shouldRun = true;
-          if (path.startsWith(projectPath)) {
+          if (path.startsWith(`${projectPath}/`)) {
             this.fileStates.delete(path);
           }
         })

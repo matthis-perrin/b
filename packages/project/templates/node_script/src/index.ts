@@ -1,4 +1,6 @@
-import {DUMMY} from '@shared/index2';
+export async function run(): Promise<void> {
+  await Promise.resolve();
+  console.log('Hello World');
+}
 
-console.log(DUMMY);
-const a: string = 3;
+run().catch(console.error);

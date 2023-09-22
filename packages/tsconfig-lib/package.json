@@ -1,10 +1,10 @@
 {
   "name": "@matthis/tsconfig-lib",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "license": "UNLICENSED",
   "type": "module",
   "main": "tsconfig.json",
   "dependencies": {
-    "typescript": "5.0.4"
+    "typescript": "5.0.x"
   }
 }

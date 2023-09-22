@@ -1,4 +1,4 @@
-import {PROJECT_TYPE_TO_METADATA, ProjectType, RuntimeType, WorkspaceName} from '@src/models';
+import {ProjectType, WorkspaceName} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
 import {generateCloudfrontDistributionTerraform} from '@src/project/terraform/cloudfront';
 import {generateLambdaTerraform} from '@src/project/terraform/lambda';
@@ -14,9 +14,7 @@ export function generateCommonTerraform(
     generateAwsProviderTerraform(workspaceName),
     generateS3BucketTerraform(
       workspaceName,
-      projects
-        .filter(p => PROJECT_TYPE_TO_METADATA[p.type].runtimeType === RuntimeType.Web)
-        .map(p => p.projectName)
+      projects.filter(p => p.type === ProjectType.Web).map(p => p.projectName)
     ),
   ].join('\n\n');
 }
@@ -32,9 +30,9 @@ export function generateWorkspaceProjectTerraform(
     return generateLambdaTerraform(workspaceName, projectName, {api: false});
   } else if (type === ProjectType.LambdaApi) {
     return generateLambdaTerraform(workspaceName, projectName, {api: true});
-  } else if (type === ProjectType.NodeLib) {
-    return undefined;
   } else if (type === ProjectType.NodeScript) {
+    return undefined;
+  } else if (type === ProjectType.SharedNode) {
     return undefined;
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === ProjectType.Shared) {

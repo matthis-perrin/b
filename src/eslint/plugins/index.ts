@@ -10,7 +10,7 @@ import {eslintReactHooks} from '@src/eslint/plugins/eslint_react_hooks';
 import {eslintSimpleImportSort} from '@src/eslint/plugins/eslint_simple_import_sort';
 import {eslintTypescript} from '@src/eslint/plugins/eslint_typescript';
 import {eslintUnicorn} from '@src/eslint/plugins/eslint_unicorn';
-import {RuntimeType} from '@src/models';
+import {EslintType} from '@src/models';
 
 const BASE_PLUGINS = [
   eslintComments,
@@ -23,12 +23,8 @@ const BASE_PLUGINS = [
   eslintUnicorn,
 ];
 
-export const PLUGINS_FOR_TYPE: Record<RuntimeType, EslintMetadata[]> = {
-  [RuntimeType.Web]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
-  [RuntimeType.Node]: [...BASE_PLUGINS, eslintNode],
-  [RuntimeType.Lambda]: [...BASE_PLUGINS, eslintNode],
-  [RuntimeType.Lib]: [...BASE_PLUGINS],
-  [RuntimeType.ReactNative]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
-  [RuntimeType.NodeLib]: [...BASE_PLUGINS, eslintNode],
-  [RuntimeType.NodeScript]: [...BASE_PLUGINS, eslintNode],
+export const PLUGINS_FOR_TYPE: Record<EslintType, EslintMetadata[]> = {
+  [EslintType.Web]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
+  [EslintType.Node]: [...BASE_PLUGINS, eslintNode],
+  [EslintType.Lib]: [...BASE_PLUGINS],
 };

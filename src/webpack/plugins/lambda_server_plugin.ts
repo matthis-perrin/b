@@ -169,7 +169,7 @@ class LambdaServerPlugin extends StandalonePlugin {
               {
                 /* eslint-disable @typescript-eslint/naming-convention */
                 env: {
-                  AWS_CONFIG_FILE: join(this.context, '../terraform/.aws-credentials'),
+                  AWS_SHARED_CREDENTIALS_FILE: join(this.context, '../terraform/.aws-credentials'),
                   PATH: process.env['PATH'], // eslint-disable-line node/no-process-env
                 },
                 /* eslint-enable @typescript-eslint/naming-convention */

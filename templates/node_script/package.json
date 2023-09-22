@@ -1,6 +1,5 @@
 {
-  "name": "script",
-  "version": "1.0.0",
+  "name": "__PROJECT_NAME__",
   "license": "UNLICENSED",
   "type": "module",
   "prettier": "@matthis/prettier-config",
@@ -8,5 +7,8 @@
     "extends": [
       "@matthis/eslint-config-node"
     ]
+  },
+  "devDependencies": {
+    "@types/node": "16.11.x"
   }
 }

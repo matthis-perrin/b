@@ -2,10 +2,10 @@ import {join} from 'node:path';
 
 import {PLUGINS_FOR_TYPE} from '@src/eslint/plugins/index';
 import {cleanDir, writeJsFile, writeJsonFile} from '@src/fs';
-import {RuntimeType} from '@src/models';
+import {EslintType} from '@src/models';
 import {ESLINT_VERSION, PACKAGE_VERSIONS} from '@src/versions';
 
-export async function generateForType(path: string, type: RuntimeType): Promise<void> {
+export async function generateForType(path: string, type: EslintType): Promise<void> {
   await cleanDir(path);
   await Promise.all([
     writeJsonFile(join(path, 'package.json'), generatePackageJson(type)),
@@ -16,14 +16,14 @@ export async function generateForType(path: string, type: RuntimeType): Promise<
   ]);
 }
 
-function generateEslintConfig(type: RuntimeType): Record<string, unknown> {
+function generateEslintConfig(type: EslintType): Record<string, unknown> {
   const plugins = PLUGINS_FOR_TYPE[type];
   const eslintConfig = {
     root: true,
     ignorePatterns: ['js', 'cjs', 'mjs'].map(ext => `**/*.${ext}`),
     env: {
-      browser: type === RuntimeType.Web,
-      node: type === RuntimeType.Node,
+      browser: type === EslintType.Web,
+      node: type === EslintType.Node,
       es6: true,
     },
     parser: '@typescript-eslint/parser',
@@ -38,7 +38,7 @@ function generateEslintConfig(type: RuntimeType): Record<string, unknown> {
   return eslintConfig;
 }
 
-function generatePackageJson(type: RuntimeType): Record<string, unknown> {
+function generatePackageJson(type: EslintType): Record<string, unknown> {
   const eslintPlugins = PLUGINS_FOR_TYPE[type];
   const baseDependencies = {
     eslint: ESLINT_VERSION,

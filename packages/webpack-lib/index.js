@@ -425,21 +425,21 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
       this.watcher = (0,chokidar__WEBPACK_IMPORTED_MODULE_2__.watch)(patterns);
       this.watcher.on('add', path => {
         this.shouldRun = true;
-        if (path.startsWith(projectPath)) {
+        if (path.startsWith(`${projectPath}/`)) {
           this.fileStates.set(path, {
             status: 'queued'
           });
         }
       }).on('change', path => {
         this.shouldRun = true;
-        if (path.startsWith(projectPath)) {
+        if (path.startsWith(`${projectPath}/`)) {
           this.fileStates.set(path, {
             status: 'queued'
           });
         }
       }).on('unlink', path => {
         this.shouldRun = true;
-        if (path.startsWith(projectPath)) {
+        if (path.startsWith(`${projectPath}/`)) {
           this.fileStates.delete(path);
         }
       }).on('ready', () => {
@@ -973,10 +973,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   config: () => (/* binding */ config)
 /* harmony export */ });
-/* harmony import */ var _src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
 function config(opts) {
-  return (0,_src_webpack_configs_base_config__WEBPACK_IMPORTED_MODULE_0__.baseConfig)(opts);
+  return (0,_src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_0__.baseConfig)(opts);
 }
 })();
 

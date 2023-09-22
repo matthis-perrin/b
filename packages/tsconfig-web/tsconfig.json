@@ -34,25 +34,6 @@
       "dom.iterable"
     ],
     "target": "esnext",
-    "paths": {
-      "@src/*": [
-        "./src/*"
-      ],
-      "*": [
-        "./node_modules/*",
-        "./node_modules/@types/*",
-        "../shared/node_modules/*",
-        "../shared/node_modules/@types/*",
-        "../shared-web/node_modules/*",
-        "../shared-web/node_modules/@types/*"
-      ],
-      "@shared/*": [
-        "../shared/src/*"
-      ],
-      "@shared-web/*": [
-        "../shared-web/src/*"
-      ]
-    },
     "jsx": "react-jsx"
   }
 }

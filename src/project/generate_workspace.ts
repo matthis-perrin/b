@@ -73,16 +73,6 @@ export function getProjectsFromWorkspaceFragment(
         },
       },
     ];
-  } else if (fragment.type === WorkspaceFragmentType.NodeLib) {
-    return [
-      {
-        projectName: fragment.libName,
-        type: ProjectType.NodeLib,
-        vars: {
-          __PROJECT_NAME__: fragment.libName,
-        },
-      },
-    ];
   } else if (fragment.type === WorkspaceFragmentType.NodeScript) {
     return [
       {
@@ -90,6 +80,17 @@ export function getProjectsFromWorkspaceFragment(
         type: ProjectType.NodeScript,
         vars: {
           __PROJECT_NAME__: fragment.scriptName,
+        },
+      },
+    ];
+  } else if (fragment.type === WorkspaceFragmentType.SharedNode) {
+    const projectName = 'shared-node' as ProjectName;
+    return [
+      {
+        projectName,
+        type: ProjectType.SharedNode,
+        vars: {
+          __PROJECT_NAME__: projectName,
         },
       },
     ];

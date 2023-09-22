@@ -38,7 +38,7 @@ async function initProject(): Promise<void> {
       alreadyGenerated.push(...projectNames);
     }
   } else {
-    frags.push({type: WorkspaceFragmentType.Shared});
+    frags.push({type: WorkspaceFragmentType.Shared}, {type: WorkspaceFragmentType.SharedNode});
     // Ask for workspace name
     const promptResponse = await prompt({
       type: 'text',
@@ -83,13 +83,15 @@ async function initProject(): Promise<void> {
   }
 }
 
-type SelectableWorkspaceFragmentType = Exclude<WorkspaceFragmentType, WorkspaceFragmentType.Shared>;
+type SelectableWorkspaceFragmentType = Exclude<
+  WorkspaceFragmentType,
+  WorkspaceFragmentType.Shared | WorkspaceFragmentType.SharedNode
+>;
 
 const WorkspaceFragmentTypeToString: Record<SelectableWorkspaceFragmentType, string> = {
   [WorkspaceFragmentType.WebApp]: 'Web App',
   [WorkspaceFragmentType.StaticWebsite]: 'Static Website',
   [WorkspaceFragmentType.StandaloneLambda]: 'Standalone Lambda',
-  [WorkspaceFragmentType.NodeLib]: 'Node Lib',
   [WorkspaceFragmentType.NodeScript]: 'Node Script',
 };
 
@@ -121,9 +123,6 @@ async function askForWorkspaceFragment(
     const websiteName = await askForProjectName('Frontend project name', 'frontend', takenNames);
     const lambdaName = await askForProjectName('Backend project name', 'backend', takenNames);
     return {type, websiteName, lambdaName};
-  } else if (type === WorkspaceFragmentType.NodeLib) {
-    const libName = await askForProjectName('Lib project name', 'lib', takenNames);
-    return {type, libName};
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === WorkspaceFragmentType.NodeScript) {
     const scriptName = await askForProjectName('Script project name', 'script', takenNames);

@@ -1,6 +1,6 @@
 import webpack, {DefinePlugin} from 'webpack'; // eslint-disable-line import/no-named-as-default
 
-import {nodeConfig} from '@src/webpack/configs/node_config';
+import {nodeConfig} from '@src/webpack/common-configs/node_config';
 import {YarnPlugin} from '@src/webpack/plugins/yarn_plugin';
 
 export async function compile(

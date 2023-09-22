@@ -1,7 +1,0 @@
-{
-  "extends": "@matthis/tsconfig-node/tsconfig",
-  "compilerOptions": {
-    "baseUrl": "."
-  },
-  "include": ["src", "../shared"]
-}

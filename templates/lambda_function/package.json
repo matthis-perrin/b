@@ -1,5 +1,5 @@
 {
-  "name": "lambda_function",
+  "name": "__PROJECT_NAME__",
   "license": "UNLICENSED",
   "type": "module",
   "prettier": "@matthis/prettier-config",

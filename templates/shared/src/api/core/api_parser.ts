@@ -1,6 +1,6 @@
 import {BadRequestError} from '@shared/api/core/api_errors';
 import {Schema, SchemaToType} from '@shared/api/core/api_schema';
-import {asArray, asBoolean, asMap, asNumber, asString, neverHappens} from '@shared/type_utils';
+import {asArray, asBoolean, asMap, asNumber, asString, neverHappens} from '@shared/lib/type_utils';
 
 export function parseSchema(
   value: unknown,
