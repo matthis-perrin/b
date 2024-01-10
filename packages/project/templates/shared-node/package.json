@@ -10,6 +10,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.395.x",
     "@aws-sdk/client-s3": "3.395.x",
+    "@aws-sdk/client-ses": "3.484.x",
     "@aws-sdk/util-dynamodb": "3.395.x"
   },
   "devDependencies": {

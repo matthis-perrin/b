@@ -1,3 +1,4 @@
+- Add commented out dummy table with table name output when generating a new project
 - Auto upgrade package.json dependencies when regenerating project
 - Use EventBridge instead of Cloudwatch event
 - NodeJS 18 https://github.com/tsconfig/bases

@@ -1,5 +1,3 @@
-import {readFileSync} from 'node:fs';
-
 import {
   AttributeValue,
   BatchGetItemCommand,
@@ -9,6 +7,7 @@ import {
   DynamoDBClient,
   GetItemCommand,
   PutItemCommand,
+  PutItemCommandInput,
   QueryCommand,
   ScanCommand,
   ScanCommandOutput,
@@ -25,34 +24,15 @@ import {
   unmarshall as utilDynamodb_unmarshall,
 } from '@aws-sdk/util-dynamodb';
 
-import {NODE_ENV, REGION} from '@shared/env';
-import {chunkArray, splitOnceOrThrow} from '@shared/lib/array_utils';
+import {REGION} from '@shared/env';
+import {chunkArray} from '@shared/lib/array_utils';
 import {removeUndefined} from '@shared/lib/type_utils';
+
+import {readCredentials} from '@shared-node/aws/credentials';
 
 const MAX_BATCH_GET_ITEMS = 100;
 const MAX_BATCH_WRITE_ITEMS = 25;
 const PUT_ITEMS_MAX_RETRIES = 3;
-
-function readCredentials(): {accessKeyId: string; secretAccessKey: string} | undefined {
-  if (NODE_ENV !== 'development') {
-    return;
-  }
-  const credentialsFile = readFileSync('./terraform/.aws-credentials').toString();
-  const credentialsLines = credentialsFile.split('\n');
-  const credentials = Object.fromEntries(
-    credentialsLines
-      .filter(line => line.includes(' = '))
-      .map(line => {
-        const [key, value] = splitOnceOrThrow(line, ' = ');
-        return [key, value];
-      })
-  );
-  const {aws_access_key_id, aws_secret_access_key} = credentials;
-  if (aws_access_key_id === undefined || aws_secret_access_key === undefined) {
-    return undefined;
-  }
-  return {accessKeyId: aws_access_key_id, secretAccessKey: aws_secret_access_key};
-}
 
 const client = new DynamoDBClient({region: REGION, credentials: readCredentials()});
 
@@ -122,6 +102,7 @@ export async function getItems<T>(params: {
   while (chunked.length > 0) {
     const chunk = chunked.pop();
     if (chunk) {
+      // eslint-disable-next-line no-await-in-loop
       const data = await client.send(
         new BatchGetItemCommand({
           RequestItems: {[params.tableName]: {Keys: chunk, ConsistentRead}},
@@ -155,10 +136,14 @@ export async function transactWriteItems(params: {
   );
 }
 
-export async function putItem<T extends Record<string, unknown>>(params: {
+export async function putItem<
+  T extends {
+    [K in keyof T]: unknown;
+  }
+>(params: {
   tableName: string;
   item: T;
-  additionalParams?: AdditionalParams;
+  additionalParams?: Omit<PutItemCommandInput, 'TableName' | 'Item'>;
 }): Promise<void> {
   await client.send(
     new PutItemCommand({
@@ -179,6 +164,7 @@ export async function putItems(params: {
   while (chunked.length > 0) {
     const chunk = chunked.pop();
     if (chunk) {
+      // eslint-disable-next-line no-await-in-loop
       const {UnprocessedItems} = await client.send(
         new BatchWriteItemCommand({
           RequestItems: {
@@ -207,6 +193,7 @@ export async function putItems(params: {
       if (retryNumber === PUT_ITEMS_MAX_RETRIES) {
         throw new Error('Failed to put items in database');
       }
+      // eslint-disable-next-line no-await-in-loop
       await putItems({
         tableName: params.tableName,
         items: unprocessedItems,
@@ -248,6 +235,7 @@ export async function queryItems<T>(params: QueryParams): Promise<{
   const items: Record<string, AttributeValue>[] = [];
   let count = 0;
   do {
+    // eslint-disable-next-line no-await-in-loop
     const {Items, LastEvaluatedKey, Count} = await client.send(
       new QueryCommand({
         TableName: params.tableName,
@@ -289,6 +277,7 @@ export async function queryAllItems<T>(
   let paginationToken: string | undefined;
   const items: T[] = [];
   do {
+    // eslint-disable-next-line no-await-in-loop
     const res = await queryItems<T>({...params, paginationToken});
     paginationToken = res.nextPaginationToken;
     items.push(...res.items);
@@ -311,6 +300,7 @@ export async function countItems(params: CountParams): Promise<number> {
 
   let counter = 0;
   do {
+    // eslint-disable-next-line no-await-in-loop
     const {LastEvaluatedKey, Count} = await client.send(
       new QueryCommand({
         TableName: params.tableName,
@@ -387,17 +377,18 @@ export interface ScanAllItemsParams {
   filterExpression?: string;
   indexName?: string;
 }
-export async function scanAllItems(params: {
+export async function scanAllItems<T = Record<string, unknown>>(params: {
   tableName: string;
   expressionAttributeNames?: Record<string, string>;
   expressionAttributeValues?: Record<string, unknown>;
   filterExpression?: string;
   indexName?: string;
   projectionExpression?: string;
-}): Promise<Record<string, unknown>[]> {
-  const items: Record<string, unknown>[] = [];
+}): Promise<T[]> {
+  const items: T[] = [];
   let lastEvaluatedKey;
   do {
+    // eslint-disable-next-line no-await-in-loop
     const {Items, LastEvaluatedKey}: ScanCommandOutput = await client.send(
       new ScanCommand({
         TableName: params.tableName,
@@ -411,7 +402,7 @@ export async function scanAllItems(params: {
         ProjectionExpression: params.projectionExpression,
       })
     );
-    items.push(...(Items ?? []).map(i => unmarshall(i)));
+    items.push(...(Items ?? []).map(i => unmarshall(i) as T));
     lastEvaluatedKey = LastEvaluatedKey;
   } while (lastEvaluatedKey !== undefined);
 

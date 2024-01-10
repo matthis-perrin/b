@@ -28,7 +28,7 @@ resource "aws_lambda_function" "${projectName}" {
   handler           = "index.handler"
   runtime           = "nodejs18.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
-  timeout           = 60 // 1 minute
+  timeout           = 900 // 15 minutes
   environment {
     variables = {
       NODE_OPTIONS = "--enable-source-maps"
