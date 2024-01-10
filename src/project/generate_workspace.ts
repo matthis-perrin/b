@@ -16,8 +16,10 @@ import {generateGitIgnore} from '@src/project/gitignore';
 import {generateWorkspacePackageJson} from '@src/project/package_json';
 import {
   generateCommonTerraform,
+  generateDummyTerraformCredentials,
   generateWorkspaceProjectTerraform,
 } from '@src/project/terraform/all';
+import {generateDynamoTerraform} from '@src/project/terraform/dynamo';
 import {generateCodeWorkspace} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 
@@ -147,7 +149,10 @@ export async function generateWorkspace(
     // .gitignore
     await writeRawFile(join(dst, '.gitignore'), generateGitIgnore()),
     // app.code-workspace
-    await writeJsonFile(join(dst, 'app.code-workspace'), generateCodeWorkspace(workspaceFragments)),
+    await writeJsonFile(
+      join(dst, 'app.code-workspace'),
+      generateCodeWorkspace(workspaceName, workspaceFragments)
+    ),
     // setup.js
     await cp(join(SCRIPTS_PATH, 'setup.js'), join(dst, 'setup.js')),
     // deploy.js
@@ -158,7 +163,15 @@ export async function generateWorkspace(
 
   // Terraform folder generation
   const terraformPath = join(dst, 'terraform');
+  const userTable = false as boolean;
   await Promise.all([
+    writeRawFile(join(terraformPath, '.aws-credentials'), generateDummyTerraformCredentials()),
+    userTable
+      ? writeRawFile(
+          join(terraformPath, 'dynamo.tf'),
+          generateDynamoTerraform(workspaceName, {tableName: 'user'})
+        )
+      : Promise.resolve(),
     writeRawFile(join(terraformPath, 'base.tf'), generateCommonTerraform(workspaceName, projects)),
     ...projects.map(async p => {
       const content = generateWorkspaceProjectTerraform(workspaceName, p);
