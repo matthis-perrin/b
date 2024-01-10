@@ -5,6 +5,7 @@ import {WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
 
 export function generateCodeWorkspace(
+  workspaceName: string,
   workspaceFragments: WorkspaceFragment[]
 ): Record<string, unknown> {
   const projects = workspaceFragments.flatMap(f =>
@@ -20,6 +21,7 @@ export function generateCodeWorkspace(
     ],
     settings: {
       /* eslint-disable @typescript-eslint/naming-convention */
+      'window.title': `${workspaceName}\${separator}\${activeEditorShort}`,
       'files.exclude': Object.fromEntries([
         ...projectNames.map(p => [p, true]),
         ['terraform', true],
@@ -43,6 +45,9 @@ export function generateCodeWorkspace(
       },
       'editor.defaultFormatter': 'esbenp.prettier-vscode',
       'emmet.showExpandedAbbreviation': 'never',
+      'files.associations': {
+        '*.tf': 'terraform',
+      },
       /* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */
     },
     extensions: {
