@@ -1,9 +1,9 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.6.1',
+  project: '1.6.2',
   eslint: '1.4.0',
   prettier: '1.2.0',
   tsconfig: '1.4.0',
-  webpack: '1.5.1',
+  webpack: '1.5.2',
   runner: '1.4.1',
 };
 

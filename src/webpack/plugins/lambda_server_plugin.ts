@@ -65,6 +65,12 @@ class LambdaServerPlugin extends StandalonePlugin {
       const port = getPort(compiler.context);
       this.server = createServer((req: IncomingMessage, res: ServerResponse) => {
         const url = req.url ?? '';
+
+        if (url === '/favicon.ico') {
+          res.end();
+          return;
+        }
+
         const method = req.method ?? '';
 
         const internalError = (err: string): void => {
