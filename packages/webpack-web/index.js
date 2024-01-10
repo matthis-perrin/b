@@ -138,9 +138,7 @@ function definePlugin() {
   const extraEnv = Object.fromEntries(Object.entries(process.env) // eslint-disable-line node/no-process-env
   .filter(([name]) => name.startsWith(envPrefix)).map(([name, value]) => [String(name.slice(envPrefix.length)), JSON.stringify(value)]));
   return new (webpack__WEBPACK_IMPORTED_MODULE_0___default().DefinePlugin)({
-    /* eslint-disable @typescript-eslint/naming-convention */
     'process.env.NODE_ENV': JSON.stringify((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__.getEnv)()),
-    /* eslint-enable @typescript-eslint/naming-convention */
     ...extraEnv
   });
 }
@@ -178,11 +176,9 @@ __webpack_require__.r(__webpack_exports__);
 function isProd() {
   return process.env['NODE_ENV'] === 'production'; // eslint-disable-line node/no-process-env
 }
-
 function isSelenium() {
   return process.env['IS_SELENIUM'] === '1'; // eslint-disable-line node/no-process-env
 }
-
 function getEnv() {
   return isProd() ? 'production' : 'development';
 }
@@ -555,7 +551,6 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
         cwd: this.context,
         overrideConfig: {
           settings: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             'import/resolver': {
               typescript: {
                 project: tsConfigPath

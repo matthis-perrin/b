@@ -200,6 +200,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 // Project type
 //
+
 let ProjectType = /*#__PURE__*/function (ProjectType) {
   ProjectType["Web"] = "web";
   ProjectType["LambdaFunction"] = "lambda_function";
@@ -302,8 +303,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(12);
 /* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(13);
 /* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(15);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(21);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(20);
+/* harmony import */ var _src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(21);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(22);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(20);
+
 
 
 
@@ -317,7 +320,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function getProjectsFromWorkspaceFragment(fragment, allFragments) {
-  /* eslint-disable @typescript-eslint/naming-convention */
   if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StaticWebsite) {
     return [{
       projectName: fragment.websiteName,
@@ -388,8 +390,7 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
       }
     }];
   }
-  /* eslint-enable @typescript-eslint/naming-convention */
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_11__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
+  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_12__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
 }
 async function generateWorkspace(dst, workspaceName, workspaceFragments, alreadyGenerated) {
   const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f, workspaceFragments));
@@ -405,7 +406,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
   // .gitignore
   await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, '.gitignore'), (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__.generateGitIgnore)()),
   // app.code-workspace
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'app.code-workspace'), (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__.generateCodeWorkspace)(workspaceFragments)),
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'app.code-workspace'), (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__.generateCodeWorkspace)(workspaceName, workspaceFragments)),
   // setup.js
   await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'setup.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'setup.js')),
   // deploy.js
@@ -415,7 +416,10 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
 
   // Terraform folder generation
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'terraform');
-  await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
+  const userTable = false;
+  await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, '.aws-credentials'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateDummyTerraformCredentials)()), userTable ? (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'dynamo.tf'), (0,_src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_10__.generateDynamoTerraform)(workspaceName, {
+    tableName: 'user'
+  })) : Promise.resolve(), (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
     const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateWorkspaceProjectTerraform)(workspaceName, p);
     if (content === undefined) {
       return;
@@ -564,7 +568,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
       // We have to manually specify the version of get-tsconfig because
       // the version 4.7.1 breaks the resolution of aliases when the baseUrl
       // is defined in a tsconfig.json that extends from another.
-      'get-tsconfig': '4.7.0' // eslint-disable-line @typescript-eslint/naming-convention
+      'get-tsconfig': '4.7.0'
     }
   };
 }
@@ -582,18 +586,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.6.0',
+  project: '1.6.1',
   eslint: '1.4.0',
   prettier: '1.2.0',
   tsconfig: '1.4.0',
-  webpack: '1.5.0',
-  runner: '1.4.0'
+  webpack: '1.5.1',
+  runner: '1.4.1'
 };
 const ESLINT_VERSION = '8.43.x';
 const PRETTIER_VERSION = '2.8.x';
 const TYPESCRIPT_VERSION = '5.0.x';
-
-/* eslint-disable @typescript-eslint/naming-convention */
 const LIB_VERSIONS = {
   '@types/react': '18.2.x',
   '@types/react-dom': '18.2.x',
@@ -603,7 +605,6 @@ const LIB_VERSIONS = {
   'react-router': '6.4.x',
   'react-router-dom': '6.4.x'
 };
-/* eslint-enable @typescript-eslint/naming-convention */
 
 /***/ }),
 /* 15 */
@@ -612,6 +613,7 @@ const LIB_VERSIONS = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateCommonTerraform: () => (/* binding */ generateCommonTerraform),
+/* harmony export */   generateDummyTerraformCredentials: () => (/* binding */ generateDummyTerraformCredentials),
 /* harmony export */   generateWorkspaceProjectTerraform: () => (/* binding */ generateWorkspaceProjectTerraform)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
@@ -653,6 +655,14 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
     return undefined;
   }
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_5__.neverHappens)(type, 'ProjectType');
+}
+function generateDummyTerraformCredentials() {
+  return `
+[default]
+aws_access_key_id=
+aws_secret_access_key=
+aws_session_token=
+`;
 }
 
 /***/ }),
@@ -769,6 +779,7 @@ resource "aws_lambda_function" "${projectName}" {
   handler           = "index.handler"
   runtime           = "nodejs18.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
+  timeout           = 60 // 1 minute
   environment {
     variables = {
       NODE_OPTIONS = "--enable-source-maps"
@@ -962,6 +973,72 @@ function removeUndefined(arr) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   generateDynamoTerraform: () => (/* binding */ generateDynamoTerraform)
+/* harmony export */ });
+function toPascal(str) {
+  return str.toLowerCase().split(/[^a-z0-9]/u).map(str => {
+    var _str$;
+    return (((_str$ = str[0]) === null || _str$ === void 0 ? void 0 : _str$.toUpperCase()) ?? '') + str.slice(1);
+  }).join('');
+}
+function toSnake(str) {
+  return str.toLowerCase().split(/[^a-z0-9]/u).join('_');
+}
+function generateDynamoTerraform(workspaceName, opts) {
+  const {
+    tableName
+  } = opts;
+  const namePascal = toPascal(workspaceName) + toPascal(tableName);
+  const nameSnake = toSnake(workspaceName) + toSnake(tableName);
+  const tableUpper = toSnake(tableName).toUpperCase();
+  return `
+//
+// ${toPascal(tableName)} table
+//
+
+locals {
+    ${tableUpper}_TABLE_NAME = "${namePascal}"
+    ${tableUpper}_BY_EMAIL_INDEX_NAME = "${namePascal}_ByEmail_SortedByCreatedAt"
+}
+output "${tableUpper}_TABLE_NAME" { value = local.${tableUpper}_TABLE_NAME }
+output "${tableUpper}_BY_EMAIL_INDEX_NAME" { value = local.${tableUpper}_BY_EMAIL_INDEX_NAME }
+
+resource "aws_dynamodb_table" "${nameSnake}_table" {
+  name           = local.${tableUpper}_TABLE_NAME
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+  attribute {
+    name = "email"
+    type = "S"
+  }
+
+  attribute {
+    name = "createdAt"
+    type = "N"
+  }
+
+  global_secondary_index {
+    name               = local.${tableUpper}_BY_EMAIL_INDEX_NAME
+    hash_key           = "email"
+    range_key          = "createdAt"
+    projection_type    = "ALL"
+  }
+}
+    `.trim();
+}
+
+/***/ }),
+/* 22 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateCodeWorkspace: () => (/* binding */ generateCodeWorkspace),
 /* harmony export */   readWorkspaceFragments: () => (/* binding */ readWorkspaceFragments)
 /* harmony export */ });
@@ -972,7 +1049,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function generateCodeWorkspace(workspaceFragments) {
+function generateCodeWorkspace(workspaceName, workspaceFragments) {
   const projects = workspaceFragments.flatMap(f => (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__.getProjectsFromWorkspaceFragment)(f, workspaceFragments));
   const projectNames = projects.map(p => p.projectName);
   return {
@@ -986,7 +1063,7 @@ function generateCodeWorkspace(workspaceFragments) {
       name: 'root'
     }],
     settings: {
-      /* eslint-disable @typescript-eslint/naming-convention */
+      'window.title': `${workspaceName}\${separator}\${activeEditorShort}`,
       'files.exclude': Object.fromEntries([...projectNames.map(p => [p, true]), ['terraform', true]]),
       'editor.acceptSuggestionOnCommitCharacter': false,
       'editor.suggestSelection': 'first',
@@ -1006,10 +1083,11 @@ function generateCodeWorkspace(workspaceFragments) {
         'source.fixAll.eslint': true
       },
       'editor.defaultFormatter': 'esbenp.prettier-vscode',
-      'emmet.showExpandedAbbreviation': 'never'
-      /* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */
+      'emmet.showExpandedAbbreviation': 'never',
+      'files.associations': {
+        '*.tf': 'terraform'
+      }
     },
-
     extensions: {
       recommendations: ['dbaeumer.vscode-eslint', 'esbenp.prettier-vscode', 'VisualStudioExptTeam.vscodeintellicode', 'styled-components.vscode-styled-components', 'naumovs.color-highlight', 'eamodio.gitlens']
     }
@@ -1104,7 +1182,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(21);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(22);
 /* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(20);
 
 

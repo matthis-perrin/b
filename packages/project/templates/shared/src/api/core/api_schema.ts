@@ -1,3 +1,5 @@
+import {Flatten} from '@shared/lib/type_utils';
+
 interface SchemaBase {
   description?: string;
 }
@@ -98,33 +100,29 @@ export type Schema =
   | ObjectSchema<Record<string, Schema>>
   | OptObjectSchema<Record<string, Schema>>;
 
-export type SchemaToType<T extends Schema> = T extends StringSchema
+export type SchemaToType<T extends Schema> = T extends StringSchema | OptStringSchema
   ? string
-  : T extends OptStringSchema
-  ? string | undefined
-  : T extends NumberSchema
+  : T extends NumberSchema | OptNumberSchema
   ? number
-  : T extends OptNumberSchema
-  ? number | undefined
-  : T extends BooleanSchema
+  : T extends BooleanSchema | OptBooleanSchema
   ? boolean
-  : T extends OptBooleanSchema
-  ? boolean | undefined
   : T extends ArraySchema<infer Item>
   ? SchemaToType<Item>[]
   : T extends OptArraySchema<infer Item>
-  ? SchemaToType<Item>[] | undefined
-  : T extends ObjectSchema<infer Properties>
-  ? {
-      [Key in keyof Properties]: SchemaToType<Properties[Key]>;
-    }
-  : T extends OptObjectSchema<infer Properties>
-  ?
-      | {
-          [Key in keyof Properties]: SchemaToType<Properties[Key]>;
-        }
-      | undefined
-  : undefined;
+  ? SchemaToType<Item>[]
+  : T extends ObjectSchema<infer Properties> | OptObjectSchema<infer Properties>
+  ? Flatten<
+      Partial<{
+        [Key in FilterKeysByOptional<Properties, true>]: SchemaToType<Properties[Key]>;
+      }> & {
+        [Key in FilterKeysByOptional<Properties, false>]: SchemaToType<Properties[Key]>;
+      }
+    >
+  : never;
+
+type FilterKeysByOptional<Properties extends Record<string, Schema>, Opt extends boolean> = {
+  [Key in keyof Properties]: Properties[Key]['optional'] extends Opt ? Key : never;
+}[keyof Properties];
 
 export type AllApiSchema = Record<
   string,

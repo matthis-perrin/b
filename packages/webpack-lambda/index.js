@@ -174,9 +174,7 @@ function definePlugin() {
   const extraEnv = Object.fromEntries(Object.entries(process.env) // eslint-disable-line node/no-process-env
   .filter(([name]) => name.startsWith(envPrefix)).map(([name, value]) => [String(name.slice(envPrefix.length)), JSON.stringify(value)]));
   return new (webpack__WEBPACK_IMPORTED_MODULE_0___default().DefinePlugin)({
-    /* eslint-disable @typescript-eslint/naming-convention */
     'process.env.NODE_ENV': JSON.stringify((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__.getEnv)()),
-    /* eslint-enable @typescript-eslint/naming-convention */
     ...extraEnv
   });
 }
@@ -214,11 +212,9 @@ __webpack_require__.r(__webpack_exports__);
 function isProd() {
   return process.env['NODE_ENV'] === 'production'; // eslint-disable-line node/no-process-env
 }
-
 function isSelenium() {
   return process.env['IS_SELENIUM'] === '1'; // eslint-disable-line node/no-process-env
 }
-
 function getEnv() {
   return isProd() ? 'production' : 'development';
 }
@@ -591,7 +587,6 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
         cwd: this.context,
         overrideConfig: {
           settings: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             'import/resolver': {
               typescript: {
                 project: tsConfigPath
@@ -1359,12 +1354,10 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
             const command = [`node --enable-source-maps -e "eval(atob('${btoa(commandJs)}'))"`].join('');
             const startTs = Date.now();
             (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {
-              /* eslint-disable @typescript-eslint/naming-convention */
               env: {
                 AWS_SHARED_CREDENTIALS_FILE: (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, '../terraform/.aws-credentials'),
                 PATH: process.env['PATH'] // eslint-disable-line node/no-process-env
               }
-              /* eslint-enable @typescript-eslint/naming-convention */
             }, (error, stdout, stderr) => {
               const duration = Date.now() - startTs;
               const infoOutput = this.parseOutput(stdout, TOKEN);
@@ -1427,7 +1420,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
   async teardown() {
     return new Promise((resolve, reject) => {
       var _this$server;
-      (_this$server = this.server) === null || _this$server === void 0 ? void 0 : _this$server.close(err => {
+      (_this$server = this.server) === null || _this$server === void 0 || _this$server.close(err => {
         if (err) {
           reject(err);
         } else {
