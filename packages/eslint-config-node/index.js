@@ -118,7 +118,7 @@ module.exports = {
     'no-alert': 'off',
     'no-array-constructor': 'off',
     'no-async-promise-executor': 'warn',
-    'no-await-in-loop': 'warn',
+    'no-await-in-loop': 'off',
     'no-bitwise': 'warn',
     'no-buffer-constructor': 'off',
     'no-caller': 'warn',

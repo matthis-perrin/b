@@ -60,7 +60,6 @@ async function initProject(): Promise<void> {
     while (true) {
       let frag;
       try {
-        // eslint-disable-next-line no-await-in-loop
         frag = await askForWorkspaceFragment(takenNames);
       } catch (err: unknown) {
         console.error(String(err));

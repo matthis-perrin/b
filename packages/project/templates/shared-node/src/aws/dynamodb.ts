@@ -122,7 +122,6 @@ export async function getItems<T>(params: {
   while (chunked.length > 0) {
     const chunk = chunked.pop();
     if (chunk) {
-      // eslint-disable-next-line no-await-in-loop
       const data = await client.send(
         new BatchGetItemCommand({
           RequestItems: {[params.tableName]: {Keys: chunk, ConsistentRead}},
@@ -180,7 +179,6 @@ export async function putItems(params: {
   while (chunked.length > 0) {
     const chunk = chunked.pop();
     if (chunk) {
-      // eslint-disable-next-line no-await-in-loop
       const {UnprocessedItems} = await client.send(
         new BatchWriteItemCommand({
           RequestItems: {
@@ -209,7 +207,6 @@ export async function putItems(params: {
       if (retryNumber === PUT_ITEMS_MAX_RETRIES) {
         throw new Error('Failed to put items in database');
       }
-      // eslint-disable-next-line no-await-in-loop
       await putItems({
         tableName: params.tableName,
         items: unprocessedItems,
@@ -251,7 +248,6 @@ export async function queryItems<T>(params: QueryParams): Promise<{
   const items: Record<string, AttributeValue>[] = [];
   let count = 0;
   do {
-    // eslint-disable-next-line no-await-in-loop
     const {Items, LastEvaluatedKey, Count} = await client.send(
       new QueryCommand({
         TableName: params.tableName,
@@ -293,7 +289,6 @@ export async function queryAllItems<T>(
   let paginationToken: string | undefined;
   const items: T[] = [];
   do {
-    // eslint-disable-next-line no-await-in-loop
     const res = await queryItems<T>({...params, paginationToken});
     paginationToken = res.nextPaginationToken;
     items.push(...res.items);
@@ -316,7 +311,6 @@ export async function countItems(params: CountParams): Promise<number> {
 
   let counter = 0;
   do {
-    // eslint-disable-next-line no-await-in-loop
     const {LastEvaluatedKey, Count} = await client.send(
       new QueryCommand({
         TableName: params.tableName,
@@ -404,7 +398,6 @@ export async function scanAllItems(params: {
   const items: Record<string, unknown>[] = [];
   let lastEvaluatedKey;
   do {
-    // eslint-disable-next-line no-await-in-loop
     const {Items, LastEvaluatedKey}: ScanCommandOutput = await client.send(
       new ScanCommand({
         TableName: params.tableName,

@@ -1,4 +1,3 @@
-- Don't call lambda in lambdadevserver when requesting /favicon
 - Auto upgrade package.json dependencies when regenerating project
 - Use EventBridge instead of Cloudwatch event
 - NodeJS 18 https://github.com/tsconfig/bases

@@ -342,7 +342,6 @@ export const eslintCore: EslintMetadata = {
     'id-match': 'warn',
     'logical-assignment-operators': ['warn', 'never'],
     'no-async-promise-executor': 'warn',
-    'no-await-in-loop': 'warn',
     'no-bitwise': 'warn',
     'no-caller': 'warn',
     'no-case-declarations': 'warn',
