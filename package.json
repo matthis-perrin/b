@@ -3,7 +3,7 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "ncu": "ts-node --esm ./src/ncu.ts",
+    "ncu": "node --loader ts-node/esm src/ncu.ts",
     "build": "NODE_ENV=development webpack build",
     "watch": "NODE_ENV=development webpack watch",
     "project": "yarn build && yarn start && cd packages/project/ && yarn install && cd ../../ && node packages/project/index.js",
@@ -39,7 +39,7 @@
     "@matthis/webpack-node": "latest",
     "@types/node": "18.7.x",
     "@types/prettier": "2.7.x",
-    "@types/prompts": "^2.0.14",
+    "@types/prompts": "2.0.x",
     "@types/semver": "7.3.x",
     "ansi-colors": "4.1.x",
     "babel-loader": "9.1.x",
@@ -51,6 +51,7 @@
     "semver": "7.3.x",
     "source-map-loader": "4.0.x",
     "terser-webpack-plugin": "5.3.x",
+    "ts-node": "10.9.x",
     "webpack": "5.87.x",
     "webpack-cli": "4.10.x",
     "webpack-dev-server": "4.15.x"
