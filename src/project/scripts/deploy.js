@@ -54,7 +54,7 @@ async function run() {
     console.log(`Deploying lambda ${lambdaName}`, lambdaUrl);
     const tmp = tmpdir();
     const zipPath = join(tmp, randomUUID()) + '.zip';
-    execSync(`pushd ${lambdaName}/dist; zip -r ${zipPath} *`);
+    execSync(`pushd ${lambdaName}/dist; zip -q -r ${zipPath} *; popd`);
     execSync(`aws s3 cp ${zipPath} s3://${code_bucket}/${lambdaName}/dist.zip`, {
       env: {AWS_SHARED_CREDENTIALS_FILE: 'terraform/.aws-credentials'},
     });
