@@ -7,7 +7,6 @@ const forbiddenProps = [
   {propName: 'id', nessage: 'Use React ref instead'},
 ];
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
@@ -177,4 +176,3 @@ export const eslintReact: EslintMetadata = {
     'react/void-dom-elements-no-children': 'warn',
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

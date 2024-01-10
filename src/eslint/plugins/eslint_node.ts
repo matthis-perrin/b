@@ -1,6 +1,5 @@
 import {EslintMetadata} from '@src/eslint/models';
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintNode: EslintMetadata = {
   plugin: ['node'],
   dependencies: {
@@ -70,4 +69,3 @@ export const eslintNode: EslintMetadata = {
     'node/process-exit-as-throw': 'warn',
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

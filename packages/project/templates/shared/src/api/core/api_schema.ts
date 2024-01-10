@@ -2,7 +2,6 @@ interface SchemaBase {
   description?: string;
 }
 
-/* eslint-disable @typescript-eslint/naming-convention */
 interface StringSchema extends SchemaBase {
   type: 'String';
   optional: false;
@@ -86,7 +85,6 @@ interface OptArraySchema<T extends Schema> extends SchemaBase {
 export function OptArr<T extends Schema>(schema: T): OptArraySchema<T> {
   return {type: 'Array', items: schema, optional: true};
 }
-/* eslint-enable @typescript-eslint/naming-convention */
 
 export type Schema =
   | StringSchema

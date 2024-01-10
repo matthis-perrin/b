@@ -1,6 +1,5 @@
 import {EslintMetadata} from '@src/eslint/models';
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintUnicorn: EslintMetadata = {
   plugin: ['unicorn'],
   dependencies: {
@@ -181,4 +180,3 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/throw-new-error': 'warn',
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

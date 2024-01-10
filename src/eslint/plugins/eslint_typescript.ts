@@ -1,7 +1,6 @@
 import {EslintMetadata} from '@src/eslint/models';
 import {TYPESCRIPT_VERSION} from '@src/versions';
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintTypescript: EslintMetadata = {
   plugin: ['@typescript-eslint'],
   dependencies: {
@@ -308,4 +307,3 @@ export const eslintTypescript: EslintMetadata = {
     '@typescript-eslint/unified-signatures': ['warn', {ignoreDifferentlyNamedParameters: true}],
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention */

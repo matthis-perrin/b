@@ -11,9 +11,7 @@ export function definePlugin(): WebpackPlugin {
       .map(([name, value]) => [String(name.slice(envPrefix.length)), JSON.stringify(value)])
   );
   return new webpack.DefinePlugin({
-    /* eslint-disable @typescript-eslint/naming-convention */
     'process.env.NODE_ENV': JSON.stringify(getEnv()),
-    /* eslint-enable @typescript-eslint/naming-convention */
     ...extraEnv,
   });
 }

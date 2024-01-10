@@ -167,12 +167,10 @@ class LambdaServerPlugin extends StandalonePlugin {
             exec(
               command,
               {
-                /* eslint-disable @typescript-eslint/naming-convention */
                 env: {
                   AWS_SHARED_CREDENTIALS_FILE: join(this.context, '../terraform/.aws-credentials'),
                   PATH: process.env['PATH'], // eslint-disable-line node/no-process-env
                 },
-                /* eslint-enable @typescript-eslint/naming-convention */
               },
               (error, stdout, stderr) => {
                 const duration = Date.now() - startTs;

@@ -23,7 +23,6 @@ const ICONS = {
     element: <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />,
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention */
 
 export type SvgIconName = keyof typeof ICONS;
 

@@ -1,6 +1,5 @@
 import {EslintMetadata} from '@src/eslint/models';
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintCore: EslintMetadata = {
   plugin: [],
   dependencies: {},
@@ -527,4 +526,3 @@ export const eslintCore: EslintMetadata = {
     // 'no-warning-comments': ['warn', {terms: ['todo'], location: 'start'}],
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

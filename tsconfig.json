@@ -2,7 +2,18 @@
   "extends": "@matthis/tsconfig-node/tsconfig",
   "compilerOptions": {
     "module": "ES2022",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["./src/*"],
+      "*": [
+        "./node_modules/*",
+        "./node_modules/@types/*",
+        "../shared/node_modules/*",
+        "../shared/node_modules/@types/*",
+        "../shared-node/node_modules/*",
+        "../shared-node/node_modules/@types/*"
+      ]
+    }
   },
   "include": ["src"]
 }

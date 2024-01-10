@@ -20,13 +20,11 @@ export function generateEnvFile(overrides: Record<string, string>): void {
     })
   );
   const envConstants = {
-    /* eslint-disable @typescript-eslint/naming-convention */
     REGION: 'RUN_TERRAFORM_APPLY',
     CODE_BUCKET: 'RUN_TERRAFORM_APPLY',
     ...Object.fromEntries(outputsEntries),
     ...overrides,
     NODE_ENV: getEnv(),
-    /* eslint-enable @typescript-eslint/naming-convention */
   };
 
   writeTsFileSync(

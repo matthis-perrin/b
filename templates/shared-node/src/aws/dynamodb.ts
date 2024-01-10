@@ -47,7 +47,6 @@ function readCredentials(): {accessKeyId: string; secretAccessKey: string} | und
         return [key, value];
       })
   );
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const {aws_access_key_id, aws_secret_access_key} = credentials;
   if (aws_access_key_id === undefined || aws_secret_access_key === undefined) {
     return undefined;

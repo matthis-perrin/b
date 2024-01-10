@@ -33,7 +33,6 @@ export function getProjectsFromWorkspaceFragment(
   fragment: WorkspaceFragment,
   allFragments: WorkspaceFragment[]
 ): WorkspaceProject[] {
-  /* eslint-disable @typescript-eslint/naming-convention */
   if (fragment.type === WorkspaceFragmentType.StaticWebsite) {
     return [
       {
@@ -117,7 +116,6 @@ export function getProjectsFromWorkspaceFragment(
       },
     ];
   }
-  /* eslint-enable @typescript-eslint/naming-convention */
   neverHappens(fragment, `Unknown ProjectType ${(fragment as WorkspaceFragment).type}`);
 }
 

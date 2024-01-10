@@ -20,8 +20,8 @@
     },
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll": false,
-      "source.fixAll.eslint": true
+      "source.fixAll": "never",
+      "source.fixAll.eslint": "always"
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "emmet.showExpandedAbbreviation": "never"

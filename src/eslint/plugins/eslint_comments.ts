@@ -1,6 +1,5 @@
 import {EslintMetadata} from '@src/eslint/models';
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintComments: EslintMetadata = {
   plugin: ['eslint-comments'],
   dependencies: {
@@ -37,4 +36,3 @@ export const eslintComments: EslintMetadata = {
     ],
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

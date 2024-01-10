@@ -1,6 +1,5 @@
 import {EslintMetadata} from '@src/eslint/models';
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintReactHooks: EslintMetadata = {
   plugin: ['react-hooks'],
   dependencies: {
@@ -16,4 +15,3 @@ export const eslintReactHooks: EslintMetadata = {
     'react-hooks/rules-of-hooks': 'warn',
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

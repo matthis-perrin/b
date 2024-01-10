@@ -1,6 +1,5 @@
 import {EslintMetadata} from '@src/eslint/models';
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const eslintImport: EslintMetadata = {
   plugin: ['import'],
   dependencies: {
@@ -91,4 +90,3 @@ export const eslintImport: EslintMetadata = {
     'import/no-webpack-loader-syntax': 'warn',
   },
 };
-/* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */

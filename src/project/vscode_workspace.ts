@@ -20,7 +20,6 @@ export function generateCodeWorkspace(
       {path: '.', name: 'root'},
     ],
     settings: {
-      /* eslint-disable @typescript-eslint/naming-convention */
       'window.title': `${workspaceName}\${separator}\${activeEditorShort}`,
       'files.exclude': Object.fromEntries([
         ...projectNames.map(p => [p, true]),
@@ -48,7 +47,6 @@ export function generateCodeWorkspace(
       'files.associations': {
         '*.tf': 'terraform',
       },
-      /* eslint-enable @typescript-eslint/naming-convention, no-null/no-null */
     },
     extensions: {
       recommendations: [

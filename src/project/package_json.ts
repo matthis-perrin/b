@@ -53,7 +53,7 @@ export function generateWorkspacePackageJson(
       // We have to manually specify the version of get-tsconfig because
       // the version 4.7.1 breaks the resolution of aliases when the baseUrl
       // is defined in a tsconfig.json that extends from another.
-      'get-tsconfig': '4.7.0', // eslint-disable-line @typescript-eslint/naming-convention
+      'get-tsconfig': '4.7.0',
     },
   };
 }
