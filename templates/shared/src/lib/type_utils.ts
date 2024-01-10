@@ -274,3 +274,20 @@ export type NestedArray<T> = (T | RecursiveArray<T>)[];
 export type None = Record<string, never>;
 
 export type NonEmptyArray<T> = [T, ...T[]];
+export type AddPrefix<T, P extends string> = {
+  [K in keyof T as K extends string ? `${P}${K}` : never]: T[K];
+};
+export function addPrefix<T extends Record<string, unknown>, Prefix extends string>(
+  attr: T,
+  prefix: Prefix
+): AddPrefix<T, Prefix> {
+  return Object.fromEntries(
+    Object.entries(attr).map(([key, value]) => [`${prefix}${key}`, value])
+  ) as AddPrefix<T, Prefix>;
+}
+
+export type WithNull<T> = {
+  [Key in keyof T]: T[Key] extends Exclude<T[Key], undefined> ? T[Key] : T[Key] | null;
+};
+type Id<T> = T;
+export type Flatten<T> = Id<{[k in keyof T]: T[k]}>;
