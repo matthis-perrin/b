@@ -605,6 +605,9 @@ function generateWorkspacePackageJson(workspaceName, projects) {
     name: workspaceName,
     license: 'UNLICENSED',
     type: 'module',
+    engines: {
+      node: '>=20.10'
+    },
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
@@ -615,13 +618,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
       ignorePatterns: ['**/*.js']
     },
     prettier: '@matthis/prettier-config',
-    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner], ['typescript', _src_versions__WEBPACK_IMPORTED_MODULE_1__.TYPESCRIPT_VERSION]].sort((d1, d2) => d1[0].localeCompare(d2[0]))),
-    resolutions: {
-      // We have to manually specify the version of get-tsconfig because
-      // the version 4.7.1 breaks the resolution of aliases when the baseUrl
-      // is defined in a tsconfig.json that extends from another.
-      'get-tsconfig': '4.7.0'
-    }
+    devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner], ['typescript', _src_versions__WEBPACK_IMPORTED_MODULE_1__.TYPESCRIPT_VERSION]].sort((d1, d2) => d1[0].localeCompare(d2[0])))
   };
 }
 
@@ -638,10 +635,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.7.1',
-  eslint: '1.5.1',
+  project: '1.8.0',
+  eslint: '1.5.2',
   prettier: '1.3.0',
-  tsconfig: '1.5.0',
+  tsconfig: '1.6.0',
   webpack: '1.6.1',
   runner: '1.5.1'
 };
@@ -829,7 +826,7 @@ resource "aws_lambda_function" "${projectName}" {
   s3_bucket         = aws_s3_object.${projectName}_archive.bucket
   s3_key            = aws_s3_object.${projectName}_archive.key
   handler           = "index.handler"
-  runtime           = "nodejs18.x"
+  runtime           = "nodejs20.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
   timeout           = 900 // 15 minutes
   environment {

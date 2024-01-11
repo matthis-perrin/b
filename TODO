@@ -1,8 +1,6 @@
 - Use typeRoots for node_modules instead of specifying all the paths, or ensure typeRoots is empty
 - Add commented out dummy table with table name output when generating a new project
-- Auto upgrade package.json dependencies when regenerating project
 - Use EventBridge instead of Cloudwatch event
-- NodeJS 18 https://github.com/tsconfig/bases
 - Add cloudwatch trigger option for the Lambda function
 - Ensure Lambda API work by itself (not in a web-app)
 - API authentication

@@ -79,7 +79,7 @@ function generateTsConfig(type: TsConfigType): Record<string, unknown> {
     additionalCompilerOptions = {
       module: 'commonjs',
       moduleResolution: 'node',
-      lib: ['es2022'],
+      lib: ['es2023'],
       target: 'es2022',
       //
       types: ['node'],

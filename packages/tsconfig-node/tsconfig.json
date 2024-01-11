@@ -31,7 +31,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "lib": [
-      "es2022"
+      "es2023"
     ],
     "target": "es2022"
   }

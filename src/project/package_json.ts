@@ -18,6 +18,9 @@ export function generateWorkspacePackageJson(
     name: workspaceName,
     license: 'UNLICENSED',
     type: 'module',
+    engines: {
+      node: '>=20.10',
+    },
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',

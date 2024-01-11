@@ -2,9 +2,9 @@ import {EslintMetadata} from '@src/eslint/models';
 import {LIB_VERSIONS} from '@src/versions';
 
 const forbiddenProps = [
-  {propName: 'className', nessage: 'Use styled-components to style your component'},
-  {propName: 'class', nessage: 'Use `className` instead'},
-  {propName: 'id', nessage: 'Use React ref instead'},
+  {propName: 'className', message: 'Use styled-components to style your component'},
+  {propName: 'class', message: 'Use `className` instead'},
+  {propName: 'id', message: 'Use React ref instead'},
 ];
 
 export const eslintReact: EslintMetadata = {

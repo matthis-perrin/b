@@ -26,7 +26,7 @@ resource "aws_lambda_function" "${projectName}" {
   s3_bucket         = aws_s3_object.${projectName}_archive.bucket
   s3_key            = aws_s3_object.${projectName}_archive.key
   handler           = "index.handler"
-  runtime           = "nodejs18.x"
+  runtime           = "nodejs20.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
   timeout           = 900 // 15 minutes
   environment {

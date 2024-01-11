@@ -744,9 +744,9 @@ module.exports = {
       'warn',
       {
         forbid: [
-          {propName: 'className', nessage: 'Use styled-components to style your component'},
-          {propName: 'class', nessage: 'Use `className` instead'},
-          {propName: 'id', nessage: 'Use React ref instead'},
+          {propName: 'className', message: 'Use styled-components to style your component'},
+          {propName: 'class', message: 'Use `className` instead'},
+          {propName: 'id', message: 'Use React ref instead'},
         ],
       },
     ],
@@ -754,9 +754,9 @@ module.exports = {
       'warn',
       {
         forbid: [
-          {propName: 'className', nessage: 'Use styled-components to style your component'},
-          {propName: 'class', nessage: 'Use `className` instead'},
-          {propName: 'id', nessage: 'Use React ref instead'},
+          {propName: 'className', message: 'Use styled-components to style your component'},
+          {propName: 'class', message: 'Use `className` instead'},
+          {propName: 'id', message: 'Use React ref instead'},
         ],
       },
     ],
