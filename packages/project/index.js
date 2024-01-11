@@ -37,12 +37,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   rmDir: () => (/* binding */ rmDir),
 /* harmony export */   stat: () => (/* binding */ stat),
 /* harmony export */   writeJsFile: () => (/* binding */ writeJsFile),
-/* harmony export */   writeJsFileSync: () => (/* binding */ writeJsFileSync),
 /* harmony export */   writeJsonFile: () => (/* binding */ writeJsonFile),
 /* harmony export */   writeRawFile: () => (/* binding */ writeRawFile),
-/* harmony export */   writeRawFileSync: () => (/* binding */ writeRawFileSync),
-/* harmony export */   writeTsFile: () => (/* binding */ writeTsFile),
-/* harmony export */   writeTsFileSync: () => (/* binding */ writeTsFileSync)
+/* harmony export */   writeTsFile: () => (/* binding */ writeTsFile)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
@@ -79,36 +76,23 @@ const prettierConfig = parser => ({
   arrowParens: 'avoid',
   endOfLine: 'auto'
 });
-const prettierFormat = (str, parser) => (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
-async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, prettierFormat(code, parser));
+async function prettierFormat(str, parser) {
+  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
 }
-function writePrettyFileSync(parser, path, code) {
-  writeRawFileSync(path, prettierFormat(code, parser));
+async function writePrettyFile(parser, path, code) {
+  await writeRawFile(path, await prettierFormat(code, parser));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);
 }
-function writeJsFileSync(path, js) {
-  return writePrettyFileSync('babel', path, js);
-}
 async function writeTsFile(path, ts) {
   return writePrettyFile('typescript', path, ts);
-}
-function writeTsFileSync(path, ts) {
-  return writePrettyFileSync('typescript', path, ts);
 }
 async function writeRawFile(path, content) {
   await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
     recursive: true
   });
   await writeFile(path, content);
-}
-function writeRawFileSync(path, content) {
-  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.mkdirSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
-    recursive: true
-  });
-  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(path, content);
 }
 async function rmDir(dirPath) {
   await rm(dirPath, {
@@ -492,10 +476,10 @@ async function generateProject(dst, project) {
       newContent = newContent.replaceAll(varName, varValue);
     }
     if (file.endsWith('.ts') || file.endsWith('.tsx')) {
-      newContent = (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettierFormat)(newContent, 'typescript');
+      newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettierFormat)(newContent, 'typescript');
     }
     if (file.endsWith('.json')) {
-      newContent = (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettierFormat)(newContent, 'json');
+      newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettierFormat)(newContent, 'json');
     }
     if (newContent !== content) {
       await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.writeFile)(file, newContent);
@@ -586,16 +570,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.6.3',
-  eslint: '1.4.1',
-  prettier: '1.2.0',
-  tsconfig: '1.4.0',
-  webpack: '1.5.2',
-  runner: '1.4.1'
+  project: '1.7.1',
+  eslint: '1.5.1',
+  prettier: '1.3.0',
+  tsconfig: '1.5.0',
+  webpack: '1.6.1',
+  runner: '1.5.1'
 };
-const ESLINT_VERSION = '8.43.x';
-const PRETTIER_VERSION = '2.8.x';
-const TYPESCRIPT_VERSION = '5.0.x';
+const ESLINT_VERSION = '8.56.x';
+const PRETTIER_VERSION = '3.1.x';
+const TYPESCRIPT_VERSION = '5.3.x';
 const LIB_VERSIONS = {
   '@types/react': '18.2.x',
   '@types/react-dom': '18.2.x',
@@ -1083,6 +1067,7 @@ function generateCodeWorkspace(workspaceName, workspaceFragments) {
         'source.fixAll.eslint': true
       },
       'editor.defaultFormatter': 'esbenp.prettier-vscode',
+      'editor.linkedEditing': true,
       'emmet.showExpandedAbbreviation': 'never',
       'files.associations': {
         '*.tf': 'terraform'
@@ -1224,13 +1209,15 @@ async function initProject() {
       type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.SharedNode
     });
     // Ask for workspace name
-    const promptResponse = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({
+    const {
+      workspaceName: newWorkspaceName
+    } = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({
       type: 'text',
       name: 'workspaceName',
       message: 'Workspace name',
       validate: v => v.length > 0
     });
-    workspaceName = promptResponse.workspaceName;
+    workspaceName = newWorkspaceName;
     if (typeof workspaceName !== 'string') {
       return cancel();
     }

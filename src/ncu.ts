@@ -27,9 +27,10 @@ export async function check(): Promise<void> {
   const packageJsonFiles = await Promise.all(
     packageDirs.map(async d => readFile(join(packagePath, d, 'package.json')))
   );
-  const dependencies = packageJsonFiles.map(
-    f => (JSON.parse(f.toString()).dependencies ?? {}) as Record<string, string>
-  );
+  const dependencies = packageJsonFiles.flatMap(f => [
+    (JSON.parse(f.toString()).dependencies ?? {}) as Record<string, string>,
+    (JSON.parse(f.toString()).devDependencies ?? {}) as Record<string, string>,
+  ]);
   const flatDependencies: Record<string, [string, number]> = {};
   const errors: string[] = [];
   for (const [index, deps] of Object.entries(dependencies)) {

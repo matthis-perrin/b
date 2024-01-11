@@ -3,8 +3,8 @@ import {EslintMetadata} from '@src/eslint/models';
 export const eslintImport: EslintMetadata = {
   plugin: ['import'],
   dependencies: {
-    'eslint-plugin-import': '2.27.x',
-    'eslint-import-resolver-typescript': '3.5.x',
+    'eslint-plugin-import': '2.29.x',
+    'eslint-import-resolver-typescript': '3.6.x',
   },
   settings: {
     'import/parsers': {

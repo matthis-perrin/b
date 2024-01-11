@@ -5,7 +5,7 @@ import {projectPackage} from '@src/project/index';
 import {generateTemplatesRootPackageJson, updateTemplatesLibVersions} from '@src/templates';
 import {tsconfigPackages} from '@src/tsconfig/index';
 import {webpackPackages} from '@src/webpack/index';
-import {webpackRunnerPackage} from '@src/webpack-runner';
+import {webpackRunnerPackage} from '@src/webpack-runner/index';
 
 const eslintRuntimes = Object.values(EslintType);
 const tsConfigRuntimes = Object.values(TsConfigType);

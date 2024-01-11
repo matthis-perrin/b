@@ -10,7 +10,7 @@ const forbiddenProps = [
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
-    'eslint-plugin-react': '7.32.x',
+    'eslint-plugin-react': '7.33.x',
   },
   settings: {
     react: {

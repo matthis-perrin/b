@@ -43,6 +43,7 @@ export function generateCodeWorkspace(
         'source.fixAll.eslint': true,
       },
       'editor.defaultFormatter': 'esbenp.prettier-vscode',
+      'editor.linkedEditing': true,
       'emmet.showExpandedAbbreviation': 'never',
       'files.associations': {
         '*.tf': 'terraform',

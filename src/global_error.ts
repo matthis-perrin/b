@@ -7,8 +7,8 @@ export function globalError(...val: unknown[]): void {
         typeof data === 'string'
           ? data
           : data instanceof Error
-          ? data.stack ?? String(data)
-          : JSON.stringify(data);
+            ? data.stack ?? String(data)
+            : JSON.stringify(data);
       console.error(str);
       appendFileSync('error.log', str);
     } catch {

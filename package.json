@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "ncu": "node --loader ts-node/esm src/ncu.ts",
+    "ncu-local": "npx npm-check-updates",
     "build": "NODE_ENV=development webpack build",
     "watch": "NODE_ENV=development webpack watch",
     "project": "yarn build && yarn start && cd packages/project/ && yarn install && cd ../../ && node packages/project/index.js",
@@ -29,36 +30,35 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "7.22.x",
-    "@babel/preset-env": "7.22.x",
-    "@babel/preset-react": "7.22.x",
-    "@babel/preset-typescript": "7.22.x",
+    "@babel/core": "7.23.x",
+    "@babel/preset-env": "7.23.x",
+    "@babel/preset-react": "7.23.x",
+    "@babel/preset-typescript": "7.23.x",
     "@matthis/eslint-config-node": "latest",
     "@matthis/prettier-config": "latest",
     "@matthis/tsconfig-node": "latest",
     "@matthis/webpack-node": "latest",
-    "@types/node": "18.7.x",
-    "@types/prettier": "2.7.x",
+    "@types/node": "20.11.x",
     "@types/prompts": "2.0.x",
     "@types/semver": "7.3.x",
     "ansi-colors": "4.1.x",
     "babel-loader": "9.1.x",
     "babel-plugin-react-remove-properties": "0.3.x",
     "chokidar": "3.5.x",
-    "fork-ts-checker-webpack-plugin": "8.0.x",
-    "html-webpack-plugin": "5.5.x",
+    "fork-ts-checker-webpack-plugin": "9.0.x",
+    "html-webpack-plugin": "5.6.x",
     "package-json": "8.1.x",
     "semver": "7.3.x",
     "source-map-loader": "4.0.x",
     "terser-webpack-plugin": "5.3.x",
     "ts-node": "10.9.x",
-    "webpack": "5.87.x",
+    "webpack": "5.89.x",
     "webpack-cli": "4.10.x",
     "webpack-dev-server": "4.15.x"
   },
   "dependencies": {
     "prompts": "2.4.x",
-    "typescript": "5.0.x"
+    "typescript": "5.3.x"
   },
   "version": "0.0.0"
 }

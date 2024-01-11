@@ -116,6 +116,7 @@ class EslintPlugin extends StandalonePlugin {
       });
       compiler.hooks.afterCompile.tapAsync(this.name, (compilation, cb) => {
         setTimeout(() => {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.awaitIdle().finally(cb);
         }, RUN_ESLINT_INTERVAL);
       });

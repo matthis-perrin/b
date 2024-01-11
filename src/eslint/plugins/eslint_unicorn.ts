@@ -3,7 +3,7 @@ import {EslintMetadata} from '@src/eslint/models';
 export const eslintUnicorn: EslintMetadata = {
   plugin: ['unicorn'],
   dependencies: {
-    'eslint-plugin-unicorn': '48.0.x',
+    'eslint-plugin-unicorn': '50.0.x',
   },
   settings: {},
   allOff: {
@@ -49,6 +49,7 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/no-this-assignment': 'off',
     'unicorn/no-typeof-undefined': 'off',
     'unicorn/no-unnecessary-await': 'off',
+    'unicorn/no-unnecessary-polyfills': 'off',
     'unicorn/no-unreadable-array-destructuring': 'off',
     'unicorn/no-unreadable-iife': 'off',
     'unicorn/no-unused-properties': 'off',

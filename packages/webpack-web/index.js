@@ -276,12 +276,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   rmDir: () => (/* binding */ rmDir),
 /* harmony export */   stat: () => (/* binding */ stat),
 /* harmony export */   writeJsFile: () => (/* binding */ writeJsFile),
-/* harmony export */   writeJsFileSync: () => (/* binding */ writeJsFileSync),
 /* harmony export */   writeJsonFile: () => (/* binding */ writeJsonFile),
 /* harmony export */   writeRawFile: () => (/* binding */ writeRawFile),
-/* harmony export */   writeRawFileSync: () => (/* binding */ writeRawFileSync),
-/* harmony export */   writeTsFile: () => (/* binding */ writeTsFile),
-/* harmony export */   writeTsFileSync: () => (/* binding */ writeTsFileSync)
+/* harmony export */   writeTsFile: () => (/* binding */ writeTsFile)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
@@ -318,36 +315,23 @@ const prettierConfig = parser => ({
   arrowParens: 'avoid',
   endOfLine: 'auto'
 });
-const prettierFormat = (str, parser) => (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
-async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, prettierFormat(code, parser));
+async function prettierFormat(str, parser) {
+  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
 }
-function writePrettyFileSync(parser, path, code) {
-  writeRawFileSync(path, prettierFormat(code, parser));
+async function writePrettyFile(parser, path, code) {
+  await writeRawFile(path, await prettierFormat(code, parser));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);
 }
-function writeJsFileSync(path, js) {
-  return writePrettyFileSync('babel', path, js);
-}
 async function writeTsFile(path, ts) {
   return writePrettyFile('typescript', path, ts);
-}
-function writeTsFileSync(path, ts) {
-  return writePrettyFileSync('typescript', path, ts);
 }
 async function writeRawFile(path, content) {
   await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
     recursive: true
   });
   await writeFile(path, content);
-}
-function writeRawFileSync(path, content) {
-  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.mkdirSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
-    recursive: true
-  });
-  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(path, content);
 }
 async function rmDir(dirPath) {
   await rm(dirPath, {
@@ -511,6 +495,7 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
       });
       compiler.hooks.afterCompile.tapAsync(this.name, (compilation, cb) => {
         setTimeout(() => {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.awaitIdle().finally(cb);
         }, RUN_ESLINT_INTERVAL);
       });

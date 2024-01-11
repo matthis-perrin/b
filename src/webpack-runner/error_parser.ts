@@ -94,8 +94,7 @@ export function parseError(
     if (!match) {
       return {severity, message: err.message};
     }
-    const absolutePath = match[2];
-    const message = match[1];
+    const [_, message, absolutePath] = match;
     if (absolutePath === undefined || message === undefined) {
       return {severity, message: err.message};
     }

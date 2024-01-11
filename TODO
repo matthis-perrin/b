@@ -1,3 +1,4 @@
+- Use typeRoots for node_modules instead of specifying all the paths, or ensure typeRoots is empty
 - Add commented out dummy table with table name output when generating a new project
 - Auto upgrade package.json dependencies when regenerating project
 - Use EventBridge instead of Cloudwatch event

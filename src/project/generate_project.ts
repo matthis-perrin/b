@@ -30,10 +30,10 @@ export async function generateProject(dst: string, project: WorkspaceProject): P
         newContent = newContent.replaceAll(varName, varValue);
       }
       if (file.endsWith('.ts') || file.endsWith('.tsx')) {
-        newContent = prettierFormat(newContent, 'typescript');
+        newContent = await prettierFormat(newContent, 'typescript');
       }
       if (file.endsWith('.json')) {
-        newContent = prettierFormat(newContent, 'json');
+        newContent = await prettierFormat(newContent, 'json');
       }
       if (newContent !== content) {
         await writeFile(file, newContent);

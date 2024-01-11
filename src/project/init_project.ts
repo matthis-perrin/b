@@ -40,13 +40,13 @@ async function initProject(): Promise<void> {
   } else {
     frags.push({type: WorkspaceFragmentType.Shared}, {type: WorkspaceFragmentType.SharedNode});
     // Ask for workspace name
-    const promptResponse = await prompt({
+    const {workspaceName: newWorkspaceName} = await prompt({
       type: 'text',
       name: 'workspaceName',
       message: 'Workspace name',
       validate: (v: string) => v.length > 0,
     });
-    workspaceName = promptResponse.workspaceName;
+    workspaceName = newWorkspaceName;
 
     if (typeof workspaceName !== 'string') {
       return cancel();

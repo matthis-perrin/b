@@ -1,15 +1,15 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.6.3',
-  eslint: '1.4.1',
-  prettier: '1.2.0',
-  tsconfig: '1.4.0',
-  webpack: '1.5.2',
-  runner: '1.4.1',
+  project: '1.7.1',
+  eslint: '1.5.1',
+  prettier: '1.3.0',
+  tsconfig: '1.5.0',
+  webpack: '1.6.1',
+  runner: '1.5.1',
 };
 
-export const ESLINT_VERSION = '8.43.x';
-export const PRETTIER_VERSION = '2.8.x';
-export const TYPESCRIPT_VERSION = '5.0.x';
+export const ESLINT_VERSION = '8.56.x';
+export const PRETTIER_VERSION = '3.1.x';
+export const TYPESCRIPT_VERSION = '5.3.x';
 
 export const LIB_VERSIONS = {
   '@types/react': '18.2.x',

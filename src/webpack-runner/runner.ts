@@ -66,7 +66,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     getProjectsFromWorkspaceFragment(f, workspaceFragments)
   );
 
-  function regenerateEnvFile(): void {
+  async function regenerateEnvFile(): Promise<void> {
     const overrides: Record<string, string> = {};
     if (getEnv() === 'development') {
       for (const {projectName, type} of projects) {
@@ -84,9 +84,9 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
         }
       }
     }
-    generateEnvFile(overrides);
+    await generateEnvFile(overrides);
   }
-  regenerateEnvFile();
+  await regenerateEnvFile();
 
   function handleStart(project: WorkspaceProject): void {
     const {projectName} = project;
@@ -244,6 +244,8 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
                 updateLambdaServerEvents(curr => {
                   curr.startEvent = log;
                 });
+                // Send and forget
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 regenerateEnvFile();
               } else {
                 updateLambdaServerEvents(curr => {

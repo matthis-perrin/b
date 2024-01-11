@@ -1,19 +1,19 @@
 {
   "name": "@matthis/eslint-config-lib",
-  "version": "1.4.1",
+  "version": "1.5.1",
   "license": "UNLICENSED",
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "5.60.x",
-    "@typescript-eslint/parser": "5.60.x",
-    "eslint": "8.43.x",
-    "eslint-import-resolver-typescript": "3.5.x",
+    "@typescript-eslint/eslint-plugin": "6.18.x",
+    "@typescript-eslint/parser": "6.18.x",
+    "eslint": "8.56.x",
+    "eslint-import-resolver-typescript": "3.6.x",
     "eslint-plugin-eslint-comments": "3.2.x",
-    "eslint-plugin-import": "2.27.x",
+    "eslint-plugin-import": "2.29.x",
     "eslint-plugin-no-null": "1.0.x",
-    "eslint-plugin-prettier": "4.2.x",
+    "eslint-plugin-prettier": "5.1.x",
     "eslint-plugin-simple-import-sort": "10.0.x",
-    "eslint-plugin-unicorn": "48.0.x",
-    "prettier": "2.8.x",
-    "typescript": "5.0.x"
+    "eslint-plugin-unicorn": "50.0.x",
+    "prettier": "3.1.x",
+    "typescript": "5.3.x"
   }
 }
