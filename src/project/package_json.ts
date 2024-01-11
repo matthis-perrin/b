@@ -49,11 +49,5 @@ export function generateWorkspacePackageJson(
         ] as [string, string][]
       ).sort((d1, d2) => d1[0].localeCompare(d2[0]))
     ),
-    resolutions: {
-      // We have to manually specify the version of get-tsconfig because
-      // the version 4.7.1 breaks the resolution of aliases when the baseUrl
-      // is defined in a tsconfig.json that extends from another.
-      'get-tsconfig': '4.7.0',
-    },
   };
 }
