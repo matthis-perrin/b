@@ -1,5 +1,5 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.8.0',
+  project: '1.8.1',
   eslint: '1.5.2',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
@@ -17,7 +17,7 @@ export const LIB_VERSIONS = {
   react: '18.2.x',
   'react-dom': '18.2.x',
 
-  'styled-components': '6.0.x',
+  'styled-components': '6.1.x',
 
   'react-router': '6.4.x',
   'react-router-dom': '6.4.x',

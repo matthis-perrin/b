@@ -11,7 +11,7 @@ import {
 import {REGION} from '@shared/env';
 
 import {readCredentials} from '@shared-node/aws/credentials';
-import {compress as gzipCompress, decompress as gzipDecompress} from '@shared-node/gzip';
+import {compress as gzipCompress, decompress as gzipDecompress} from '@shared-node/lib/gzip';
 
 const client = new S3Client({region: REGION, credentials: readCredentials()});
 
