@@ -314,6 +314,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   writeJsFile: () => (/* binding */ writeJsFile),
 /* harmony export */   writeJsonFile: () => (/* binding */ writeJsonFile),
 /* harmony export */   writeRawFile: () => (/* binding */ writeRawFile),
+/* harmony export */   writeRawFileIfNotExists: () => (/* binding */ writeRawFileIfNotExists),
 /* harmony export */   writeTsFile: () => (/* binding */ writeTsFile)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
@@ -368,6 +369,12 @@ async function writeRawFile(path, content) {
     recursive: true
   });
   await writeFile(path, content);
+}
+async function writeRawFileIfNotExists(path, content) {
+  if (await exists(path)) {
+    return;
+  }
+  await writeRawFile(path, content);
 }
 async function rmDir(dirPath) {
   await rm(dirPath, {

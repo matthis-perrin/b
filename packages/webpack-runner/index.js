@@ -296,7 +296,7 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
     const projectName = 'shared';
     const otherVars = {};
     for (const f of allFragments) {
-      if (f.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.WebApp) {
+      if ('lambdaName' in f) {
         otherVars['__BACKEND_NAME__'] = f.lambdaName;
         otherVars['__BACKEND_NAME_UPPERCASE__'] = f.lambdaName.toUpperCase();
       }
@@ -336,16 +336,13 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
 
   // Terraform folder generation
   const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'terraform');
-  const userTable = false;
-  await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, '.aws-credentials'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateDummyTerraformCredentials)()), userTable ? (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'dynamo.tf'), (0,_src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_10__.generateDynamoTerraform)(workspaceName, {
-    tableName: 'user'
-  })) : Promise.resolve(), (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
+  await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFileIfNotExists)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, '.aws-credentials'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateDummyTerraformCredentials)()), (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFileIfNotExists)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'dynamo_table_dummy.tf'), (0,_src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_10__.generateDynamoTerraform)()), (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFileIfNotExists)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
     const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateWorkspaceProjectTerraform)(workspaceName, p);
     if (content === undefined) {
       return;
     }
     const name = `${p.projectName}_terraform`;
-    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, `${name}.tf`), content);
+    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFileIfNotExists)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, `${name}.tf`), content);
   })]);
 
   // Run setup.js
@@ -398,6 +395,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   writeJsFile: () => (/* binding */ writeJsFile),
 /* harmony export */   writeJsonFile: () => (/* binding */ writeJsonFile),
 /* harmony export */   writeRawFile: () => (/* binding */ writeRawFile),
+/* harmony export */   writeRawFileIfNotExists: () => (/* binding */ writeRawFileIfNotExists),
 /* harmony export */   writeTsFile: () => (/* binding */ writeTsFile)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
@@ -452,6 +450,12 @@ async function writeRawFile(path, content) {
     recursive: true
   });
   await writeFile(path, content);
+}
+async function writeRawFileIfNotExists(path, content) {
+  if (await exists(path)) {
+    return;
+  }
+  await writeRawFile(path, content);
 }
 async function rmDir(dirPath) {
   await rm(dirPath, {
@@ -652,12 +656,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.3',
+  project: '1.8.5',
   eslint: '1.5.2',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
   webpack: '1.6.1',
-  runner: '1.5.3'
+  runner: '1.5.5'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.1.x';
@@ -732,7 +736,7 @@ function generateDummyTerraformCredentials() {
 aws_access_key_id=
 aws_secret_access_key=
 aws_session_token=
-`;
+`.trim();
 }
 
 /***/ }),
@@ -1045,36 +1049,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateDynamoTerraform: () => (/* binding */ generateDynamoTerraform)
 /* harmony export */ });
-function toPascal(str) {
-  return str.toLowerCase().split(/[^a-z0-9]/u).map(str => {
-    var _str$;
-    return (((_str$ = str[0]) === null || _str$ === void 0 ? void 0 : _str$.toUpperCase()) ?? '') + str.slice(1);
-  }).join('');
+function generateDynamoTerraform() {
+  return `output "dummy_table_name" {
+  value       = aws_dynamodb_table.dummy_table.name
 }
-function toSnake(str) {
-  return str.toLowerCase().split(/[^a-z0-9]/u).join('_');
-}
-function generateDynamoTerraform(workspaceName, opts) {
-  const {
-    tableName
-  } = opts;
-  const namePascal = toPascal(workspaceName) + toPascal(tableName);
-  const nameSnake = toSnake(workspaceName) + toSnake(tableName);
-  const tableUpper = toSnake(tableName).toUpperCase();
-  return `
-//
-// ${toPascal(tableName)} table
-//
 
-locals {
-    ${tableUpper}_TABLE_NAME = "${namePascal}"
-    ${tableUpper}_BY_EMAIL_INDEX_NAME = "${namePascal}_ByEmail_SortedByCreatedAt"
+output "dummy_index_name" {
+  value = {
+    for obj in aws_dynamodb_table.dummy_table.global_secondary_index : "\${aws_dynamodb_table.dummy_table.name }_By_\${obj.hash_key}\${ length(obj.range_key) > 0 ? '_Sorted_By_\${obj.range_key}' : '' }" => obj.name
+  }
 }
-output "${tableUpper}_TABLE_NAME" { value = local.${tableUpper}_TABLE_NAME }
-output "${tableUpper}_BY_EMAIL_INDEX_NAME" { value = local.${tableUpper}_BY_EMAIL_INDEX_NAME }
 
-resource "aws_dynamodb_table" "${nameSnake}_table" {
-  name           = local.${tableUpper}_TABLE_NAME
+resource "aws_dynamodb_table" "dummy_table" {
+  name           = "Dummy"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "id"
 
@@ -1084,23 +1071,28 @@ resource "aws_dynamodb_table" "${nameSnake}_table" {
   }
 
   attribute {
-    name = "email"
+    name = "group"
     type = "S"
   }
 
   attribute {
-    name = "createdAt"
+    name = "ts"
     type = "N"
   }
 
   global_secondary_index {
-    name               = local.${tableUpper}_BY_EMAIL_INDEX_NAME
-    hash_key           = "email"
-    range_key          = "createdAt"
+    name               = "Dummy_ByGroup_SortedByTs"
+    hash_key           = "group"
+    range_key          = "ts"
     projection_type    = "ALL"
   }
-}
-    `.trim();
+
+  global_secondary_index {
+    name               = "Dummy_ByTs"
+    hash_key           = "ts"
+    projection_type    = "ALL"
+  }
+}`.trim().split('\n').map(l => `# ${l}`).join('\n');
 }
 
 /***/ }),
@@ -1300,10 +1292,17 @@ async function generateEnvFile(overrides) {
     cwd: terraformPath
   }).toString());
   const outputsEntries = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.removeUndefined)(Object.entries(res).map(([key, value]) => {
-    if (value.sensitive || value.type !== 'string' || typeof value.value !== 'string') {
+    if (value.sensitive) {
       return undefined;
     }
-    return [key.toUpperCase(), value.value];
+    if (Array.isArray(value.type) && value.type[0] === 'object' && typeof value.value === 'object' && value.value !== null // eslint-disable-line no-null/no-null
+    ) {
+      return [key.toUpperCase(), Object.fromEntries(Object.entries(value.value).map(([k, v]) => [k.toUpperCase(), v]))];
+    }
+    if (value.type === 'string' && typeof value.value === 'string') {
+      return [key.toUpperCase(), value.value];
+    }
+    return undefined;
   }));
   const envConstants = {
     REGION: 'RUN_TERRAFORM_APPLY',
@@ -1312,7 +1311,7 @@ async function generateEnvFile(overrides) {
     ...overrides,
     NODE_ENV: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__.getEnv)()
   };
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.ts'), Object.entries(envConstants).map(([key, value]) => `export const ${key} = ${JSON.stringify(value)} as string;`).join('\n'));
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeTsFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(process.cwd(), 'shared', 'src', 'env.ts'), Object.entries(envConstants).map(([key, value]) => `export const ${key} = ${JSON.stringify(value)}${typeof value === 'string' ? ' as string' : ''};`).join('\n'));
 }
 
 /***/ }),

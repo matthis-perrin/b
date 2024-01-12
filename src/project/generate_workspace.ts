@@ -3,7 +3,7 @@ import {cp} from 'node:fs/promises';
 import {join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {writeJsonFile, writeRawFile} from '@src/fs';
+import {writeJsonFile, writeRawFile, writeRawFileIfNotExists} from '@src/fs';
 import {
   ProjectName,
   ProjectType,
@@ -112,7 +112,7 @@ export function getProjectsFromWorkspaceFragment(
     const projectName = 'shared' as ProjectName;
     const otherVars: Record<string, string> = {};
     for (const f of allFragments) {
-      if (f.type === WorkspaceFragmentType.WebApp) {
+      if ('lambdaName' in f) {
         otherVars['__BACKEND_NAME__'] = f.lambdaName;
         otherVars['__BACKEND_NAME_UPPERCASE__'] = f.lambdaName.toUpperCase();
       }
@@ -173,23 +173,26 @@ export async function generateWorkspace(
 
   // Terraform folder generation
   const terraformPath = join(dst, 'terraform');
-  const userTable = false as boolean;
   await Promise.all([
-    writeRawFile(join(terraformPath, '.aws-credentials'), generateDummyTerraformCredentials()),
-    userTable
-      ? writeRawFile(
-          join(terraformPath, 'dynamo.tf'),
-          generateDynamoTerraform(workspaceName, {tableName: 'user'})
-        )
-      : Promise.resolve(),
-    writeRawFile(join(terraformPath, 'base.tf'), generateCommonTerraform(workspaceName, projects)),
+    writeRawFileIfNotExists(
+      join(terraformPath, '.aws-credentials'),
+      generateDummyTerraformCredentials()
+    ),
+    writeRawFileIfNotExists(
+      join(terraformPath, 'dynamo_table_dummy.tf'),
+      generateDynamoTerraform()
+    ),
+    writeRawFileIfNotExists(
+      join(terraformPath, 'base.tf'),
+      generateCommonTerraform(workspaceName, projects)
+    ),
     ...projects.map(async p => {
       const content = generateWorkspaceProjectTerraform(workspaceName, p);
       if (content === undefined) {
         return;
       }
       const name = `${p.projectName}_terraform`;
-      await writeRawFile(join(terraformPath, `${name}.tf`), content);
+      await writeRawFileIfNotExists(join(terraformPath, `${name}.tf`), content);
     }),
   ]);
 

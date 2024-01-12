@@ -1,4 +1,3 @@
-- Add commented out dummy table with table name output when generating a new project
 - Use EventBridge instead of Cloudwatch event
 - Add cloudwatch trigger option for the Lambda function
 - API authentication
@@ -8,7 +7,7 @@
 - Add instructions/commands after creating workspace (ie: code project/app.code-workspace, yarn deploy, etc)
 - Different template for different lambda trigger (API gateway proxy vs Cloudwatch trigger vs SQS trigger)
 - Centralize build lib and code
-- allow multiple yarn watch of lamda projects in parallele (conflict with port)
+- allow multiple yarn watch of lambda projects in parallele (conflict with port)
 - Add lambda alerts, better logging, dead letter queue, etc
 - Warn when overriding files (show changes?) when add project to workspace
 - Proxy lambda response headers in webpack lambda plugin

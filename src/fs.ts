@@ -47,6 +47,13 @@ export async function writeRawFile(path: string, content: string): Promise<void>
   await writeFile(path, content);
 }
 
+export async function writeRawFileIfNotExists(path: string, content: string): Promise<void> {
+  if (await exists(path)) {
+    return;
+  }
+  await writeRawFile(path, content);
+}
+
 export async function rmDir(dirPath: string): Promise<void> {
   await rm(dirPath, {recursive: true, force: true});
 }
