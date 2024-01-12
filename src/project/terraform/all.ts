@@ -30,6 +30,8 @@ export function generateWorkspaceProjectTerraform(
     return generateLambdaTerraform(workspaceName, projectName, {api: false});
   } else if (type === ProjectType.LambdaApi) {
     return generateLambdaTerraform(workspaceName, projectName, {api: true});
+  } else if (type === ProjectType.LambdaWebApi) {
+    return generateLambdaTerraform(workspaceName, projectName, {api: true});
   } else if (type === ProjectType.NodeScript) {
     return undefined;
   } else if (type === ProjectType.SharedNode) {

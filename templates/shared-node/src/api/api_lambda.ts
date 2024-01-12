@@ -37,14 +37,11 @@ export function lambdaEventToApiRequest(event: LambdaEvent): ApiRequest {
 
 export function apiResponseToLambdaResonse(opts: {
   req: ApiRequest;
-  frontendDomain: string;
+  frontendDomain?: string;
 }): (res: ApiResponse) => LambdaResponse {
   const {req, frontendDomain} = opts;
   const origin = getHeader(req.headers, 'origin') ?? '';
   return apiResponse => {
-    const httpProtocol = `http${NODE_ENV === 'development' ? '' : 's'}://`;
-    const frontendUrl = `${httpProtocol}${frontendDomain}`;
-    const allowedOrigin = new Set([frontendUrl]);
     const {body: rawBody, opts} = apiResponse;
 
     let body = rawBody;
@@ -60,12 +57,21 @@ export function apiResponseToLambdaResonse(opts: {
       contentType = 'application/json',
       extraHeaders = {},
     } = opts ?? {};
-    const corsHeaders = allowedOrigin.has(origin)
-      ? {
-          'Access-Control-Allow-Origin': allowedOrigin.has(origin) ? origin : undefined,
-          'Access-Control-Allow-Headers': 'content-type',
-        }
-      : {};
+
+    // Add cors headers to restrict to the frontend domain if there is one
+    let corsHeaders: Record<string, string | undefined> = {};
+    if (frontendDomain !== undefined) {
+      const httpProtocol = `http${NODE_ENV === 'development' ? '' : 's'}://`;
+      const frontendUrl = `${httpProtocol}${frontendDomain}`;
+      const allowedOrigin = new Set([frontendUrl]);
+      corsHeaders = allowedOrigin.has(origin)
+        ? {
+            'Access-Control-Allow-Origin': allowedOrigin.has(origin) ? origin : undefined,
+            'Access-Control-Allow-Headers': 'content-type',
+          }
+        : {};
+    }
+
     return {
       statusCode,
       headers: {

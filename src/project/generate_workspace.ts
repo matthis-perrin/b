@@ -53,6 +53,18 @@ export function getProjectsFromWorkspaceFragment(
         },
       },
     ];
+  } else if (fragment.type === WorkspaceFragmentType.ApiLambda) {
+    return [
+      {
+        projectName: fragment.lambdaName,
+        type: ProjectType.LambdaApi,
+        vars: {
+          __PROJECT_NAME__: fragment.lambdaName,
+          __BACKEND_NAME__: fragment.lambdaName,
+          __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
+        },
+      },
+    ];
   } else if (fragment.type === WorkspaceFragmentType.WebApp) {
     return [
       {
@@ -66,7 +78,7 @@ export function getProjectsFromWorkspaceFragment(
       },
       {
         projectName: fragment.lambdaName,
-        type: ProjectType.LambdaApi,
+        type: ProjectType.LambdaWebApi,
         vars: {
           __PROJECT_NAME__: fragment.lambdaName,
           __FRONTEND_NAME__: fragment.websiteName,

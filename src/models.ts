@@ -11,6 +11,7 @@ export enum ProjectType {
   Web = 'web',
   LambdaFunction = 'lambda_function',
   LambdaApi = 'lambda_api',
+  LambdaWebApi = 'lambda_web_api',
   NodeScript = 'node_script',
   Shared = 'shared',
   SharedNode = 'shared-node',
@@ -56,6 +57,11 @@ export const PROJECT_TYPE_TO_METADATA = {
     tsconfig: TsConfigType.Node,
     webpack: WebpackType.Lambda,
   },
+  [ProjectType.LambdaWebApi]: {
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.Lambda,
+  },
   [ProjectType.NodeScript]: {
     eslint: EslintType.Node,
     tsconfig: TsConfigType.Node,
@@ -80,6 +86,7 @@ export const PROJECT_TYPE_TO_METADATA = {
 export enum WorkspaceFragmentType {
   StaticWebsite = 'static-website',
   StandaloneLambda = 'standalone-lambda',
+  ApiLambda = 'api-lambda',
   WebApp = 'web-app',
   NodeScript = 'node-script',
   Shared = 'shared',
@@ -97,6 +104,10 @@ export interface WorkspaceFragmentRegistry {
   };
   [WorkspaceFragmentType.StandaloneLambda]: {
     type: WorkspaceFragmentType.StandaloneLambda;
+    lambdaName: ProjectName;
+  };
+  [WorkspaceFragmentType.ApiLambda]: {
+    type: WorkspaceFragmentType.ApiLambda;
     lambdaName: ProjectName;
   };
   [WorkspaceFragmentType.WebApp]: {

@@ -91,6 +91,7 @@ const WorkspaceFragmentTypeToString: Record<SelectableWorkspaceFragmentType, str
   [WorkspaceFragmentType.WebApp]: 'Web App',
   [WorkspaceFragmentType.StaticWebsite]: 'Static Website',
   [WorkspaceFragmentType.StandaloneLambda]: 'Standalone Lambda',
+  [WorkspaceFragmentType.ApiLambda]: 'API Lambda',
   [WorkspaceFragmentType.NodeScript]: 'Node Script',
 };
 
@@ -116,6 +117,9 @@ async function askForWorkspaceFragment(
     const websiteName = await askForProjectName('Website project name', 'website', takenNames);
     return {type, websiteName};
   } else if (type === WorkspaceFragmentType.StandaloneLambda) {
+    const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
+    return {type, lambdaName};
+  } else if (type === WorkspaceFragmentType.ApiLambda) {
     const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
     return {type, lambdaName};
   } else if (type === WorkspaceFragmentType.WebApp) {

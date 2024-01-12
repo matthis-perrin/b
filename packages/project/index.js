@@ -189,6 +189,7 @@ let ProjectType = /*#__PURE__*/function (ProjectType) {
   ProjectType["Web"] = "web";
   ProjectType["LambdaFunction"] = "lambda_function";
   ProjectType["LambdaApi"] = "lambda_api";
+  ProjectType["LambdaWebApi"] = "lambda_web_api";
   ProjectType["NodeScript"] = "node_script";
   ProjectType["Shared"] = "shared";
   ProjectType["SharedNode"] = "shared-node";
@@ -229,6 +230,11 @@ const PROJECT_TYPE_TO_METADATA = {
     tsconfig: TsConfigType.Node,
     webpack: WebpackType.Lambda
   },
+  [ProjectType.LambdaWebApi]: {
+    eslint: EslintType.Node,
+    tsconfig: TsConfigType.Node,
+    webpack: WebpackType.Lambda
+  },
   [ProjectType.NodeScript]: {
     eslint: EslintType.Node,
     tsconfig: TsConfigType.Node,
@@ -253,6 +259,7 @@ const PROJECT_TYPE_TO_METADATA = {
 let WorkspaceFragmentType = /*#__PURE__*/function (WorkspaceFragmentType) {
   WorkspaceFragmentType["StaticWebsite"] = "static-website";
   WorkspaceFragmentType["StandaloneLambda"] = "standalone-lambda";
+  WorkspaceFragmentType["ApiLambda"] = "api-lambda";
   WorkspaceFragmentType["WebApp"] = "web-app";
   WorkspaceFragmentType["NodeScript"] = "node-script";
   WorkspaceFragmentType["Shared"] = "shared";
@@ -320,6 +327,16 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
         __PROJECT_NAME__: fragment.lambdaName
       }
     }];
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.ApiLambda) {
+    return [{
+      projectName: fragment.lambdaName,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaApi,
+      vars: {
+        __PROJECT_NAME__: fragment.lambdaName,
+        __BACKEND_NAME__: fragment.lambdaName,
+        __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase()
+      }
+    }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.WebApp) {
     return [{
       projectName: fragment.websiteName,
@@ -331,7 +348,7 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
       }
     }, {
       projectName: fragment.lambdaName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaApi,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.LambdaWebApi,
       vars: {
         __PROJECT_NAME__: fragment.lambdaName,
         __FRONTEND_NAME__: fragment.websiteName,
@@ -567,12 +584,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.1',
+  project: '1.8.3',
   eslint: '1.5.2',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
   webpack: '1.6.1',
-  runner: '1.5.1'
+  runner: '1.5.3'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.1.x';
@@ -624,6 +641,10 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
       api: false
     });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaApi) {
+    return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
+      api: true
+    });
+  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaWebApi) {
     return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
       api: true
     });
@@ -1248,6 +1269,7 @@ const WorkspaceFragmentTypeToString = {
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.WebApp]: 'Web App',
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StaticWebsite]: 'Static Website',
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StandaloneLambda]: 'Standalone Lambda',
+  [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.ApiLambda]: 'API Lambda',
   [_src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.NodeScript]: 'Node Script'
 };
 async function askForWorkspaceFragment(takenNames) {
@@ -1277,6 +1299,12 @@ async function askForWorkspaceFragment(takenNames) {
       websiteName
     };
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.StandaloneLambda) {
+    const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
+    return {
+      type,
+      lambdaName
+    };
+  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.ApiLambda) {
     const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
     return {
       type,

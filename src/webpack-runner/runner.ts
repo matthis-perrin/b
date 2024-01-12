@@ -70,7 +70,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     const overrides: Record<string, string> = {};
     if (getEnv() === 'development') {
       for (const {projectName, type} of projects) {
-        if (type === ProjectType.LambdaApi) {
+        if (type === ProjectType.LambdaApi || type === ProjectType.LambdaWebApi) {
           const status = statuses.get(projectName);
           const port =
             status?.lambdaServerEvents.startEvent?.port ?? getPort(join(root, projectName));
