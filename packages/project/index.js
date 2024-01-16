@@ -384,11 +384,23 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.Shared) {
     const projectName = 'shared';
     const otherVars = {};
-    for (const f of allFragments) {
-      if ('lambdaName' in f) {
-        otherVars['__BACKEND_NAME__'] = f.lambdaName;
-        otherVars['__BACKEND_NAME_UPPERCASE__'] = f.lambdaName.toUpperCase();
+    const [bestBackend] = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_12__.removeUndefined)(allFragments.map(frag => {
+      if (frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.WebApp) {
+        return {
+          name: frag.lambdaName,
+          prio: 1
+        };
+      } else if (frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.ApiLambda) {
+        return {
+          name: frag.lambdaName,
+          prio: 2
+        };
       }
+      return undefined;
+    })).sort((a, b) => a.prio - b.prio);
+    if (bestBackend) {
+      otherVars['__BACKEND_NAME__'] = bestBackend.name;
+      otherVars['__BACKEND_NAME_UPPERCASE__'] = bestBackend.name.toUpperCase();
     }
     return [{
       projectName,
@@ -594,12 +606,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.13',
+  project: '1.8.15',
   eslint: '1.5.2',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
-  webpack: '1.6.2',
-  runner: '1.5.6'
+  webpack: '1.6.3',
+  runner: '1.5.7'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.1.x';

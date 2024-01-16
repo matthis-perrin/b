@@ -21,7 +21,7 @@ import {
 } from '@src/project/terraform/all';
 import {generateDynamoTerraform} from '@src/project/terraform/dynamo';
 import {generateCodeWorkspace} from '@src/project/vscode_workspace';
-import {neverHappens} from '@src/type_utils';
+import {neverHappens, removeUndefined} from '@src/type_utils';
 
 const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 
@@ -113,11 +113,19 @@ export function getProjectsFromWorkspaceFragment(
   } else if (fragment.type === WorkspaceFragmentType.Shared) {
     const projectName = 'shared' as ProjectName;
     const otherVars: Record<string, string> = {};
-    for (const f of allFragments) {
-      if ('lambdaName' in f) {
-        otherVars['__BACKEND_NAME__'] = f.lambdaName;
-        otherVars['__BACKEND_NAME_UPPERCASE__'] = f.lambdaName.toUpperCase();
-      }
+    const [bestBackend] = removeUndefined(
+      allFragments.map(frag => {
+        if (frag.type === WorkspaceFragmentType.WebApp) {
+          return {name: frag.lambdaName, prio: 1};
+        } else if (frag.type === WorkspaceFragmentType.ApiLambda) {
+          return {name: frag.lambdaName, prio: 2};
+        }
+        return undefined;
+      })
+    ).sort((a, b) => a.prio - b.prio);
+    if (bestBackend) {
+      otherVars['__BACKEND_NAME__'] = bestBackend.name;
+      otherVars['__BACKEND_NAME_UPPERCASE__'] = bestBackend.name.toUpperCase();
     }
     return [
       {

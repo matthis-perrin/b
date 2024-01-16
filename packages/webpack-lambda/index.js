@@ -1251,7 +1251,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
       const port = (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.getPort)(compiler.context);
       this.server = (0,node_http__WEBPACK_IMPORTED_MODULE_3__.createServer)((req, res) => {
         const url = req.url ?? '';
-        if (url === '/favicon.ico') {
+        if (url.startsWith('/favicon')) {
           res.end();
           return;
         }

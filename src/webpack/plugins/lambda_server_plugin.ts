@@ -66,7 +66,7 @@ class LambdaServerPlugin extends StandalonePlugin {
       this.server = createServer((req: IncomingMessage, res: ServerResponse) => {
         const url = req.url ?? '';
 
-        if (url === '/favicon.ico') {
+        if (url.startsWith('/favicon')) {
           res.end();
           return;
         }
