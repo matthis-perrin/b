@@ -34,7 +34,7 @@ export async function generateTemplatesRootPackageJson(
 export async function updateTemplatesLibVersions(): Promise<void> {
   const templatesEnts = await readdir(TEMPLATES_DIR, {withFileTypes: true});
   const templatesDirs = templatesEnts.filter(
-    ent => ent.isDirectory() && ent.name !== 'node_modules'
+    ent => ent.isDirectory() && ent.name !== 'node_modules' && ent.name !== '.vscode'
   );
   await Promise.all([
     ...templatesDirs.map(async template => {

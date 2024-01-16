@@ -26,8 +26,7 @@ import {
 
 import {REGION} from '@shared/env';
 import {chunkArray} from '@shared/lib/array_utils';
-import {removeUndefined} from '@shared/lib/type_utils';
-import {AnyInterface} from '@shared/type_utils';
+import {AnyInterface, removeUndefined} from '@shared/lib/type_utils';
 
 import {readCredentials} from '@shared-node/aws/credentials';
 

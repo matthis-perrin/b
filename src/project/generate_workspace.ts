@@ -23,6 +23,8 @@ import {generateDynamoTerraform} from '@src/project/terraform/dynamo';
 import {generateCodeWorkspace} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 
+const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
+
 export interface WorkspaceProject {
   projectName: ProjectName;
   type: ProjectType;
@@ -163,6 +165,8 @@ export async function generateWorkspace(
       join(dst, 'app.code-workspace'),
       generateCodeWorkspace(workspaceName, workspaceFragments)
     ),
+    // vscode folder
+    await cp(join(TEMPLATES_PATH, '.vscode'), join(dst, '.vscode'), {recursive: true, force: true}),
     // setup.js
     await cp(join(SCRIPTS_PATH, 'setup.js'), join(dst, 'setup.js')),
     // deploy.js

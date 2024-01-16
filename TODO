@@ -1,4 +1,3 @@
-- React vscode template like for onescale
 - Use EventBridge instead of Cloudwatch event
 - Add cloudwatch trigger option for the Lambda function
 - API authentication
@@ -13,6 +12,6 @@
 - Auto lambda monitoring and error logging
 - Migrate from eslint-plugin-node to eslint-plugin-n
 - Move cloudwatch trigger terraform to the file of the lambda it triggers
-- For asynchronous lambda are retried 2 times (remove or allow configuration)
+- Asynchronous lambda are retried 2 times (remove or allow configuration)
 - babelLoader (Node version is hardcoded, corejs too)
 - eslint-simple-import-sort don't group @shared-web for node version
