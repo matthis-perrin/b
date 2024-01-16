@@ -1,3 +1,4 @@
+- React vscode template like for onescale
 - Use EventBridge instead of Cloudwatch event
 - Add cloudwatch trigger option for the Lambda function
 - API authentication

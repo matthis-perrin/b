@@ -1455,10 +1455,12 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
     })}\n`);
   }
   appLog(log) {
-    if (this.appLogFile === undefined || log.length === 0) {
+    var _logs$;
+    const logs = Array.isArray(log) ? log : [log];
+    if (this.appLogFile === undefined || logs.length === 0 || logs.length === 1 && ((_logs$ = logs[0]) === null || _logs$ === void 0 ? void 0 : _logs$.length) === 0) {
       return;
     }
-    (0,node_fs__WEBPACK_IMPORTED_MODULE_2__.appendFileSync)(this.appLogFile, `${log}\n`);
+    (0,node_fs__WEBPACK_IMPORTED_MODULE_2__.appendFileSync)(this.appLogFile, logs.map(log => `[${new Date().toISOString()}] ${log}\n`).join(''));
   }
 }
 function lambdaServerPlugin() {

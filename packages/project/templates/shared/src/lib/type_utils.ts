@@ -30,6 +30,8 @@ export function neverHappens(value: never, errorMessage?: string): never {
   throw new Error(errorMessage);
 }
 
+export type AnyInterface<T> = {[K in keyof T]: unknown};
+
 export type AnyMap = Record<string, unknown>;
 export function asMap(value: unknown): AnyMap | undefined;
 export function asMap(value: unknown, defaultValue: AnyMap): AnyMap;

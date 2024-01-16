@@ -588,12 +588,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.5',
+  project: '1.8.8',
   eslint: '1.5.2',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
-  webpack: '1.6.1',
-  runner: '1.5.5'
+  webpack: '1.6.2',
+  runner: '1.5.6'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.1.x';

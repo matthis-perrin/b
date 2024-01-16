@@ -14,6 +14,9 @@ export function parseSchema(
     return undefined;
   }
   const errorPrefix = `${parameterName ?? 'body'}${schema.optional ? '' : ' is required and'} `;
+  if (schema.type === 'Unknown') {
+    return value;
+  }
   if (schema.type === 'String') {
     const parsed = asString(value);
     if (parsed === undefined) {

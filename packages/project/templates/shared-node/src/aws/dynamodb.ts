@@ -27,6 +27,7 @@ import {
 import {REGION} from '@shared/env';
 import {chunkArray} from '@shared/lib/array_utils';
 import {removeUndefined} from '@shared/lib/type_utils';
+import {AnyInterface} from '@shared/type_utils';
 
 import {readCredentials} from '@shared-node/aws/credentials';
 
@@ -39,12 +40,13 @@ const client = new DynamoDBClient({region: REGION, credentials: readCredentials(
 type Key = Record<string, unknown>;
 type AdditionalParams = Record<string, unknown>;
 
-export const marshall = (input: Record<string, unknown>): Record<string, AttributeValue> =>
-  utilDynamodb_marshall(input, {
+export function marshall<T extends AnyInterface<T>>(input: T): Record<string, AttributeValue> {
+  return utilDynamodb_marshall(input, {
     convertEmptyValues: false,
     removeUndefinedValues: true,
     convertClassInstanceToMap: false,
   });
+}
 export const unmarshall = utilDynamodb_unmarshall;
 
 export async function deleteItem(params: {
@@ -90,15 +92,25 @@ export async function getItem<T>(params: {
   return unmarshall(item) as T;
 }
 
-export async function getItems<T>(params: {
+export async function getItems<T extends AnyInterface<T>>(params: {
   tableName: string;
   keys: Record<string, unknown>[];
   consistent?: boolean;
 }): Promise<T[]> {
+  const [firstKey] = params.keys;
+  if (!firstKey) {
+    return [];
+  }
+  const firstKeyKeys = Object.keys(firstKey);
+  const [idKey] = firstKeyKeys;
+  if (idKey === undefined || firstKeyKeys.length > 1) {
+    throw new Error('getItems only supported with single keys');
+  }
+
   const ConsistentRead = params.consistent;
   const allKeys = params.keys.map(key => marshall(key));
   const chunked = chunkArray(allKeys, MAX_BATCH_GET_ITEMS);
-  const items: T[] = [];
+  const items = new Map<unknown, T>();
   while (chunked.length > 0) {
     const chunk = chunked.pop();
     if (chunk) {
@@ -110,7 +122,10 @@ export async function getItems<T>(params: {
 
       const newItems = data.Responses?.[params.tableName];
       if (newItems) {
-        items.push(...newItems.map(item => unmarshall(item) as T));
+        for (const itemRaw of newItems) {
+          const item = unmarshall(itemRaw) as T;
+          items.set((item as Record<string, unknown>)[idKey], item);
+        }
       }
 
       // Handle UnprocessedKeys by adding the missing keys back into our list of keys to fetch
@@ -121,7 +136,8 @@ export async function getItems<T>(params: {
       }
     }
   }
-  return items;
+
+  return removeUndefined(params.keys.map(k => items.get(k[idKey])));
 }
 
 // simple transaction function to put items in multiple tables
@@ -135,11 +151,7 @@ export async function transactWriteItems(params: {
   );
 }
 
-export async function putItem<
-  T extends {
-    [K in keyof T]: unknown;
-  },
->(params: {
+export async function putItem<T extends AnyInterface<T>>(params: {
   tableName: string;
   item: T;
   additionalParams?: Omit<PutItemCommandInput, 'TableName' | 'Item'>;
@@ -153,12 +165,12 @@ export async function putItem<
   );
 }
 
-export async function putItems(params: {
+export async function putItems<T extends AnyInterface<T>>(params: {
   tableName: string;
-  items: Record<string, unknown>[];
+  items: T[];
   retryNumber?: number;
 }): Promise<void> {
-  const unprocessedItems: Record<string, unknown>[] = [];
+  const unprocessedItems: T[] = [];
   const chunked = chunkArray(params.items, MAX_BATCH_WRITE_ITEMS);
   while (chunked.length > 0) {
     const chunk = chunked.pop();
@@ -177,7 +189,7 @@ export async function putItems(params: {
       if (UnprocessedItems !== undefined) {
         for (const writeRequest of Object.values(UnprocessedItems[params.tableName] ?? [])) {
           if (writeRequest.PutRequest?.Item) {
-            unprocessedItems.push(writeRequest.PutRequest.Item);
+            unprocessedItems.push(writeRequest.PutRequest.Item as T);
           }
         }
       }
@@ -191,6 +203,7 @@ export async function putItems(params: {
       if (retryNumber === PUT_ITEMS_MAX_RETRIES) {
         throw new Error('Failed to put items in database');
       }
+
       await putItems({
         tableName: params.tableName,
         items: unprocessedItems,
@@ -213,7 +226,9 @@ export interface QueryParams {
   additionalParams?: AdditionalParams;
 }
 
-export async function queryItems<T>(params: QueryParams): Promise<{
+export async function queryItems<T extends AnyInterface<T>>(
+  params: QueryParams
+): Promise<{
   items: T[];
   nextPaginationToken?: string;
   count?: number;
@@ -267,7 +282,7 @@ export async function queryItems<T>(params: QueryParams): Promise<{
   };
 }
 
-export async function queryAllItems<T>(
+export async function queryAllItems<T extends AnyInterface<T>>(
   params: Omit<QueryParams, 'paginationToken' | 'limit'>
 ): Promise<T[]> {
   let paginationToken: string | undefined;
@@ -317,7 +332,7 @@ export async function countItems(params: CountParams): Promise<number> {
   return counter;
 }
 
-export async function scanItems<T>(params: {
+export async function scanItems<T extends AnyInterface<T>>(params: {
   tableName: string;
   expressionAttributeNames?: Record<string, string>;
   expressionAttributeValues?: Record<string, unknown>;
@@ -371,7 +386,7 @@ export interface ScanAllItemsParams {
   filterExpression?: string;
   indexName?: string;
 }
-export async function scanAllItems<T = Record<string, unknown>>(params: {
+export async function scanAllItems<T extends AnyInterface<T>>(params: {
   tableName: string;
   expressionAttributeNames?: Record<string, string>;
   expressionAttributeValues?: Record<string, unknown>;

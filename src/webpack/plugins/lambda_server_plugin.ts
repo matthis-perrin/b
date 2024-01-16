@@ -284,11 +284,19 @@ class LambdaServerPlugin extends StandalonePlugin {
     );
   }
 
-  private appLog(log: string): void {
-    if (this.appLogFile === undefined || log.length === 0) {
+  private appLog(log: string | string[]): void {
+    const logs = Array.isArray(log) ? log : [log];
+    if (
+      this.appLogFile === undefined ||
+      logs.length === 0 ||
+      (logs.length === 1 && logs[0]?.length === 0)
+    ) {
       return;
     }
-    appendFileSync(this.appLogFile, `${log}\n`);
+    appendFileSync(
+      this.appLogFile,
+      logs.map(log => `[${new Date().toISOString()}] ${log}\n`).join('')
+    );
   }
 }
 
