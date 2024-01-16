@@ -36,6 +36,15 @@ export function nodeConfig(opts: {
         javascript: {importMeta: false},
       },
     },
+    resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      modules: ['node_modules', '../shared-node/node_modules', '../shared/node_modules'],
+      alias: {
+        '@src': join(context, 'src'),
+        '@shared': join(context, '../shared/src'),
+        '@shared-node': join(context, '../shared-node/src'),
+      },
+    },
     plugins: [...(base.plugins ?? []), dependencyPackerPlugin(packageJsonProperties)],
     externals: (ctx, cb) => {
       const {request, context, contextInfo, getResolve} = ctx;

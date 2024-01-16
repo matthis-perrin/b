@@ -18,6 +18,12 @@ async function cancel(workspacePath?: string): Promise<never> {
   process.exit(0);
 }
 
+const BASE_FRAGMENTS = [
+  {type: WorkspaceFragmentType.Shared},
+  {type: WorkspaceFragmentType.SharedNode},
+  {type: WorkspaceFragmentType.SharedWeb},
+] as const;
+
 async function initProject(): Promise<void> {
   let workspaceName: string;
   let workspacePath = process.cwd();
@@ -28,6 +34,11 @@ async function initProject(): Promise<void> {
   // Check if we are already in a workspace
   const workspaceFragments = await readWorkspaceFragments(workspacePath);
   if (workspaceFragments !== undefined) {
+    for (const baseFrag of BASE_FRAGMENTS) {
+      if (!workspaceFragments.find(f => f.type === baseFrag.type)) {
+        frags.push(baseFrag);
+      }
+    }
     workspaceName = basename(workspacePath);
     for (const fragment of workspaceFragments) {
       frags.push(fragment);
@@ -38,7 +49,7 @@ async function initProject(): Promise<void> {
       alreadyGenerated.push(...projectNames);
     }
   } else {
-    frags.push({type: WorkspaceFragmentType.Shared}, {type: WorkspaceFragmentType.SharedNode});
+    frags.push(...BASE_FRAGMENTS);
     // Ask for workspace name
     const {workspaceName: newWorkspaceName} = await prompt({
       type: 'text',
@@ -84,7 +95,7 @@ async function initProject(): Promise<void> {
 
 type SelectableWorkspaceFragmentType = Exclude<
   WorkspaceFragmentType,
-  WorkspaceFragmentType.Shared | WorkspaceFragmentType.SharedNode
+  WorkspaceFragmentType.Shared | WorkspaceFragmentType.SharedNode | WorkspaceFragmentType.SharedWeb
 >;
 
 const WorkspaceFragmentTypeToString: Record<SelectableWorkspaceFragmentType, string> = {

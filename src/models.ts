@@ -15,6 +15,7 @@ export enum ProjectType {
   NodeScript = 'node_script',
   Shared = 'shared',
   SharedNode = 'shared-node',
+  SharedWeb = 'shared-web',
 }
 
 export enum EslintType {
@@ -77,6 +78,11 @@ export const PROJECT_TYPE_TO_METADATA = {
     tsconfig: TsConfigType.Node,
     webpack: WebpackType.Lib,
   },
+  [ProjectType.SharedWeb]: {
+    eslint: EslintType.Web,
+    tsconfig: TsConfigType.Web,
+    webpack: WebpackType.Lib,
+  },
 } satisfies Record<ProjectType, ProjectTypeMetadata>;
 
 //
@@ -91,6 +97,7 @@ export enum WorkspaceFragmentType {
   NodeScript = 'node-script',
   Shared = 'shared',
   SharedNode = 'shared-node',
+  SharedWeb = 'shared-web',
 }
 
 interface WorkspaceFragmentBase {
@@ -124,6 +131,9 @@ export interface WorkspaceFragmentRegistry {
   };
   [WorkspaceFragmentType.SharedNode]: {
     type: WorkspaceFragmentType.SharedNode;
+  };
+  [WorkspaceFragmentType.SharedWeb]: {
+    type: WorkspaceFragmentType.SharedWeb;
   };
 }
 

@@ -4,7 +4,6 @@ import {definePlugin} from '@src/webpack/plugins/define_plugin';
 import {eslintPlugin} from '@src/webpack/plugins/eslint_plugin';
 import {forkTsCheckerPlugin} from '@src/webpack/plugins/fork_ts_checker_plugin';
 import {terserPlugin} from '@src/webpack/plugins/terser_plugin';
-import {getTsConfigAlias} from '@src/webpack/plugins/ts_config_alias';
 import {YarnPlugin} from '@src/webpack/plugins/yarn_plugin';
 import {isProd} from '@src/webpack/utils';
 
@@ -16,10 +15,6 @@ export function baseConfig(opts: {context: string; watch: boolean}): Configurati
     context,
     entry: {},
     devtool: 'source-map',
-    resolve: {
-      extensions: ['.js', '.jsx', '.ts', '.tsx'],
-      alias: getTsConfigAlias(context),
-    },
     plugins: [new YarnPlugin(), forkTsCheckerPlugin(context), eslintPlugin(), definePlugin()],
     stats: false,
     infrastructureLogging: {level: 'error'},

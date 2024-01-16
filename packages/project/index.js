@@ -200,6 +200,7 @@ let ProjectType = /*#__PURE__*/function (ProjectType) {
   ProjectType["NodeScript"] = "node_script";
   ProjectType["Shared"] = "shared";
   ProjectType["SharedNode"] = "shared-node";
+  ProjectType["SharedWeb"] = "shared-web";
   return ProjectType;
 }({});
 let EslintType = /*#__PURE__*/function (EslintType) {
@@ -256,6 +257,11 @@ const PROJECT_TYPE_TO_METADATA = {
     eslint: EslintType.Node,
     tsconfig: TsConfigType.Node,
     webpack: WebpackType.Lib
+  },
+  [ProjectType.SharedWeb]: {
+    eslint: EslintType.Web,
+    tsconfig: TsConfigType.Web,
+    webpack: WebpackType.Lib
   }
 };
 
@@ -271,6 +277,7 @@ let WorkspaceFragmentType = /*#__PURE__*/function (WorkspaceFragmentType) {
   WorkspaceFragmentType["NodeScript"] = "node-script";
   WorkspaceFragmentType["Shared"] = "shared";
   WorkspaceFragmentType["SharedNode"] = "shared-node";
+  WorkspaceFragmentType["SharedWeb"] = "shared-web";
   return WorkspaceFragmentType;
 }({});
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -376,6 +383,15 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
     return [{
       projectName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.SharedNode,
+      vars: {
+        __PROJECT_NAME__: projectName
+      }
+    }];
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.SharedWeb) {
+    const projectName = 'shared-web';
+    return [{
+      projectName,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.ProjectType.SharedWeb,
       vars: {
         __PROJECT_NAME__: projectName
       }
@@ -606,12 +622,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.15',
+  project: '1.8.23',
   eslint: '1.5.2',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
-  webpack: '1.6.3',
-  runner: '1.5.7'
+  webpack: '1.6.6',
+  runner: '1.5.8'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.1.x';
@@ -673,6 +689,8 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
     return undefined;
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.SharedNode) {
+    return undefined;
+  } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.SharedWeb) {
     return undefined;
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Shared) {
@@ -1091,8 +1109,8 @@ function generateCodeWorkspace(workspaceName, workspaceFragments) {
       },
       'editor.formatOnSave': true,
       'editor.codeActionsOnSave': {
-        'source.fixAll': false,
-        'source.fixAll.eslint': true
+        'source.fixAll': 'never',
+        'source.fixAll.eslint': 'explicit'
       },
       'editor.defaultFormatter': 'esbenp.prettier-vscode',
       'editor.linkedEditing': true,
@@ -1213,6 +1231,13 @@ async function cancel(workspacePath) {
   // eslint-disable-next-line node/no-process-exit
   process.exit(0);
 }
+const BASE_FRAGMENTS = [{
+  type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.Shared
+}, {
+  type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.SharedNode
+}, {
+  type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.SharedWeb
+}];
 async function initProject() {
   let workspaceName;
   let workspacePath = process.cwd();
@@ -1223,6 +1248,11 @@ async function initProject() {
   // Check if we are already in a workspace
   const workspaceFragments = await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__.readWorkspaceFragments)(workspacePath);
   if (workspaceFragments !== undefined) {
+    for (const baseFrag of BASE_FRAGMENTS) {
+      if (!workspaceFragments.find(f => f.type === baseFrag.type)) {
+        frags.push(baseFrag);
+      }
+    }
     workspaceName = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.basename)(workspacePath);
     for (const fragment of workspaceFragments) {
       frags.push(fragment);
@@ -1231,11 +1261,7 @@ async function initProject() {
       alreadyGenerated.push(...projectNames);
     }
   } else {
-    frags.push({
-      type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.Shared
-    }, {
-      type: _src_models__WEBPACK_IMPORTED_MODULE_4__.WorkspaceFragmentType.SharedNode
-    });
+    frags.push(...BASE_FRAGMENTS);
     // Ask for workspace name
     const {
       workspaceName: newWorkspaceName

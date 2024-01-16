@@ -24,6 +24,15 @@ export function webConfig(opts: {context: string; watch: boolean}): Configuratio
     module: {
       rules: [babelLoaderWeb(), sourceMapLoader()],
     },
+    resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      modules: ['node_modules', '../shared-web/node_modules', '../shared/node_modules'],
+      alias: {
+        '@src': join(context, 'src'),
+        '@shared': join(context, '../shared/src'),
+        '@shared-web': join(context, '../shared-web/src'),
+      },
+    },
     plugins: [...(base.plugins ?? []), htmlPlugin(context)],
     devServer: watch ? webpackDevServer(context) : undefined,
     optimization: {

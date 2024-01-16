@@ -36,6 +36,8 @@ export function generateWorkspaceProjectTerraform(
     return undefined;
   } else if (type === ProjectType.SharedNode) {
     return undefined;
+  } else if (type === ProjectType.SharedWeb) {
+    return undefined;
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === ProjectType.Shared) {
     return undefined;

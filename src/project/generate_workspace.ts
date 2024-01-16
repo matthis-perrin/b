@@ -109,6 +109,17 @@ export function getProjectsFromWorkspaceFragment(
         },
       },
     ];
+  } else if (fragment.type === WorkspaceFragmentType.SharedWeb) {
+    const projectName = 'shared-web' as ProjectName;
+    return [
+      {
+        projectName,
+        type: ProjectType.SharedWeb,
+        vars: {
+          __PROJECT_NAME__: projectName,
+        },
+      },
+    ];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (fragment.type === WorkspaceFragmentType.Shared) {
     const projectName = 'shared' as ProjectName;
