@@ -4,7 +4,5 @@
   "license": "UNLICENSED",
   "type": "module",
   "main": "tsconfig.json",
-  "dependencies": {
-    "typescript": "5.3.x"
-  }
+  "dependencies": {"typescript": "5.3.x"}
 }

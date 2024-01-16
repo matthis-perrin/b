@@ -28,9 +28,7 @@
     "skipLibCheck": true,
     "module": "none",
     "moduleResolution": "node",
-    "lib": [
-      "es2022"
-    ],
+    "lib": ["es2022"],
     "target": "es2022"
   }
 }

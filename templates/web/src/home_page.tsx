@@ -1,18 +1,35 @@
-import {useEffect} from 'react';
+import {useCallback} from 'react';
 import {styled} from 'styled-components';
+
+import {Button} from '@shared-web/components/core/button';
+import {showSuccess} from '@shared-web/components/core/notifications';
+import {sleep} from '@shared-web/lib/time_utils';
 
 import {apiCall} from '@src/lib/api';
 
 export const HomePage: React.FC = () => {
-  useEffect(() => {
-    apiCall('GET /test', {val: '1337'}).then(console.log).catch(console.error);
+  const handleClick = useCallback(async () => {
+    await sleep(1000);
+    const res = await apiCall('GET /test', {val: '1337'});
+    console.log(res);
+    showSuccess('Success');
   }, []);
-  return <Wrapper>Hello</Wrapper>;
+
+  return (
+    <Wrapper>
+      <div>Hello</div>
+      <Button onClickAsync={handleClick}>BUTTON</Button>
+    </Wrapper>
+  );
 };
 HomePage.displayName = 'HomePage';
 
 const Wrapper = styled.div`
+  width: 100%;
+  height: 100%;
   padding: 16px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;

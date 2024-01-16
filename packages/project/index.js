@@ -65,9 +65,6 @@ const {
   mkdir,
   rm
 } = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
-async function writeJsonFile(path, json) {
-  await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
-}
 const prettierConfig = parser => ({
   parser,
   printWidth: 100,
@@ -82,6 +79,9 @@ async function prettierFormat(str, parser) {
 }
 async function writePrettyFile(parser, path, code) {
   await writeRawFile(path, await prettierFormat(code, parser));
+}
+async function writeJsonFile(path, json) {
+  await writePrettyFile('json', path, JSON.stringify(json));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);
@@ -493,18 +493,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateProject: () => (/* binding */ generateProject)
 /* harmony export */ });
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(10);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
 
 
 
-
-const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_2__.fileURLToPath)(import.meta.url), '../templates');
+const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_1__.fileURLToPath)(import.meta.url), '../templates');
 async function generateProject(dst, project) {
   const {
     projectName,
@@ -512,34 +509,31 @@ async function generateProject(dst, project) {
     vars
   } = project;
   // Copy template files
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(TEMPLATES_PATH, type), dst);
-
-  // Replace name in package.json
-  const packageJsonPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(dst, 'package.json');
-  const packageJsonbuffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)(packageJsonPath);
-  const packageJson = JSON.parse(packageJsonbuffer.toString());
-  packageJson['name'] = projectName;
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.writeJsonFile)(packageJsonPath, packageJson);
-
-  // Replace variables
-  const files = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.listFiles)(dst);
+  const templatePath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(TEMPLATES_PATH, type);
+  const files = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.listFiles)(templatePath);
   await Promise.all(files.map(async file => {
-    const buffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)(file);
+    const buffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.readFile)(file);
     const content = buffer.toString();
     let newContent = content;
     for (const [varName, varValue] of Object.entries(vars)) {
       newContent = newContent.replaceAll(varName, varValue);
     }
     if (file.endsWith('.ts') || file.endsWith('.tsx')) {
-      newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettierFormat)(newContent, 'typescript');
+      newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.prettierFormat)(newContent, 'typescript');
     }
     if (file.endsWith('.json')) {
-      newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettierFormat)(newContent, 'json');
+      newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.prettierFormat)(newContent, 'json');
     }
-    if (newContent !== content) {
-      await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.writeFile)(file, newContent);
-    }
+    const relativePath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.relative)(templatePath, file);
+    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(dst, relativePath), newContent);
   }));
+
+  // Replace name in package.json
+  const packageJsonPath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(dst, 'package.json');
+  const packageJsonbuffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.readFile)(packageJsonPath);
+  const packageJson = JSON.parse(packageJsonbuffer.toString());
+  packageJson['name'] = projectName;
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsonFile)(packageJsonPath, packageJson);
 }
 
 /***/ }),
@@ -622,7 +616,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.23',
+  project: '1.8.33',
   eslint: '1.5.2',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
@@ -1258,7 +1252,9 @@ async function initProject() {
       frags.push(fragment);
       const projectNames = (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.getProjectsFromWorkspaceFragment)(fragment, workspaceFragments).map(p => p.projectName);
       takenNames.push(...projectNames);
-      alreadyGenerated.push(...projectNames);
+      if (!BASE_FRAGMENTS.find(frag => frag.type === fragment.type)) {
+        alreadyGenerated.push(...projectNames);
+      }
     }
   } else {
     frags.push(...BASE_FRAGMENTS);

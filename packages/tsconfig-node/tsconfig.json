@@ -19,9 +19,7 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "useUnknownInCatchVariables": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": false,
@@ -30,9 +28,7 @@
     "skipLibCheck": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": [
-      "es2023"
-    ],
+    "lib": ["es2023"],
     "target": "es2022"
   }
 }

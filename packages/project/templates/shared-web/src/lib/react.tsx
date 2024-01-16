@@ -12,8 +12,8 @@ import {
   useMemo,
 } from 'react';
 
-export type Custom<Props, Element extends ElementType> = FC<
-  Props & Omit<ComponentPropsWithoutRef<Element>, 'style'>
+export type Custom<Props, Element extends ElementType, Omitted extends string = ''> = FC<
+  Props & Omit<ComponentPropsWithoutRef<Element>, 'style' | Omitted>
 >;
 export type CustomWithStyle<Props, Element extends ElementType> = FC<
   Props & ComponentPropsWithoutRef<Element>
@@ -21,7 +21,7 @@ export type CustomWithStyle<Props, Element extends ElementType> = FC<
 export type CustomWithout<
   Props,
   Element extends ElementType,
-  Excluded extends keyof ComponentPropsWithoutRef<Element>
+  Excluded extends keyof ComponentPropsWithoutRef<Element>,
 > = FC<Props & Omit<ComponentPropsWithoutRef<Element>, 'style' | Excluded>>;
 
 export type InputHandler = ChangeEventHandler<HTMLInputElement>;

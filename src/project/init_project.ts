@@ -46,7 +46,9 @@ async function initProject(): Promise<void> {
         p => p.projectName
       );
       takenNames.push(...projectNames);
-      alreadyGenerated.push(...projectNames);
+      if (!BASE_FRAGMENTS.find(frag => frag.type === fragment.type)) {
+        alreadyGenerated.push(...projectNames);
+      }
     }
   } else {
     frags.push(...BASE_FRAGMENTS);

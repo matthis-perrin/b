@@ -307,9 +307,6 @@ const {
   mkdir,
   rm
 } = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
-async function writeJsonFile(path, json) {
-  await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
-}
 const prettierConfig = parser => ({
   parser,
   printWidth: 100,
@@ -324,6 +321,9 @@ async function prettierFormat(str, parser) {
 }
 async function writePrettyFile(parser, path, code) {
   await writeRawFile(path, await prettierFormat(code, parser));
+}
+async function writeJsonFile(path, json) {
+  await writePrettyFile('json', path, JSON.stringify(json));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);

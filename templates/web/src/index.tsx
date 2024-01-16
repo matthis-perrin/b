@@ -1,28 +1,24 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
-import {createGlobalStyle} from 'styled-components';
+
+import {addPrefix} from '@shared/lib/type_utils';
+
+import {CssReset} from '@shared-web/components/core/css_reset';
+import {GlobalStyle} from '@shared-web/components/core/global_styles';
+import {ThemeContext} from '@shared-web/theme/theme_context';
 
 import {App} from '@src/app';
-
-const GlobalCss = createGlobalStyle`
-  html, body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    height: 100%;
-    background-color: #fbfbfb;
-  }
-`;
+import {theme} from '@src/theme';
 
 const container = document.getElementById('root');
 if (container) {
   createRoot(container).render(
     <StrictMode>
-      <App />
-      <GlobalCss />
+      <ThemeContext.Provider value={theme}>
+        <CssReset />
+        <App />
+        <GlobalStyle {...addPrefix(theme.main, '$')} />
+      </ThemeContext.Provider>
     </StrictMode>
   );
 }

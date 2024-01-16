@@ -7,10 +7,6 @@ import {BuiltInParserName, format} from 'prettier';
 export const {access, readFile, readdir, stat} = promises;
 const {writeFile, mkdir, rm} = promises;
 
-export async function writeJsonFile(path: string, json: unknown): Promise<void> {
-  await writeRawFile(path, `${JSON.stringify(json, undefined, 2)}\n`);
-}
-
 const prettierConfig = (parser: BuiltInParserName) =>
   ({
     parser,
@@ -32,6 +28,10 @@ async function writePrettyFile(
   code: string
 ): Promise<void> {
   await writeRawFile(path, await prettierFormat(code, parser));
+}
+
+export async function writeJsonFile(path: string, json: unknown): Promise<void> {
+  await writePrettyFile('json', path, JSON.stringify(json));
 }
 
 export async function writeJsFile(path: string, js: string): Promise<void> {
