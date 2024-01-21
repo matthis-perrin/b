@@ -1,3 +1,4 @@
+import {execSync} from 'node:child_process';
 import {join} from 'node:path';
 
 import {underline} from 'ansi-colors';
@@ -9,7 +10,7 @@ import {globalError} from '@src/global_error';
 import {ProjectName, ProjectType, WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment, WorkspaceProject} from '@src/project/generate_workspace';
 import {readWorkspaceFragments} from '@src/project/vscode_workspace';
-import {neverHappens} from '@src/type_utils';
+import {neverHappens, removeUndefined} from '@src/type_utils';
 import {
   FullLambdaServerEvent,
   LambdaServerEvent,
@@ -363,6 +364,47 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
         resolvePromise();
       });
   };
+
+  if (watch) {
+    process.stdin.setRawMode(true);
+    process.stdin.on('data', data => {
+      const str = data.toString();
+      // Handle ctrl+c
+      if (str === '\u0003') {
+        process.emit('SIGINT', 'SIGINT');
+      } else if (str === 'o') {
+        const errorPaths = removeUndefined(
+          [...statuses.values()]
+            .flatMap(status => status.errors)
+            .map(err => ('loc' in err ? err.loc.absolutePath : undefined))
+        );
+        const files = [...new Set([...errorPaths]).values()];
+        const openCommand = `code ${files.join(' ')}`;
+        execSync(openCommand);
+      }
+    });
+
+    process.on('SIGINT', () => {
+      process.stdin.setRawMode(false);
+      console.log('See you soon!');
+      // eslint-disable-next-line node/no-process-exit
+      process.exit(0);
+    });
+
+    // Handle uncaught error and exceptions
+    process.on('uncaughtException', err => {
+      console.error('Uncaught Exception');
+      console.error(err);
+      process.emit('SIGINT', 'SIGINT');
+    });
+
+    // Handle unhandled failing promises
+    process.on('unhandledRejection', err => {
+      console.error('Unhandled Rejection');
+      console.error(err);
+      process.emit('SIGINT', 'SIGINT');
+    });
+  }
 
   registerExitCallback(cleanup);
   return globalPromise;

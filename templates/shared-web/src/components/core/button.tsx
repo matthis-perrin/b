@@ -132,7 +132,7 @@ export function createButton<Type extends keyof ButtonTypes>(opts: {
 
     useGlobalKeyPress(['Enter'], () => {
       if (keyboardSubmit && !isDisabled && !isLoading) {
-        onClickCallback(undefined as unknown as MouseEvent<HTMLButtonElement>);
+        handleClick?.(undefined as unknown as MouseEvent<HTMLButtonElement>);
       }
     });
 

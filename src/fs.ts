@@ -31,7 +31,7 @@ async function writePrettyFile(
 }
 
 export async function writeJsonFile(path: string, json: unknown): Promise<void> {
-  await writePrettyFile('json', path, JSON.stringify(json));
+  await writePrettyFile('json', path, JSON.stringify(json, undefined, 2));
 }
 
 export async function writeJsFile(path: string, js: string): Promise<void> {

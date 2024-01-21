@@ -323,7 +323,7 @@ async function writePrettyFile(parser, path, code) {
   await writeRawFile(path, await prettierFormat(code, parser));
 }
 async function writeJsonFile(path, json) {
-  await writePrettyFile('json', path, JSON.stringify(json));
+  await writePrettyFile('json', path, JSON.stringify(json, undefined, 2));
 }
 async function writeJsFile(path, js) {
   return writePrettyFile('babel', path, js);
