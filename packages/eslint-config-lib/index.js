@@ -12,7 +12,6 @@ module.exports = {
   plugins: [
     'eslint-comments',
     'import',
-    'no-null',
     'prettier',
     'simple-import-sort',
     '@typescript-eslint',
@@ -435,7 +434,6 @@ module.exports = {
     'import/order': 'off',
     'import/prefer-default-export': 'off',
     'import/unambiguous': 'off',
-    'no-null/no-null': 'warn',
     'prettier/prettier': 'warn',
     'simple-import-sort/imports': [
       'warn',

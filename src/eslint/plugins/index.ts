@@ -2,7 +2,6 @@ import {EslintMetadata} from '@src/eslint/models';
 import {eslintComments} from '@src/eslint/plugins/eslint_comments';
 import {eslintCore} from '@src/eslint/plugins/eslint_core';
 import {eslintImport} from '@src/eslint/plugins/eslint_import';
-import {eslintNoNull} from '@src/eslint/plugins/eslint_no_null';
 import {eslintNode} from '@src/eslint/plugins/eslint_node';
 import {eslintPrettier} from '@src/eslint/plugins/eslint_prettier';
 import {eslintReact} from '@src/eslint/plugins/eslint_react';
@@ -16,7 +15,6 @@ const BASE_PLUGINS = [
   eslintComments,
   eslintCore,
   eslintImport,
-  eslintNoNull,
   eslintPrettier,
   eslintSimpleImportSort,
   eslintTypescript,

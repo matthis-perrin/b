@@ -3,7 +3,6 @@ import {DeepPartial} from '@shared/lib/type_utils';
 function isObject(val: unknown): val is Record<string, unknown> {
   return (
     typeof val === 'object' &&
-    // eslint-disable-next-line no-null/no-null
     val !== null &&
     !Array.isArray(val) &&
     !(
@@ -45,11 +44,9 @@ export function deepEqual(obj1: unknown, obj2: unknown): boolean {
     return obj1 === obj2;
   }
 
-  // eslint-disable-next-line no-null/no-null
   if (obj1 === null && obj2 === null) {
     return true;
   }
-  // eslint-disable-next-line no-null/no-null
   if (obj1 === null || obj2 === null) {
     return false;
   }

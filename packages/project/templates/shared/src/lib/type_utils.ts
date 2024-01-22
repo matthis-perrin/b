@@ -36,7 +36,6 @@ export type AnyMap = Record<string, unknown>;
 export function asMap(value: unknown): AnyMap | undefined;
 export function asMap(value: unknown, defaultValue: AnyMap): AnyMap;
 export function asMap(value: unknown, defaultValue?: AnyMap): AnyMap | undefined {
-  // eslint-disable-next-line no-null/no-null
   return typeof value === 'object' && value !== null ? (value as AnyMap) : defaultValue;
 }
 export function asMapOrThrow(value: unknown): Record<string, unknown> {
@@ -176,7 +175,6 @@ export function asJsonOrThrow(value: string): AnyMap {
 // }
 
 export function isNull<T>(val: T | null): val is null {
-  // eslint-disable-next-line no-null/no-null
   return val === null;
 }
 

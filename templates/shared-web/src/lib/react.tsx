@@ -27,7 +27,7 @@ export type CustomWithout<
 export type InputHandler = ChangeEventHandler<HTMLInputElement>;
 export type ButtonHandler = MouseEventHandler<HTMLButtonElement>;
 
-export const NULL_REF = null; // eslint-disable-line no-null/no-null
+export const NULL_REF = null;
 export const EmptyFragment = <></>;
 
 export type AsyncMouseHandler<T = Element> = (event: MouseEvent<T>) => Promise<void>;

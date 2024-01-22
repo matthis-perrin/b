@@ -1,6 +1,6 @@
 {
   "name": "@matthis/eslint-config-lib",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "license": "UNLICENSED",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "6.18.x",
@@ -9,7 +9,6 @@
     "eslint-import-resolver-typescript": "3.6.x",
     "eslint-plugin-eslint-comments": "3.2.x",
     "eslint-plugin-import": "2.29.x",
-    "eslint-plugin-no-null": "1.0.x",
     "eslint-plugin-prettier": "5.1.x",
     "eslint-plugin-simple-import-sort": "10.0.x",
     "eslint-plugin-unicorn": "50.0.x",

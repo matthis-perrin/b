@@ -493,7 +493,6 @@ export function makeUpdateBatchParams(
   const expressionAttributeValues: Record<string, unknown> = {};
 
   for (const [i, {name, value}] of Object.entries(props)) {
-    // eslint-disable-next-line no-null/no-null
     if (value === null || value === undefined) {
       updateExpressionRemove.push(`#name${i}`);
       expressionAttributeNames[`#name${i}`] = name;
