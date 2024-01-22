@@ -4,3 +4,4 @@ dist
 .yarn-warnings.log
 .yarn-errors.log
 test
+/shared/src/env.ts

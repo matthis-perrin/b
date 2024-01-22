@@ -14,5 +14,6 @@ terraform/*.tfstate.backup
 terraform/.aws-credentials
 terraform/archives
 */log
+/shared/src/env.ts
     `.trim();
 }

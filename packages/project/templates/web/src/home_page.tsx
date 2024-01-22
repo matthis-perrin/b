@@ -12,7 +12,7 @@ export const HomePage: React.FC = () => {
     await sleep(1000);
     const res = await apiCall('GET /test', {val: '1337'});
     console.log(res);
-    showSuccess('Success!');
+    showSuccess('Success');
   }, []);
 
   return (

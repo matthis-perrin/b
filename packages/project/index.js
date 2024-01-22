@@ -634,6 +634,7 @@ terraform/*.tfstate.backup
 terraform/.aws-credentials
 terraform/archives
 */log
+/shared/src/env.ts
     `.trim();
 }
 
@@ -690,7 +691,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.39',
+  project: '1.8.41',
   eslint: '1.5.2',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
