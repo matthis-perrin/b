@@ -4,8 +4,13 @@ import {dirname, join} from 'node:path';
 
 import {BuiltInParserName, format} from 'prettier';
 
-export const {access, readFile, readdir, stat} = promises;
+export const {access, readFile: readFileInternal, readdir, stat} = promises;
 const {writeFile, mkdir, rm} = promises;
+
+export async function readFile(path: string): Promise<string> {
+  const buffer = await readFileInternal(path);
+  return buffer.toString();
+}
 
 const prettierConfig = (parser: BuiltInParserName) =>
   ({
@@ -22,29 +27,34 @@ export async function prettierFormat(str: string, parser: BuiltInParserName): Pr
   return format(str, prettierConfig(parser));
 }
 
-async function writePrettyFile(
-  parser: BuiltInParserName,
-  path: string,
-  code: string
-): Promise<void> {
-  await writeRawFile(path, await prettierFormat(code, parser));
-}
-
-export async function writeJsonFile(path: string, json: unknown): Promise<void> {
-  await writePrettyFile('json', path, JSON.stringify(json, undefined, 2));
-}
-
-export async function writeJsFile(path: string, js: string): Promise<void> {
-  return writePrettyFile('babel', path, js);
-}
-
-export async function writeTsFile(path: string, ts: string): Promise<void> {
-  return writePrettyFile('typescript', path, ts);
-}
-
 export async function writeRawFile(path: string, content: string): Promise<void> {
   await mkdir(dirname(path), {recursive: true});
   await writeFile(path, content);
+}
+
+export async function prettyJson(json: unknown, opts?: {compact?: boolean}): Promise<string> {
+  const {compact} = opts ?? {};
+  return format(
+    compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2),
+    prettierConfig('json')
+  );
+}
+export async function writeJsonFile(path: string, json: unknown): Promise<void> {
+  await writeRawFile(path, await prettyJson(json));
+}
+
+export async function prettyJs(js: string): Promise<string> {
+  return format(js, prettierConfig('babel'));
+}
+export async function writeJsFile(path: string, js: string): Promise<void> {
+  await writeRawFile(path, await prettyJs(js));
+}
+
+export async function prettyTs(ts: string): Promise<string> {
+  return format(ts, prettierConfig('typescript'));
+}
+export async function writeTsFile(path: string, ts: string): Promise<void> {
+  await writeRawFile(path, await prettyTs(ts));
 }
 
 export async function writeRawFileIfNotExists(path: string, content: string): Promise<void> {

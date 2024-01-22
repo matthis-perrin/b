@@ -1,9 +1,9 @@
 import {execSync} from 'node:child_process';
-import {cp} from 'node:fs/promises';
 import {join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {writeJsonFile, writeRawFile, writeRawFileIfNotExists} from '@src/fs';
+import {listFiles, prettyJs, prettyJson, readFile, writeRawFile} from '@src/fs';
+import {md5} from '@src/hash';
 import {
   ProjectName,
   ProjectType,
@@ -20,8 +20,14 @@ import {
   generateWorkspaceProjectTerraform,
 } from '@src/project/terraform/all';
 import {generateDynamoTerraform} from '@src/project/terraform/dynamo';
-import {generateCodeWorkspace} from '@src/project/vscode_workspace';
+import {
+  FileHash,
+  generateCodeWorkspace,
+  Workspace,
+  writeWorkspace,
+} from '@src/project/vscode_workspace';
 import {neverHappens, removeUndefined} from '@src/type_utils';
+import {PACKAGE_VERSIONS} from '@src/versions';
 
 const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 
@@ -156,68 +162,79 @@ export async function generateWorkspace(
   dst: string,
   workspaceName: WorkspaceName,
   workspaceFragments: WorkspaceFragment[],
-  alreadyGenerated: ProjectName[]
+  workspace: Workspace | undefined
 ): Promise<void> {
   const projects = workspaceFragments.flatMap(f =>
     getProjectsFromWorkspaceFragment(f, workspaceFragments)
   );
 
   // Create projects files from templates
-  await Promise.all(
-    projects
-      .filter(p => !alreadyGenerated.includes(p.projectName))
-      .map(async project => generateProject(join(dst, project.projectName), project))
+  const projectFiles = await Promise.all(
+    projects.map(async project => generateProject(dst, project, workspace))
   );
 
   // Generate workspace root files
   const SCRIPTS_PATH = join(fileURLToPath(import.meta.url), '../scripts');
-  await Promise.all([
+  const writeFile = async (path: string, file: string): Promise<FileHash> =>
+    writeWorkspaceFile(workspace, dst, path, file);
+  const workspaceFiles = await Promise.all([
     // package.json
-    await writeJsonFile(
-      join(dst, 'package.json'),
-      generateWorkspacePackageJson(workspaceName, projects)
+    writeFile(
+      'package.json',
+      await prettyJson(generateWorkspacePackageJson(workspaceName, projects))
+    ),
+    // app.code-workspace
+    writeFile(
+      'app.code-workspace',
+      await prettyJson(generateCodeWorkspace(workspaceName, workspaceFragments))
     ),
     // .gitignore
-    await writeRawFile(join(dst, '.gitignore'), generateGitIgnore()),
-    // app.code-workspace
-    await writeJsonFile(
-      join(dst, 'app.code-workspace'),
-      generateCodeWorkspace(workspaceName, workspaceFragments)
-    ),
-    // vscode folder
-    await cp(join(TEMPLATES_PATH, '.vscode'), join(dst, '.vscode'), {recursive: true, force: true}),
+    writeFile('.gitignore', generateGitIgnore()),
     // setup.js
-    await cp(join(SCRIPTS_PATH, 'setup.js'), join(dst, 'setup.js')),
+    writeFile('setup.js', await prettyJs(await readFile(join(SCRIPTS_PATH, 'setup.js')))),
     // deploy.js
-    await cp(join(SCRIPTS_PATH, 'deploy.js'), join(dst, 'deploy.js')),
+    writeFile('deploy.js', await prettyJs(await readFile(join(SCRIPTS_PATH, 'deploy.js')))),
     // build.js
-    await cp(join(SCRIPTS_PATH, 'build.js'), join(dst, 'build.js')),
+    writeFile('build.js', await prettyJs(await readFile(join(SCRIPTS_PATH, 'build.js')))),
   ]);
 
+  // Vscode folder
+  const vscodePath = join(TEMPLATES_PATH, '.vscode');
+  const vscodeFileList = await listFiles(vscodePath);
+  const vscodeFiles = await Promise.all(
+    vscodeFileList.map(async file => {
+      const relativePath = relative(vscodePath, file);
+      const dstPath = join('.vscode', relativePath);
+      const content = await readFile(file);
+      return writeFile(dstPath, content);
+    })
+  );
+
   // Terraform folder generation
-  const terraformPath = join(dst, 'terraform');
-  await Promise.all([
-    writeRawFileIfNotExists(
-      join(terraformPath, '.aws-credentials'),
-      generateDummyTerraformCredentials()
-    ),
-    writeRawFileIfNotExists(
-      join(terraformPath, 'dynamo_table_dummy.tf'),
-      generateDynamoTerraform()
-    ),
-    writeRawFileIfNotExists(
-      join(terraformPath, 'base.tf'),
-      generateCommonTerraform(workspaceName, projects)
-    ),
+  const terraformFiles = await Promise.all([
+    writeFile(join('terraform', '.aws-credentials'), generateDummyTerraformCredentials()),
+    writeFile(join('terraform', 'dynamo_table_dummy.tf'), generateDynamoTerraform()),
+    writeFile(join('terraform', 'base.tf'), generateCommonTerraform(workspaceName, projects)),
     ...projects.map(async p => {
       const content = generateWorkspaceProjectTerraform(workspaceName, p);
       if (content === undefined) {
         return;
       }
       const name = `${p.projectName}_terraform`;
-      await writeRawFileIfNotExists(join(terraformPath, `${name}.tf`), content);
+      return writeFile(join('terraform', `${name}.tf`), content);
     }),
   ]);
+
+  await writeWorkspace(dst, {
+    files: removeUndefined([
+      ...projectFiles.flat(),
+      ...workspaceFiles,
+      ...terraformFiles,
+      ...vscodeFiles,
+    ]),
+    fragments: workspaceFragments,
+    version: PACKAGE_VERSIONS.project,
+  });
 
   // Run setup.js
   console.log('Running post install script');
@@ -227,4 +244,20 @@ export async function generateWorkspace(
   // Final instructions
   console.log(`Run the following to get started:`);
   console.log(`cd ${relative(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
+}
+
+export async function writeWorkspaceFile(
+  workspace: Workspace | undefined,
+  root: string,
+  path: string,
+  file: string
+): Promise<FileHash> {
+  const newHash = md5(file);
+  const oldHash = workspace?.files.find(f => f.path === path)?.hash;
+  // Only write the file if it is different since last time we've generated the project.
+  // Prevent needlessly overwriting changes made in the project in between.
+  if (newHash !== oldHash) {
+    await writeRawFile(join(root, path), file);
+  }
+  return {path, hash: newHash};
 }

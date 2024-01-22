@@ -7,6 +7,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 
 import {REGION} from '@shared/env';
 
@@ -39,10 +40,17 @@ export const NotFoundError = NotFound;
 export async function headObject(options: {
   bucket: string;
   key: string;
-}): Promise<HeadObjectOutput> {
+}): Promise<HeadObjectOutput | undefined> {
   const {bucket, key} = options;
-  const res = await client.send(new HeadObjectCommand({Bucket: bucket, Key: key}));
-  return res;
+  try {
+    const res = await client.send(new HeadObjectCommand({Bucket: bucket, Key: key}));
+    return res;
+  } catch (err: unknown) {
+    if (err instanceof NotFoundError) {
+      return undefined;
+    }
+    throw err;
+  }
 }
 
 export async function getObject(options: {
@@ -64,4 +72,29 @@ export async function getObject(options: {
     }
     throw err;
   }
+}
+export async function getPresignedUploadUrl(
+  bucket: string,
+  key: string,
+  opts?: {expiresInSeconds?: number; contentType?: string}
+): Promise<string> {
+  const {expiresInSeconds, contentType} = opts ?? {};
+  return getSignedUrl(
+    client,
+    new PutObjectCommand({Bucket: bucket, Key: key, ContentType: contentType}),
+    {
+      expiresIn: expiresInSeconds,
+    }
+  );
+}
+
+export async function getPresignedDownloadUrl(
+  bucket: string,
+  key: string,
+  opts?: {expiresInSeconds?: number}
+): Promise<string> {
+  const {expiresInSeconds} = opts ?? {};
+  return getSignedUrl(client, new GetObjectCommand({Bucket: bucket, Key: key}), {
+    expiresIn: expiresInSeconds,
+  });
 }

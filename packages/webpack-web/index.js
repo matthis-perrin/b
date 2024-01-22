@@ -274,7 +274,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   listFiles: () => (/* binding */ listFiles),
 /* harmony export */   maybeReadFile: () => (/* binding */ maybeReadFile),
 /* harmony export */   prettierFormat: () => (/* binding */ prettierFormat),
+/* harmony export */   prettyJs: () => (/* binding */ prettyJs),
+/* harmony export */   prettyJson: () => (/* binding */ prettyJson),
+/* harmony export */   prettyTs: () => (/* binding */ prettyTs),
 /* harmony export */   readFile: () => (/* binding */ readFile),
+/* harmony export */   readFileInternal: () => (/* binding */ readFileInternal),
 /* harmony export */   readdir: () => (/* binding */ readdir),
 /* harmony export */   rmDir: () => (/* binding */ rmDir),
 /* harmony export */   stat: () => (/* binding */ stat),
@@ -298,7 +302,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const {
   access,
-  readFile,
+  readFile: readFileInternal,
   readdir,
   stat
 } = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
@@ -307,6 +311,10 @@ const {
   mkdir,
   rm
 } = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
+async function readFile(path) {
+  const buffer = await readFileInternal(path);
+  return buffer.toString();
+}
 const prettierConfig = parser => ({
   parser,
   printWidth: 100,
@@ -319,23 +327,32 @@ const prettierConfig = parser => ({
 async function prettierFormat(str, parser) {
   return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
 }
-async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, await prettierFormat(code, parser));
-}
-async function writeJsonFile(path, json) {
-  await writePrettyFile('json', path, JSON.stringify(json, undefined, 2));
-}
-async function writeJsFile(path, js) {
-  return writePrettyFile('babel', path, js);
-}
-async function writeTsFile(path, ts) {
-  return writePrettyFile('typescript', path, ts);
-}
 async function writeRawFile(path, content) {
   await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
     recursive: true
   });
   await writeFile(path, content);
+}
+async function prettyJson(json, opts) {
+  const {
+    compact
+  } = opts ?? {};
+  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('json'));
+}
+async function writeJsonFile(path, json) {
+  await writeRawFile(path, await prettyJson(json));
+}
+async function prettyJs(js) {
+  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(js, prettierConfig('babel'));
+}
+async function writeJsFile(path, js) {
+  await writeRawFile(path, await prettyJs(js));
+}
+async function prettyTs(ts) {
+  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(ts, prettierConfig('typescript'));
+}
+async function writeTsFile(path, ts) {
+  await writeRawFile(path, await prettyTs(ts));
 }
 async function writeRawFileIfNotExists(path, content) {
   if (await exists(path)) {

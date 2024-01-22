@@ -6,7 +6,7 @@ import {prompt} from 'prompts';
 import {rmDir} from '@src/fs';
 import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '@src/models';
 import {generateWorkspace, getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
-import {readWorkspaceFragments} from '@src/project/vscode_workspace';
+import {readWorkspace} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 
 async function cancel(workspacePath?: string): Promise<never> {
@@ -29,26 +29,22 @@ async function initProject(): Promise<void> {
   let workspacePath = process.cwd();
   const frags: WorkspaceFragment[] = [];
   const takenNames = ['terraform'];
-  const alreadyGenerated: ProjectName[] = [];
 
   // Check if we are already in a workspace
-  const workspaceFragments = await readWorkspaceFragments(workspacePath);
-  if (workspaceFragments !== undefined) {
+  const workspace = await readWorkspace(workspacePath);
+  if (workspace !== undefined) {
     for (const baseFrag of BASE_FRAGMENTS) {
-      if (!workspaceFragments.find(f => f.type === baseFrag.type)) {
+      if (!workspace.fragments.find(f => f.type === baseFrag.type)) {
         frags.push(baseFrag);
       }
     }
     workspaceName = basename(workspacePath);
-    for (const fragment of workspaceFragments) {
+    for (const fragment of workspace.fragments) {
       frags.push(fragment);
-      const projectNames = getProjectsFromWorkspaceFragment(fragment, workspaceFragments).map(
+      const projectNames = getProjectsFromWorkspaceFragment(fragment, workspace.fragments).map(
         p => p.projectName
       );
       takenNames.push(...projectNames);
-      if (!BASE_FRAGMENTS.find(frag => frag.type === fragment.type)) {
-        alreadyGenerated.push(...projectNames);
-      }
     }
   } else {
     frags.push(...BASE_FRAGMENTS);
@@ -88,7 +84,7 @@ async function initProject(): Promise<void> {
 
     const name = workspaceName as WorkspaceName;
 
-    await generateWorkspace(workspacePath, name, frags, alreadyGenerated);
+    await generateWorkspace(workspacePath, name, frags, workspace);
   } catch (err: unknown) {
     console.error(String(err));
     await cancel(workspaceName);

@@ -32,7 +32,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   listFiles: () => (/* binding */ listFiles),
 /* harmony export */   maybeReadFile: () => (/* binding */ maybeReadFile),
 /* harmony export */   prettierFormat: () => (/* binding */ prettierFormat),
+/* harmony export */   prettyJs: () => (/* binding */ prettyJs),
+/* harmony export */   prettyJson: () => (/* binding */ prettyJson),
+/* harmony export */   prettyTs: () => (/* binding */ prettyTs),
 /* harmony export */   readFile: () => (/* binding */ readFile),
+/* harmony export */   readFileInternal: () => (/* binding */ readFileInternal),
 /* harmony export */   readdir: () => (/* binding */ readdir),
 /* harmony export */   rmDir: () => (/* binding */ rmDir),
 /* harmony export */   stat: () => (/* binding */ stat),
@@ -56,7 +60,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const {
   access,
-  readFile,
+  readFile: readFileInternal,
   readdir,
   stat
 } = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
@@ -65,6 +69,10 @@ const {
   mkdir,
   rm
 } = node_fs__WEBPACK_IMPORTED_MODULE_1__.promises;
+async function readFile(path) {
+  const buffer = await readFileInternal(path);
+  return buffer.toString();
+}
 const prettierConfig = parser => ({
   parser,
   printWidth: 100,
@@ -77,23 +85,32 @@ const prettierConfig = parser => ({
 async function prettierFormat(str, parser) {
   return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
 }
-async function writePrettyFile(parser, path, code) {
-  await writeRawFile(path, await prettierFormat(code, parser));
-}
-async function writeJsonFile(path, json) {
-  await writePrettyFile('json', path, JSON.stringify(json, undefined, 2));
-}
-async function writeJsFile(path, js) {
-  return writePrettyFile('babel', path, js);
-}
-async function writeTsFile(path, ts) {
-  return writePrettyFile('typescript', path, ts);
-}
 async function writeRawFile(path, content) {
   await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
     recursive: true
   });
   await writeFile(path, content);
+}
+async function prettyJson(json, opts) {
+  const {
+    compact
+  } = opts ?? {};
+  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('json'));
+}
+async function writeJsonFile(path, json) {
+  await writeRawFile(path, await prettyJson(json));
+}
+async function prettyJs(js) {
+  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(js, prettierConfig('babel'));
+}
+async function writeJsFile(path, js) {
+  await writeRawFile(path, await prettyJs(js));
+}
+async function prettyTs(ts) {
+  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(ts, prettierConfig('typescript'));
+}
+async function writeTsFile(path, ts) {
+  await writeRawFile(path, await prettyTs(ts));
 }
 async function writeRawFileIfNotExists(path, content) {
   if (await exists(path)) {
@@ -292,25 +309,26 @@ function validateRegistry() {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateWorkspace: () => (/* binding */ generateWorkspace),
-/* harmony export */   getProjectsFromWorkspaceFragment: () => (/* binding */ getProjectsFromWorkspaceFragment)
+/* harmony export */   getProjectsFromWorkspaceFragment: () => (/* binding */ getProjectsFromWorkspaceFragment),
+/* harmony export */   writeWorkspaceFile: () => (/* binding */ writeWorkspaceFile)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(10);
-/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(10);
+/* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
+/* harmony import */ var _src_hash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(11);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
-/* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(11);
-/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(12);
-/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(13);
-/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(15);
-/* harmony import */ var _src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(21);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(22);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(20);
+/* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(13);
+/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(14);
+/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(15);
+/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(17);
+/* harmony import */ var _src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(23);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(24);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(22);
+/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(16);
 
 
 
@@ -324,7 +342,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_3__.fileURLToPath)(import.meta.url), '../templates');
+
+const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_2__.fileURLToPath)(import.meta.url), '../templates');
 function getProjectsFromWorkspaceFragment(fragment, allFragments) {
   if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StaticWebsite) {
     return [{
@@ -429,43 +448,53 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
   }
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_12__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
 }
-async function generateWorkspace(dst, workspaceName, workspaceFragments, alreadyGenerated) {
+async function generateWorkspace(dst, workspaceName, workspaceFragments, workspace) {
   const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f, workspaceFragments));
 
   // Create projects files from templates
-  await Promise.all(projects.filter(p => !alreadyGenerated.includes(p.projectName)).map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__.generateProject)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, project.projectName), project)));
+  const projectFiles = await Promise.all(projects.map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_6__.generateProject)(dst, project, workspace)));
 
   // Generate workspace root files
-  const SCRIPTS_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_3__.fileURLToPath)(import.meta.url), '../scripts');
-  await Promise.all([
+  const SCRIPTS_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_2__.fileURLToPath)(import.meta.url), '../scripts');
+  const writeFile = async (path, file) => writeWorkspaceFile(workspace, dst, path, file);
+  const workspaceFiles = await Promise.all([
   // package.json
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'package.json'), (0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_8__.generateWorkspacePackageJson)(workspaceName, projects)),
-  // .gitignore
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, '.gitignore'), (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__.generateGitIgnore)()),
+  writeFile('package.json', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJson)((0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_8__.generateWorkspacePackageJson)(workspaceName, projects))),
   // app.code-workspace
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeJsonFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'app.code-workspace'), (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__.generateCodeWorkspace)(workspaceName, workspaceFragments)),
-  // vscode folder
-  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(TEMPLATES_PATH, '.vscode'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, '.vscode'), {
-    recursive: true,
-    force: true
-  }),
+  writeFile('app.code-workspace', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJson)((0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__.generateCodeWorkspace)(workspaceName, workspaceFragments))),
+  // .gitignore
+  writeFile('.gitignore', (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_7__.generateGitIgnore)()),
   // setup.js
-  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'setup.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'setup.js')),
+  writeFile('setup.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'setup.js')))),
   // deploy.js
-  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'deploy.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'deploy.js')),
+  writeFile('deploy.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'deploy.js')))),
   // build.js
-  await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.cp)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(SCRIPTS_PATH, 'build.js'), (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'build.js'))]);
+  writeFile('build.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'build.js'))))]);
+
+  // Vscode folder
+  const vscodePath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(TEMPLATES_PATH, '.vscode');
+  const vscodeFileList = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.listFiles)(vscodePath);
+  const vscodeFiles = await Promise.all(vscodeFileList.map(async file => {
+    const relativePath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.relative)(vscodePath, file);
+    const dstPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('.vscode', relativePath);
+    const content = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)(file);
+    return writeFile(dstPath, content);
+  }));
 
   // Terraform folder generation
-  const terraformPath = (0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(dst, 'terraform');
-  await Promise.all([(0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFileIfNotExists)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, '.aws-credentials'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateDummyTerraformCredentials)()), (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFileIfNotExists)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'dynamo_table_dummy.tf'), (0,_src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_10__.generateDynamoTerraform)()), (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFileIfNotExists)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
+  const terraformFiles = await Promise.all([writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', '.aws-credentials'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateDummyTerraformCredentials)()), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', 'dynamo_table_dummy.tf'), (0,_src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_10__.generateDynamoTerraform)()), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
     const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_9__.generateWorkspaceProjectTerraform)(workspaceName, p);
     if (content === undefined) {
       return;
     }
     const name = `${p.projectName}_terraform`;
-    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFileIfNotExists)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, `${name}.tf`), content);
+    return writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `${name}.tf`), content);
   })]);
+  await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_11__.writeWorkspace)(dst, {
+    files: (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_12__.removeUndefined)([...projectFiles.flat(), ...workspaceFiles, ...terraformFiles, ...vscodeFiles]),
+    fragments: workspaceFragments,
+    version: _src_versions__WEBPACK_IMPORTED_MODULE_13__.PACKAGE_VERSIONS.project
+  });
 
   // Run setup.js
   console.log('Running post install script');
@@ -476,7 +505,21 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, already
 
   // Final instructions
   console.log(`Run the following to get started:`);
-  console.log(`cd ${(0,node_path__WEBPACK_IMPORTED_MODULE_2__.relative)(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
+  console.log(`cd ${(0,node_path__WEBPACK_IMPORTED_MODULE_1__.relative)(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
+}
+async function writeWorkspaceFile(workspace, root, path, file) {
+  var _workspace$files$find;
+  const newHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_4__.md5)(file);
+  const oldHash = workspace === null || workspace === void 0 || (_workspace$files$find = workspace.files.find(f => f.path === path)) === null || _workspace$files$find === void 0 ? void 0 : _workspace$files$find.hash;
+  // Only write the file if it is different since last time we've generated the project.
+  // Prevent needlessly overwriting changes made in the project in between.
+  if (newHash !== oldHash) {
+    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, path), file);
+  }
+  return {
+    path,
+    hash: newHash
+  };
 }
 
 /***/ }),
@@ -491,6 +534,32 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   hashPassword: () => (/* binding */ hashPassword),
+/* harmony export */   md5: () => (/* binding */ md5)
+/* harmony export */ });
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(12);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
+
+function md5(data) {
+  const content = typeof data === 'string' ? data : data.toString();
+  return (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.createHash)('md5').update(content).digest('hex');
+}
+function hashPassword(password, salt) {
+  return (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.createHash)('sha256').update(`${password}${salt}`).digest('base64');
+}
+
+/***/ }),
+/* 12 */
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
+
+/***/ }),
+/* 13 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateProject: () => (/* binding */ generateProject)
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
@@ -498,22 +567,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9);
+
 
 
 
 const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_1__.fileURLToPath)(import.meta.url), '../templates');
-async function generateProject(dst, project) {
+async function generateProject(dst, project, workspace) {
+  const written = [];
+  const writeFile = async (path, file) => (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_3__.writeWorkspaceFile)(workspace, dst, path, file);
   const {
     projectName,
     type,
     vars
   } = project;
+
   // Copy template files
   const templatePath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(TEMPLATES_PATH, type);
   const files = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.listFiles)(templatePath);
   await Promise.all(files.map(async file => {
-    const buffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.readFile)(file);
-    const content = buffer.toString();
+    const relativePath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.relative)(templatePath, file);
+    const dstPath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectName, relativePath);
+    const content = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.readFile)(file);
     let newContent = content;
     for (const [varName, varValue] of Object.entries(vars)) {
       newContent = newContent.replaceAll(varName, varValue);
@@ -522,22 +597,21 @@ async function generateProject(dst, project) {
       newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.prettierFormat)(newContent, 'typescript');
     }
     if (file.endsWith('.json')) {
-      newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.prettierFormat)(newContent, 'json');
+      if (file.endsWith('package.json')) {
+        const packageJson = JSON.parse(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.readFile)(file));
+        packageJson['name'] = projectName;
+        newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.prettyJson)(packageJson);
+      } else {
+        newContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.prettierFormat)(newContent, 'json');
+      }
     }
-    const relativePath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.relative)(templatePath, file);
-    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(dst, relativePath), newContent);
+    written.push(await writeFile(dstPath, newContent));
   }));
-
-  // Replace name in package.json
-  const packageJsonPath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(dst, 'package.json');
-  const packageJsonbuffer = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.readFile)(packageJsonPath);
-  const packageJson = JSON.parse(packageJsonbuffer.toString());
-  packageJson['name'] = projectName;
-  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.writeJsonFile)(packageJsonPath, packageJson);
+  return written;
 }
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -564,7 +638,7 @@ terraform/archives
 }
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -572,7 +646,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   generateWorkspacePackageJson: () => (/* binding */ generateWorkspacePackageJson)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(14);
+/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(16);
 
 
 function uniq(val) {
@@ -604,7 +678,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
 }
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -616,7 +690,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.34',
+  project: '1.8.39',
   eslint: '1.5.2',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
@@ -637,7 +711,7 @@ const LIB_VERSIONS = {
 };
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -647,11 +721,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   generateWorkspaceProjectTerraform: () => (/* binding */ generateWorkspaceProjectTerraform)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
-/* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(16);
-/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(17);
-/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(18);
-/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(19);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(20);
+/* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(18);
+/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(19);
+/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(20);
+/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(21);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(22);
 
 
 
@@ -697,12 +771,11 @@ function generateDummyTerraformCredentials() {
 [default]
 aws_access_key_id=
 aws_secret_access_key=
-aws_session_token=
 `.trim();
 }
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -782,7 +855,7 @@ resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
 }
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -902,7 +975,7 @@ resource "aws_iam_role" "${projectName}_lambda_exec" {
 }
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -938,7 +1011,7 @@ output "region" {
 }
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -985,26 +1058,284 @@ resource "aws_s3_bucket_policy" "code" {
 }
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   addPrefix: () => (/* binding */ addPrefix),
+/* harmony export */   asArray: () => (/* binding */ asArray),
+/* harmony export */   asArrayOrThrow: () => (/* binding */ asArrayOrThrow),
+/* harmony export */   asBoolean: () => (/* binding */ asBoolean),
+/* harmony export */   asBooleanOrThrow: () => (/* binding */ asBooleanOrThrow),
+/* harmony export */   asConstantOrThrow: () => (/* binding */ asConstantOrThrow),
+/* harmony export */   asDate: () => (/* binding */ asDate),
+/* harmony export */   asDateOrThrow: () => (/* binding */ asDateOrThrow),
+/* harmony export */   asError: () => (/* binding */ asError),
+/* harmony export */   asJson: () => (/* binding */ asJson),
+/* harmony export */   asJsonOrThrow: () => (/* binding */ asJsonOrThrow),
+/* harmony export */   asJsonString: () => (/* binding */ asJsonString),
+/* harmony export */   asJsonStringOrThrow: () => (/* binding */ asJsonStringOrThrow),
+/* harmony export */   asMap: () => (/* binding */ asMap),
+/* harmony export */   asMapArray: () => (/* binding */ asMapArray),
+/* harmony export */   asMapArrayOrThrow: () => (/* binding */ asMapArrayOrThrow),
+/* harmony export */   asMapOrThrow: () => (/* binding */ asMapOrThrow),
+/* harmony export */   asNumber: () => (/* binding */ asNumber),
+/* harmony export */   asNumberOrThrow: () => (/* binding */ asNumberOrThrow),
+/* harmony export */   asString: () => (/* binding */ asString),
+/* harmony export */   asStringArray: () => (/* binding */ asStringArray),
+/* harmony export */   asStringArrayOrThrow: () => (/* binding */ asStringArrayOrThrow),
+/* harmony export */   asStringOrThrow: () => (/* binding */ asStringOrThrow),
+/* harmony export */   errorAndStackAsString: () => (/* binding */ errorAndStackAsString),
+/* harmony export */   errorAsString: () => (/* binding */ errorAsString),
+/* harmony export */   isNull: () => (/* binding */ isNull),
+/* harmony export */   isNumber: () => (/* binding */ isNumber),
+/* harmony export */   isString: () => (/* binding */ isString),
+/* harmony export */   iterNumberEnum: () => (/* binding */ iterNumberEnum),
+/* harmony export */   iterStringEnum: () => (/* binding */ iterStringEnum),
 /* harmony export */   neverHappens: () => (/* binding */ neverHappens),
-/* harmony export */   removeUndefined: () => (/* binding */ removeUndefined)
+/* harmony export */   parseJson: () => (/* binding */ parseJson),
+/* harmony export */   removeUndefined: () => (/* binding */ removeUndefined),
+/* harmony export */   removeUndefinedOrNullProps: () => (/* binding */ removeUndefinedOrNullProps)
 /* harmony export */ });
-function neverHappens(value, msg) {
-  throw new Error(msg ?? `Unexpected value ${value}`);
-}
 function notUndefined(val) {
   return val !== undefined;
+}
+function isString(val) {
+  return typeof val === 'string';
+}
+function isNumber(val) {
+  return typeof val === 'number';
+}
+function iterNumberEnum(e) {
+  return Object.values(e).filter(isNumber);
+}
+function iterStringEnum(e) {
+  return Object.values(e).filter(isString);
 }
 function removeUndefined(arr) {
   return arr.filter(notUndefined);
 }
+function removeUndefinedOrNullProps(obj) {
+  return Object.fromEntries(
+  // eslint-disable-next-line no-null/no-null
+  Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null));
+}
+function neverHappens(value, errorMessage) {
+  throw new Error(errorMessage);
+}
+function asMap(value, defaultValue) {
+  // eslint-disable-next-line no-null/no-null
+  return typeof value === 'object' && value !== null ? value : defaultValue;
+}
+function asMapOrThrow(value) {
+  const valueAsMap = asMap(value);
+  if (valueAsMap === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a map`);
+  }
+  return valueAsMap;
+}
+function asJson(value, defaultValue) {
+  try {
+    const json = JSON.parse(value);
+    const res = asMap(json);
+    return res ?? defaultValue;
+  } catch {
+    return defaultValue;
+  }
+}
+function asJsonOrThrow(value) {
+  const valueAsJson = asJson(value);
+  if (valueAsJson === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a valid JSON string of a map`);
+  }
+  return valueAsJson;
+}
+function asJsonString(value, defaultValue) {
+  const str = asString(value);
+  return str === undefined ? defaultValue : defaultValue === undefined ? asJson(str) : asJson(str, defaultValue);
+}
+function asJsonStringOrThrow(value) {
+  return asJsonOrThrow(asStringOrThrow(value));
+}
+function asString(value, defaultValue) {
+  return typeof value === 'string' ? value : defaultValue;
+}
+function asStringOrThrow(value) {
+  const valueAsString = asString(value);
+  if (valueAsString === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a string`);
+  }
+  return valueAsString;
+}
+function asArray(value, defaultValue) {
+  return Array.isArray(value) ? value : defaultValue;
+}
+function asArrayOrThrow(value) {
+  if (!Array.isArray(value)) {
+    throw new Error(`Invalid value: \`${value}\` is not an array`);
+  }
+  return value;
+}
+function asStringArray(value, defaultValue) {
+  const arr = asArray(value);
+  if (arr === undefined) {
+    return defaultValue;
+  }
+  return removeUndefined(arr.map(s => asString(s)));
+}
+function asStringArrayOrThrow(value) {
+  const arr = asArrayOrThrow(value);
+  return arr.map(s => asStringOrThrow(s));
+}
+function asMapArray(value, defaultValue) {
+  const arr = asArray(value);
+  if (arr === undefined) {
+    return defaultValue;
+  }
+  return removeUndefined(arr.map(s => asMap(s)));
+}
+function asMapArrayOrThrow(value) {
+  const arr = asArrayOrThrow(value);
+  return arr.map(s => asMapOrThrow(s));
+}
+function asNumber(value, defaultValue) {
+  if (typeof value === 'number') {
+    return !isNaN(value) ? value : defaultValue;
+  }
+  if (typeof value === 'string') {
+    try {
+      const parsedValue = parseFloat(value);
+      return !isNaN(parsedValue) ? parsedValue : defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  }
+  return defaultValue;
+}
+function asNumberOrThrow(value) {
+  const valueAsNumber = asNumber(value);
+  if (valueAsNumber === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a number`);
+  }
+  return valueAsNumber;
+}
+function asBoolean(value, defaultValue) {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'number') {
+    return !isNaN(value) ? value !== 0 : false;
+  }
+  if (typeof value === 'string') {
+    if (value === '0' || value === 'false') {
+      return false;
+    } else if (value === '1' || value === 'true') {
+      return true;
+    }
+    return defaultValue;
+  }
+  return defaultValue;
+}
+function asBooleanOrThrow(value) {
+  const valueAsBoolean = asBoolean(value);
+  if (valueAsBoolean === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a boolean`);
+  }
+  return valueAsBoolean;
+}
+const TIMESTAMP_REGEX = /^[0-9]{1,15}$/u;
+function asDate(value, defaultValue) {
+  const date = value instanceof Date ? value : new Date(typeof value === 'string' && TIMESTAMP_REGEX.test(value) ? parseFloat(value) : String(value));
+  return isNaN(date.getTime()) ? defaultValue : date;
+}
+function asDateOrThrow(value) {
+  const valueAsDate = asDate(value);
+  if (valueAsDate === undefined) {
+    throw new Error(`Invalid value: \`${value}\` cannot be parsed as a Date`);
+  }
+  return valueAsDate;
+}
+
+// export function asDate(value: unknown): Date | undefined;
+// export function asDate(value: unknown, defaultValue: Date): Date;
+// export function asDate(value: unknown, defaultValue?: Date): Date | undefined {
+//   if (typeof value === 'number') {
+//     return new Date(value);
+//   }
+//   return value instanceof Date ? value : defaultValue;
+// }
+
+function isNull(val) {
+  // eslint-disable-next-line no-null/no-null
+  return val === null;
+}
+function asError(err) {
+  return err instanceof Error ? err : new Error(typeof err === 'string' ? err : String(err));
+}
+function errorAsString(err) {
+  const errorMap = asMap(err);
+  if (errorMap === undefined) {
+    return asString(err) ?? String(err);
+  }
+  const errorMessage = asString(errorMap['message']);
+  if (errorMessage === undefined) {
+    return String(err);
+  }
+  return errorMessage;
+}
+function errorAndStackAsString(err) {
+  const errorMap = asMap(err);
+  if (errorMap === undefined) {
+    return asString(err) ?? String(err);
+  }
+  const stack = asString(errorMap['stack']);
+  if (stack === undefined) {
+    return String(err);
+  }
+  return stack;
+}
+function asConstantOrThrow(value, expected) {
+  if (value !== expected) {
+    throw new Error(`Invalid value: \`${value}\`, expected \`${expected}\``);
+  }
+  return value;
+}
+
+// export function asParsedJson<T>(json: string): T {
+//   try {
+//     return JSON.parse(json) as T;
+//   } catch {
+//     const defaultValue = {};
+//     return defaultValue as T;
+//   }
+// }
+function parseJson(json) {
+  try {
+    return {
+      res: JSON.parse(json),
+      err: undefined
+    };
+  } catch (err) {
+    return {
+      err,
+      res: undefined
+    };
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+// Get all the keys of a type including the optional attributes
+
+// Type for an empty object (ie: {})
+
+function addPrefix(attr, prefix) {
+  return Object.fromEntries(Object.entries(attr).map(([key, value]) => [`${prefix}${key}`, value]));
+}
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1058,18 +1389,21 @@ resource "aws_dynamodb_table" "dummy_table" {
 }
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateCodeWorkspace: () => (/* binding */ generateCodeWorkspace),
-/* harmony export */   readWorkspaceFragments: () => (/* binding */ readWorkspaceFragments)
+/* harmony export */   readWorkspace: () => (/* binding */ readWorkspace),
+/* harmony export */   writeWorkspace: () => (/* binding */ writeWorkspace)
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(22);
+
 
 
 
@@ -1077,7 +1411,6 @@ function generateCodeWorkspace(workspaceName, workspaceFragments) {
   const projects = workspaceFragments.flatMap(f => (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__.getProjectsFromWorkspaceFragment)(f, workspaceFragments));
   const projectNames = projects.map(p => p.projectName);
   return {
-    projects: workspaceFragments,
     folders: [...projectNames.map(p => ({
       path: p
     })), {
@@ -1118,11 +1451,26 @@ function generateCodeWorkspace(workspaceName, workspaceFragments) {
     }
   };
 }
-async function readWorkspaceFragments(workspacePath) {
-  const workspaceContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_1__.maybeReadFile)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(workspacePath, 'app.code-workspace'));
-  const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
-  const workspaceProjects = Array.isArray(workspaceJson.projects) ? workspaceJson.projects : undefined;
-  return workspaceProjects;
+async function readWorkspace(workspacePath) {
+  const workspaceContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_1__.maybeReadFile)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(workspacePath, '.workspace'));
+  if (workspaceContent === undefined) {
+    return undefined;
+  }
+  const workspaceData = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.asMap)(JSON.parse(workspaceContent), {});
+  const {
+    fragments = [],
+    version = '',
+    files = []
+  } = workspaceData;
+  return {
+    fragments,
+    version,
+    files
+  };
+}
+async function writeWorkspace(workspacePath, workspace) {
+  workspace.files.sort((f1, f2) => f1.path.localeCompare(f2.path));
+  await (0,_src_fs__WEBPACK_IMPORTED_MODULE_1__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(workspacePath, '.workspace'), await (0,_src_fs__WEBPACK_IMPORTED_MODULE_1__.prettyJson)(workspace));
 }
 
 /***/ })
@@ -1207,8 +1555,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(22);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(20);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(24);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(22);
 
 
 
@@ -1237,24 +1585,20 @@ async function initProject() {
   let workspacePath = process.cwd();
   const frags = [];
   const takenNames = ['terraform'];
-  const alreadyGenerated = [];
 
   // Check if we are already in a workspace
-  const workspaceFragments = await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__.readWorkspaceFragments)(workspacePath);
-  if (workspaceFragments !== undefined) {
+  const workspace = await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_6__.readWorkspace)(workspacePath);
+  if (workspace !== undefined) {
     for (const baseFrag of BASE_FRAGMENTS) {
-      if (!workspaceFragments.find(f => f.type === baseFrag.type)) {
+      if (!workspace.fragments.find(f => f.type === baseFrag.type)) {
         frags.push(baseFrag);
       }
     }
     workspaceName = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.basename)(workspacePath);
-    for (const fragment of workspaceFragments) {
+    for (const fragment of workspace.fragments) {
       frags.push(fragment);
-      const projectNames = (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.getProjectsFromWorkspaceFragment)(fragment, workspaceFragments).map(p => p.projectName);
+      const projectNames = (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.getProjectsFromWorkspaceFragment)(fragment, workspace.fragments).map(p => p.projectName);
       takenNames.push(...projectNames);
-      if (!BASE_FRAGMENTS.find(frag => frag.type === fragment.type)) {
-        alreadyGenerated.push(...projectNames);
-      }
     }
   } else {
     frags.push(...BASE_FRAGMENTS);
@@ -1291,7 +1635,7 @@ async function initProject() {
       }
     }
     const name = workspaceName;
-    await (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.generateWorkspace)(workspacePath, name, frags, alreadyGenerated);
+    await (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.generateWorkspace)(workspacePath, name, frags, workspace);
   } catch (err) {
     console.error(String(err));
     await cancel(workspaceName);

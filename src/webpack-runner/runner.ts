@@ -9,7 +9,7 @@ import {registerExitCallback} from '@src/exit_handler';
 import {globalError} from '@src/global_error';
 import {ProjectName, ProjectType, WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment, WorkspaceProject} from '@src/project/generate_workspace';
-import {readWorkspaceFragments} from '@src/project/vscode_workspace';
+import {readWorkspace} from '@src/project/vscode_workspace';
 import {neverHappens, removeUndefined} from '@src/type_utils';
 import {
   FullLambdaServerEvent,
@@ -415,13 +415,13 @@ export async function runAllWebpacks(
 ): Promise<void> {
   const {root, watch} = options;
 
-  const workspaceFragments = await readWorkspaceFragments(root);
-  if (!workspaceFragments) {
+  const {fragments} = (await readWorkspace(root)) ?? {};
+  if (!fragments) {
     throw new Error(`No workspace projects at path ${root}`);
   }
   await runWebpacks({
     root,
-    workspaceFragments,
+    workspaceFragments: fragments,
     watch,
   });
 }

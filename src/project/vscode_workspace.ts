@@ -1,8 +1,9 @@
 import {join} from 'node:path';
 
-import {maybeReadFile} from '@src/fs';
+import {maybeReadFile, prettyJson, writeRawFile} from '@src/fs';
 import {WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
+import {asMap} from '@src/type_utils';
 
 export function generateCodeWorkspace(
   workspaceName: string,
@@ -13,7 +14,6 @@ export function generateCodeWorkspace(
   );
   const projectNames = projects.map(p => p.projectName);
   return {
-    projects: workspaceFragments,
     folders: [
       ...projectNames.map(p => ({path: p})),
       {path: 'terraform'},
@@ -62,13 +62,27 @@ export function generateCodeWorkspace(
   };
 }
 
-export async function readWorkspaceFragments(
-  workspacePath: string
-): Promise<WorkspaceFragment[] | undefined> {
-  const workspaceContent = await maybeReadFile(join(workspacePath, 'app.code-workspace'));
-  const workspaceJson = workspaceContent === undefined ? {} : JSON.parse(workspaceContent);
-  const workspaceProjects = Array.isArray(workspaceJson.projects)
-    ? workspaceJson.projects
-    : undefined;
-  return workspaceProjects as WorkspaceFragment[] | undefined;
+export interface FileHash {
+  path: string;
+  hash: string;
+}
+export interface Workspace {
+  fragments: WorkspaceFragment[];
+  version: string;
+  files: FileHash[];
+}
+
+export async function readWorkspace(workspacePath: string): Promise<Workspace | undefined> {
+  const workspaceContent = await maybeReadFile(join(workspacePath, '.workspace'));
+  if (workspaceContent === undefined) {
+    return undefined;
+  }
+  const workspaceData = asMap(JSON.parse(workspaceContent), {});
+  const {fragments = [], version = '', files = []} = workspaceData;
+  return {fragments, version, files} as Workspace;
+}
+
+export async function writeWorkspace(workspacePath: string, workspace: Workspace): Promise<void> {
+  workspace.files.sort((f1, f2) => f1.path.localeCompare(f2.path));
+  await writeRawFile(join(workspacePath, '.workspace'), await prettyJson(workspace));
 }
