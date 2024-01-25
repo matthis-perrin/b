@@ -25,7 +25,7 @@ function terraformOutputs() {
 }
 
 function getProjects() {
-  const projects = JSON.parse(readFileSync('app.code-workspace').toString()).projects;
+  const projects = JSON.parse(readFileSync('.workspace').toString()).fragments;
   if (!Array.isArray(projects)) {
     throw new Error('No projects in the workspace');
   }

@@ -19,8 +19,10 @@ type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 export function apiCaller<Name extends ApiName>(
   api: Name,
   fetcher: Fetcher,
-  logger: (msg: string, info?: unknown, err?: unknown) => void
+  logger: (msg: string, info?: unknown, err?: unknown) => void,
+  opts?: {schemaValidation: boolean}
 ) {
+  const {schemaValidation = true} = opts ?? {};
   const {host} = API_CONFIGS[api];
   const sanitizedHost = host.endsWith('/') ? host.slice(0, -1) : host;
   const apiSchemas = (ALL as AllApiSchema)[api as string];
@@ -78,8 +80,9 @@ export function apiCaller<Name extends ApiName>(
         throw new Error('Unexpected error');
       }
       try {
-        const res = parseSchema(resJson, schema.res);
-        return res as FlatApi<Name>[Endpoint]['res'];
+        return (
+          schemaValidation ? parseSchema(resJson, schema.res) : resJson
+        ) as FlatApi<Name>[Endpoint]['res'];
       } catch (err: unknown) {
         logger(`Invalid API response, schema not respected`, debugInfo, err);
         throw new Error('Unexpected error');
