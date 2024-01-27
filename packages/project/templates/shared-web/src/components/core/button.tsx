@@ -1,6 +1,6 @@
 import {MouseEvent, MouseEventHandler, useState} from 'react';
-import {NavLink as ReactRouterNavLink, NavLinkProps} from 'react-router-dom';
 import {styled} from 'styled-components';
+import {Link as WooterLink, LinkProps} from 'wouter';
 
 import {capitalize} from '@shared/lib/format_utils';
 import {AddPrefix, addPrefix} from '@shared/lib/type_utils';
@@ -71,13 +71,13 @@ export interface ButtonProps {
 interface ButtonTypes {
   button: Custom<ButtonProps, 'button'>;
   a: Custom<ButtonProps, 'a'>;
-  NavLink: Custom<ButtonProps & NavLinkProps, 'a'>;
+  NavLink: Custom<ButtonProps & LinkProps, 'a'>;
 }
 
-const underlyingComponent: Record<keyof ButtonTypes, string | typeof ReactRouterNavLink> = {
+const underlyingComponent: Record<keyof ButtonTypes, string | typeof WooterLink> = {
   button: 'button',
   a: 'a',
-  NavLink: ReactRouterNavLink,
+  NavLink: WooterLink,
 };
 
 export function createButton<Type extends keyof ButtonTypes>(opts: {

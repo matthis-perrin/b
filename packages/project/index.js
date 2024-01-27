@@ -691,7 +691,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.49',
+  project: '1.8.50',
   eslint: '1.5.3',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
@@ -706,9 +706,7 @@ const LIB_VERSIONS = {
   '@types/react-dom': '18.2.x',
   react: '18.2.x',
   'react-dom': '18.2.x',
-  'styled-components': '6.1.x',
-  'react-router': '6.4.x',
-  'react-router-dom': '6.4.x'
+  'styled-components': '6.1.x'
 };
 
 /***/ }),

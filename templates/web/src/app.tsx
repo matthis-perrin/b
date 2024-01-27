@@ -1,17 +1,19 @@
-import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {styled} from 'styled-components';
+import {Route} from 'wouter';
 
+import {TestPage} from '@src/test_page';
 import {HomePage} from '@src/home_page';
+import {NavBar} from '@src/nav_bar';
 
 export const App: React.FC = () => {
   return (
-    <Wrapper>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-        </Routes>
-      </BrowserRouter>
-    </Wrapper>
+    <Route path="/" nest>
+      <Wrapper>
+        <NavBar />
+        <Route path="/" component={HomePage} />
+        <Route path="/test" component={TestPage} />
+      </Wrapper>
+    </Route>
   );
 };
 App.displayName = 'App';
