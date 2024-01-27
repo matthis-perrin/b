@@ -7,7 +7,7 @@ import {sleep} from '@shared-web/lib/time_utils';
 
 import {apiCall} from '@src/lib/api';
 
-export const HomePage: React.FC = () => {
+export const TestPage: React.FC = () => {
   const handleClick = useCallback(async () => {
     await sleep(1000);
     const res = await apiCall('GET /test', {val: '1337'});
@@ -22,7 +22,7 @@ export const HomePage: React.FC = () => {
     </Wrapper>
   );
 };
-HomePage.displayName = 'HomePage';
+TestPage.displayName = 'TestPage';
 
 const Wrapper = styled.div`
   width: 100%;

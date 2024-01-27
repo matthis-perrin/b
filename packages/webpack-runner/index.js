@@ -753,7 +753,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.50',
+  project: '1.8.51',
   eslint: '1.5.3',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
