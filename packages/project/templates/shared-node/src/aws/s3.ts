@@ -91,10 +91,18 @@ export async function getPresignedUploadUrl(
 export async function getPresignedDownloadUrl(
   bucket: string,
   key: string,
-  opts?: {expiresInSeconds?: number}
+  opts?: {expiresInSeconds?: number; responseContentDisposition?: string}
 ): Promise<string> {
-  const {expiresInSeconds} = opts ?? {};
-  return getSignedUrl(client, new GetObjectCommand({Bucket: bucket, Key: key}), {
-    expiresIn: expiresInSeconds,
-  });
+  const o = opts ?? {};
+  return getSignedUrl(
+    client,
+    new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ResponseContentDisposition: o.responseContentDisposition,
+    }),
+    {
+      expiresIn: o.expiresInSeconds,
+    }
+  );
 }

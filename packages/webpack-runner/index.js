@@ -753,7 +753,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.51',
+  project: '1.8.52',
   eslint: '1.5.3',
   prettier: '1.3.0',
   tsconfig: '1.6.0',
@@ -950,6 +950,7 @@ resource "aws_lambda_function" "${projectName}" {
   runtime           = "nodejs20.x"
   role              = aws_iam_role.${projectName}_lambda_exec.arn
   timeout           = 900 // 15 minutes
+  memory_size       = 128 // Mo
   environment {
     variables = {
       NODE_OPTIONS = "--enable-source-maps"
