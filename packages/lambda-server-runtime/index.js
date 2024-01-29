@@ -618,7 +618,6 @@ const server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res
     method: ''
   });
 }).on('listening', () => {
-  process.stdout.write('ready');
   runtimeLog({
     event: 'start',
     port

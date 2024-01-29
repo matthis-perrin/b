@@ -64,7 +64,7 @@ export async function getIndex(opts: {
   frontendDomain: string;
 }): Promise<ApiResponse> {
   const {frontendName, frontendDomain} = opts;
-  if (indexHtmlCache !== undefined) {
+  if (indexHtmlCache !== undefined && NODE_ENV !== 'development') {
     return {body: indexHtmlCache, opts: {contentType: 'text/html'}};
   }
   const httpProtocol = `http${NODE_ENV === 'development' ? '' : 's'}://`;

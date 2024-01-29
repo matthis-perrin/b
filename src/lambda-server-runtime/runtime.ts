@@ -239,7 +239,6 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     runtimeLog({event: 'error', err: errorAndStackAsString(err), path: '', method: ''});
   })
   .on('listening', () => {
-    process.stdout.write('ready');
     runtimeLog({event: 'start', port});
   });
 
