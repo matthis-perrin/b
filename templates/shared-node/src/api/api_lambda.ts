@@ -45,7 +45,7 @@ export function apiResponseToLambdaResonse(opts: {
     const {body: rawBody, opts} = apiResponse;
 
     let body = rawBody;
-    let isBase64Encoded = false;
+    let isBase64Encoded = opts?.isBase64Encoded;
     if (Buffer.isBuffer(rawBody)) {
       body = rawBody.toString('base64');
       isBase64Encoded = true;

@@ -5,6 +5,7 @@ import {AllApiSchema} from '@shared/api/core/api_schema';
 import {ApiContext, ApiName, FlatApi} from '@shared/api/core/api_types';
 
 import {ApiRequest, ApiResponse} from '@shared-node/api/api_interface';
+import {compress} from '@shared-node/lib/gzip';
 
 export async function handleApi<Name extends ApiName>(
   req: ApiRequest,
@@ -39,7 +40,10 @@ export async function handleApi<Name extends ApiName>(
   try {
     const handlerReq = parseSchema(body, schema.req);
     const handlerRes = await Promise.resolve(handler(handlerReq, context));
-    return {body: JSON.stringify(handlerRes), opts: {extraHeaders}};
+
+    const compressedRes = await compress(JSON.stringify(handlerRes));
+    extraHeaders['Content-Encoding'] = 'gzip';
+    return {body: compressedRes.toString('base64'), opts: {extraHeaders, isBase64Encoded: true}};
   } catch (err: unknown) {
     // Error handling
     if (err instanceof HttpError) {
