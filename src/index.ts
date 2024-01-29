@@ -1,4 +1,5 @@
 import {eslintPackages} from '@src/eslint/index';
+import {error} from '@src/logger';
 import {EslintType, TsConfigType, WebpackType} from '@src/models';
 import {prettierPackage} from '@src/prettier/index';
 import {projectPackage} from '@src/project/index';
@@ -22,4 +23,4 @@ const webpackRuntimes = Object.values(WebpackType);
     webpackPackages(webpackRuntimes),
     webpackRunnerPackage(),
   ]);
-})().catch(console.error);
+})().catch(error);

@@ -1,6 +1,7 @@
 import {spawn} from 'node:child_process';
 
 import {registerExitCallback} from '@src/exit_handler';
+import {log} from '@src/logger';
 
 export function readLines(filePath: string, cb: (newLines: string[]) => void): () => void {
   const p = spawn('tail', ['-F', filePath], {stdio: 'pipe'});
@@ -19,7 +20,7 @@ export function readLines(filePath: string, cb: (newLines: string[]) => void): (
     data = lines.at(-1) ?? '';
   });
   p.on('error', err => {
-    console.log(err);
+    log(err);
   });
   return cleanup;
 }

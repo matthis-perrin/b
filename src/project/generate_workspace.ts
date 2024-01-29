@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 
 import {listFiles, prettyJs, prettyJson, readFile, writeRawFile} from '@src/fs';
 import {md5} from '@src/hash';
+import {log} from '@src/logger';
 import {
   ProjectName,
   ProjectType,
@@ -237,13 +238,13 @@ export async function generateWorkspace(
   });
 
   // Run setup.js
-  console.log('Running post install script');
+  log('Running post install script');
   const commands = [`cd ${dst}`, `node setup.js`, `git init`];
   execSync(commands.join(' && '), {stdio: ['ignore', 'inherit', 'inherit']});
 
   // Final instructions
-  console.log(`Run the following to get started:`);
-  console.log(`cd ${relative(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
+  log(`Run the following to get started:`);
+  log(`cd ${relative(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
 }
 
 export async function writeWorkspaceFile(

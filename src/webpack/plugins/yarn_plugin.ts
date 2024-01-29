@@ -4,6 +4,8 @@ import {join} from 'node:path';
 
 import {Compiler} from 'webpack';
 
+import {error} from '@src/logger';
+
 export class YarnPlugin {
   public apply(compiler: Compiler): void {
     compiler.hooks.beforeRun.tapAsync('YarnPlugin', (compiler, cb) => {
@@ -16,10 +18,10 @@ export class YarnPlugin {
         '--non-interactive',
         '--production=false',
       ].join(' ');
-      exec(command, {cwd: compiler.context}, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Yarn failed in ${compiler.context}`);
-          cb(error);
+      exec(command, {cwd: compiler.context}, (err, stdout, stderr) => {
+        if (err) {
+          error(`Yarn failed in ${compiler.context}`);
+          cb(err);
           return;
         }
         const warnings = stderr.split('\n').filter(l => l.trim().length > 0);

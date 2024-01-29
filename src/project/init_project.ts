@@ -4,13 +4,14 @@ import {basename, join} from 'node:path';
 import {prompt} from 'prompts';
 
 import {rmDir} from '@src/fs';
+import {error, log} from '@src/logger';
 import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '@src/models';
 import {generateWorkspace, getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
 import {readWorkspace} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 
 async function cancel(workspacePath?: string): Promise<never> {
-  console.log('Cancelling...');
+  log('Cancelling...');
   if (workspacePath !== undefined) {
     await rmDir(workspacePath);
   }
@@ -71,7 +72,7 @@ async function initProject(): Promise<void> {
       try {
         frag = await askForWorkspaceFragment(takenNames);
       } catch (err: unknown) {
-        console.error(String(err));
+        error(String(err));
         continue;
       }
       if (frag) {
@@ -86,7 +87,7 @@ async function initProject(): Promise<void> {
 
     await generateWorkspace(workspacePath, name, frags, workspace);
   } catch (err: unknown) {
-    console.error(String(err));
+    error(String(err));
     await cancel(workspaceName);
   }
 }
@@ -178,4 +179,4 @@ async function askForProjectName(
   return value as ProjectName;
 }
 
-initProject().catch(console.error);
+initProject().catch(error);

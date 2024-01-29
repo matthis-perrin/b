@@ -9,10 +9,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   baseConfig: () => (/* binding */ baseConfig)
 /* harmony export */ });
 /* harmony import */ var _src_webpack_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _src_webpack_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(12);
-/* harmony import */ var _src_webpack_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(19);
-/* harmony import */ var _src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(21);
-/* harmony import */ var _src_webpack_plugins_yarn_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(23);
+/* harmony import */ var _src_webpack_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var _src_webpack_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(20);
+/* harmony import */ var _src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(22);
+/* harmony import */ var _src_webpack_plugins_yarn_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(24);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(4);
 
 
@@ -94,6 +94,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8);
+/* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(12);
+
 
 
 
@@ -130,8 +132,8 @@ async function findPackageJson(p) {
     packageJsonCache.set(p, res);
     return res;
   } catch (err) {
-    console.log('findPackageJson');
-    console.log(err);
+    (0,_src_logger__WEBPACK_IMPORTED_MODULE_4__.log)('findPackageJson');
+    (0,_src_logger__WEBPACK_IMPORTED_MODULE_4__.log)(err);
     packageJsonCache.set(p, undefined);
     return undefined;
   }
@@ -368,6 +370,20 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   error: () => (/* binding */ error),
+/* harmony export */   log: () => (/* binding */ log)
+/* harmony export */ });
+const {
+  log,
+  error
+} = console;
+
+/***/ }),
+/* 13 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   EslintWebpackError: () => (/* binding */ EslintWebpackError),
 /* harmony export */   eslintPlugin: () => (/* binding */ eslintPlugin)
 /* harmony export */ });
@@ -375,14 +391,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
+/* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(14);
 /* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(chokidar__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+/* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(15);
 /* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(eslint__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(3);
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(webpack__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(15);
-/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(16);
+/* harmony import */ var _src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(16);
+/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(17);
 
 
 
@@ -590,19 +606,19 @@ function eslintPlugin() {
 }
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("chokidar");
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("eslint");
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -613,15 +629,15 @@ const ansiRegex = new RegExp(['[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*
 const stripAnsi = s => s.replace(ansiRegex, '');
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   StandalonePlugin: () => (/* binding */ StandalonePlugin)
 /* harmony export */ });
-/* harmony import */ var _src_exit_handler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(17);
-/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(18);
+/* harmony import */ var _src_exit_handler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(18);
+/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(19);
 
 
 class StandalonePlugin {
@@ -669,14 +685,14 @@ class StandalonePlugin {
 }
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   registerExitCallback: () => (/* binding */ registerExitCallback)
 /* harmony export */ });
-/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(18);
+/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
 
 let called = false;
 const callbacks = [];
@@ -702,7 +718,7 @@ function registerExitCallback(cb) {
 }
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -711,22 +727,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(12);
+
 
 function globalError(...val) {
   for (const data of val) {
     try {
       const str = typeof data === 'string' ? data : data instanceof Error ? data.stack ?? String(data) : JSON.stringify(data);
-      console.error(str);
+      (0,_src_logger__WEBPACK_IMPORTED_MODULE_1__.error)(str);
       (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', str);
     } catch {
-      console.error(String(val));
+      (0,_src_logger__WEBPACK_IMPORTED_MODULE_1__.error)(String(val));
       (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', String(val));
     }
   }
 }
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -735,7 +753,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(20);
+/* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(21);
 /* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__);
 
 
@@ -760,20 +778,20 @@ function forkTsCheckerPlugin(context) {
 }
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fork-ts-checker-webpack-plugin");
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   terserPlugin: () => (/* binding */ terserPlugin)
 /* harmony export */ });
-/* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(22);
+/* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(23);
 /* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__);
 
 function terserPlugin() {
@@ -788,13 +806,13 @@ function terserPlugin() {
 }
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("terser-webpack-plugin");
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -807,6 +825,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(12);
+
 
 
 
@@ -816,10 +836,10 @@ class YarnPlugin {
       const command = ['yarn', 'install', '--audit', '--check-files', '--ignore-optional', '--non-interactive', '--production=false'].join(' ');
       (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {
         cwd: compiler.context
-      }, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Yarn failed in ${compiler.context}`);
-          cb(error);
+      }, (err, stdout, stderr) => {
+        if (err) {
+          (0,_src_logger__WEBPACK_IMPORTED_MODULE_3__.error)(`Yarn failed in ${compiler.context}`);
+          cb(err);
           return;
         }
         const warnings = stderr.split('\n').filter(l => l.trim().length > 0);

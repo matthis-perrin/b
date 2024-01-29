@@ -11,6 +11,8 @@ import colors from 'ansi-colors';
 import packageMetadata from 'package-json';
 import {satisfies} from 'semver';
 
+import {error, log} from '@src/logger.js';
+
 function sameVersion(v1: string, v2: string): boolean {
   // eslint-disable-next-line unicorn/no-for-loop
   for (let index = 0; index < v1.length; index++) {
@@ -49,7 +51,7 @@ export async function check(): Promise<void> {
   }
 
   if (errors.length > 0) {
-    console.error(errors.join('\n'));
+    error(errors.join('\n'));
     process.exit(1); // eslint-disable-line node/no-process-exit
   }
 
@@ -58,9 +60,9 @@ export async function check(): Promise<void> {
   );
   const outdated = removeUndefined(res).sort(([name1], [name2]) => name1.localeCompare(name2));
   if (outdated.length === 0) {
-    console.log('Everything is up-to-date');
+    log('Everything is up-to-date');
   } else {
-    console.log(
+    log(
       table(
         outdated.map(([name, v1, v2]) => [name, v1, '->', v2]),
         {align: ['l', 'r', 'l', 'l']}
@@ -85,5 +87,5 @@ async function checkPackage(
   return undefined;
 }
 
-check().catch(console.error);
+check().catch(error);
 /* eslint-enable import/no-named-as-default-member */

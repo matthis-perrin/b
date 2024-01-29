@@ -5,6 +5,7 @@ import zlib from 'node:zlib';
 
 import {Configuration} from 'webpack-dev-server';
 
+import {error} from '@src/logger';
 import {getPort, initLogFile} from '@src/webpack/utils';
 
 export interface WebpackDevServerStartEvent {
@@ -28,7 +29,7 @@ export function webpackDevServer(context: string): Configuration {
       }
       logsSaved = [];
     })
-    .catch(console.error);
+    .catch(error);
   function log(event: WebpackDevServerEvent): void {
     if (logFile === undefined) {
       logsSaved.push(event);

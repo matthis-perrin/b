@@ -97,7 +97,7 @@ export function renderLambdaServerEvent(event: LambdaServerEvent): string {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === 'response') {
     const httpCode = `[HTTP ${event.statusCode}]`;
-    const size = `[${event.body.length.toLocaleString()}b]`;
+    const size = `[${event.bodyLength.toLocaleString()}b]`;
     const duration = `[${event.duration.toLocaleString()}ms]`;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     const color = event.statusCode >= 400 ? red : green;

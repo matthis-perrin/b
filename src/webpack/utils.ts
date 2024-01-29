@@ -3,6 +3,7 @@ import {mkdir, readdir, readFile, rm, stat} from 'node:fs/promises';
 import {join, resolve} from 'node:path';
 
 import {exists, rmDir} from '@src/fs';
+import {log} from '@src/logger';
 
 export interface WebpackConfigFragment {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,8 +47,8 @@ export async function findPackageJson(p: string): Promise<Record<string, unknown
     packageJsonCache.set(p, res);
     return res;
   } catch (err: unknown) {
-    console.log('findPackageJson');
-    console.log(err);
+    log('findPackageJson');
+    log(err);
     packageJsonCache.set(p, undefined);
     return undefined;
   }

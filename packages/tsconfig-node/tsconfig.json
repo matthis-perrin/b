@@ -26,7 +26,7 @@
     "noErrorTruncation": true,
     "pretty": true,
     "skipLibCheck": true,
-    "module": "commonjs",
+    "module": "es2022",
     "moduleResolution": "node",
     "lib": ["es2023"],
     "target": "es2022"

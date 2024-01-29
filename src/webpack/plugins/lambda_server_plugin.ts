@@ -1,11 +1,13 @@
-import {exec} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
-import {appendFileSync} from 'node:fs';
+import {appendFileSync, writeFileSync} from 'node:fs';
 import {createServer, IncomingMessage, Server, ServerResponse} from 'node:http';
 import {join} from 'node:path';
 
 import {Compiler} from 'webpack';
 
+import {maybeReadFile} from '@src/fs';
+import {md5} from '@src/hash';
+import {asMap, errorAndStackAsString} from '@src/type_utils';
 import {WebpackPlugin} from '@src/webpack/models';
 import {StandalonePlugin} from '@src/webpack/plugins/standalone_plugin';
 import {getPort, initLogFile} from '@src/webpack/utils';
@@ -26,7 +28,7 @@ export interface LambdaServerRequestEvent {
   event: 'request';
   path: string;
   method: string;
-  body?: string;
+  bodyLength: number;
 }
 
 export interface LambdaServerResponseEvent {
@@ -36,7 +38,7 @@ export interface LambdaServerResponseEvent {
   duration: number;
   statusCode: number;
   headers: Record<string, string>;
-  body: string;
+  bodyLength: number;
 }
 
 export type LambdaServerEvent =
@@ -46,11 +48,18 @@ export type LambdaServerEvent =
   | LambdaServerResponseEvent;
 export type FullLambdaServerEvent = {t: string} & LambdaServerEvent;
 
+interface LambdaHandler {
+  hash: string;
+  fn: Function;
+}
+
 class LambdaServerPlugin extends StandalonePlugin {
   protected name = 'LambdaServerPlugin';
   private server: Server | undefined;
   private runtimeLogFile?: string;
   private appLogFile?: string;
+
+  private handler: LambdaHandler | undefined;
 
   protected async setup(compiler: Compiler): Promise<void> {
     // Only starts the lambda server in watch mode
@@ -107,7 +116,7 @@ class LambdaServerPlugin extends StandalonePlugin {
               statusCode,
               duration,
               headers,
-              body: typeof body === 'string' ? body : 'Buffer',
+              bodyLength: body.length,
             });
             res.statusCode = statusCode;
             for (const [headerName, headerValue] of Object.entries(headers)) {
@@ -119,7 +128,7 @@ class LambdaServerPlugin extends StandalonePlugin {
 
           req.on('end', () => {
             // Log the request
-            this.runtimeLog({event: 'request', path: url, method, body});
+            this.runtimeLog({event: 'request', path: url, method, bodyLength: body.length});
 
             // Create the lambda event
             const event = {
@@ -150,84 +159,60 @@ class LambdaServerPlugin extends StandalonePlugin {
               isBase64Encoded: false,
             };
 
-            const TOKEN = randomUUID();
-
-            const handlerPath = join(this.context, 'dist/index.js');
-            const commandJs = `
-(async () => {
-  try {
-    const {handler} = await import('${handlerPath}');
-    const json = await handler(JSON.parse(atob('${btoa(JSON.stringify(event))}')));
-    process.stdout.write(\`${TOKEN}\${JSON.stringify(json)}${TOKEN}\`);
-  }
-  catch (err) {
-    process.stderr.write(\`${TOKEN}\${String(err)}${TOKEN}\`);
-  }
-})()
-        `.trim();
-            const command = [
-              `node --enable-source-maps -e "eval(atob('${btoa(commandJs)}'))"`,
-            ].join('');
-
-            const startTs = Date.now();
-            exec(
-              command,
-              {
-                env: {
-                  AWS_SHARED_CREDENTIALS_FILE: join(this.context, '../terraform/.aws-credentials'),
-                  PATH: process.env['PATH'], // eslint-disable-line node/no-process-env
-                },
-              },
-              (error, stdout, stderr) => {
-                const duration = Date.now() - startTs;
-                const infoOutput = this.parseOutput(stdout, TOKEN);
-                const errOutput = this.parseOutput(stderr, TOKEN);
-                this.appLog(infoOutput.logs);
-                this.appLog(errOutput.logs);
-
-                const err = error ? String(error) : errOutput.result;
-                if (err !== undefined) {
-                  return internalError(err.split('\n')[0] ?? err);
+            // Run the handler
+            this.loadHandler()
+              .then(handler => {
+                if (!handler) {
+                  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                  sendRes('Lambda handler not found', 0, 404);
+                  return;
                 }
-
-                const stdoutRes = infoOutput.result ?? '';
-                try {
-                  if (stdoutRes === 'undefined') {
-                    return internalError(`Lambda returned undefined`);
-                  }
-                  const result = JSON.parse(stdoutRes);
-                  if (result === undefined) {
-                    return internalError(`Invalid response: ${stdoutRes}`);
-                  }
-
-                  res.setHeader('Content-Type', 'application/json');
-                  // eslint-disable-next-line no-null/no-null
-                  if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
-                    const {body, headers, statusCode, isBase64Encoded} = result;
-                    if (!('statusCode' in result)) {
-                      return sendRes(stdoutRes, duration);
-                    } else if (typeof statusCode !== 'number') {
-                      return internalError(
-                        `statusCode ${JSON.stringify(statusCode)} is not a number`
-                      );
+                const startTs = Date.now();
+                Promise.resolve(handler.fn(event))
+                  .then(handlerRes => {
+                    const duration = Date.now() - startTs;
+                    try {
+                      if (handlerRes === undefined) {
+                        return internalError(`Invalid response: ${JSON.stringify(handlerRes)}`);
+                      }
+                      res.setHeader('Content-Type', 'application/json');
+                      if (
+                        typeof handlerRes === 'object' &&
+                        // eslint-disable-next-line no-null/no-null
+                        handlerRes !== null &&
+                        !Array.isArray(handlerRes)
+                      ) {
+                        const {body, headers, statusCode, isBase64Encoded} = handlerRes;
+                        if (!('statusCode' in handlerRes)) {
+                          return sendRes(JSON.stringify(handlerRes), duration);
+                        } else if (typeof statusCode !== 'number') {
+                          return internalError(
+                            `statusCode ${JSON.stringify(statusCode)} is not a number`
+                          );
+                        }
+                        const resBody =
+                          typeof body === 'string'
+                            ? typeof isBase64Encoded === 'boolean' && isBase64Encoded
+                              ? Buffer.from(body, 'base64')
+                              : body
+                            : JSON.stringify(body);
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                        return sendRes(resBody, duration, statusCode, headers);
+                      } else if (typeof handlerRes === 'string') {
+                        return sendRes(handlerRes, duration);
+                      }
+                      return sendRes(JSON.stringify(handlerRes), duration);
+                    } catch (err: unknown) {
+                      return internalError(errorAndStackAsString(err));
                     }
-                    const resBody =
-                      typeof body === 'string'
-                        ? typeof isBase64Encoded === 'boolean' && isBase64Encoded
-                          ? Buffer.from(body, 'base64')
-                          : body
-                        : JSON.stringify(body);
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                    return sendRes(resBody, duration, statusCode, headers);
-                  } else if (typeof result === 'string') {
-                    return sendRes(result, duration);
-                  }
-                  return sendRes(stdoutRes, duration);
-                } catch (err: unknown) {
-                  return internalError(String(err));
-                }
-              }
-            );
+                  })
+                  .catch((err: unknown) => {
+                    return internalError(errorAndStackAsString(err));
+                  });
+              })
+              .catch((err): void => {
+                internalError(`Error while loading handler: ${errorAndStackAsString(err)}`);
+              });
           });
         } catch (err: unknown) {
           internalError(String(err));
@@ -284,19 +269,67 @@ class LambdaServerPlugin extends StandalonePlugin {
     );
   }
 
-  private appLog(log: string | string[]): void {
+  private appLog(
+    appendFileSync: (file: string, content: string) => void,
+    log: string | string[]
+  ): void {
     const logs = Array.isArray(log) ? log : [log];
-    if (
-      this.appLogFile === undefined ||
-      logs.length === 0 ||
-      (logs.length === 1 && logs[0]?.length === 0)
-    ) {
+    if (this.appLogFile === undefined || logs.length === 0) {
       return;
     }
     appendFileSync(
       this.appLogFile,
       logs.map(log => `[${new Date().toISOString()}] ${log}\n`).join('')
     );
+  }
+
+  private clearLogs(): void {
+    if (this.appLogFile !== undefined) {
+      writeFileSync(this.appLogFile, '');
+    }
+    if (this.runtimeLogFile !== undefined) {
+      writeFileSync(this.runtimeLogFile, '');
+    }
+  }
+
+  private async loadHandler(): Promise<LambdaHandler | undefined> {
+    // Find the handler source file and compute its hash
+    const handlerPath = join(this.context, 'dist/index.js');
+    const handlerSource = await maybeReadFile(handlerPath);
+    if (handlerSource === undefined) {
+      // handler has never been compiled
+      this.handler = undefined;
+      return undefined;
+    }
+    const handlerHash = md5(handlerSource);
+
+    // If the hash is the same as the previously loaded handler, return the cached version
+    if (this.handler?.hash === handlerHash) {
+      return this.handler;
+    }
+
+    // If the hash changed (or if this is the first time), we load and validate the lambda handler.
+    // (Override the handler calls to the console)
+    const logger = this.appLog.bind(this, appendFileSync);
+    console.log = (...args: unknown[]) => logger(args.map(arg => JSON.stringify(arg)));
+    console.error = (...args: unknown[]) => logger(args.map(arg => JSON.stringify(arg)));
+    // eslint-disable-next-line node/no-unsupported-features/es-syntax, import/dynamic-import-chunkname
+    const imported = await import(/* webpackIgnore: true */ `${handlerPath}?v=${Date.now()}`);
+    const importedHandler = asMap(imported)?.['handler'];
+    if (typeof importedHandler !== 'function') {
+      // Invalid export
+      this.handler = undefined;
+      return undefined;
+    }
+
+    // Everything looks correct, save in the cache and return
+    this.clearLogs();
+    logger('*** Handler loaded ***');
+    this.handler = {
+      hash: handlerHash,
+      fn: importedHandler,
+    };
+    return this.handler;
   }
 }
 

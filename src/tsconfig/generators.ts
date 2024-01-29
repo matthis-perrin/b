@@ -62,14 +62,14 @@ function generateTsConfig(type: TsConfigType): Record<string, unknown> {
     additionalCompilerOptions = {
       module: 'none',
       moduleResolution: 'node',
-      lib: ['es2022'],
+      lib: ['es2023'],
       target: 'es2022',
     };
   } else if (type === TsConfigType.Web) {
     additionalCompilerOptions = {
       module: 'esnext',
       moduleResolution: 'node',
-      lib: ['es2022', 'dom', 'dom.iterable'],
+      lib: ['es2023', 'dom', 'dom.iterable'],
       target: 'esnext',
       //
       jsx: 'react-jsx',
@@ -77,7 +77,7 @@ function generateTsConfig(type: TsConfigType): Record<string, unknown> {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === TsConfigType.Node) {
     additionalCompilerOptions = {
-      module: 'commonjs',
+      module: 'es2022',
       moduleResolution: 'node',
       lib: ['es2023'],
       target: 'es2022',

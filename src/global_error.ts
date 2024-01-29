@@ -1,5 +1,7 @@
 import {appendFileSync} from 'node:fs';
 
+import {error} from '@src/logger';
+
 export function globalError(...val: unknown[]): void {
   for (const data of val) {
     try {
@@ -9,10 +11,10 @@ export function globalError(...val: unknown[]): void {
           : data instanceof Error
             ? data.stack ?? String(data)
             : JSON.stringify(data);
-      console.error(str);
+      error(str);
       appendFileSync('error.log', str);
     } catch {
-      console.error(String(val));
+      error(String(val));
       appendFileSync('error.log', String(val));
     }
   }

@@ -1,5 +1,6 @@
 import webpack, {DefinePlugin} from 'webpack'; // eslint-disable-line import/no-named-as-default
 
+import {error, log} from '@src/logger';
 import {nodeConfig} from '@src/webpack/common-configs/node_config';
 import {YarnPlugin} from '@src/webpack/plugins/yarn_plugin';
 
@@ -28,17 +29,15 @@ export async function compile(
   return new Promise((resolve, reject) => {
     webpack(config, (err, stats) => {
       if (err) {
-        console.error(`Failure to compile ${entry}`);
+        error(`Failure to compile ${entry}`);
         reject(err);
       } else if (stats?.hasErrors() || stats?.hasWarnings()) {
         const {errors = [], warnings = []} = stats.toJson({errors: true, warnings: true});
-        console.log('-------');
-        console.log(`Compiled ${entry} with errors:`);
-        console.log(errors.map(err => `${err.file}:${err.loc}\n[error] ${err.message}`).join('\n'));
-        console.log(
-          warnings.map(warn => `${warn.file}:${warn.loc}\n[warning] ${warn.message}`).join('\n')
-        );
-        console.log('-------');
+        log('-------');
+        log(`Compiled ${entry} with errors:`);
+        log(errors.map(err => `${err.file}:${err.loc}\n[error] ${err.message}`).join('\n'));
+        log(warnings.map(warn => `${warn.file}:${warn.loc}\n[warning] ${warn.message}`).join('\n'));
+        log('-------');
       }
       resolve();
     });

@@ -4,6 +4,7 @@ import {writeFile} from 'node:fs/promises';
 import {Compiler} from 'webpack';
 
 import {globalError} from '@src/global_error';
+import {error, log} from '@src/logger';
 import {WebpackPlugin} from '@src/webpack/models';
 import {findPackageJson} from '@src/webpack/utils';
 
@@ -30,7 +31,7 @@ class DependencyPackerPlugin {
           const {name, version} = result.descriptionFileData as {name: string; version: string};
           depMap.set(name, version);
         } else {
-          console.log('failure to identify module', result.descriptionFileData);
+          log('failure to identify module', result.descriptionFileData);
         }
         return result;
       });
@@ -44,7 +45,7 @@ class DependencyPackerPlugin {
     //   //       if (!('userRequest' in m)) {
     //   //         return;
     //   //       }
-    //   //       // console.log(
+    //   //       // log(
     //   //       //   compilation.resolverFactory
     //   //       //     .get('normal')
     //   //       //     .resolveSync(m.context, compiler.context, m.request)
@@ -118,11 +119,11 @@ async function yarnInstall(path: string): Promise<void> {
     exec(
       `yarn install --non-interactive --ignore-optional --production`,
       {cwd: path},
-      (error, stdout, stderr) => {
-        if (!error) {
+      (err, stdout, stderr) => {
+        if (!err) {
           resolve();
         } else {
-          console.error(`Failure to run \`yarn install\` at "${path}"\n${stderr}`);
+          error(`Failure to run \`yarn install\` at "${path}"\n${stderr}`);
           reject(new Error(stderr));
         }
       }

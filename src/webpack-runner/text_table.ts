@@ -44,13 +44,15 @@ export function table(data: Cell[][], options?: TextTableOptions): string {
   return data
     .map(line =>
       line
-        .map((cell, colIndex) => {
+        .map((cell, colIndex, arr) => {
           const content = formatCell(cell);
-          return padString(
-            content,
-            (maxWidths[colIndex] ?? 0) - stripAnsi(content).length,
-            align[colIndex] !== 'r'
-          );
+          return colIndex === arr.length - 1 && align[colIndex] !== 'r'
+            ? content
+            : padString(
+                content,
+                (maxWidths[colIndex] ?? 0) - stripAnsi(content).length,
+                align[colIndex] !== 'r'
+              );
         })
         .join(' ')
     )

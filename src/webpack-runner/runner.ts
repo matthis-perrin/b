@@ -7,6 +7,7 @@ import WebpackDevServer from 'webpack-dev-server';
 
 import {registerExitCallback} from '@src/exit_handler';
 import {globalError} from '@src/global_error';
+import {error, log} from '@src/logger';
 import {ProjectName, ProjectType, WorkspaceFragment} from '@src/models';
 import {getProjectsFromWorkspaceFragment, WorkspaceProject} from '@src/project/generate_workspace';
 import {readWorkspace} from '@src/project/vscode_workspace';
@@ -149,10 +150,10 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     if (watch) {
       process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
     }
-    console.log(table(summary));
+    log(table(summary));
     if (report.length > 0) {
-      console.log(`\nBuild completed with ${renderErrorWarningCount(errors)}\n`);
-      console.log(report);
+      log(`\nBuild completed with ${renderErrorWarningCount(errors)}\n`);
+      log(report);
     }
   }
 
@@ -386,22 +387,22 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
 
     process.on('SIGINT', () => {
       process.stdin.setRawMode(false);
-      console.log('See you soon!');
+      log('See you soon!');
       // eslint-disable-next-line node/no-process-exit
       process.exit(0);
     });
 
     // Handle uncaught error and exceptions
     process.on('uncaughtException', err => {
-      console.error('Uncaught Exception');
-      console.error(err);
+      error('Uncaught Exception');
+      error(err);
       process.emit('SIGINT', 'SIGINT');
     });
 
     // Handle unhandled failing promises
     process.on('unhandledRejection', err => {
-      console.error('Unhandled Rejection');
-      console.error(err);
+      error('Unhandled Rejection');
+      error(err);
       process.emit('SIGINT', 'SIGINT');
     });
   }

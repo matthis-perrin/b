@@ -11,9 +11,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
-/* harmony import */ var _src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(25);
-/* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
-/* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(32);
+/* harmony import */ var _src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(26);
+/* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(31);
+/* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(33);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
 
 
@@ -123,10 +123,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   baseConfig: () => (/* binding */ baseConfig)
 /* harmony export */ });
 /* harmony import */ var _src_webpack_plugins_define_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
-/* harmony import */ var _src_webpack_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
-/* harmony import */ var _src_webpack_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(20);
-/* harmony import */ var _src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(22);
-/* harmony import */ var _src_webpack_plugins_yarn_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(24);
+/* harmony import */ var _src_webpack_plugins_eslint_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(14);
+/* harmony import */ var _src_webpack_plugins_fork_ts_checker_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(21);
+/* harmony import */ var _src_webpack_plugins_terser_plugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(23);
+/* harmony import */ var _src_webpack_plugins_yarn_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(25);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
 
 
@@ -208,6 +208,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9);
+/* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(13);
+
 
 
 
@@ -244,8 +246,8 @@ async function findPackageJson(p) {
     packageJsonCache.set(p, res);
     return res;
   } catch (err) {
-    console.log('findPackageJson');
-    console.log(err);
+    (0,_src_logger__WEBPACK_IMPORTED_MODULE_4__.log)('findPackageJson');
+    (0,_src_logger__WEBPACK_IMPORTED_MODULE_4__.log)(err);
     packageJsonCache.set(p, undefined);
     return undefined;
   }
@@ -476,6 +478,20 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   error: () => (/* binding */ error),
+/* harmony export */   log: () => (/* binding */ log)
+/* harmony export */ });
+const {
+  log,
+  error
+} = console;
+
+/***/ }),
+/* 14 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   EslintWebpackError: () => (/* binding */ EslintWebpackError),
 /* harmony export */   eslintPlugin: () => (/* binding */ eslintPlugin)
 /* harmony export */ });
@@ -483,14 +499,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(14);
+/* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(15);
 /* harmony import */ var chokidar__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(chokidar__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(15);
+/* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(16);
 /* harmony import */ var eslint__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(eslint__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5);
 /* harmony import */ var webpack__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(webpack__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(16);
-/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(17);
+/* harmony import */ var _src_webpack_plugins_formatter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(17);
+/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(18);
 
 
 
@@ -698,19 +714,19 @@ function eslintPlugin() {
 }
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("chokidar");
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("eslint");
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -721,15 +737,15 @@ const ansiRegex = new RegExp(['[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*
 const stripAnsi = s => s.replace(ansiRegex, '');
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   StandalonePlugin: () => (/* binding */ StandalonePlugin)
 /* harmony export */ });
-/* harmony import */ var _src_exit_handler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(18);
-/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(19);
+/* harmony import */ var _src_exit_handler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
+/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(20);
 
 
 class StandalonePlugin {
@@ -777,14 +793,14 @@ class StandalonePlugin {
 }
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   registerExitCallback: () => (/* binding */ registerExitCallback)
 /* harmony export */ });
-/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
+/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
 
 let called = false;
 const callbacks = [];
@@ -810,7 +826,7 @@ function registerExitCallback(cb) {
 }
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -819,22 +835,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(11);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+
 
 function globalError(...val) {
   for (const data of val) {
     try {
       const str = typeof data === 'string' ? data : data instanceof Error ? data.stack ?? String(data) : JSON.stringify(data);
-      console.error(str);
+      (0,_src_logger__WEBPACK_IMPORTED_MODULE_1__.error)(str);
       (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', str);
     } catch {
-      console.error(String(val));
+      (0,_src_logger__WEBPACK_IMPORTED_MODULE_1__.error)(String(val));
       (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', String(val));
     }
   }
 }
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -843,7 +861,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(21);
+/* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(22);
 /* harmony import */ var fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(fork_ts_checker_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__);
 
 
@@ -868,20 +886,20 @@ function forkTsCheckerPlugin(context) {
 }
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("fork-ts-checker-webpack-plugin");
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   terserPlugin: () => (/* binding */ terserPlugin)
 /* harmony export */ });
-/* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(23);
+/* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(24);
 /* harmony import */ var terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(terser_webpack_plugin__WEBPACK_IMPORTED_MODULE_0__);
 
 function terserPlugin() {
@@ -896,13 +914,13 @@ function terserPlugin() {
 }
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("terser-webpack-plugin");
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -915,6 +933,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
+
 
 
 
@@ -924,10 +944,10 @@ class YarnPlugin {
       const command = ['yarn', 'install', '--audit', '--check-files', '--ignore-optional', '--non-interactive', '--production=false'].join(' ');
       (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {
         cwd: compiler.context
-      }, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Yarn failed in ${compiler.context}`);
-          cb(error);
+      }, (err, stdout, stderr) => {
+        if (err) {
+          (0,_src_logger__WEBPACK_IMPORTED_MODULE_3__.error)(`Yarn failed in ${compiler.context}`);
+          cb(err);
           return;
         }
         const warnings = stderr.split('\n').filter(l => l.trim().length > 0);
@@ -941,20 +961,20 @@ class YarnPlugin {
 }
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   babelLoaderNode: () => (/* binding */ babelLoaderNode)
 /* harmony export */ });
-/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(26);
+/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(27);
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(27);
+/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(28);
 /* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_env__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(28);
+/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(29);
 /* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(29);
+/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(babel_loader__WEBPACK_IMPORTED_MODULE_3__);
 /* eslint-disable import/no-unassigned-import */
 
@@ -979,46 +999,46 @@ function babelLoaderNode() {
 }
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("@babel/core");
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("@babel/preset-env");
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("@babel/preset-typescript");
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("babel-loader");
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   sourceMapLoader: () => (/* binding */ sourceMapLoader)
 /* harmony export */ });
-/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(26);
+/* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(27);
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(27);
+/* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(28);
 /* harmony import */ var _babel_preset_env__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_env__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(28);
+/* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(29);
 /* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(29);
+/* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(babel_loader__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(31);
+/* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(32);
 /* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(source_map_loader__WEBPACK_IMPORTED_MODULE_4__);
 /* eslint-disable import/no-unassigned-import */
 
@@ -1037,13 +1057,13 @@ function sourceMapLoader() {
 }
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("source-map-loader");
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1054,8 +1074,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(19);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var _src_global_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(20);
+/* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6);
+
 
 
 
@@ -1079,7 +1101,7 @@ class DependencyPackerPlugin {
           } = result.descriptionFileData;
           depMap.set(name, version);
         } else {
-          console.log('failure to identify module', result.descriptionFileData);
+          (0,_src_logger__WEBPACK_IMPORTED_MODULE_3__.log)('failure to identify module', result.descriptionFileData);
         }
         return result;
       });
@@ -1092,7 +1114,7 @@ class DependencyPackerPlugin {
     //   //       if (!('userRequest' in m)) {
     //   //         return;
     //   //       }
-    //   //       // console.log(
+    //   //       // log(
     //   //       //   compilation.resolverFactory
     //   //       //     .get('normal')
     //   //       //     .resolveSync(m.context, compiler.context, m.request)
@@ -1129,7 +1151,7 @@ class DependencyPackerPlugin {
           return;
         }
         const entryPoint = firstEntryPoint.import.at(-1);
-        const entryPackageJson = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_3__.findPackageJson)(entryPoint);
+        const entryPackageJson = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__.findPackageJson)(entryPoint);
         if (!entryPackageJson) {
           (0,_src_global_error__WEBPACK_IMPORTED_MODULE_2__.globalError)(`Failure to retrieve entryPoint's package.json for ${entryPoint}`);
           return;
@@ -1154,11 +1176,11 @@ async function yarnInstall(path) {
   return new Promise((resolve, reject) => {
     (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(`yarn install --non-interactive --ignore-optional --production`, {
       cwd: path
-    }, (error, stdout, stderr) => {
-      if (!error) {
+    }, (err, stdout, stderr) => {
+      if (!err) {
         resolve();
       } else {
-        console.error(`Failure to run \`yarn install\` at "${path}"\n${stderr}`);
+        (0,_src_logger__WEBPACK_IMPORTED_MODULE_3__.error)(`Failure to run \`yarn install\` at "${path}"\n${stderr}`);
         reject(new Error(stderr));
       }
     });
@@ -1169,25 +1191,26 @@ function dependencyPackerPlugin(packageJsonProperties) {
 }
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   lambdaServerPlugin: () => (/* binding */ lambdaServerPlugin)
 /* harmony export */ });
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
-/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(34);
-/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_http__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(2);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(17);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(35);
+/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_http__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
+/* harmony import */ var _src_hash__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(36);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(37);
+/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(18);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(6);
 
 
 
@@ -1195,18 +1218,20 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_5__.StandalonePlugin {
+
+
+class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_7__.StandalonePlugin {
   name = 'LambdaServerPlugin';
   async setup(compiler) {
     // Only starts the lambda server in watch mode
     if (!compiler.options.watch) {
       return;
     }
-    this.runtimeLogFile = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.initLogFile)(compiler.context, 'lambda_server_runtime.txt');
-    this.appLogFile = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.initLogFile)(compiler.context, 'lambda_server_log.txt');
+    this.runtimeLogFile = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.initLogFile)(compiler.context, 'lambda_server_runtime.txt');
+    this.appLogFile = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.initLogFile)(compiler.context, 'lambda_server_log.txt');
     return new Promise((resolve, reject) => {
-      const port = (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.getPort)(compiler.context);
-      this.server = (0,node_http__WEBPACK_IMPORTED_MODULE_3__.createServer)((req, res) => {
+      const port = (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.getPort)(compiler.context);
+      this.server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res) => {
         const url = req.url ?? '';
         if (url.startsWith('/favicon')) {
           res.end();
@@ -1244,7 +1269,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
               statusCode,
               duration,
               headers,
-              body: typeof body === 'string' ? body : 'Buffer'
+              bodyLength: body.length
             });
             res.statusCode = statusCode;
             for (const [headerName, headerValue] of Object.entries(headers)) {
@@ -1259,7 +1284,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
               event: 'request',
               path: url,
               method,
-              body
+              bodyLength: body.length
             });
 
             // Create the lambda event
@@ -1282,7 +1307,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
                   // sourceIp: '88.138.164.86',
                   userAgent: req.headers['user-agent']
                 },
-                requestId: (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)(),
+                requestId: (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.randomUUID)(),
                 routeKey: '$default',
                 stage: '$default',
                 timeEpoch: Date.now()
@@ -1290,70 +1315,51 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
               body,
               isBase64Encoded: false
             };
-            const TOKEN = (0,node_crypto__WEBPACK_IMPORTED_MODULE_1__.randomUUID)();
-            const handlerPath = (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, 'dist/index.js');
-            const commandJs = `
-(async () => {
-  try {
-    const {handler} = await import('${handlerPath}');
-    const json = await handler(JSON.parse(atob('${btoa(JSON.stringify(event))}')));
-    process.stdout.write(\`${TOKEN}\${JSON.stringify(json)}${TOKEN}\`);
-  }
-  catch (err) {
-    process.stderr.write(\`${TOKEN}\${String(err)}${TOKEN}\`);
-  }
-})()
-        `.trim();
-            const command = [`node --enable-source-maps -e "eval(atob('${btoa(commandJs)}'))"`].join('');
-            const startTs = Date.now();
-            (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {
-              env: {
-                AWS_SHARED_CREDENTIALS_FILE: (0,node_path__WEBPACK_IMPORTED_MODULE_4__.join)(this.context, '../terraform/.aws-credentials'),
-                PATH: process.env['PATH'] // eslint-disable-line node/no-process-env
+
+            // Run the handler
+            this.loadHandler().then(handler => {
+              if (!handler) {
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                sendRes('Lambda handler not found', 0, 404);
+                return;
               }
-            }, (error, stdout, stderr) => {
-              const duration = Date.now() - startTs;
-              const infoOutput = this.parseOutput(stdout, TOKEN);
-              const errOutput = this.parseOutput(stderr, TOKEN);
-              this.appLog(infoOutput.logs);
-              this.appLog(errOutput.logs);
-              const err = error ? String(error) : errOutput.result;
-              if (err !== undefined) {
-                return internalError(err.split('\n')[0] ?? err);
-              }
-              const stdoutRes = infoOutput.result ?? '';
-              try {
-                if (stdoutRes === 'undefined') {
-                  return internalError(`Lambda returned undefined`);
-                }
-                const result = JSON.parse(stdoutRes);
-                if (result === undefined) {
-                  return internalError(`Invalid response: ${stdoutRes}`);
-                }
-                res.setHeader('Content-Type', 'application/json');
-                // eslint-disable-next-line no-null/no-null
-                if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
-                  const {
-                    body,
-                    headers,
-                    statusCode,
-                    isBase64Encoded
-                  } = result;
-                  if (!('statusCode' in result)) {
-                    return sendRes(stdoutRes, duration);
-                  } else if (typeof statusCode !== 'number') {
-                    return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
+              const startTs = Date.now();
+              Promise.resolve(handler.fn(event)).then(handlerRes => {
+                const duration = Date.now() - startTs;
+                try {
+                  if (handlerRes === undefined) {
+                    return internalError(`Invalid response: ${JSON.stringify(handlerRes)}`);
                   }
-                  const resBody = typeof body === 'string' ? typeof isBase64Encoded === 'boolean' && isBase64Encoded ? Buffer.from(body, 'base64') : body : JSON.stringify(body);
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                  return sendRes(resBody, duration, statusCode, headers);
-                } else if (typeof result === 'string') {
-                  return sendRes(result, duration);
+                  res.setHeader('Content-Type', 'application/json');
+                  if (typeof handlerRes === 'object' &&
+                  // eslint-disable-next-line no-null/no-null
+                  handlerRes !== null && !Array.isArray(handlerRes)) {
+                    const {
+                      body,
+                      headers,
+                      statusCode,
+                      isBase64Encoded
+                    } = handlerRes;
+                    if (!('statusCode' in handlerRes)) {
+                      return sendRes(JSON.stringify(handlerRes), duration);
+                    } else if (typeof statusCode !== 'number') {
+                      return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
+                    }
+                    const resBody = typeof body === 'string' ? typeof isBase64Encoded === 'boolean' && isBase64Encoded ? Buffer.from(body, 'base64') : body : JSON.stringify(body);
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                    return sendRes(resBody, duration, statusCode, headers);
+                  } else if (typeof handlerRes === 'string') {
+                    return sendRes(handlerRes, duration);
+                  }
+                  return sendRes(JSON.stringify(handlerRes), duration);
+                } catch (err) {
+                  return internalError((0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.errorAndStackAsString)(err));
                 }
-                return sendRes(stdoutRes, duration);
-              } catch (err) {
-                return internalError(String(err));
-              }
+              }).catch(err => {
+                return internalError((0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.errorAndStackAsString)(err));
+              });
+            }).catch(err => {
+              internalError(`Error while loading handler: ${(0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.errorAndStackAsString)(err)}`);
             });
           });
         } catch (err) {
@@ -1406,18 +1412,65 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
     if (this.runtimeLogFile === undefined) {
       return;
     }
-    (0,node_fs__WEBPACK_IMPORTED_MODULE_2__.appendFileSync)(this.runtimeLogFile, `${JSON.stringify({
+    (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.appendFileSync)(this.runtimeLogFile, `${JSON.stringify({
       t: new Date().toISOString(),
       ...event
     })}\n`);
   }
-  appLog(log) {
-    var _logs$;
+  appLog(appendFileSync, log) {
     const logs = Array.isArray(log) ? log : [log];
-    if (this.appLogFile === undefined || logs.length === 0 || logs.length === 1 && ((_logs$ = logs[0]) === null || _logs$ === void 0 ? void 0 : _logs$.length) === 0) {
+    if (this.appLogFile === undefined || logs.length === 0) {
       return;
     }
-    (0,node_fs__WEBPACK_IMPORTED_MODULE_2__.appendFileSync)(this.appLogFile, logs.map(log => `[${new Date().toISOString()}] ${log}\n`).join(''));
+    appendFileSync(this.appLogFile, logs.map(log => `[${new Date().toISOString()}] ${log}\n`).join(''));
+  }
+  clearLogs() {
+    if (this.appLogFile !== undefined) {
+      (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(this.appLogFile, '');
+    }
+    if (this.runtimeLogFile !== undefined) {
+      (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(this.runtimeLogFile, '');
+    }
+  }
+  async loadHandler() {
+    var _this$handler, _asMap;
+    // Find the handler source file and compute its hash
+    const handlerPath = (0,node_path__WEBPACK_IMPORTED_MODULE_3__.join)(this.context, 'dist/index.js');
+    const handlerSource = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.maybeReadFile)(handlerPath);
+    if (handlerSource === undefined) {
+      // handler has never been compiled
+      this.handler = undefined;
+      return undefined;
+    }
+    const handlerHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_5__.md5)(handlerSource);
+
+    // If the hash is the same as the previously loaded handler, return the cached version
+    if (((_this$handler = this.handler) === null || _this$handler === void 0 ? void 0 : _this$handler.hash) === handlerHash) {
+      return this.handler;
+    }
+
+    // If the hash changed (or if this is the first time), we load and validate the lambda handler.
+    // (Override the handler calls to the console)
+    const logger = this.appLog.bind(this, node_fs__WEBPACK_IMPORTED_MODULE_1__.appendFileSync);
+    console.log = (...args) => logger(args.map(arg => JSON.stringify(arg)));
+    console.error = (...args) => logger(args.map(arg => JSON.stringify(arg)));
+    // eslint-disable-next-line node/no-unsupported-features/es-syntax, import/dynamic-import-chunkname
+    const imported = await import( /* webpackIgnore: true */`${handlerPath}?v=${Date.now()}`);
+    const importedHandler = (_asMap = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.asMap)(imported)) === null || _asMap === void 0 ? void 0 : _asMap['handler'];
+    if (typeof importedHandler !== 'function') {
+      // Invalid export
+      this.handler = undefined;
+      return undefined;
+    }
+
+    // Everything looks correct, save in the cache and return
+    this.clearLogs();
+    logger('*** Handler loaded ***');
+    this.handler = {
+      hash: handlerHash,
+      fn: importedHandler
+    };
+    return this.handler;
   }
 }
 function lambdaServerPlugin() {
@@ -1425,10 +1478,307 @@ function lambdaServerPlugin() {
 }
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:http");
+
+/***/ }),
+/* 36 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   hashPassword: () => (/* binding */ hashPassword),
+/* harmony export */   md5: () => (/* binding */ md5)
+/* harmony export */ });
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
+
+function md5(data) {
+  const content = typeof data === 'string' ? data : data.toString();
+  return (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.createHash)('md5').update(content).digest('hex');
+}
+function hashPassword(password, salt) {
+  return (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.createHash)('sha256').update(`${password}${salt}`).digest('base64');
+}
+
+/***/ }),
+/* 37 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   addPrefix: () => (/* binding */ addPrefix),
+/* harmony export */   asArray: () => (/* binding */ asArray),
+/* harmony export */   asArrayOrThrow: () => (/* binding */ asArrayOrThrow),
+/* harmony export */   asBoolean: () => (/* binding */ asBoolean),
+/* harmony export */   asBooleanOrThrow: () => (/* binding */ asBooleanOrThrow),
+/* harmony export */   asConstantOrThrow: () => (/* binding */ asConstantOrThrow),
+/* harmony export */   asDate: () => (/* binding */ asDate),
+/* harmony export */   asDateOrThrow: () => (/* binding */ asDateOrThrow),
+/* harmony export */   asError: () => (/* binding */ asError),
+/* harmony export */   asJson: () => (/* binding */ asJson),
+/* harmony export */   asJsonOrThrow: () => (/* binding */ asJsonOrThrow),
+/* harmony export */   asJsonString: () => (/* binding */ asJsonString),
+/* harmony export */   asJsonStringOrThrow: () => (/* binding */ asJsonStringOrThrow),
+/* harmony export */   asMap: () => (/* binding */ asMap),
+/* harmony export */   asMapArray: () => (/* binding */ asMapArray),
+/* harmony export */   asMapArrayOrThrow: () => (/* binding */ asMapArrayOrThrow),
+/* harmony export */   asMapOrThrow: () => (/* binding */ asMapOrThrow),
+/* harmony export */   asNumber: () => (/* binding */ asNumber),
+/* harmony export */   asNumberOrThrow: () => (/* binding */ asNumberOrThrow),
+/* harmony export */   asString: () => (/* binding */ asString),
+/* harmony export */   asStringArray: () => (/* binding */ asStringArray),
+/* harmony export */   asStringArrayOrThrow: () => (/* binding */ asStringArrayOrThrow),
+/* harmony export */   asStringOrThrow: () => (/* binding */ asStringOrThrow),
+/* harmony export */   errorAndStackAsString: () => (/* binding */ errorAndStackAsString),
+/* harmony export */   errorAsString: () => (/* binding */ errorAsString),
+/* harmony export */   isNull: () => (/* binding */ isNull),
+/* harmony export */   isNumber: () => (/* binding */ isNumber),
+/* harmony export */   isString: () => (/* binding */ isString),
+/* harmony export */   iterNumberEnum: () => (/* binding */ iterNumberEnum),
+/* harmony export */   iterStringEnum: () => (/* binding */ iterStringEnum),
+/* harmony export */   neverHappens: () => (/* binding */ neverHappens),
+/* harmony export */   parseJson: () => (/* binding */ parseJson),
+/* harmony export */   removeUndefined: () => (/* binding */ removeUndefined),
+/* harmony export */   removeUndefinedOrNullProps: () => (/* binding */ removeUndefinedOrNullProps)
+/* harmony export */ });
+function notUndefined(val) {
+  return val !== undefined;
+}
+function isString(val) {
+  return typeof val === 'string';
+}
+function isNumber(val) {
+  return typeof val === 'number';
+}
+function iterNumberEnum(e) {
+  return Object.values(e).filter(isNumber);
+}
+function iterStringEnum(e) {
+  return Object.values(e).filter(isString);
+}
+function removeUndefined(arr) {
+  return arr.filter(notUndefined);
+}
+function removeUndefinedOrNullProps(obj) {
+  return Object.fromEntries(
+  // eslint-disable-next-line no-null/no-null
+  Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null));
+}
+function neverHappens(value, errorMessage) {
+  throw new Error(errorMessage);
+}
+function asMap(value, defaultValue) {
+  // eslint-disable-next-line no-null/no-null
+  return typeof value === 'object' && value !== null ? value : defaultValue;
+}
+function asMapOrThrow(value) {
+  const valueAsMap = asMap(value);
+  if (valueAsMap === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a map`);
+  }
+  return valueAsMap;
+}
+function asJson(value, defaultValue) {
+  try {
+    const json = JSON.parse(value);
+    const res = asMap(json);
+    return res ?? defaultValue;
+  } catch {
+    return defaultValue;
+  }
+}
+function asJsonOrThrow(value) {
+  const valueAsJson = asJson(value);
+  if (valueAsJson === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a valid JSON string of a map`);
+  }
+  return valueAsJson;
+}
+function asJsonString(value, defaultValue) {
+  const str = asString(value);
+  return str === undefined ? defaultValue : defaultValue === undefined ? asJson(str) : asJson(str, defaultValue);
+}
+function asJsonStringOrThrow(value) {
+  return asJsonOrThrow(asStringOrThrow(value));
+}
+function asString(value, defaultValue) {
+  return typeof value === 'string' ? value : defaultValue;
+}
+function asStringOrThrow(value) {
+  const valueAsString = asString(value);
+  if (valueAsString === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a string`);
+  }
+  return valueAsString;
+}
+function asArray(value, defaultValue) {
+  return Array.isArray(value) ? value : defaultValue;
+}
+function asArrayOrThrow(value) {
+  if (!Array.isArray(value)) {
+    throw new Error(`Invalid value: \`${value}\` is not an array`);
+  }
+  return value;
+}
+function asStringArray(value, defaultValue) {
+  const arr = asArray(value);
+  if (arr === undefined) {
+    return defaultValue;
+  }
+  return removeUndefined(arr.map(s => asString(s)));
+}
+function asStringArrayOrThrow(value) {
+  const arr = asArrayOrThrow(value);
+  return arr.map(s => asStringOrThrow(s));
+}
+function asMapArray(value, defaultValue) {
+  const arr = asArray(value);
+  if (arr === undefined) {
+    return defaultValue;
+  }
+  return removeUndefined(arr.map(s => asMap(s)));
+}
+function asMapArrayOrThrow(value) {
+  const arr = asArrayOrThrow(value);
+  return arr.map(s => asMapOrThrow(s));
+}
+function asNumber(value, defaultValue) {
+  if (typeof value === 'number') {
+    return !isNaN(value) ? value : defaultValue;
+  }
+  if (typeof value === 'string') {
+    try {
+      const parsedValue = parseFloat(value);
+      return !isNaN(parsedValue) ? parsedValue : defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  }
+  return defaultValue;
+}
+function asNumberOrThrow(value) {
+  const valueAsNumber = asNumber(value);
+  if (valueAsNumber === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a number`);
+  }
+  return valueAsNumber;
+}
+function asBoolean(value, defaultValue) {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'number') {
+    return !isNaN(value) ? value !== 0 : false;
+  }
+  if (typeof value === 'string') {
+    if (value === '0' || value === 'false') {
+      return false;
+    } else if (value === '1' || value === 'true') {
+      return true;
+    }
+    return defaultValue;
+  }
+  return defaultValue;
+}
+function asBooleanOrThrow(value) {
+  const valueAsBoolean = asBoolean(value);
+  if (valueAsBoolean === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a boolean`);
+  }
+  return valueAsBoolean;
+}
+const TIMESTAMP_REGEX = /^[0-9]{1,15}$/u;
+function asDate(value, defaultValue) {
+  const date = value instanceof Date ? value : new Date(typeof value === 'string' && TIMESTAMP_REGEX.test(value) ? parseFloat(value) : String(value));
+  return isNaN(date.getTime()) ? defaultValue : date;
+}
+function asDateOrThrow(value) {
+  const valueAsDate = asDate(value);
+  if (valueAsDate === undefined) {
+    throw new Error(`Invalid value: \`${value}\` cannot be parsed as a Date`);
+  }
+  return valueAsDate;
+}
+
+// export function asDate(value: unknown): Date | undefined;
+// export function asDate(value: unknown, defaultValue: Date): Date;
+// export function asDate(value: unknown, defaultValue?: Date): Date | undefined {
+//   if (typeof value === 'number') {
+//     return new Date(value);
+//   }
+//   return value instanceof Date ? value : defaultValue;
+// }
+
+function isNull(val) {
+  // eslint-disable-next-line no-null/no-null
+  return val === null;
+}
+function asError(err) {
+  return err instanceof Error ? err : new Error(typeof err === 'string' ? err : String(err));
+}
+function errorAsString(err) {
+  const errorMap = asMap(err);
+  if (errorMap === undefined) {
+    return asString(err) ?? String(err);
+  }
+  const errorMessage = asString(errorMap['message']);
+  if (errorMessage === undefined) {
+    return String(err);
+  }
+  return errorMessage;
+}
+function errorAndStackAsString(err) {
+  const errorMap = asMap(err);
+  if (errorMap === undefined) {
+    return asString(err) ?? String(err);
+  }
+  const stack = asString(errorMap['stack']);
+  if (stack === undefined) {
+    return String(err);
+  }
+  return stack;
+}
+function asConstantOrThrow(value, expected) {
+  if (value !== expected) {
+    throw new Error(`Invalid value: \`${value}\`, expected \`${expected}\``);
+  }
+  return value;
+}
+
+// export function asParsedJson<T>(json: string): T {
+//   try {
+//     return JSON.parse(json) as T;
+//   } catch {
+//     const defaultValue = {};
+//     return defaultValue as T;
+//   }
+// }
+function parseJson(json) {
+  try {
+    return {
+      res: JSON.parse(json),
+      err: undefined
+    };
+  } catch (err) {
+    return {
+      err,
+      res: undefined
+    };
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+// Get all the keys of a type including the optional attributes
+
+// Type for an empty object (ie: {})
+
+function addPrefix(attr, prefix) {
+  return Object.fromEntries(Object.entries(attr).map(([key, value]) => [`${prefix}${key}`, value]));
+}
 
 /***/ })
 /******/ ]);
@@ -1507,7 +1857,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   config: () => (/* binding */ config)
 /* harmony export */ });
 /* harmony import */ var _src_webpack_common_configs_node_config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(33);
+/* harmony import */ var _src_webpack_plugins_lambda_server_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(34);
 
 
 function config(opts) {
