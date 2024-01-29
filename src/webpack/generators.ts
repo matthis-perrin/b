@@ -1,7 +1,7 @@
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {cleanDir} from '@src/fs';
+import {cleanDir, readFile, writeRawFile} from '@src/fs';
 import {WebpackType} from '@src/models';
 import {compile} from '@src/packager';
 import {PACKAGE_VERSIONS} from '@src/versions';
@@ -25,4 +25,15 @@ async function compileWebpackConfig(type: WebpackType, path: string): Promise<vo
     name: `@matthis/webpack-${type}`,
     version: PACKAGE_VERSIONS.webpack,
   });
+  if (type === WebpackType.Lambda) {
+    const packageJsonPath = join(
+      fileURLToPath(import.meta.url),
+      `../../packages/webpack-lambda/package.json`
+    );
+    const packageJsonContent = await readFile(packageJsonPath);
+    const packageJson = JSON.parse(packageJsonContent);
+    packageJson.dependencies['@matthis/lambda-server-runtime'] =
+      PACKAGE_VERSIONS.lambdaServerRuntime;
+    await writeRawFile(packageJsonPath, JSON.stringify(packageJson, undefined, 2));
+  }
 }

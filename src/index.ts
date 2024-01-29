@@ -1,4 +1,5 @@
 import {eslintPackages} from '@src/eslint/index';
+import {lambdaServerRuntimePackage} from '@src/lambda-server-runtime';
 import {error} from '@src/logger';
 import {EslintType, TsConfigType, WebpackType} from '@src/models';
 import {prettierPackage} from '@src/prettier/index';
@@ -22,5 +23,6 @@ const webpackRuntimes = Object.values(WebpackType);
     tsconfigPackages(tsConfigRuntimes),
     webpackPackages(webpackRuntimes),
     webpackRunnerPackage(),
+    lambdaServerRuntimePackage(),
   ]);
 })().catch(error);

@@ -8,8 +8,13 @@ import {error, log} from '@src/logger';
 import {WebpackPlugin} from '@src/webpack/models';
 import {findPackageJson} from '@src/webpack/utils';
 
+interface DependencyPackerPluginOptions {
+  packageJsonProperties?: Record<string, unknown>;
+  disableYarnRun?: boolean;
+}
+
 class DependencyPackerPlugin {
-  public constructor(private readonly packageJsonProperties: Record<string, unknown> = {}) {}
+  public constructor(private readonly opts: DependencyPackerPluginOptions = {}) {}
 
   public apply(compiler: Compiler): void {
     const name = 'DependencyPackerPlugin';
@@ -73,7 +78,7 @@ class DependencyPackerPlugin {
         [...depMap.entries()].sort((e1, e2) => e1[0].localeCompare(e2[0]))
       );
 
-      let {name, version, ...extraProps} = this.packageJsonProperties;
+      let {name, version, ...extraProps} = this.opts.packageJsonProperties ?? {};
 
       if (name === undefined || version === undefined) {
         const entryPoints = Object.values(stats.compilation.compiler.options.entry);
@@ -108,8 +113,9 @@ class DependencyPackerPlugin {
           2
         )
       );
-
-      await yarnInstall(outputDirectory);
+      if (!this.opts.disableYarnRun) {
+        await yarnInstall(outputDirectory);
+      }
     });
   }
 }
@@ -131,8 +137,6 @@ async function yarnInstall(path: string): Promise<void> {
   });
 }
 
-export function dependencyPackerPlugin(
-  packageJsonProperties?: Record<string, unknown>
-): WebpackPlugin {
-  return new DependencyPackerPlugin(packageJsonProperties);
+export function dependencyPackerPlugin(opts?: DependencyPackerPluginOptions): WebpackPlugin {
+  return new DependencyPackerPlugin(opts);
 }

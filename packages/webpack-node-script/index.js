@@ -27,7 +27,8 @@ function nodeConfig(opts) {
     watch,
     isLib,
     noEntry,
-    packageJsonProperties
+    packageJsonProperties,
+    disableYarnRun
   } = opts;
   const base = (0,_src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)({
     context,
@@ -69,7 +70,10 @@ function nodeConfig(opts) {
         '@shared-node': (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(context, '../shared-node/src')
       }
     },
-    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__.dependencyPackerPlugin)(packageJsonProperties)],
+    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__.dependencyPackerPlugin)({
+      packageJsonProperties,
+      disableYarnRun
+    })],
     externals: (ctx, cb) => {
       const {
         request,
@@ -1083,8 +1087,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class DependencyPackerPlugin {
-  constructor(packageJsonProperties = {}) {
-    this.packageJsonProperties = packageJsonProperties;
+  constructor(opts = {}) {
+    this.opts = opts;
   }
   apply(compiler) {
     const name = 'DependencyPackerPlugin';
@@ -1143,7 +1147,7 @@ class DependencyPackerPlugin {
         name,
         version,
         ...extraProps
-      } = this.packageJsonProperties;
+      } = this.opts.packageJsonProperties ?? {};
       if (name === undefined || version === undefined) {
         const entryPoints = Object.values(stats.compilation.compiler.options.entry);
         const [firstEntryPoint] = entryPoints;
@@ -1168,7 +1172,9 @@ class DependencyPackerPlugin {
         ...extraProps,
         dependencies
       }, undefined, 2));
-      await yarnInstall(outputDirectory);
+      if (!this.opts.disableYarnRun) {
+        await yarnInstall(outputDirectory);
+      }
     });
   }
 }
@@ -1186,8 +1192,8 @@ async function yarnInstall(path) {
     });
   });
 }
-function dependencyPackerPlugin(packageJsonProperties) {
-  return new DependencyPackerPlugin(packageJsonProperties);
+function dependencyPackerPlugin(opts) {
+  return new DependencyPackerPlugin(opts);
 }
 
 /***/ })

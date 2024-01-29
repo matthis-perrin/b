@@ -15,6 +15,7 @@ export async function compile(
     watch: false,
     isLib,
     packageJsonProperties,
+    disableYarnRun: true,
   });
   const plugins = (baseConfig.plugins ?? []).filter(
     p => !(p instanceof DefinePlugin || p instanceof YarnPlugin)

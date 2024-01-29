@@ -47,7 +47,7 @@ const unpublishedVersions = await Promise.all(
   })
 );
 const publishedVersions = new Map(
-  await Promise.all(packageDirs.map(async p => [p, (await version(p)).version]))
+  await Promise.all(packageDirs.map(async p => [p, (await version(p))?.version]))
 );
 
 const toPublish = unpublishedVersions.filter(

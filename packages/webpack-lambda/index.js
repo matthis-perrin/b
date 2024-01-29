@@ -27,7 +27,8 @@ function nodeConfig(opts) {
     watch,
     isLib,
     noEntry,
-    packageJsonProperties
+    packageJsonProperties,
+    disableYarnRun
   } = opts;
   const base = (0,_src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_1__.baseConfig)({
     context,
@@ -69,7 +70,10 @@ function nodeConfig(opts) {
         '@shared-node': (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(context, '../shared-node/src')
       }
     },
-    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__.dependencyPackerPlugin)(packageJsonProperties)],
+    plugins: [...(base.plugins ?? []), (0,_src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__.dependencyPackerPlugin)({
+      packageJsonProperties,
+      disableYarnRun
+    })],
     externals: (ctx, cb) => {
       const {
         request,
@@ -1083,8 +1087,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class DependencyPackerPlugin {
-  constructor(packageJsonProperties = {}) {
-    this.packageJsonProperties = packageJsonProperties;
+  constructor(opts = {}) {
+    this.opts = opts;
   }
   apply(compiler) {
     const name = 'DependencyPackerPlugin';
@@ -1143,7 +1147,7 @@ class DependencyPackerPlugin {
         name,
         version,
         ...extraProps
-      } = this.packageJsonProperties;
+      } = this.opts.packageJsonProperties ?? {};
       if (name === undefined || version === undefined) {
         const entryPoints = Object.values(stats.compilation.compiler.options.entry);
         const [firstEntryPoint] = entryPoints;
@@ -1168,7 +1172,9 @@ class DependencyPackerPlugin {
         ...extraProps,
         dependencies
       }, undefined, 2));
-      await yarnInstall(outputDirectory);
+      if (!this.opts.disableYarnRun) {
+        await yarnInstall(outputDirectory);
+      }
     });
   }
 }
@@ -1186,8 +1192,8 @@ async function yarnInstall(path) {
     });
   });
 }
-function dependencyPackerPlugin(packageJsonProperties) {
-  return new DependencyPackerPlugin(packageJsonProperties);
+function dependencyPackerPlugin(opts) {
+  return new DependencyPackerPlugin(opts);
 }
 
 /***/ }),
@@ -1198,279 +1204,55 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   lambdaServerPlugin: () => (/* binding */ lambdaServerPlugin)
 /* harmony export */ });
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(35);
-/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_http__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(2);
-/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
-/* harmony import */ var _src_hash__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(36);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(37);
-/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(18);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(6);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9);
+/* harmony import */ var _src_hash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(35);
+/* harmony import */ var _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(18);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
 
 
 
 
 
 
-
-
-
-class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_7__.StandalonePlugin {
+class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPORTED_MODULE_4__.StandalonePlugin {
   name = 'LambdaServerPlugin';
   async setup(compiler) {
     // Only starts the lambda server in watch mode
     if (!compiler.options.watch) {
       return;
     }
-    this.runtimeLogFile = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.initLogFile)(compiler.context, 'lambda_server_runtime.txt');
-    this.appLogFile = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.initLogFile)(compiler.context, 'lambda_server_log.txt');
-    return new Promise((resolve, reject) => {
-      const port = (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.getPort)(compiler.context);
-      this.server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res) => {
-        const url = req.url ?? '';
-        if (url.startsWith('/favicon')) {
-          res.end();
-          return;
-        }
-        const method = req.method ?? '';
-        const internalError = err => {
-          this.runtimeLog({
-            event: 'error',
-            err,
-            path: url,
-            method
-          });
-          res.statusCode = 500;
-          res.end();
-        };
-        try {
-          // Parse body
-          let body = '';
-          req.on('data', chunk => {
-            body += chunk;
-          });
-
-          // Parse URL
-          const parsedUrl = new URL(`http://localhost${url}`);
-          const rawQueryString = parsedUrl.search.slice(1);
-          const queryStringParameters = Object.fromEntries([...new URLSearchParams(decodeURIComponent(rawQueryString)).entries()]);
-          const sendRes = (body, duration,
-          // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-          statusCode = 200, headers = {}) => {
-            this.runtimeLog({
-              event: 'response',
-              path: url,
-              method,
-              statusCode,
-              duration,
-              headers,
-              bodyLength: body.length
-            });
-            res.statusCode = statusCode;
-            for (const [headerName, headerValue] of Object.entries(headers)) {
-              res.setHeader(headerName, headerValue);
-            }
-            res.write(body);
-            res.end();
-          };
-          req.on('end', () => {
-            // Log the request
-            this.runtimeLog({
-              event: 'request',
-              path: url,
-              method,
-              bodyLength: body.length
-            });
-
-            // Create the lambda event
-            const event = {
-              version: '2.0',
-              routeKey: '$default',
-              rawPath: parsedUrl.pathname,
-              rawQueryString,
-              headers: req.headers,
-              queryStringParameters,
-              requestContext: {
-                accountId: 'anonymous',
-                // apiId: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
-                // domainName: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp.lambda-url.eu-west-3.on.aws',
-                // domainPrefix: 'rqez6mmiihukf4yvq2l7rrq2340xpkvp',
-                http: {
-                  method,
-                  path: parsedUrl.pathname,
-                  // protocol: 'HTTP/1.1',
-                  // sourceIp: '88.138.164.86',
-                  userAgent: req.headers['user-agent']
-                },
-                requestId: (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.randomUUID)(),
-                routeKey: '$default',
-                stage: '$default',
-                timeEpoch: Date.now()
-              },
-              body,
-              isBase64Encoded: false
-            };
-
-            // Run the handler
-            this.loadHandler().then(handler => {
-              if (!handler) {
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                sendRes('Lambda handler not found', 0, 404);
-                return;
-              }
-              const startTs = Date.now();
-              Promise.resolve(handler.fn(event)).then(handlerRes => {
-                const duration = Date.now() - startTs;
-                try {
-                  if (handlerRes === undefined) {
-                    return internalError(`Invalid response: ${JSON.stringify(handlerRes)}`);
-                  }
-                  res.setHeader('Content-Type', 'application/json');
-                  if (typeof handlerRes === 'object' &&
-                  // eslint-disable-next-line no-null/no-null
-                  handlerRes !== null && !Array.isArray(handlerRes)) {
-                    const {
-                      body,
-                      headers,
-                      statusCode,
-                      isBase64Encoded
-                    } = handlerRes;
-                    if (!('statusCode' in handlerRes)) {
-                      return sendRes(JSON.stringify(handlerRes), duration);
-                    } else if (typeof statusCode !== 'number') {
-                      return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
-                    }
-                    const resBody = typeof body === 'string' ? typeof isBase64Encoded === 'boolean' && isBase64Encoded ? Buffer.from(body, 'base64') : body : JSON.stringify(body);
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                    return sendRes(resBody, duration, statusCode, headers);
-                  } else if (typeof handlerRes === 'string') {
-                    return sendRes(handlerRes, duration);
-                  }
-                  return sendRes(JSON.stringify(handlerRes), duration);
-                } catch (err) {
-                  return internalError((0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.errorAndStackAsString)(err));
-                }
-              }).catch(err => {
-                return internalError((0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.errorAndStackAsString)(err));
-              });
-            }).catch(err => {
-              internalError(`Error while loading handler: ${(0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.errorAndStackAsString)(err)}`);
-            });
-          });
-        } catch (err) {
-          internalError(String(err));
-        }
-      }).listen(port).on('error', err => {
-        reject(err);
-      }).on('listening', () => {
-        resolve();
-        this.runtimeLog({
-          event: 'start',
-          port
-        });
-      });
-    });
-  }
-  async teardown() {
-    return new Promise((resolve, reject) => {
-      var _this$server;
-      (_this$server = this.server) === null || _this$server === void 0 || _this$server.close(err => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-
-  // Parse the output (stdout or stderr) of a script and extract the data
-  // that is wrapped by the value of `token`.
-  // parseOutput('Hello###foo###World', '###') => {result: 'foo', logs: 'HelloWorld'}
-  // parseOutput('Hello World', '###') => {result: undefined, logs: 'Hello World'}
-  parseOutput(output, token) {
-    const tokenIndex1 = output.indexOf(token);
-    if (tokenIndex1 !== -1) {
-      const tokenIndex2 = output.indexOf(token, tokenIndex1 + token.length);
-      if (tokenIndex1 !== -1) {
-        return {
-          result: output.slice(tokenIndex1 + token.length, tokenIndex2),
-          logs: (output.slice(0, tokenIndex1) + output.slice(tokenIndex2 + token.length)).trim()
-        };
+    const runtimeLogFile = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__.initLogFile)(compiler.context, 'lambda_server_runtime.txt');
+    const appLogFile = await (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__.initLogFile)(compiler.context, 'lambda_server_log.txt');
+    const handlerPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(compiler.context, 'dist/index.js');
+    const port = (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__.getPort)(compiler.context);
+    compiler.hooks.done.tapPromise(this.name, async () => {
+      const newHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_3__.md5)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.readFile)(handlerPath));
+      if (this.handlerHash === newHash) {
+        return;
       }
-    }
-    return {
-      logs: output.trim()
-    };
+      this.handlerHash = newHash;
+      if (this.runtime && !this.runtime.killed) {
+        this.runtime.kill();
+      }
+      this.runtime = (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.fork)('./node_modules/@matthis/lambda-server-runtime/index.js', {
+        env: {
+          PORT: String(port),
+          RUNTIME_LOG_FILE: runtimeLogFile,
+          APP_LOG_FILE: appLogFile,
+          HANDLER_PATH: handlerPath
+        }
+      });
+    });
   }
-  runtimeLog(event) {
-    if (this.runtimeLogFile === undefined) {
-      return;
+  teardown() {
+    if (this.runtime && !this.runtime.killed) {
+      this.runtime.kill();
+      this.runtime = undefined;
     }
-    (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.appendFileSync)(this.runtimeLogFile, `${JSON.stringify({
-      t: new Date().toISOString(),
-      ...event
-    })}\n`);
-  }
-  appLog(appendFileSync, log) {
-    const logs = Array.isArray(log) ? log : [log];
-    if (this.appLogFile === undefined || logs.length === 0) {
-      return;
-    }
-    appendFileSync(this.appLogFile, logs.map(log => `[${new Date().toISOString()}] ${log}\n`).join(''));
-  }
-  clearLogs() {
-    if (this.appLogFile !== undefined) {
-      (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(this.appLogFile, '');
-    }
-    if (this.runtimeLogFile !== undefined) {
-      (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.writeFileSync)(this.runtimeLogFile, '');
-    }
-  }
-  async loadHandler() {
-    var _this$handler, _asMap;
-    // Find the handler source file and compute its hash
-    const handlerPath = (0,node_path__WEBPACK_IMPORTED_MODULE_3__.join)(this.context, 'dist/index.js');
-    const handlerSource = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.maybeReadFile)(handlerPath);
-    if (handlerSource === undefined) {
-      // handler has never been compiled
-      this.handler = undefined;
-      return undefined;
-    }
-    const handlerHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_5__.md5)(handlerSource);
-
-    // If the hash is the same as the previously loaded handler, return the cached version
-    if (((_this$handler = this.handler) === null || _this$handler === void 0 ? void 0 : _this$handler.hash) === handlerHash) {
-      return this.handler;
-    }
-
-    // If the hash changed (or if this is the first time), we load and validate the lambda handler.
-    // (Override the handler calls to the console)
-    const logger = this.appLog.bind(this, node_fs__WEBPACK_IMPORTED_MODULE_1__.appendFileSync);
-    console.log = (...args) => logger(args.map(arg => JSON.stringify(arg)));
-    console.error = (...args) => logger(args.map(arg => JSON.stringify(arg)));
-    // eslint-disable-next-line node/no-unsupported-features/es-syntax, import/dynamic-import-chunkname
-    const imported = await import( /* webpackIgnore: true */`${handlerPath}?v=${Date.now()}`);
-    const importedHandler = (_asMap = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_6__.asMap)(imported)) === null || _asMap === void 0 ? void 0 : _asMap['handler'];
-    if (typeof importedHandler !== 'function') {
-      // Invalid export
-      this.handler = undefined;
-      return undefined;
-    }
-
-    // Everything looks correct, save in the cache and return
-    this.clearLogs();
-    logger('*** Handler loaded ***');
-    this.handler = {
-      hash: handlerHash,
-      fn: importedHandler
-    };
-    return this.handler;
   }
 }
 function lambdaServerPlugin() {
@@ -1479,12 +1261,6 @@ function lambdaServerPlugin() {
 
 /***/ }),
 /* 35 */
-/***/ ((module) => {
-
-module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:http");
-
-/***/ }),
-/* 36 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1501,283 +1277,6 @@ function md5(data) {
 }
 function hashPassword(password, salt) {
   return (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.createHash)('sha256').update(`${password}${salt}`).digest('base64');
-}
-
-/***/ }),
-/* 37 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   addPrefix: () => (/* binding */ addPrefix),
-/* harmony export */   asArray: () => (/* binding */ asArray),
-/* harmony export */   asArrayOrThrow: () => (/* binding */ asArrayOrThrow),
-/* harmony export */   asBoolean: () => (/* binding */ asBoolean),
-/* harmony export */   asBooleanOrThrow: () => (/* binding */ asBooleanOrThrow),
-/* harmony export */   asConstantOrThrow: () => (/* binding */ asConstantOrThrow),
-/* harmony export */   asDate: () => (/* binding */ asDate),
-/* harmony export */   asDateOrThrow: () => (/* binding */ asDateOrThrow),
-/* harmony export */   asError: () => (/* binding */ asError),
-/* harmony export */   asJson: () => (/* binding */ asJson),
-/* harmony export */   asJsonOrThrow: () => (/* binding */ asJsonOrThrow),
-/* harmony export */   asJsonString: () => (/* binding */ asJsonString),
-/* harmony export */   asJsonStringOrThrow: () => (/* binding */ asJsonStringOrThrow),
-/* harmony export */   asMap: () => (/* binding */ asMap),
-/* harmony export */   asMapArray: () => (/* binding */ asMapArray),
-/* harmony export */   asMapArrayOrThrow: () => (/* binding */ asMapArrayOrThrow),
-/* harmony export */   asMapOrThrow: () => (/* binding */ asMapOrThrow),
-/* harmony export */   asNumber: () => (/* binding */ asNumber),
-/* harmony export */   asNumberOrThrow: () => (/* binding */ asNumberOrThrow),
-/* harmony export */   asString: () => (/* binding */ asString),
-/* harmony export */   asStringArray: () => (/* binding */ asStringArray),
-/* harmony export */   asStringArrayOrThrow: () => (/* binding */ asStringArrayOrThrow),
-/* harmony export */   asStringOrThrow: () => (/* binding */ asStringOrThrow),
-/* harmony export */   errorAndStackAsString: () => (/* binding */ errorAndStackAsString),
-/* harmony export */   errorAsString: () => (/* binding */ errorAsString),
-/* harmony export */   isNull: () => (/* binding */ isNull),
-/* harmony export */   isNumber: () => (/* binding */ isNumber),
-/* harmony export */   isString: () => (/* binding */ isString),
-/* harmony export */   iterNumberEnum: () => (/* binding */ iterNumberEnum),
-/* harmony export */   iterStringEnum: () => (/* binding */ iterStringEnum),
-/* harmony export */   neverHappens: () => (/* binding */ neverHappens),
-/* harmony export */   parseJson: () => (/* binding */ parseJson),
-/* harmony export */   removeUndefined: () => (/* binding */ removeUndefined),
-/* harmony export */   removeUndefinedOrNullProps: () => (/* binding */ removeUndefinedOrNullProps)
-/* harmony export */ });
-function notUndefined(val) {
-  return val !== undefined;
-}
-function isString(val) {
-  return typeof val === 'string';
-}
-function isNumber(val) {
-  return typeof val === 'number';
-}
-function iterNumberEnum(e) {
-  return Object.values(e).filter(isNumber);
-}
-function iterStringEnum(e) {
-  return Object.values(e).filter(isString);
-}
-function removeUndefined(arr) {
-  return arr.filter(notUndefined);
-}
-function removeUndefinedOrNullProps(obj) {
-  return Object.fromEntries(
-  // eslint-disable-next-line no-null/no-null
-  Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null));
-}
-function neverHappens(value, errorMessage) {
-  throw new Error(errorMessage);
-}
-function asMap(value, defaultValue) {
-  // eslint-disable-next-line no-null/no-null
-  return typeof value === 'object' && value !== null ? value : defaultValue;
-}
-function asMapOrThrow(value) {
-  const valueAsMap = asMap(value);
-  if (valueAsMap === undefined) {
-    throw new Error(`Invalid value: \`${value}\` is not a map`);
-  }
-  return valueAsMap;
-}
-function asJson(value, defaultValue) {
-  try {
-    const json = JSON.parse(value);
-    const res = asMap(json);
-    return res ?? defaultValue;
-  } catch {
-    return defaultValue;
-  }
-}
-function asJsonOrThrow(value) {
-  const valueAsJson = asJson(value);
-  if (valueAsJson === undefined) {
-    throw new Error(`Invalid value: \`${value}\` is not a valid JSON string of a map`);
-  }
-  return valueAsJson;
-}
-function asJsonString(value, defaultValue) {
-  const str = asString(value);
-  return str === undefined ? defaultValue : defaultValue === undefined ? asJson(str) : asJson(str, defaultValue);
-}
-function asJsonStringOrThrow(value) {
-  return asJsonOrThrow(asStringOrThrow(value));
-}
-function asString(value, defaultValue) {
-  return typeof value === 'string' ? value : defaultValue;
-}
-function asStringOrThrow(value) {
-  const valueAsString = asString(value);
-  if (valueAsString === undefined) {
-    throw new Error(`Invalid value: \`${value}\` is not a string`);
-  }
-  return valueAsString;
-}
-function asArray(value, defaultValue) {
-  return Array.isArray(value) ? value : defaultValue;
-}
-function asArrayOrThrow(value) {
-  if (!Array.isArray(value)) {
-    throw new Error(`Invalid value: \`${value}\` is not an array`);
-  }
-  return value;
-}
-function asStringArray(value, defaultValue) {
-  const arr = asArray(value);
-  if (arr === undefined) {
-    return defaultValue;
-  }
-  return removeUndefined(arr.map(s => asString(s)));
-}
-function asStringArrayOrThrow(value) {
-  const arr = asArrayOrThrow(value);
-  return arr.map(s => asStringOrThrow(s));
-}
-function asMapArray(value, defaultValue) {
-  const arr = asArray(value);
-  if (arr === undefined) {
-    return defaultValue;
-  }
-  return removeUndefined(arr.map(s => asMap(s)));
-}
-function asMapArrayOrThrow(value) {
-  const arr = asArrayOrThrow(value);
-  return arr.map(s => asMapOrThrow(s));
-}
-function asNumber(value, defaultValue) {
-  if (typeof value === 'number') {
-    return !isNaN(value) ? value : defaultValue;
-  }
-  if (typeof value === 'string') {
-    try {
-      const parsedValue = parseFloat(value);
-      return !isNaN(parsedValue) ? parsedValue : defaultValue;
-    } catch {
-      return defaultValue;
-    }
-  }
-  return defaultValue;
-}
-function asNumberOrThrow(value) {
-  const valueAsNumber = asNumber(value);
-  if (valueAsNumber === undefined) {
-    throw new Error(`Invalid value: \`${value}\` is not a number`);
-  }
-  return valueAsNumber;
-}
-function asBoolean(value, defaultValue) {
-  if (typeof value === 'boolean') {
-    return value;
-  }
-  if (typeof value === 'number') {
-    return !isNaN(value) ? value !== 0 : false;
-  }
-  if (typeof value === 'string') {
-    if (value === '0' || value === 'false') {
-      return false;
-    } else if (value === '1' || value === 'true') {
-      return true;
-    }
-    return defaultValue;
-  }
-  return defaultValue;
-}
-function asBooleanOrThrow(value) {
-  const valueAsBoolean = asBoolean(value);
-  if (valueAsBoolean === undefined) {
-    throw new Error(`Invalid value: \`${value}\` is not a boolean`);
-  }
-  return valueAsBoolean;
-}
-const TIMESTAMP_REGEX = /^[0-9]{1,15}$/u;
-function asDate(value, defaultValue) {
-  const date = value instanceof Date ? value : new Date(typeof value === 'string' && TIMESTAMP_REGEX.test(value) ? parseFloat(value) : String(value));
-  return isNaN(date.getTime()) ? defaultValue : date;
-}
-function asDateOrThrow(value) {
-  const valueAsDate = asDate(value);
-  if (valueAsDate === undefined) {
-    throw new Error(`Invalid value: \`${value}\` cannot be parsed as a Date`);
-  }
-  return valueAsDate;
-}
-
-// export function asDate(value: unknown): Date | undefined;
-// export function asDate(value: unknown, defaultValue: Date): Date;
-// export function asDate(value: unknown, defaultValue?: Date): Date | undefined {
-//   if (typeof value === 'number') {
-//     return new Date(value);
-//   }
-//   return value instanceof Date ? value : defaultValue;
-// }
-
-function isNull(val) {
-  // eslint-disable-next-line no-null/no-null
-  return val === null;
-}
-function asError(err) {
-  return err instanceof Error ? err : new Error(typeof err === 'string' ? err : String(err));
-}
-function errorAsString(err) {
-  const errorMap = asMap(err);
-  if (errorMap === undefined) {
-    return asString(err) ?? String(err);
-  }
-  const errorMessage = asString(errorMap['message']);
-  if (errorMessage === undefined) {
-    return String(err);
-  }
-  return errorMessage;
-}
-function errorAndStackAsString(err) {
-  const errorMap = asMap(err);
-  if (errorMap === undefined) {
-    return asString(err) ?? String(err);
-  }
-  const stack = asString(errorMap['stack']);
-  if (stack === undefined) {
-    return String(err);
-  }
-  return stack;
-}
-function asConstantOrThrow(value, expected) {
-  if (value !== expected) {
-    throw new Error(`Invalid value: \`${value}\`, expected \`${expected}\``);
-  }
-  return value;
-}
-
-// export function asParsedJson<T>(json: string): T {
-//   try {
-//     return JSON.parse(json) as T;
-//   } catch {
-//     const defaultValue = {};
-//     return defaultValue as T;
-//   }
-// }
-function parseJson(json) {
-  try {
-    return {
-      res: JSON.parse(json),
-      err: undefined
-    };
-  } catch (err) {
-    return {
-      err,
-      res: undefined
-    };
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-
-// Get all the keys of a type including the optional attributes
-
-// Type for an empty object (ie: {})
-
-function addPrefix(attr, prefix) {
-  return Object.fromEntries(Object.entries(attr).map(([key, value]) => [`${prefix}${key}`, value]));
 }
 
 /***/ })

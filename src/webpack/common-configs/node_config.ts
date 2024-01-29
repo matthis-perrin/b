@@ -14,8 +14,9 @@ export function nodeConfig(opts: {
   isLib: boolean;
   noEntry?: boolean;
   packageJsonProperties?: Record<string, unknown>;
+  disableYarnRun?: boolean;
 }): Configuration {
-  const {context, watch, isLib, noEntry, packageJsonProperties} = opts;
+  const {context, watch, isLib, noEntry, packageJsonProperties, disableYarnRun} = opts;
   const base = baseConfig({context, watch});
   return {
     ...base,
@@ -45,7 +46,10 @@ export function nodeConfig(opts: {
         '@shared-node': join(context, '../shared-node/src'),
       },
     },
-    plugins: [...(base.plugins ?? []), dependencyPackerPlugin(packageJsonProperties)],
+    plugins: [
+      ...(base.plugins ?? []),
+      dependencyPackerPlugin({packageJsonProperties, disableYarnRun}),
+    ],
     externals: (ctx, cb) => {
       const {request, context, contextInfo, getResolve} = ctx;
       if (request === undefined) {
