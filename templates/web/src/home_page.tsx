@@ -17,7 +17,7 @@ export const HomePage: React.FC = () => {
 
   return (
     <Wrapper>
-      <div>Home</div>
+      <div>Home Page</div>
       <Button onClickAsync={handleClick}>BUTTON</Button>
     </Wrapper>
   );

@@ -11,10 +11,10 @@ export const NavBar: FC<NavBarProps> = () => {
   return (
     <Wrapper>
       <StyledNavLink $active={location === '/'} to="/">
-        NZB.su
+        Home
       </StyledNavLink>
-      <StyledNavLink $active={location === '/browse'} to="/browse">
-        Movies
+      <StyledNavLink $active={location === '/test-page'} to="/test-page">
+        Test
       </StyledNavLink>
     </Wrapper>
   );

@@ -11,7 +11,7 @@ export const App: React.FC = () => {
       <Wrapper>
         <NavBar />
         <Route path="/" component={HomePage} />
-        <Route path="/test" component={TestPage} />
+        <Route path="/test-page" component={TestPage} />
       </Wrapper>
     </Route>
   );
