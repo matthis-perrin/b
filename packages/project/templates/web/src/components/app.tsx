@@ -1,9 +1,9 @@
 import {styled} from 'styled-components';
 import {Route} from 'wouter';
 
-import {HomePage} from '@src/home_page';
-import {NavBar} from '@src/nav_bar';
-import {TestPage} from '@src/test_page';
+import {HomePage} from '@src/components/home_page';
+import {NavBar} from '@src/components/nav_bar';
+import {TestPage} from '@src/components/test_page';
 
 export const App: React.FC = () => {
   return (
