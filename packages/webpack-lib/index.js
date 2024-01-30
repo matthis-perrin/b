@@ -203,6 +203,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   exists: () => (/* binding */ exists),
 /* harmony export */   listFiles: () => (/* binding */ listFiles),
 /* harmony export */   maybeReadFile: () => (/* binding */ maybeReadFile),
+/* harmony export */   maybeReadFileSync: () => (/* binding */ maybeReadFileSync),
 /* harmony export */   prettierFormat: () => (/* binding */ prettierFormat),
 /* harmony export */   prettyJs: () => (/* binding */ prettyJs),
 /* harmony export */   prettyJson: () => (/* binding */ prettyJson),
@@ -321,6 +322,14 @@ async function exists(path) {
 async function maybeReadFile(path) {
   try {
     const fileContent = await readFile(path);
+    return fileContent.toString();
+  } catch {
+    return undefined;
+  }
+}
+function maybeReadFileSync(path) {
+  try {
+    const fileContent = (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.readFileSync)(path);
     return fileContent.toString();
   } catch {
     return undefined;
@@ -833,7 +842,7 @@ __webpack_require__.r(__webpack_exports__);
 class YarnPlugin {
   apply(compiler) {
     compiler.hooks.beforeRun.tapAsync('YarnPlugin', (compiler, cb) => {
-      const command = ['yarn', 'install', '--audit', '--check-files', '--ignore-optional', '--non-interactive', '--production=false'].join(' ');
+      const command = ['yarn', 'install', '--audit', '--check-files', '--non-interactive', '--production=false'].join(' ');
       (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(command, {
         cwd: compiler.context
       }, (err, stdout, stderr) => {

@@ -201,7 +201,11 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
       const config: Configuration = await import(
         /*webpackIgnore: true*/ join(projectPath, 'webpack.config.js')
-      ).then(({getConfig}) => getConfig({context: projectPath, watch}));
+      )
+        .then(({getConfig}) => getConfig({context: projectPath, watch}))
+        .catch((err: unknown) => {
+          reportCompilationFailure(String(err));
+        });
 
       const reportCompilationFailure = (error: string): void => {
         updateStatus(curr => {

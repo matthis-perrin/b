@@ -10,12 +10,16 @@ const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 export async function generateProject(
   dst: string,
   project: WorkspaceProject,
-  workspace: Workspace | undefined
+  workspace: Workspace | undefined,
+  workspaceName: string
 ): Promise<FileHash[]> {
   const written: FileHash[] = [];
   const writeFile = async (path: string, file: string): Promise<FileHash> =>
     writeWorkspaceFile(workspace, dst, path, file);
   const {projectName, type, vars} = project;
+  const defaultVars = {
+    __WORKSPACE_NAME__: workspaceName,
+  };
 
   // Copy template files
   const templatePath = join(TEMPLATES_PATH, type);
@@ -26,7 +30,7 @@ export async function generateProject(
       const dstPath = join(projectName, relativePath);
       const content = await readFile(file);
       let newContent = content;
-      for (const [varName, varValue] of Object.entries(vars)) {
+      for (const [varName, varValue] of Object.entries({...vars, ...defaultVars})) {
         newContent = newContent.replaceAll(varName, varValue);
       }
       if (file.endsWith('.ts') || file.endsWith('.tsx')) {

@@ -5,10 +5,10 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import {WebpackPlugin} from '@src/webpack/models';
 import {isProd} from '@src/webpack/utils';
 
-export function htmlPlugin(context: string): WebpackPlugin {
+export function htmlPlugin(context: string, publicUrl: string): WebpackPlugin {
   return new HtmlWebpackPlugin({
     template: join(context, 'src/index.html'),
-    publicPath: '{{PUBLIC_PATH}}',
+    publicPath: publicUrl,
     minify: isProd(),
   });
 }

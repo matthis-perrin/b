@@ -171,7 +171,7 @@ export async function generateWorkspace(
 
   // Create projects files from templates
   const projectFiles = await Promise.all(
-    projects.map(async project => generateProject(dst, project, workspace))
+    projects.map(async project => generateProject(dst, project, workspace, workspaceName))
   );
 
   // Generate workspace root files

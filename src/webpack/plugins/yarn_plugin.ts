@@ -14,7 +14,6 @@ export class YarnPlugin {
         'install',
         '--audit',
         '--check-files',
-        '--ignore-optional',
         '--non-interactive',
         '--production=false',
       ].join(' ');

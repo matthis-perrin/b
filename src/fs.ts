@@ -1,5 +1,5 @@
 import {exec} from 'node:child_process';
-import {promises} from 'node:fs';
+import {promises, readFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 
 import {BuiltInParserName, format} from 'prettier';
@@ -94,6 +94,15 @@ export async function exists(path: string): Promise<boolean> {
 export async function maybeReadFile(path: string): Promise<string | undefined> {
   try {
     const fileContent = await readFile(path);
+    return fileContent.toString();
+  } catch {
+    return undefined;
+  }
+}
+
+export function maybeReadFileSync(path: string): string | undefined {
+  try {
+    const fileContent = readFileSync(path);
     return fileContent.toString();
   } catch {
     return undefined;

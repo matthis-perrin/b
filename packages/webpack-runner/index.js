@@ -371,7 +371,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f, workspaceFragments));
 
   // Create projects files from templates
-  const projectFiles = await Promise.all(projects.map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_7__.generateProject)(dst, project, workspace)));
+  const projectFiles = await Promise.all(projects.map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_7__.generateProject)(dst, project, workspace, workspaceName)));
 
   // Generate workspace root files
   const SCRIPTS_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_2__.fileURLToPath)(import.meta.url), '../scripts');
@@ -459,6 +459,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   exists: () => (/* binding */ exists),
 /* harmony export */   listFiles: () => (/* binding */ listFiles),
 /* harmony export */   maybeReadFile: () => (/* binding */ maybeReadFile),
+/* harmony export */   maybeReadFileSync: () => (/* binding */ maybeReadFileSync),
 /* harmony export */   prettierFormat: () => (/* binding */ prettierFormat),
 /* harmony export */   prettyJs: () => (/* binding */ prettyJs),
 /* harmony export */   prettyJson: () => (/* binding */ prettyJson),
@@ -582,6 +583,14 @@ async function maybeReadFile(path) {
     return undefined;
   }
 }
+function maybeReadFileSync(path) {
+  try {
+    const fileContent = (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.readFileSync)(path);
+    return fileContent.toString();
+  } catch {
+    return undefined;
+  }
+}
 async function listFiles(path) {
   const files = [];
   const ents = await readdir(path, {
@@ -653,7 +662,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_1__.fileURLToPath)(import.meta.url), '../templates');
-async function generateProject(dst, project, workspace) {
+async function generateProject(dst, project, workspace, workspaceName) {
   const written = [];
   const writeFile = async (path, file) => (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_3__.writeWorkspaceFile)(workspace, dst, path, file);
   const {
@@ -661,6 +670,9 @@ async function generateProject(dst, project, workspace) {
     type,
     vars
   } = project;
+  const defaultVars = {
+    __WORKSPACE_NAME__: workspaceName
+  };
 
   // Copy template files
   const templatePath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(TEMPLATES_PATH, type);
@@ -670,7 +682,10 @@ async function generateProject(dst, project, workspace) {
     const dstPath = (0,node_path__WEBPACK_IMPORTED_MODULE_0__.join)(projectName, relativePath);
     const content = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.readFile)(file);
     let newContent = content;
-    for (const [varName, varValue] of Object.entries(vars)) {
+    for (const [varName, varValue] of Object.entries({
+      ...vars,
+      ...defaultVars
+    })) {
       newContent = newContent.replaceAll(varName, varValue);
     }
     if (file.endsWith('.ts') || file.endsWith('.tsx')) {
@@ -771,11 +786,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.70',
+  project: '1.8.83',
   eslint: '1.5.3',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
-  webpack: '1.6.15',
+  webpack: '1.6.25',
   runner: '1.5.16',
   lambdaServerRuntime: '1.0.1'
 };
@@ -2400,7 +2415,9 @@ async function runWebpacks(opts) {
     }) => getConfig({
       context: projectPath,
       watch
-    }));
+    })).catch(err => {
+      reportCompilationFailure(String(err));
+    });
     const reportCompilationFailure = error => {
       updateStatus(curr => {
         curr.compilationFailure = error;

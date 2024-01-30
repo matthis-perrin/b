@@ -122,18 +122,14 @@ class DependencyPackerPlugin {
 
 async function yarnInstall(path: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    exec(
-      `yarn install --non-interactive --ignore-optional --production`,
-      {cwd: path},
-      (err, stdout, stderr) => {
-        if (!err) {
-          resolve();
-        } else {
-          error(`Failure to run \`yarn install\` at "${path}"\n${stderr}`);
-          reject(new Error(stderr));
-        }
+    exec(`yarn install --non-interactive --production`, {cwd: path}, (err, stdout, stderr) => {
+      if (!err) {
+        resolve();
+      } else {
+        error(`Failure to run \`yarn install\` at "${path}"\n${stderr}`);
+        reject(new Error(stderr));
       }
-    );
+    });
   });
 }
 

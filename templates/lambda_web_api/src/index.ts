@@ -24,7 +24,7 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   }
 
   // Static resources
-  const staticsRes = await handleStatics(req, {frontendName, frontendDomain});
+  const staticsRes = await handleStatics(req, {frontendName});
   if (staticsRes) {
     return res(staticsRes);
   }
@@ -38,6 +38,6 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   }
 
   // Default to the index
-  const indexRes = await getIndex({frontendName, frontendDomain});
+  const indexRes = await getIndex({frontendName});
   return res(indexRes);
 }

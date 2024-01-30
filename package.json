@@ -46,6 +46,8 @@
     "babel-loader": "9.1.x",
     "babel-plugin-react-remove-properties": "0.3.x",
     "chokidar": "3.5.x",
+    "favicons": "7.1.x",
+    "favicons-webpack-plugin": "6.0.x",
     "fork-ts-checker-webpack-plugin": "9.0.x",
     "html-webpack-plugin": "5.6.x",
     "package-json": "8.1.x",

@@ -1,16 +1,37 @@
-import {join} from 'node:path';
+import {readFileSync} from 'node:fs';
+import {basename, join} from 'node:path';
 
 import {Configuration} from 'webpack';
 
 import {baseConfig} from '@src/webpack/common-configs/base_config';
 import {babelLoaderWeb} from '@src/webpack/loaders/babel_loader_web';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
+import {faviconsWebpackPlugin} from '@src/webpack/plugins/favicons_webpack_plugin';
 import {htmlPlugin} from '@src/webpack/plugins/html_plugin';
 import {webpackDevServer} from '@src/webpack/plugins/webpack_dev_server';
+import {isProd} from '@src/webpack/utils';
 
 export function webConfig(opts: {context: string; watch: boolean}): Configuration {
   const {context, watch} = opts;
   const base = baseConfig({context, watch});
+
+  // Hack to retrieve the public url from the env variables
+  const envVariableFilePath = join(context, '../shared/src/env.ts');
+  const domainNameEnvVariable = `${basename(context).toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`;
+  const match = new RegExp(
+    `export const ${domainNameEnvVariable} =\\s*'(?<domainName>[^']*)'`,
+    'u'
+  ).exec(readFileSync(envVariableFilePath).toString());
+  const domainName = match?.[1];
+  if (domainName === undefined) {
+    throw new Error(
+      `Failure to retrieve domain name for web project "${basename(
+        context
+      )}". Variable ${domainNameEnvVariable} not found in file ${envVariableFilePath}`
+    );
+  }
+  const publicUrl = `http${isProd() ? 's' : ''}://${domainName}`;
+
   return {
     ...base,
     target: 'web',
@@ -33,7 +54,11 @@ export function webConfig(opts: {context: string; watch: boolean}): Configuratio
         '@shared-web': join(context, '../shared-web/src'),
       },
     },
-    plugins: [...(base.plugins ?? []), htmlPlugin(context)],
+    plugins: [
+      ...(base.plugins ?? []),
+      htmlPlugin(context, publicUrl),
+      faviconsWebpackPlugin(context, publicUrl),
+    ],
     devServer: watch ? webpackDevServer(context) : undefined,
     optimization: {
       ...base.optimization,
