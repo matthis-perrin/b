@@ -1,6 +1,6 @@
 {
   "name": "@matthis/webpack-web",
-  "version": "1.6.26",
+  "version": "1.6.27",
   "type": "module",
   "main": "index.js",
   "dependencies": {

@@ -96,11 +96,23 @@ import(/* webpackIgnore: true */ HANDLER_PATH)
 // LAMBDA SERVER
 //
 
+let currentRes: ServerResponse | undefined;
+function globalError(err: unknown): void {
+  runtimeLog({event: 'error', err: String(err), path: '', method: ''});
+  if (currentRes) {
+    currentRes.statusCode = 500;
+    currentRes.end();
+    currentRes = undefined;
+  }
+}
+
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
+  currentRes = res;
   const url = req.url ?? '';
 
   if (url.startsWith('/favicon')) {
     res.end();
+    currentRes = undefined;
     return;
   }
 
@@ -110,6 +122,7 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     runtimeLog({event: 'error', err, path: url, method});
     res.statusCode = 500;
     res.end();
+    currentRes = undefined;
   };
 
   try {
@@ -148,6 +161,7 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
       }
       res.write(body);
       res.end();
+      currentRes = undefined;
     };
 
     req.on('end', () => {
@@ -240,7 +254,7 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
 })
   .listen(PORT)
   .on('error', err => {
-    runtimeLog({event: 'error', err: errorAndStackAsString(err), path: '', method: ''});
+    globalError(err);
   })
   .on('listening', () => {
     runtimeLog({event: 'start', port});
@@ -253,10 +267,10 @@ function cleanup(): void {
 process.on('SIGINT', () => cleanup());
 process.on('SIGTERM', () => cleanup());
 process.on('uncaughtException', err => {
-  runtimeLog({event: 'error', err: errorAndStackAsString(err), path: '', method: ''});
+  globalError(err);
   cleanup();
 });
 process.on('unhandledRejection', err => {
-  runtimeLog({event: 'error', err: errorAndStackAsString(err), path: '', method: ''});
+  globalError(err);
   cleanup();
 });

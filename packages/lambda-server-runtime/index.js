@@ -480,10 +480,26 @@ import( /* webpackIgnore: true */HANDLER_PATH).then(imported => {
 // LAMBDA SERVER
 //
 
+let currentRes;
+function globalError(err) {
+  runtimeLog({
+    event: 'error',
+    err: String(err),
+    path: '',
+    method: ''
+  });
+  if (currentRes) {
+    currentRes.statusCode = 500;
+    currentRes.end();
+    currentRes = undefined;
+  }
+}
 const server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res) => {
+  currentRes = res;
   const url = req.url ?? '';
   if (url.startsWith('/favicon')) {
     res.end();
+    currentRes = undefined;
     return;
   }
   const method = req.method ?? '';
@@ -496,6 +512,7 @@ const server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res
     });
     res.statusCode = 500;
     res.end();
+    currentRes = undefined;
   };
   try {
     // Parse body
@@ -526,6 +543,7 @@ const server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res
       }
       res.write(body);
       res.end();
+      currentRes = undefined;
     };
     req.on('end', () => {
       // Log the request
@@ -615,12 +633,7 @@ const server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res
     internalError(String(err));
   }
 }).listen(PORT).on('error', err => {
-  runtimeLog({
-    event: 'error',
-    err: (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.errorAndStackAsString)(err),
-    path: '',
-    method: ''
-  });
+  globalError(err);
 }).on('listening', () => {
   runtimeLog({
     event: 'start',
@@ -633,21 +646,11 @@ function cleanup() {
 process.on('SIGINT', () => cleanup());
 process.on('SIGTERM', () => cleanup());
 process.on('uncaughtException', err => {
-  runtimeLog({
-    event: 'error',
-    err: (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.errorAndStackAsString)(err),
-    path: '',
-    method: ''
-  });
+  globalError(err);
   cleanup();
 });
 process.on('unhandledRejection', err => {
-  runtimeLog({
-    event: 'error',
-    err: (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.errorAndStackAsString)(err),
-    path: '',
-    method: ''
-  });
+  globalError(err);
   cleanup();
 });
 })();
