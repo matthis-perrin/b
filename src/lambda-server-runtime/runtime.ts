@@ -190,45 +190,49 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
         return;
       }
       const startTs = Date.now();
-      Promise.resolve(handler(event))
-        .then(handlerRes => {
-          const duration = Date.now() - startTs;
-          try {
-            if (handlerRes === undefined) {
-              return internalError(`Invalid response: ${JSON.stringify(handlerRes)}`);
-            }
-            res.setHeader('Content-Type', 'application/json');
-            if (
-              typeof handlerRes === 'object' &&
-              // eslint-disable-next-line no-null/no-null
-              handlerRes !== null &&
-              !Array.isArray(handlerRes)
-            ) {
-              const {body, headers, statusCode, isBase64Encoded} = handlerRes;
-              if (!('statusCode' in handlerRes)) {
-                return sendRes(JSON.stringify(handlerRes), duration);
-              } else if (typeof statusCode !== 'number') {
-                return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
+      try {
+        Promise.resolve(handler(event))
+          .then(handlerRes => {
+            const duration = Date.now() - startTs;
+            try {
+              if (handlerRes === undefined) {
+                return internalError(`Invalid response: ${JSON.stringify(handlerRes)}`);
               }
-              const resBody =
-                typeof body === 'string'
-                  ? typeof isBase64Encoded === 'boolean' && isBase64Encoded
-                    ? Buffer.from(body, 'base64')
-                    : body
-                  : JSON.stringify(body);
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              return sendRes(resBody, duration, statusCode, headers);
-            } else if (typeof handlerRes === 'string') {
-              return sendRes(handlerRes, duration);
+              res.setHeader('Content-Type', 'application/json');
+              if (
+                typeof handlerRes === 'object' &&
+                // eslint-disable-next-line no-null/no-null
+                handlerRes !== null &&
+                !Array.isArray(handlerRes)
+              ) {
+                const {body, headers, statusCode, isBase64Encoded} = handlerRes;
+                if (!('statusCode' in handlerRes)) {
+                  return sendRes(JSON.stringify(handlerRes), duration);
+                } else if (typeof statusCode !== 'number') {
+                  return internalError(`statusCode ${JSON.stringify(statusCode)} is not a number`);
+                }
+                const resBody =
+                  typeof body === 'string'
+                    ? typeof isBase64Encoded === 'boolean' && isBase64Encoded
+                      ? Buffer.from(body, 'base64')
+                      : body
+                    : JSON.stringify(body);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                return sendRes(resBody, duration, statusCode, headers);
+              } else if (typeof handlerRes === 'string') {
+                return sendRes(handlerRes, duration);
+              }
+              return sendRes(JSON.stringify(handlerRes), duration);
+            } catch (err: unknown) {
+              internalError(errorAndStackAsString(err));
             }
-            return sendRes(JSON.stringify(handlerRes), duration);
-          } catch (err: unknown) {
-            return internalError(errorAndStackAsString(err));
-          }
-        })
-        .catch((err: unknown) => {
-          return internalError(errorAndStackAsString(err));
-        });
+          })
+          .catch((err: unknown) => {
+            internalError(errorAndStackAsString(err));
+          });
+      } catch (err: unknown) {
+        internalError(errorAndStackAsString(err));
+      }
     });
   } catch (err: unknown) {
     internalError(String(err));
