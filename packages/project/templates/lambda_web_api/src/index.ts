@@ -1,4 +1,7 @@
-import {__FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME} from '@shared/env';
+import {
+  __BACKEND_NAME_UPPERCASE___FUNCTION_URL,
+  __FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME,
+} from '@shared/env';
 
 import {
   apiResponseToLambdaResonse,
@@ -13,6 +16,7 @@ import {testHandler} from '@src/handlers/test_handlers';
 
 const frontendName = '__FRONTEND_NAME__';
 const frontendDomain = __FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME;
+const websiteUrl = __BACKEND_NAME_UPPERCASE___FUNCTION_URL;
 
 export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   const req = lambdaEventToApiRequest(event);
@@ -24,7 +28,7 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   }
 
   // Static resources
-  const staticsRes = await handleStatics(req, {frontendName});
+  const staticsRes = await handleStatics(req, {frontendName, websiteUrl});
   if (staticsRes) {
     return res(staticsRes);
   }

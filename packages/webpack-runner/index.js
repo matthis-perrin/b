@@ -291,22 +291,21 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
       }
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp) {
+    const vars = {
+      __PROJECT_NAME__: fragment.lambdaName,
+      __BACKEND_NAME__: fragment.lambdaName,
+      __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
+      __FRONTEND_NAME__: fragment.websiteName,
+      __FRONTEND_NAME_UPPERCASE__: fragment.websiteName.toUpperCase()
+    };
     return [{
       projectName: fragment.websiteName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.Web,
-      vars: {
-        __PROJECT_NAME__: fragment.websiteName,
-        __BACKEND_NAME__: fragment.lambdaName,
-        __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase()
-      }
+      vars
     }, {
       projectName: fragment.lambdaName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.LambdaWebApi,
-      vars: {
-        __PROJECT_NAME__: fragment.lambdaName,
-        __FRONTEND_NAME__: fragment.websiteName,
-        __FRONTEND_NAME_UPPERCASE__: fragment.websiteName.toUpperCase()
-      }
+      vars
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.NodeScript) {
     return [{
@@ -786,7 +785,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.83',
+  project: '1.8.86',
   eslint: '1.5.3',
   prettier: '1.3.0',
   tsconfig: '1.6.1',

@@ -75,24 +75,23 @@ export function getProjectsFromWorkspaceFragment(
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.WebApp) {
+    const vars = {
+      __PROJECT_NAME__: fragment.lambdaName,
+      __BACKEND_NAME__: fragment.lambdaName,
+      __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
+      __FRONTEND_NAME__: fragment.websiteName,
+      __FRONTEND_NAME_UPPERCASE__: fragment.websiteName.toUpperCase(),
+    };
     return [
       {
         projectName: fragment.websiteName,
         type: ProjectType.Web,
-        vars: {
-          __PROJECT_NAME__: fragment.websiteName,
-          __BACKEND_NAME__: fragment.lambdaName,
-          __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
-        },
+        vars,
       },
       {
         projectName: fragment.lambdaName,
         type: ProjectType.LambdaWebApi,
-        vars: {
-          __PROJECT_NAME__: fragment.lambdaName,
-          __FRONTEND_NAME__: fragment.websiteName,
-          __FRONTEND_NAME_UPPERCASE__: fragment.websiteName.toUpperCase(),
-        },
+        vars,
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.NodeScript) {
