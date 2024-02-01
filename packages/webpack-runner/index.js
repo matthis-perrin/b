@@ -785,12 +785,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.88',
+  project: '1.8.89',
   eslint: '1.5.3',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
   webpack: '1.6.27',
-  runner: '1.5.16',
+  runner: '1.5.17',
   lambdaServerRuntime: '1.0.3'
 };
 const ESLINT_VERSION = '8.56.x';
@@ -1900,6 +1900,28 @@ function parseError(err, opts) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   getLocalIp: () => (/* binding */ getLocalIp)
+/* harmony export */ });
+/* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(35);
+/* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_os__WEBPACK_IMPORTED_MODULE_0__);
+
+function getLocalIp() {
+  var _Object$values$flat$f;
+  return ((_Object$values$flat$f = Object.values((0,node_os__WEBPACK_IMPORTED_MODULE_0__.networkInterfaces)()).flat().find(net => net !== undefined && net.family === 'IPv4' && net.address.startsWith('192.168.'))) === null || _Object$values$flat$f === void 0 ? void 0 : _Object$values$flat$f.address) ?? '127.0.0.1';
+}
+
+/***/ }),
+/* 35 */
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:os");
+
+/***/ }),
+/* 36 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   readLines: () => (/* binding */ readLines)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
@@ -1934,7 +1956,7 @@ function readLines(filePath, cb) {
 }
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1948,7 +1970,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(26);
-/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(36);
+/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(38);
+/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(34);
+
 
 
 
@@ -2017,7 +2041,7 @@ function renderErrorWarningCount(errors) {
 function renderLambdaServerEvent(event) {
   const type = event.event;
   if (type === 'start') {
-    return `http://localhost:${event.port}`;
+    return `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_3__.getLocalIp)()}:${event.port}`;
   }
   const req = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(`${event.method} ${event.path}`);
   if (type === 'error') {
@@ -2039,7 +2063,7 @@ function renderWebpackDevServerEvent(event) {
   const type = event.event;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (type === 'start') {
-    return `http://localhost:${event.port}`;
+    return `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_3__.getLocalIp)()}:${event.port}`;
   }
   // const req = gray(`${event.method} ${event.path}`);
   // if (type === 'error') {
@@ -2059,7 +2083,7 @@ function renderWebpackDevServerEvent(event) {
 }
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2108,7 +2132,7 @@ function formatError(err) {
 }
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2244,9 +2268,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(31);
 /* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(32);
 /* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(33);
-/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(34);
-/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(35);
-/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(37);
+/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(34);
+/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(36);
+/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(37);
+/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(39);
+
 
 
 
@@ -2286,13 +2312,13 @@ async function runWebpacks(opts) {
           var _status$lambdaServerE;
           const status = statuses.get(projectName);
           const port = (status === null || status === void 0 || (_status$lambdaServerE = status.lambdaServerEvents.startEvent) === null || _status$lambdaServerE === void 0 ? void 0 : _status$lambdaServerE.port) ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_12__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, projectName));
-          overrides[`${projectName.toUpperCase()}_FUNCTION_URL`] = `http://localhost:${port}/`;
+          overrides[`${projectName.toUpperCase()}_FUNCTION_URL`] = `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_16__.getLocalIp)()}:${port}/`;
         }
         if (type === _src_models__WEBPACK_IMPORTED_MODULE_8__.ProjectType.Web) {
           var _status$webpackDevSer;
           const status = statuses.get(projectName);
           const port = (status === null || status === void 0 || (_status$webpackDevSer = status.webpackDevServerEvents.startEvent) === null || _status$webpackDevSer === void 0 ? void 0 : _status$webpackDevSer.port) ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_12__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, projectName));
-          overrides[`${projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`] = `localhost:${port}`;
+          overrides[`${projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`] = `${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_16__.getLocalIp)()}:${port}`;
         }
       }
     }
@@ -2353,16 +2379,16 @@ async function runWebpacks(opts) {
     const errors = [...statuses.values()].flatMap(v => v.errors);
     const groupedErrors = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_14__.groupAndSortErrors)(errors);
     const summary = [...statuses.values()].map(status => {
-      return (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_17__.renderProjectStatus)(status.project, status.firstRun, status.isRunning, groupedErrors, status.compilationFailure, status.lambdaServerEvents, status.webpackDevServerEvents);
+      return (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__.renderProjectStatus)(status.project, status.firstRun, status.isRunning, groupedErrors, status.compilationFailure, status.lambdaServerEvents, status.webpackDevServerEvents);
     });
     summary.unshift([(0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)(`Projects (${projects.length})`), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Status'), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Run')]);
-    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_17__.renderErrors)(groupedErrors);
+    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__.renderErrors)(groupedErrors);
     if (watch) {
       process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
     }
-    (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_18__.table)(summary));
+    (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_19__.table)(summary));
     if (report.length > 0) {
-      (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_17__.renderErrorWarningCount)(errors)}\n`);
+      (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__.renderErrorWarningCount)(errors)}\n`);
       (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)(report);
     }
   }
@@ -2439,7 +2465,7 @@ async function runWebpacks(opts) {
 
     // Read events in the lambda server logs to update the globalInfo
     let lastProcessedLambdaLog = Date.now();
-    const tailLambdaServerCleanup = watch ? (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_16__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
+    const tailLambdaServerCleanup = watch ? (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_17__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
       const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
       let shouldRedraw = false;
       for (const log of logs) {
@@ -2469,7 +2495,7 @@ async function runWebpacks(opts) {
 
     // Read events in the webpack dev server logs to update the globalInfo
     let lastProcessedDevServerLog = Date.now();
-    const tailWebpackServerCleanup = watch ? (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_16__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
+    const tailWebpackServerCleanup = watch ? (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_17__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
       const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
       let shouldRedraw = false;
       for (const log of logs) {

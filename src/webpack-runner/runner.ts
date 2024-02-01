@@ -25,6 +25,7 @@ import {getEnv, getPort} from '@src/webpack/utils';
 import {generateEnvFile} from '@src/webpack-runner/env_definition_file';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
+import {getLocalIp} from '@src/webpack-runner/ip';
 import {readLines} from '@src/webpack-runner/line_reader';
 import {
   renderErrors,
@@ -76,13 +77,15 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
           const status = statuses.get(projectName);
           const port =
             status?.lambdaServerEvents.startEvent?.port ?? getPort(join(root, projectName));
-          overrides[`${projectName.toUpperCase()}_FUNCTION_URL`] = `http://localhost:${port}/`;
+          overrides[`${projectName.toUpperCase()}_FUNCTION_URL`] =
+            `http://${getLocalIp()}:${port}/`;
         }
         if (type === ProjectType.Web) {
           const status = statuses.get(projectName);
           const port =
             status?.webpackDevServerEvents.startEvent?.port ?? getPort(join(root, projectName));
-          overrides[`${projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`] = `localhost:${port}`;
+          overrides[`${projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`] =
+            `${getLocalIp()}:${port}`;
         }
       }
     }

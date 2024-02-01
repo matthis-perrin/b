@@ -7,6 +7,7 @@ import {WebpackDevServerEvent} from '@src/webpack/plugins/webpack_dev_server';
 import {formatError, formatFilePath, formatProject} from '@src/webpack-runner/error_formatter';
 import {GroupedErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError} from '@src/webpack-runner/error_parser';
+import {getLocalIp} from '@src/webpack-runner/ip';
 import {LambdaServerEvents, WebpackDevServerEvents} from '@src/webpack-runner/runner';
 
 export function renderErrors(errors: GroupedErrors): string {
@@ -87,7 +88,7 @@ export function renderErrorWarningCount(errors: ParsedError[]): string {
 export function renderLambdaServerEvent(event: LambdaServerEvent): string {
   const type = event.event;
   if (type === 'start') {
-    return `http://localhost:${event.port}`;
+    return `http://${getLocalIp()}:${event.port}`;
   }
   const req = gray(`${event.method} ${event.path}`);
   if (type === 'error') {
@@ -110,7 +111,7 @@ export function renderWebpackDevServerEvent(event: WebpackDevServerEvent): strin
   const type = event.event;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (type === 'start') {
-    return `http://localhost:${event.port}`;
+    return `http://${getLocalIp()}:${event.port}`;
   }
   // const req = gray(`${event.method} ${event.path}`);
   // if (type === 'error') {
