@@ -20,9 +20,9 @@ export function apiCaller<Name extends ApiName>(
   api: Name,
   fetcher: Fetcher,
   logger: (msg: string, info?: unknown, err?: unknown) => void,
-  opts?: {schemaValidation: boolean}
+  opts?: {schemaValidation: boolean; onHttpError?: (statusCode: number) => void}
 ) {
-  const {schemaValidation = true} = opts ?? {};
+  const {schemaValidation = true, onHttpError} = opts ?? {};
   const {host} = API_CONFIGS[api];
   const sanitizedHost = host.endsWith('/') ? host.slice(0, -1) : host;
   const apiSchemas = (ALL as AllApiSchema)[api as string];
@@ -65,6 +65,7 @@ export function apiCaller<Name extends ApiName>(
     // ERROR
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     if (res.status >= 400) {
+      onHttpError?.(res.status);
       const resErr = asString(asJson(resText, {})['err']);
       if (resErr === undefined) {
         logger(`Invalid API response, no err field in response`, debugInfo);

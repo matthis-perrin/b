@@ -12,7 +12,9 @@ import {
 import {handleApi} from '@shared-node/api/api_router';
 import {getIndex, handleStatics} from '@shared-node/api/api_statics';
 
+import {loginHandler} from '@src/handlers/login_handler';
 import {testHandler} from '@src/handlers/test_handlers';
+import {session} from '@src/session';
 
 const frontendName = '__FRONTEND_NAME__';
 const frontendDomain = __FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME;
@@ -28,7 +30,11 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   }
 
   // Static resources
-  const staticsRes = await handleStatics(req, {frontendName, websiteUrl});
+  const staticsRes = await handleStatics(req, {
+    frontendName,
+    websiteUrl,
+    session,
+  });
   if (staticsRes) {
     return res(staticsRes);
   }
@@ -36,12 +42,13 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   // API handlers
   const apiRes = await handleApi(req, '__PROJECT_NAME__', {
     'GET /test': testHandler,
+    'POST /login': loginHandler,
   });
   if (apiRes) {
     return res(apiRes);
   }
 
   // Default to the index
-  const indexRes = await getIndex({frontendName});
+  const indexRes = await getIndex(req, {frontendName, session});
   return res(indexRes);
 }

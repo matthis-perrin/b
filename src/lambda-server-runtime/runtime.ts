@@ -61,8 +61,11 @@ if (RUNTIME_LOG_FILE !== undefined) {
 
 // eslint-disable-next-line no-null/no-null
 const logger = appLog.bind(null, appendFileSync);
-console.log = (...args: unknown[]) => logger(args.map(arg => JSON.stringify(arg)));
-console.error = (...args: unknown[]) => logger(args.map(arg => JSON.stringify(arg)));
+function serialize(val: unknown): string {
+  return val instanceof Error ? errorAndStackAsString(val) : JSON.stringify(val);
+}
+console.log = (...args: unknown[]) => logger(args.map(serialize));
+console.error = (...args: unknown[]) => logger(args.map(serialize));
 
 let handler: Function | undefined;
 // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax

@@ -4,6 +4,8 @@ import {fileURLToPath} from 'node:url';
 import {listFiles, prettierFormat, prettyJson, readFile} from '@src/fs';
 import {WorkspaceProject, writeWorkspaceFile} from '@src/project/generate_workspace';
 import {FileHash, Workspace} from '@src/project/vscode_workspace';
+import {randomStringSafe} from '@src/rand_safe';
+import {upperCase} from '@src/string_utils';
 
 const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 
@@ -19,6 +21,9 @@ export async function generateProject(
   const {projectName, type, vars} = project;
   const defaultVars = {
     __WORKSPACE_NAME__: workspaceName,
+    __WORKSPACE_NAME_UPPERCASE__: upperCase(workspaceName),
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    __COOKIE_ENCRYPTION_KEY__: randomStringSafe(32),
   };
 
   // Copy template files

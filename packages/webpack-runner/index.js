@@ -240,13 +240,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(10);
 /* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(17);
-/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(18);
-/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(19);
-/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(21);
-/* harmony import */ var _src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(27);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(28);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(26);
-/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(20);
+/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(20);
+/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(21);
+/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(23);
+/* harmony import */ var _src_project_terraform_dynamo_user__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(29);
+/* harmony import */ var _src_project_terraform_dynamo_user_session__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(30);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(31);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(28);
+/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(22);
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(19);
+
+
 
 
 
@@ -337,7 +341,7 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.Shared) {
     const projectName = 'shared';
     const otherVars = {};
-    const [bestBackend] = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_13__.removeUndefined)(allFragments.map(frag => {
+    const [bestBackend] = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_14__.removeUndefined)(allFragments.map(frag => {
       if (frag.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp) {
         return {
           name: frag.lambdaName,
@@ -364,7 +368,7 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
       }
     }];
   }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_13__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
+  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_14__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
 }
 async function generateWorkspace(dst, workspaceName, workspaceFragments, workspace) {
   const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f, workspaceFragments));
@@ -379,7 +383,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   // package.json
   writeFile('package.json', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJson)((0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_9__.generateWorkspacePackageJson)(workspaceName, projects))),
   // app.code-workspace
-  writeFile('app.code-workspace', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJson)((0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_12__.generateCodeWorkspace)(workspaceName, workspaceFragments))),
+  writeFile('app.code-workspace', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJson)((0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_13__.generateCodeWorkspace)(workspaceName, workspaceFragments))),
   // .gitignore
   writeFile('.gitignore', (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_8__.generateGitIgnore)()),
   // setup.js
@@ -400,7 +404,8 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   }));
 
   // Terraform folder generation
-  const terraformFiles = await Promise.all([writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', '.aws-credentials'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateDummyTerraformCredentials)()), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', 'dynamo_table_dummy.tf'), (0,_src_project_terraform_dynamo__WEBPACK_IMPORTED_MODULE_11__.generateDynamoTerraform)()), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
+  const tablePrefix = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_16__.lowerCase)(workspaceName);
+  const terraformFiles = await Promise.all([writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', '.aws-credentials'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateDummyTerraformCredentials)()), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${tablePrefix}_user.tf`), (0,_src_project_terraform_dynamo_user__WEBPACK_IMPORTED_MODULE_11__.generateDynamoUserTerraform)(workspaceName)), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${tablePrefix}_user_session.tf`), (0,_src_project_terraform_dynamo_user_session__WEBPACK_IMPORTED_MODULE_12__.generateDynamoUserSessionTerraform)(workspaceName)), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', 'base.tf'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects)), ...projects.map(async p => {
     const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateWorkspaceProjectTerraform)(workspaceName, p);
     if (content === undefined) {
       return;
@@ -408,10 +413,10 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
     const name = `${p.projectName}_terraform`;
     return writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `${name}.tf`), content);
   })]);
-  await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_12__.writeWorkspace)(dst, {
-    files: (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_13__.removeUndefined)([...projectFiles.flat(), ...workspaceFiles, ...terraformFiles, ...vscodeFiles]),
+  await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_13__.writeWorkspace)(dst, {
+    files: (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_14__.removeUndefined)([...projectFiles.flat(), ...workspaceFiles, ...terraformFiles, ...vscodeFiles]),
     fragments: workspaceFragments,
-    version: _src_versions__WEBPACK_IMPORTED_MODULE_14__.PACKAGE_VERSIONS.project
+    version: _src_versions__WEBPACK_IMPORTED_MODULE_15__.PACKAGE_VERSIONS.project
   });
 
   // Run setup.js
@@ -656,6 +661,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);
+/* harmony import */ var _src_rand_safe__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(18);
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(19);
+
+
 
 
 
@@ -670,7 +679,10 @@ async function generateProject(dst, project, workspace, workspaceName) {
     vars
   } = project;
   const defaultVars = {
-    __WORKSPACE_NAME__: workspaceName
+    __WORKSPACE_NAME__: workspaceName,
+    __WORKSPACE_NAME_UPPERCASE__: (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_5__.upperCase)(workspaceName),
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    __COOKIE_ENCRYPTION_KEY__: (0,_src_rand_safe__WEBPACK_IMPORTED_MODULE_4__.randomStringSafe)(32)
   };
 
   // Copy template files
@@ -710,6 +722,70 @@ async function generateProject(dst, project, workspace, workspaceName) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   generateNonce: () => (/* binding */ generateNonce),
+/* harmony export */   randomStringSafe: () => (/* binding */ randomStringSafe),
+/* harmony export */   uidSafe: () => (/* binding */ uidSafe)
+/* harmony export */ });
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(16);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
+
+const ALPHANUM = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+function randomStringSafe(length, set) {
+  let result = '';
+  const characters = set ?? ALPHANUM;
+  const bytes = (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.randomBytes)(length);
+  for (const byte of bytes) {
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    result += characters[Math.floor(byte / 255 * (characters.length - 1))];
+  }
+  return result;
+}
+const UID_LENGTH = 16;
+function uidSafe(prefix) {
+  const id = randomStringSafe(UID_LENGTH);
+  return prefix === undefined ? id : `${prefix}${id}`;
+}
+const NONCE_BYTE_SIZE = 16;
+function generateNonce() {
+  return (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.randomBytes)(NONCE_BYTE_SIZE).toString('base64');
+}
+
+/***/ }),
+/* 19 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   capitalize: () => (/* binding */ capitalize),
+/* harmony export */   lowerCase: () => (/* binding */ lowerCase),
+/* harmony export */   pascalCase: () => (/* binding */ pascalCase),
+/* harmony export */   uncapitalize: () => (/* binding */ uncapitalize),
+/* harmony export */   upperCase: () => (/* binding */ upperCase)
+/* harmony export */ });
+function capitalize(value) {
+  const [firstChar] = value;
+  return firstChar === undefined ? '' : firstChar.toUpperCase() + value.slice(1);
+}
+function uncapitalize(value) {
+  const [firstChar] = value;
+  return firstChar === undefined ? '' : firstChar.toLowerCase() + value.slice(1);
+}
+function pascalCase(str) {
+  return str.toLowerCase().split(/[^a-z]+/u).map(s => capitalize(s)).join('');
+}
+function upperCase(str) {
+  return str.toUpperCase().split(/[^A-Z]+/u).join('_');
+}
+function lowerCase(str) {
+  return str.toLowerCase().split(/[^a-z]+/u).join('_');
+}
+
+/***/ }),
+/* 20 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateGitIgnore: () => (/* binding */ generateGitIgnore)
 /* harmony export */ });
 function generateGitIgnore() {
@@ -733,7 +809,7 @@ terraform/archives
 }
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -741,7 +817,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   generateWorkspacePackageJson: () => (/* binding */ generateWorkspacePackageJson)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
-/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(20);
+/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(22);
 
 
 function uniq(val) {
@@ -773,7 +849,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
 }
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -785,13 +861,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.8.90',
+  project: '1.9.0',
   eslint: '1.5.3',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
-  webpack: '1.6.27',
+  webpack: '1.6.28',
   runner: '1.5.17',
-  lambdaServerRuntime: '1.0.3'
+  lambdaServerRuntime: '1.0.4'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.1.x';
@@ -805,7 +881,7 @@ const LIB_VERSIONS = {
 };
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -815,11 +891,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   generateWorkspaceProjectTerraform: () => (/* binding */ generateWorkspaceProjectTerraform)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
-/* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(22);
-/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(23);
-/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(24);
-/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(25);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(26);
+/* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(24);
+/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(25);
+/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(26);
+/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(27);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(28);
 
 
 
@@ -869,7 +945,7 @@ aws_secret_access_key=
 }
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -949,23 +1025,40 @@ resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
 }
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateLambdaTerraform: () => (/* binding */ generateLambdaTerraform)
 /* harmony export */ });
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
+
 function generateLambdaTerraform(workspaceName, projectName, opts) {
   const {
     api
   } = opts;
+  const workspaceNamePascalCase = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.pascalCase)(workspaceName);
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
   statement {
-    actions   = ["s3:ListAllMyBuckets"]
-    resources = ["*"]
+    actions   = [
+      "dynamodb:GetItem",
+      "dynamodb:BatchGetItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:DeleteItem",
+    ]
+    resources = [
+      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}User",
+      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}User/index/*",
+      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession",
+      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession/index/*",
+
+    ]
   }
 }
 
@@ -1070,7 +1163,7 @@ resource "aws_iam_role" "${projectName}_lambda_exec" {
 }
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1102,11 +1195,13 @@ data "aws_region" "current" {}
 output "region" {
   value = data.aws_region.current.id
 }
+
+data "aws_caller_identity" "current" {}
 `.trim();
 }
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1153,7 +1248,7 @@ resource "aws_s3_bucket_policy" "code" {
 }
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1430,61 +1525,83 @@ function addPrefix(attr, prefix) {
 }
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   generateDynamoTerraform: () => (/* binding */ generateDynamoTerraform)
+/* harmony export */   generateDynamoUserTerraform: () => (/* binding */ generateDynamoUserTerraform)
 /* harmony export */ });
-function generateDynamoTerraform() {
-  return `output "dummy_table_name" {
-  value       = aws_dynamodb_table.dummy_table.name
-}
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
 
-output "dummy_index_name" {
-  value = {
-    for obj in aws_dynamodb_table.dummy_table.global_secondary_index : "\${aws_dynamodb_table.dummy_table.name }_By_\${obj.hash_key}\${ length(obj.range_key) > 0 ? '_Sorted_By_\${obj.range_key}' : '' }" => obj.name
+function generateDynamoUserTerraform(workspaceName) {
+  const prefixLower = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.lowerCase)(workspaceName);
+  const prefixPascal = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.pascalCase)(workspaceName);
+  return `output "${prefixLower}_user_table_name" {
+    value       = aws_dynamodb_table.${prefixLower}_user_table.name
   }
-}
-
-resource "aws_dynamodb_table" "dummy_table" {
-  name           = "Dummy"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "id"
-
-  attribute {
-    name = "id"
-    type = "S"
+  
+  output "${prefixLower}_user_index_name" {
+    value = {
+      for obj in aws_dynamodb_table.${prefixLower}_user_table.global_secondary_index : "\${aws_dynamodb_table.${prefixLower}_user_table.name }_By_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_Sorted_By_\${obj.range_key}" : "" }" => obj.name
+    }
   }
-
-  attribute {
-    name = "group"
-    type = "S"
-  }
-
-  attribute {
-    name = "ts"
-    type = "N"
-  }
-
-  global_secondary_index {
-    name               = "Dummy_ByGroup_SortedByTs"
-    hash_key           = "group"
-    range_key          = "ts"
-    projection_type    = "ALL"
-  }
-
-  global_secondary_index {
-    name               = "Dummy_ByTs"
-    hash_key           = "ts"
-    projection_type    = "ALL"
-  }
-}`.trim().split('\n').map(l => `# ${l}`).join('\n');
+  
+  resource "aws_dynamodb_table" "${prefixLower}_user_table" {
+    name           = "${prefixPascal}User"
+    billing_mode   = "PAY_PER_REQUEST"
+    hash_key       = "id"
+  
+    attribute {
+      name = "id"
+      type = "S"
+    }
+  }`.trim();
 }
 
 /***/ }),
-/* 28 */
+/* 30 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   generateDynamoUserSessionTerraform: () => (/* binding */ generateDynamoUserSessionTerraform)
+/* harmony export */ });
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
+
+function generateDynamoUserSessionTerraform(workspaceName) {
+  const prefixLower = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.lowerCase)(workspaceName);
+  const prefixPascal = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.pascalCase)(workspaceName);
+  return `output "${prefixLower}_user_session_table_name" {
+  value       = aws_dynamodb_table.${prefixLower}_user_session_table.name
+}
+
+output "${prefixLower}_user_session_index_name" {
+  value = {
+    for obj in aws_dynamodb_table.${prefixLower}_user_session_table.global_secondary_index : "\${aws_dynamodb_table.${prefixLower}_user_session_table.name }_By_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_Sorted_By_\${obj.range_key}" : "" }" => obj.name
+  }
+}
+
+resource "aws_dynamodb_table" "${prefixLower}_user_session_table" {
+  name           = "${prefixPascal}UserSession"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "token"
+
+  attribute {
+    name = "token"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "expiresAt"
+    enabled = true
+  }
+
+}`.trim();
+}
+
+/***/ }),
+/* 31 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1497,7 +1614,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(26);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(28);
 
 
 
@@ -1569,7 +1686,7 @@ async function writeWorkspace(workspacePath, workspace) {
 }
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1583,7 +1700,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(16);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(30);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(33);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
@@ -1668,13 +1785,13 @@ async function lookupRoot(fromPath) {
 }
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs/promises");
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1686,8 +1803,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(26);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(29);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(28);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(32);
 
 
 
@@ -1722,7 +1839,7 @@ async function generateEnvFile(overrides) {
 }
 
 /***/ }),
-/* 32 */
+/* 35 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1781,7 +1898,7 @@ function groupAndSortErrors(errors) {
 }
 
 /***/ }),
-/* 33 */
+/* 36 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1895,14 +2012,14 @@ function parseError(err, opts) {
 }
 
 /***/ }),
-/* 34 */
+/* 37 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getLocalIp: () => (/* binding */ getLocalIp)
 /* harmony export */ });
-/* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(35);
+/* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(38);
 /* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_os__WEBPACK_IMPORTED_MODULE_0__);
 
 function getLocalIp() {
@@ -1911,13 +2028,13 @@ function getLocalIp() {
 }
 
 /***/ }),
-/* 35 */
+/* 38 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:os");
 
 /***/ }),
-/* 36 */
+/* 39 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1956,7 +2073,7 @@ function readLines(filePath, cb) {
 }
 
 /***/ }),
-/* 37 */
+/* 40 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1969,9 +2086,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(26);
-/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(38);
-/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(34);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(28);
+/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(41);
+/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(37);
 
 
 
@@ -2083,7 +2200,7 @@ function renderWebpackDevServerEvent(event) {
 }
 
 /***/ }),
-/* 38 */
+/* 41 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2132,7 +2249,7 @@ function formatError(err) {
 }
 
 /***/ }),
-/* 39 */
+/* 42 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2262,16 +2379,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(10);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(11);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(28);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(26);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(29);
-/* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(31);
-/* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(32);
-/* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(33);
-/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(34);
-/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(36);
-/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(37);
-/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(39);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(31);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(28);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(32);
+/* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(34);
+/* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(35);
+/* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(36);
+/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(37);
+/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(39);
+/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(40);
+/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(42);
 
 
 
@@ -2293,6 +2410,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const name = 'WebpackRunner';
+function exit() {
+  process.stdin.setRawMode(false);
+  (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)('See you soon!');
+  // eslint-disable-next-line node/no-process-exit
+  process.exit(0);
+}
 async function runWebpacks(opts) {
   const {
     root,
@@ -2606,24 +2729,24 @@ async function runWebpacks(opts) {
       }
     });
     process.on('SIGINT', () => {
-      process.stdin.setRawMode(false);
-      (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)('See you soon!');
-      // eslint-disable-next-line node/no-process-exit
-      process.exit(0);
+      exit();
+    });
+    process.on('beforeExit', () => {
+      exit();
     });
 
     // Handle uncaught error and exceptions
     process.on('uncaughtException', err => {
       (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.error)('Uncaught Exception');
       (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.error)(err);
-      process.emit('SIGINT', 'SIGINT');
+      exit();
     });
 
     // Handle unhandled failing promises
     process.on('unhandledRejection', err => {
       (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.error)('Unhandled Rejection');
       (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.error)(err);
-      process.emit('SIGINT', 'SIGINT');
+      exit();
     });
   }
   (0,_src_exit_handler__WEBPACK_IMPORTED_MODULE_5__.registerExitCallback)(cleanup);

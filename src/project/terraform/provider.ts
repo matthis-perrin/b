@@ -25,5 +25,7 @@ data "aws_region" "current" {}
 output "region" {
   value = data.aws_region.current.id
 }
+
+data "aws_caller_identity" "current" {}
 `.trim();
 }

@@ -1,4 +1,5 @@
 import {ProjectName, WorkspaceName} from '@src/models';
+import {pascalCase} from '@src/string_utils';
 
 export function generateLambdaTerraform(
   workspaceName: WorkspaceName,
@@ -6,12 +7,27 @@ export function generateLambdaTerraform(
   opts: {api: boolean}
 ): string {
   const {api} = opts;
+  const workspaceNamePascalCase = pascalCase(workspaceName);
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
   statement {
-    actions   = ["s3:ListAllMyBuckets"]
-    resources = ["*"]
+    actions   = [
+      "dynamodb:GetItem",
+      "dynamodb:BatchGetItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:PutItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:DeleteItem",
+    ]
+    resources = [
+      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}User",
+      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}User/index/*",
+      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession",
+      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession/index/*",
+
+    ]
   }
 }
 

@@ -62,6 +62,13 @@ interface ProjectStatus {
 
 const name = 'WebpackRunner';
 
+function exit(): void {
+  process.stdin.setRawMode(false);
+  log('See you soon!');
+  // eslint-disable-next-line node/no-process-exit
+  process.exit(0);
+}
+
 export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   const {root, workspaceFragments, watch} = opts;
   const statuses = new Map<ProjectName, ProjectStatus>();
@@ -393,24 +400,24 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     });
 
     process.on('SIGINT', () => {
-      process.stdin.setRawMode(false);
-      log('See you soon!');
-      // eslint-disable-next-line node/no-process-exit
-      process.exit(0);
+      exit();
+    });
+    process.on('beforeExit', () => {
+      exit();
     });
 
     // Handle uncaught error and exceptions
     process.on('uncaughtException', err => {
       error('Uncaught Exception');
       error(err);
-      process.emit('SIGINT', 'SIGINT');
+      exit();
     });
 
     // Handle unhandled failing promises
     process.on('unhandledRejection', err => {
       error('Unhandled Rejection');
       error(err);
-      process.emit('SIGINT', 'SIGINT');
+      exit();
     });
   }
 

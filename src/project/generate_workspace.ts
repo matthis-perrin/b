@@ -20,13 +20,15 @@ import {
   generateDummyTerraformCredentials,
   generateWorkspaceProjectTerraform,
 } from '@src/project/terraform/all';
-import {generateDynamoTerraform} from '@src/project/terraform/dynamo';
+import {generateDynamoUserTerraform} from '@src/project/terraform/dynamo_user';
+import {generateDynamoUserSessionTerraform} from '@src/project/terraform/dynamo_user_session';
 import {
   FileHash,
   generateCodeWorkspace,
   Workspace,
   writeWorkspace,
 } from '@src/project/vscode_workspace';
+import {lowerCase} from '@src/string_utils';
 import {neverHappens, removeUndefined} from '@src/type_utils';
 import {PACKAGE_VERSIONS} from '@src/versions';
 
@@ -211,9 +213,17 @@ export async function generateWorkspace(
   );
 
   // Terraform folder generation
+  const tablePrefix = lowerCase(workspaceName);
   const terraformFiles = await Promise.all([
     writeFile(join('terraform', '.aws-credentials'), generateDummyTerraformCredentials()),
-    writeFile(join('terraform', 'dynamo_table_dummy.tf'), generateDynamoTerraform()),
+    writeFile(
+      join('terraform', `dynamo_table_${tablePrefix}_user.tf`),
+      generateDynamoUserTerraform(workspaceName)
+    ),
+    writeFile(
+      join('terraform', `dynamo_table_${tablePrefix}_user_session.tf`),
+      generateDynamoUserSessionTerraform(workspaceName)
+    ),
     writeFile(join('terraform', 'base.tf'), generateCommonTerraform(workspaceName, projects)),
     ...projects.map(async p => {
       const content = generateWorkspaceProjectTerraform(workspaceName, p);

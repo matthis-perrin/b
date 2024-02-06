@@ -11,6 +11,12 @@ export type Test = SchemaToType<typeof TestSchema>;
 
 export const ALL = {
   __BACKEND_NAME__: {
+    '/login': {
+      POST: {
+        req: Obj({id: Str(), password: Str()}),
+        res: Obj({}),
+      },
+    },
     '/test': {
       GET: {
         req: Obj({val: Str()}),

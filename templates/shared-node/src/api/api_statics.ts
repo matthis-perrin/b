@@ -5,17 +5,18 @@ import {GetObjectCommand, S3Client} from '@aws-sdk/client-s3';
 import {CODE_BUCKET, NODE_ENV} from '@shared/env';
 
 import {ApiRequest, ApiResponse} from '@shared-node/api/api_interface';
+import {SessionManager} from '@shared-node/api/api_session';
 
 export async function handleStatics(
   req: ApiRequest,
-  opts: {frontendName: string; websiteUrl: string}
+  opts: {frontendName: string; websiteUrl: string; session: SessionManager}
 ): Promise<ApiResponse | undefined> {
   const {method, path} = req;
-  const {frontendName, websiteUrl} = opts;
+  const {frontendName, websiteUrl, session} = opts;
 
   // index.html
   if (method === 'GET' && (path === '' || path === '/' || path === '/index.html')) {
-    return getIndex({frontendName});
+    return getIndex(req, {frontendName, session});
   }
   // manifest.webmanifest
   if (method === 'GET' && path === '/manifest.webmanifest') {
@@ -61,19 +62,32 @@ async function loadStatic(opts: {
   const res = await s3Client.send(
     new GetObjectCommand({Bucket: CODE_BUCKET, Key: `${frontendName}/${path}`})
   );
-  const indexHtml = await res.Body?.transformToString();
-  if (indexHtml === undefined) {
+  const content = await res.Body?.transformToString();
+  if (content === undefined) {
     return {body: '', opts: {contentType}};
   }
   // eslint-disable-next-line require-atomic-updates
-  staticsCache[cacheKey] = replaceManifestPath(indexHtml);
+  staticsCache[cacheKey] = replaceManifestPath(content);
   return {body: staticsCache[cacheKey], opts: {contentType}};
 }
 
-export async function getIndex(opts: {frontendName: string}): Promise<ApiResponse> {
-  return loadStatic({
+export async function getIndex(
+  req: ApiRequest,
+  opts: {
+    frontendName: string;
+    session: SessionManager;
+  }
+): Promise<ApiResponse> {
+  const res = await loadStatic({
     frontendName: opts.frontendName,
     path: 'index.html',
     contentType: 'text/html',
   });
+  if (
+    res.body !== undefined &&
+    opts.session.isLikelyConnected({getRequestHeader: (h: string) => req.headers[h.toLowerCase()]})
+  ) {
+    res.body = res.body.replace('</head>', '<script>window.IS_CONNECTED = true</script></head>');
+  }
+  return res;
 }

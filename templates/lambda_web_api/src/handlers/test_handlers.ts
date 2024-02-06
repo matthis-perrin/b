@@ -2,7 +2,10 @@ import {Test} from '@shared/api/api';
 import {NotFoundError} from '@shared/api/core/api_errors';
 import {ApiHandler} from '@shared/api/core/api_types';
 
-export const testHandler: ApiHandler<'__PROJECT_NAME__', 'GET /test'> = async req => {
+import {session} from '@src/session';
+
+export const testHandler: ApiHandler<'__PROJECT_NAME__', 'GET /test'> = async (req, context) => {
+  await session.enforceSession(context);
   const {val} = req;
   if (val === 'throw') {
     throw new NotFoundError();

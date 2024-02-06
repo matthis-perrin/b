@@ -447,8 +447,11 @@ if (RUNTIME_LOG_FILE !== undefined) {
 
 // eslint-disable-next-line no-null/no-null
 const logger = appLog.bind(null, node_fs__WEBPACK_IMPORTED_MODULE_1__.appendFileSync);
-console.log = (...args) => logger(args.map(arg => JSON.stringify(arg)));
-console.error = (...args) => logger(args.map(arg => JSON.stringify(arg)));
+function serialize(val) {
+  return val instanceof Error ? (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.errorAndStackAsString)(val) : JSON.stringify(val);
+}
+console.log = (...args) => logger(args.map(serialize));
+console.error = (...args) => logger(args.map(serialize));
 let handler;
 // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
 import( /* webpackIgnore: true */HANDLER_PATH).then(imported => {

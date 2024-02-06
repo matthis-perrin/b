@@ -31,4 +31,5 @@ export function joinWithSpacing(elements: JSX.Element[], spacing: SpacingProps):
 const StyledSpacing = styled.div<{$width: number | string; $height: number | string}>`
   width: ${p => cssPx(p.$width)};
   height: ${p => cssPx(p.$height)};
+  flex-shrink: 0;
 `;
