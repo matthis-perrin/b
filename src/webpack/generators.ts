@@ -34,19 +34,26 @@ async function compileWebpackConfig(type: WebpackType, path: string): Promise<vo
   } else if (type === WebpackType.Web) {
     await injectDependencies('webpack-web', {favicons: '7.1.x', sharp: '0.33.x'});
   }
+  await injectDependencies(`webpack-${type}`, {tsx: '4.7.x'});
 }
 
-async function injectDependencies(project: string, dep: Record<string, string>): Promise<void> {
+async function injectDependencies(
+  project: string,
+  dep: Record<string, string>,
+  opts?: {dev?: boolean}
+): Promise<void> {
+  const {dev} = opts ?? {};
   const packageJsonPath = join(
     fileURLToPath(import.meta.url),
     `../../packages/${project}/package.json`
   );
   const packageJsonContent = await readFile(packageJsonPath);
   const packageJson = JSON.parse(packageJsonContent);
-  const dependencies = asMap(packageJson.dependencies, {});
+  const depKey = dev ? 'devDependencies' : 'dependencies';
+  const dependencies = asMap(packageJson[depKey], {});
   const newDependencies = Object.fromEntries(
     Object.entries({...dependencies, ...dep}).sort((d1, d2) => d1[0].localeCompare(d2[0]))
   );
-  packageJson.dependencies = newDependencies;
+  packageJson[depKey] = newDependencies;
   await writeRawFile(packageJsonPath, JSON.stringify(packageJson, undefined, 2));
 }

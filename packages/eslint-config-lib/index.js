@@ -731,4 +731,11 @@ module.exports = {
     'unicorn/throw-new-error': 'warn',
     'unicorn/prefer-array-flat': 'warn',
   },
+  overrides: {
+    files: ['**/*.test.ts', '**/*.test.tsx'],
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'off',
+      '@typescript-eslint/no-magic-numbers': 'off',
+    },
+  },
 };
