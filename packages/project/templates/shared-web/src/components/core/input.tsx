@@ -128,6 +128,8 @@ function InputInternal<T>(props: FullInputProps<T>, ref: Ref<HTMLInputElement>):
       ref={ref ?? internalRef}
       width={width}
       spellCheck={false}
+      autoCapitalize="off"
+      autoCorrect="off"
       onChange={handleInputChange}
       onBlur={handleBlur}
       type="text"

@@ -26,6 +26,7 @@ interface ModalState {
   mode: ModalMode;
   noCross?: boolean;
   backdropColor?: string;
+  onHide?: () => void;
 }
 
 const modalStateStore = createDataStore<ModalState>({
@@ -53,6 +54,7 @@ export function showModal(
     children,
   } = options;
   showRawModal({
+    ...options,
     children: (
       <ModalWrapper $color={color} $background={background}>
         <ModalTitle>{title}</ModalTitle>
@@ -60,7 +62,6 @@ export function showModal(
       </ModalWrapper>
     ),
     mode,
-    ...options,
   });
 }
 
@@ -76,7 +77,10 @@ export function showRawModal(options: Omit<ModalState, 'shownState'>): void {
 }
 
 export function hideModal(): void {
-  updateModalState(state => ({...state, shownState: ModalShownState.Hidding}));
+  updateModalState(state => {
+    state.onHide?.();
+    return {...state, shownState: ModalShownState.Hidding};
+  });
 
   const modal = document.getElementById('modal');
   if (!modal) {

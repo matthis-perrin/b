@@ -73,6 +73,7 @@ class LambdaServerPlugin extends StandalonePlugin {
       this.runtime = fork('./node_modules/@matthis/lambda-server-runtime/index.js', {
         env: {
           PORT: String(port),
+          TIMEOUT_MS: String(60 * 1000),
           RUNTIME_LOG_FILE: runtimeLogFile,
           APP_LOG_FILE: appLogFile,
           HANDLER_PATH: handlerPath,

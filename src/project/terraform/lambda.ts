@@ -26,7 +26,6 @@ data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
       "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}User/index/*",
       "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession",
       "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession/index/*",
-
     ]
   }
 }

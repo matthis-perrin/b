@@ -388,13 +388,25 @@ const {
   PORT,
   RUNTIME_LOG_FILE,
   APP_LOG_FILE,
-  HANDLER_PATH
+  HANDLER_PATH,
+  TIMEOUT_MS
 } = process.env;
 const port = parseFloat(PORT ?? '');
 if (isNaN(port)) {
   runtimeLog({
     event: 'error',
     err: `Invalid process.env.PORT: ${PORT}`,
+    path: '',
+    method: ''
+  });
+  // eslint-disable-next-line node/no-process-exit
+  process.exit(0);
+}
+const timeoutMs = parseFloat(TIMEOUT_MS ?? '');
+if (isNaN(timeoutMs)) {
+  runtimeLog({
+    event: 'error',
+    err: `Invalid process.env.TIMEOUT_MS: ${TIMEOUT_MS}`,
     path: '',
     method: ''
   });
@@ -594,7 +606,12 @@ const server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res
       }
       const startTs = Date.now();
       try {
-        Promise.resolve(handler(event)).then(handlerRes => {
+        const context = {
+          getRemainingTimeInMillis: () => {
+            return timeoutMs - (Date.now() - startTs);
+          }
+        };
+        Promise.resolve(handler(event, context)).then(handlerRes => {
           const duration = Date.now() - startTs;
           try {
             if (handlerRes === undefined) {

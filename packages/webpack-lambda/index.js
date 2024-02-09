@@ -1250,6 +1250,7 @@ class LambdaServerPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK
       this.runtime = (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.fork)('./node_modules/@matthis/lambda-server-runtime/index.js', {
         env: {
           PORT: String(port),
+          TIMEOUT_MS: String(60 * 1000),
           RUNTIME_LOG_FILE: runtimeLogFile,
           APP_LOG_FILE: appLogFile,
           HANDLER_PATH: handlerPath

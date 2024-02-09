@@ -10,11 +10,23 @@ import {LambdaServerEvent} from '@src/webpack/plugins/lambda_server_plugin';
 //
 
 // eslint-disable-next-line node/no-process-env
-const {PORT, RUNTIME_LOG_FILE, APP_LOG_FILE, HANDLER_PATH} = process.env;
+const {PORT, RUNTIME_LOG_FILE, APP_LOG_FILE, HANDLER_PATH, TIMEOUT_MS} = process.env;
 
 const port = parseFloat(PORT ?? '');
 if (isNaN(port)) {
   runtimeLog({event: 'error', err: `Invalid process.env.PORT: ${PORT}`, path: '', method: ''});
+  // eslint-disable-next-line node/no-process-exit
+  process.exit(0);
+}
+
+const timeoutMs = parseFloat(TIMEOUT_MS ?? '');
+if (isNaN(timeoutMs)) {
+  runtimeLog({
+    event: 'error',
+    err: `Invalid process.env.TIMEOUT_MS: ${TIMEOUT_MS}`,
+    path: '',
+    method: '',
+  });
   // eslint-disable-next-line node/no-process-exit
   process.exit(0);
 }
@@ -208,7 +220,12 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
       }
       const startTs = Date.now();
       try {
-        Promise.resolve(handler(event))
+        const context = {
+          getRemainingTimeInMillis: () => {
+            return timeoutMs - (Date.now() - startTs);
+          },
+        };
+        Promise.resolve(handler(event, context))
           .then(handlerRes => {
             const duration = Date.now() - startTs;
             try {
