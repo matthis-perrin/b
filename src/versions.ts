@@ -1,5 +1,5 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.9.6',
+  project: '1.9.7',
   eslint: '1.5.5',
   prettier: '1.3.0',
   tsconfig: '1.6.1',

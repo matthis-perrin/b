@@ -1,5 +1,5 @@
 import {ProjectName, WorkspaceName} from '@src/models';
-import {pascalCase} from '@src/string_utils';
+import {lowerCase} from '@src/string_utils';
 
 export function generateLambdaTerraform(
   workspaceName: WorkspaceName,
@@ -7,7 +7,7 @@ export function generateLambdaTerraform(
   opts: {api: boolean}
 ): string {
   const {api} = opts;
-  const workspaceNamePascalCase = pascalCase(workspaceName);
+  const prefixLower = lowerCase(workspaceName);
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
@@ -22,10 +22,10 @@ data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
       "dynamodb:DeleteItem",
     ]
     resources = [
-      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}User",
-      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}User/index/*",
-      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession",
-      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession/index/*",
+      "\${aws_dynamodb_table.${prefixLower}_user_table.arn}",
+      "\${aws_dynamodb_table.${prefixLower}_user_table.arn}/index/*",
+      "\${aws_dynamodb_table.${prefixLower}_user_session_table.arn}",
+      "\${aws_dynamodb_table.${prefixLower}_user_session_table.arn}/index/*",
     ]
   }
 }
@@ -56,7 +56,6 @@ output "${projectName}_function_name" {
   value       = aws_lambda_function.${projectName}.function_name
   description = "Function name of the \\"${workspaceName}-${projectName}\\" lambda"
 }
-
 ${
   api
     ? `

@@ -2,6 +2,8 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   HeadObjectOutput,
+  ListObjectsV2Command,
+  ListObjectsV2Output,
   NoSuchKey,
   NotFound,
   PutObjectCommand,
@@ -73,6 +75,7 @@ export async function getObject(options: {
     throw err;
   }
 }
+
 export async function getPresignedUploadUrl(
   bucket: string,
   key: string,
@@ -104,5 +107,24 @@ export async function getPresignedDownloadUrl(
     {
       expiresIn: o.expiresInSeconds,
     }
+  );
+}
+
+export async function listObjects(options: {
+  bucket: string;
+  prefix?: string;
+  startAfter?: string;
+  limit?: number;
+  continuationToken?: string;
+}): Promise<ListObjectsV2Output> {
+  const {bucket, prefix, startAfter, limit, continuationToken} = options;
+  return client.send(
+    new ListObjectsV2Command({
+      Bucket: bucket,
+      Prefix: prefix,
+      StartAfter: startAfter,
+      MaxKeys: limit,
+      ContinuationToken: continuationToken,
+    })
   );
 }

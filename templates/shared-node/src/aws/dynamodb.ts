@@ -91,7 +91,7 @@ export async function getItem<T>(params: {
   return unmarshall(item) as T;
 }
 
-export async function getItems<T extends AnyInterface<T>>(params: {
+export async function batchGetItems<T extends AnyInterface<T>>(params: {
   tableName: string;
   keys: Record<string, unknown>[];
   consistent?: boolean;

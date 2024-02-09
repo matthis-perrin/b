@@ -797,7 +797,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.5',
+  project: '1.9.7',
   eslint: '1.5.5',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
@@ -974,7 +974,7 @@ function generateLambdaTerraform(workspaceName, projectName, opts) {
   const {
     api
   } = opts;
-  const workspaceNamePascalCase = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.pascalCase)(workspaceName);
+  const prefixLower = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.lowerCase)(workspaceName);
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
@@ -989,10 +989,10 @@ data "aws_iam_policy_document" "${projectName}_lambda_extra_role" {
       "dynamodb:DeleteItem",
     ]
     resources = [
-      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}User",
-      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}User/index/*",
-      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession",
-      "arn:aws:dynamodb:\${data.aws_region.current.id}:\${data.aws_caller_identity.current.account_id}:table/${workspaceNamePascalCase}UserSession/index/*",
+      "\${aws_dynamodb_table.${prefixLower}_user_table.arn}",
+      "\${aws_dynamodb_table.${prefixLower}_user_table.arn}/index/*",
+      "\${aws_dynamodb_table.${prefixLower}_user_session_table.arn}",
+      "\${aws_dynamodb_table.${prefixLower}_user_session_table.arn}/index/*",
     ]
   }
 }
@@ -1023,7 +1023,6 @@ output "${projectName}_function_name" {
   value       = aws_lambda_function.${projectName}.function_name
   description = "Function name of the \\"${workspaceName}-${projectName}\\" lambda"
 }
-
 ${api ? `
 resource "aws_lambda_function_url" "${projectName}" {
   function_name      = aws_lambda_function.${projectName}.function_name
@@ -1130,8 +1129,6 @@ data "aws_region" "current" {}
 output "region" {
   value = data.aws_region.current.id
 }
-
-data "aws_caller_identity" "current" {}
 `.trim();
 }
 
