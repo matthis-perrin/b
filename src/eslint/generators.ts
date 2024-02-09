@@ -34,13 +34,15 @@ function generateEslintConfig(type: EslintType): Record<string, unknown> {
     settings: plugins.reduce((all, {settings}) => ({...all, ...settings}), {}),
     plugins: plugins.reduce<string[]>((all, {plugin}) => [...all, ...plugin], []),
     rules: plugins.reduce((all, {allOff, onlyOn}) => ({...all, ...allOff, ...onlyOn}), {}),
-    overrides: {
-      files: ['**/*.test.ts', '**/*.test.tsx'],
-      rules: {
-        '@typescript-eslint/no-floating-promises': 'off',
-        '@typescript-eslint/no-magic-numbers': 'off',
+    overrides: [
+      {
+        files: ['**/*.test.ts', '**/*.test.tsx'],
+        rules: {
+          '@typescript-eslint/no-floating-promises': 'off',
+          '@typescript-eslint/no-magic-numbers': 'off',
+        },
       },
-    },
+    ],
   };
   return eslintConfig;
 }

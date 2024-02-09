@@ -861,8 +861,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.7',
-  eslint: '1.5.5',
+  project: '1.9.8',
+  eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
   webpack: '1.6.31',
@@ -1087,6 +1087,7 @@ output "${projectName}_function_name" {
   value       = aws_lambda_function.${projectName}.function_name
   description = "Function name of the \\"${workspaceName}-${projectName}\\" lambda"
 }
+
 ${api ? `
 resource "aws_lambda_function_url" "${projectName}" {
   function_name      = aws_lambda_function.${projectName}.function_name

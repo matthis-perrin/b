@@ -767,11 +767,13 @@ module.exports = {
     'node/process-exit-as-throw': 'warn',
     'node/shebang': 'off',
   },
-  overrides: {
-    files: ['**/*.test.ts', '**/*.test.tsx'],
-    rules: {
-      '@typescript-eslint/no-floating-promises': 'off',
-      '@typescript-eslint/no-magic-numbers': 'off',
+  overrides: [
+    {
+      files: ['**/*.test.ts', '**/*.test.tsx'],
+      rules: {
+        '@typescript-eslint/no-floating-promises': 'off',
+        '@typescript-eslint/no-magic-numbers': 'off',
+      },
     },
-  },
+  ],
 };
