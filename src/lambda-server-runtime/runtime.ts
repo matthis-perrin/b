@@ -56,6 +56,9 @@ function runtimeLog(event: LambdaServerEvent): void {
   if (RUNTIME_LOG_FILE === undefined) {
     return;
   }
+  if (event.event === 'error') {
+    logger(event.err);
+  }
   appendFileSync(RUNTIME_LOG_FILE, `${JSON.stringify({t: new Date().toISOString(), ...event})}\n`);
 }
 
@@ -74,7 +77,11 @@ if (RUNTIME_LOG_FILE !== undefined) {
 // eslint-disable-next-line no-null/no-null
 const logger = appLog.bind(null, appendFileSync);
 function serialize(val: unknown): string {
-  return val instanceof Error ? errorAndStackAsString(val) : JSON.stringify(val);
+  return val instanceof Error
+    ? errorAndStackAsString(val)
+    : typeof val === 'string'
+      ? val
+      : JSON.stringify(val);
 }
 console.log = (...args: unknown[]) => logger(args.map(serialize));
 console.error = (...args: unknown[]) => logger(args.map(serialize));

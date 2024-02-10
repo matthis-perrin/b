@@ -861,13 +861,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.8',
+  project: '1.9.9',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
-  webpack: '1.6.31',
+  webpack: '1.6.32',
   runner: '1.5.17',
-  lambdaServerRuntime: '1.0.5'
+  lambdaServerRuntime: '1.0.6'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.1.x';

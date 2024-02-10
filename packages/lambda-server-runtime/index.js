@@ -439,6 +439,9 @@ function runtimeLog(event) {
   if (RUNTIME_LOG_FILE === undefined) {
     return;
   }
+  if (event.event === 'error') {
+    logger(event.err);
+  }
   (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.appendFileSync)(RUNTIME_LOG_FILE, `${JSON.stringify({
     t: new Date().toISOString(),
     ...event
@@ -460,7 +463,7 @@ if (RUNTIME_LOG_FILE !== undefined) {
 // eslint-disable-next-line no-null/no-null
 const logger = appLog.bind(null, node_fs__WEBPACK_IMPORTED_MODULE_1__.appendFileSync);
 function serialize(val) {
-  return val instanceof Error ? (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.errorAndStackAsString)(val) : JSON.stringify(val);
+  return val instanceof Error ? (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.errorAndStackAsString)(val) : typeof val === 'string' ? val : JSON.stringify(val);
 }
 console.log = (...args) => logger(args.map(serialize));
 console.error = (...args) => logger(args.map(serialize));
