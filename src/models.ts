@@ -112,15 +112,19 @@ export interface WorkspaceFragmentRegistry {
   [WorkspaceFragmentType.StandaloneLambda]: {
     type: WorkspaceFragmentType.StandaloneLambda;
     lambdaName: ProjectName;
+    alarmEmail: string | undefined;
+    cloudwatchTriggerMinutes: number | undefined;
   };
   [WorkspaceFragmentType.ApiLambda]: {
     type: WorkspaceFragmentType.ApiLambda;
     lambdaName: ProjectName;
+    alarmEmail: string | undefined;
   };
   [WorkspaceFragmentType.WebApp]: {
     type: WorkspaceFragmentType.WebApp;
     websiteName: ProjectName;
     lambdaName: ProjectName;
+    alarmEmail: string | undefined;
   };
   [WorkspaceFragmentType.NodeScript]: {
     type: WorkspaceFragmentType.NodeScript;

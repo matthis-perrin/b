@@ -37,6 +37,7 @@ const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 export interface WorkspaceProject {
   projectName: ProjectName;
   type: ProjectType;
+  fromFragment: WorkspaceFragment;
   vars: Record<string, string>;
 }
 
@@ -49,6 +50,7 @@ export function getProjectsFromWorkspaceFragment(
       {
         projectName: fragment.websiteName,
         type: ProjectType.Web,
+        fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: fragment.websiteName,
         },
@@ -59,6 +61,7 @@ export function getProjectsFromWorkspaceFragment(
       {
         projectName: fragment.lambdaName,
         type: ProjectType.LambdaFunction,
+        fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: fragment.lambdaName,
         },
@@ -69,6 +72,7 @@ export function getProjectsFromWorkspaceFragment(
       {
         projectName: fragment.lambdaName,
         type: ProjectType.LambdaApi,
+        fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: fragment.lambdaName,
           __BACKEND_NAME__: fragment.lambdaName,
@@ -88,11 +92,13 @@ export function getProjectsFromWorkspaceFragment(
       {
         projectName: fragment.websiteName,
         type: ProjectType.Web,
+        fromFragment: fragment,
         vars,
       },
       {
         projectName: fragment.lambdaName,
         type: ProjectType.LambdaWebApi,
+        fromFragment: fragment,
         vars,
       },
     ];
@@ -101,6 +107,7 @@ export function getProjectsFromWorkspaceFragment(
       {
         projectName: fragment.scriptName,
         type: ProjectType.NodeScript,
+        fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: fragment.scriptName,
         },
@@ -112,6 +119,7 @@ export function getProjectsFromWorkspaceFragment(
       {
         projectName,
         type: ProjectType.SharedNode,
+        fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: projectName,
         },
@@ -123,6 +131,7 @@ export function getProjectsFromWorkspaceFragment(
       {
         projectName,
         type: ProjectType.SharedWeb,
+        fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: projectName,
         },
@@ -150,6 +159,7 @@ export function getProjectsFromWorkspaceFragment(
       {
         projectName,
         type: ProjectType.Shared,
+        fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: projectName,
           ...otherVars,

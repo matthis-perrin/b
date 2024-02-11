@@ -23,15 +23,33 @@ export function generateWorkspaceProjectTerraform(
   workspaceName: WorkspaceName,
   project: WorkspaceProject
 ): string | undefined {
-  const {projectName, type} = project;
+  const {projectName, type, fromFragment} = project;
+  const cloudwatchTriggerMinutes =
+    'cloudwatchTriggerMinutes' in fromFragment ? fromFragment.cloudwatchTriggerMinutes : undefined;
+  const alarmEmail = 'alarmEmail' in fromFragment ? fromFragment.alarmEmail : undefined;
   if (type === ProjectType.Web) {
     return generateCloudfrontDistributionTerraform(workspaceName, projectName);
   } else if (type === ProjectType.LambdaFunction) {
-    return generateLambdaTerraform(workspaceName, projectName, {api: false});
+    return generateLambdaTerraform(workspaceName, projectName, {
+      api: false,
+      web: false,
+      alarmEmail,
+      cloudwatchTriggerMinutes,
+    });
   } else if (type === ProjectType.LambdaApi) {
-    return generateLambdaTerraform(workspaceName, projectName, {api: true});
+    return generateLambdaTerraform(workspaceName, projectName, {
+      api: true,
+      web: false,
+      alarmEmail,
+      cloudwatchTriggerMinutes,
+    });
   } else if (type === ProjectType.LambdaWebApi) {
-    return generateLambdaTerraform(workspaceName, projectName, {api: true});
+    return generateLambdaTerraform(workspaceName, projectName, {
+      api: true,
+      web: true,
+      alarmEmail,
+      cloudwatchTriggerMinutes,
+    });
   } else if (type === ProjectType.NodeScript) {
     return undefined;
   } else if (type === ProjectType.SharedNode) {

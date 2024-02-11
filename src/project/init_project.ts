@@ -128,14 +128,18 @@ async function askForWorkspaceFragment(
     return {type, websiteName};
   } else if (type === WorkspaceFragmentType.StandaloneLambda) {
     const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
-    return {type, lambdaName};
+    const alarmEmail = await askForAlarmEmail(true);
+    const cloudwatchTriggerMinutes = await askForCloudwatchTrigger();
+    return {type, lambdaName, alarmEmail, cloudwatchTriggerMinutes};
   } else if (type === WorkspaceFragmentType.ApiLambda) {
     const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
-    return {type, lambdaName};
+    const alarmEmail = await askForAlarmEmail(false);
+    return {type, lambdaName, alarmEmail};
   } else if (type === WorkspaceFragmentType.WebApp) {
     const websiteName = await askForProjectName('Frontend project name', 'frontend', takenNames);
     const lambdaName = await askForProjectName('Backend project name', 'backend', takenNames);
-    return {type, websiteName, lambdaName};
+    const alarmEmail = await askForAlarmEmail(false);
+    return {type, websiteName, lambdaName, alarmEmail};
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === WorkspaceFragmentType.NodeScript) {
     const scriptName = await askForProjectName('Script project name', 'script', takenNames);
@@ -177,6 +181,54 @@ async function askForProjectName(
     throw new Error(`${value} is taken`);
   }
   return value as ProjectName;
+}
+
+let alarmEmailDefault: string | undefined;
+
+async function askForAlarmEmail(defaultVal: boolean): Promise<string | undefined> {
+  const alarm = await prompt({
+    type: 'confirm',
+    name: 'value',
+    message: 'Add an alarm when an error is logged?',
+    initial: defaultVal,
+  });
+  if (alarm.value !== true) {
+    return undefined;
+  }
+  const email = await prompt({
+    type: 'text',
+    name: 'value',
+    message: 'Which email to send the alarm to?',
+    initial: alarmEmailDefault,
+    validate: (v: string) => v.length > 0,
+  });
+  if (typeof alarm.value !== 'string') {
+    return undefined;
+  }
+  return email.value;
+}
+
+async function askForCloudwatchTrigger(): Promise<number | undefined> {
+  const trigger = await prompt({
+    type: 'confirm',
+    name: 'value',
+    message: 'Add a Cloudwatch trigger?',
+    initial: true,
+  });
+  if (trigger.value !== true) {
+    return undefined;
+  }
+  const minutes = await prompt({
+    type: 'text',
+    name: 'value',
+    message: 'Trigger period (in minutes)?',
+    initial: 1,
+    validate: (v: number) => v >= 1 && Math.round(v) === v,
+  });
+  if (typeof minutes.value !== 'number') {
+    return undefined;
+  }
+  return minutes.value;
 }
 
 initProject().catch(error);
