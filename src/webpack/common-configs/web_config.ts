@@ -22,14 +22,7 @@ export function webConfig(opts: {context: string; watch: boolean}): Configuratio
     `export const ${domainNameEnvVariable} =\\s*'(?<domainName>[^']*)'`,
     'u'
   ).exec(readFileSync(envVariableFilePath).toString());
-  const domainName = match?.[1];
-  if (domainName === undefined) {
-    throw new Error(
-      `Failure to retrieve domain name for web project "${basename(
-        context
-      )}". Variable ${domainNameEnvVariable} not found in file ${envVariableFilePath}`
-    );
-  }
+  const domainName = match?.[1] ?? 'domain-not-found';
   const publicUrl = `http${isProd() ? 's' : ''}://${domainName}`;
 
   return {

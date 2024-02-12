@@ -20,7 +20,7 @@ export async function generateEnvFile(overrides: Record<string, string>): Promis
         Array.isArray(value.type) &&
         value.type[0] === 'object' &&
         typeof value.value === 'object' &&
-        value.value !== null // eslint-disable-line no-null/no-null
+        value.value !== null
       ) {
         return [
           key.toUpperCase(),

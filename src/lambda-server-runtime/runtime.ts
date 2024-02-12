@@ -74,7 +74,6 @@ if (RUNTIME_LOG_FILE !== undefined) {
 // HANDLER LOADING
 //
 
-// eslint-disable-next-line no-null/no-null
 const logger = appLog.bind(null, appendFileSync);
 function serialize(val: unknown): string {
   return val instanceof Error
@@ -242,7 +241,6 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
               res.setHeader('Content-Type', 'application/json');
               if (
                 typeof handlerRes === 'object' &&
-                // eslint-disable-next-line no-null/no-null
                 handlerRes !== null &&
                 !Array.isArray(handlerRes)
               ) {

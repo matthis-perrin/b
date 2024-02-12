@@ -1,11 +1,11 @@
 {
   "name": "@matthis/webpack-web",
-  "version": "1.6.32",
+  "version": "1.6.33",
   "type": "module",
   "main": "index.js",
   "dependencies": {
-    "@babel/core": "7.23.7",
-    "@babel/preset-env": "7.23.8",
+    "@babel/core": "7.23.9",
+    "@babel/preset-env": "7.23.9",
     "@babel/preset-react": "7.23.3",
     "@babel/preset-typescript": "7.23.3",
     "babel-loader": "9.1.3",

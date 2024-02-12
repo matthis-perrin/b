@@ -42,10 +42,7 @@ function webConfig(opts) {
   const envVariableFilePath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(context, '../shared/src/env.ts');
   const domainNameEnvVariable = `${(0,node_path__WEBPACK_IMPORTED_MODULE_1__.basename)(context).toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`;
   const match = new RegExp(`export const ${domainNameEnvVariable} =\\s*'(?<domainName>[^']*)'`, 'u').exec((0,node_fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)(envVariableFilePath).toString());
-  const domainName = match === null || match === void 0 ? void 0 : match[1];
-  if (domainName === undefined) {
-    throw new Error(`Failure to retrieve domain name for web project "${(0,node_path__WEBPACK_IMPORTED_MODULE_1__.basename)(context)}". Variable ${domainNameEnvVariable} not found in file ${envVariableFilePath}`);
-  }
+  const domainName = (match === null || match === void 0 ? void 0 : match[1]) ?? 'domain-not-found';
   const publicUrl = `http${(0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.isProd)() ? 's' : ''}://${domainName}`;
   return {
     ...base,
@@ -1230,15 +1227,12 @@ function removeUndefined(arr) {
   return arr.filter(notUndefined);
 }
 function removeUndefinedOrNullProps(obj) {
-  return Object.fromEntries(
-  // eslint-disable-next-line no-null/no-null
-  Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null));
+  return Object.fromEntries(Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null));
 }
 function neverHappens(value, errorMessage) {
   throw new Error(errorMessage);
 }
 function asMap(value, defaultValue) {
-  // eslint-disable-next-line no-null/no-null
   return typeof value === 'object' && value !== null ? value : defaultValue;
 }
 function asMapOrThrow(value) {
@@ -1380,7 +1374,6 @@ function asDateOrThrow(value) {
 // }
 
 function isNull(val) {
-  // eslint-disable-next-line no-null/no-null
   return val === null;
 }
 function asError(err) {

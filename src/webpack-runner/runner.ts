@@ -207,21 +207,30 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
         lambdaServerEvents: {},
         webpackDevServerEvents: {},
       };
-      statuses.set(projectName, intialStatus);
-      // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
-      const config: Configuration = await import(
-        /*webpackIgnore: true*/ join(projectPath, 'webpack.config.js')
-      )
-        .then(({getConfig}) => getConfig({context: projectPath, watch}))
-        .catch((err: unknown) => {
-          reportCompilationFailure(String(err));
-        });
 
-      const reportCompilationFailure = (error: string): void => {
+      function updateStatus(fn: (curr: ProjectStatus) => void): void {
+        let current = statuses.get(projectName);
+        if (!current) {
+          current = intialStatus;
+          statuses.set(projectName, current);
+        }
+        fn(current);
+      }
+
+      function reportCompilationFailure(error: string): void {
         updateStatus(curr => {
           curr.compilationFailure = error;
         });
-      };
+      }
+
+      statuses.set(projectName, intialStatus);
+      // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
+      const config = await import(/*webpackIgnore: true*/ join(projectPath, 'webpack.config.js'))
+        .then(({getConfig}) => getConfig({context: projectPath, watch}) as Configuration)
+        .catch((err: unknown) => {
+          reportCompilationFailure(String(err));
+          return undefined;
+        });
 
       const updateLambdaServerEvents = (fn: (curr: LambdaServerEvents) => void): void => {
         updateStatus(curr => fn(curr.lambdaServerEvents));
@@ -229,15 +238,6 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
 
       const updateWebpackDevServerEvents = (fn: (curr: WebpackDevServerEvents) => void): void => {
         updateStatus(curr => fn(curr.webpackDevServerEvents));
-      };
-
-      const updateStatus = (fn: (curr: ProjectStatus) => void): void => {
-        let current = statuses.get(projectName);
-        if (!current) {
-          current = intialStatus;
-          statuses.set(projectName, current);
-        }
-        fn(current);
       };
 
       // Read events in the lambda server logs to update the globalInfo
@@ -309,6 +309,10 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
           })
         : undefined;
 
+      if (!config) {
+        return;
+      }
+
       const compiler = webpack({...config, watch}, (err?: Error, res?: Stats) => {
         if (err || !res) {
           reportCompilationFailure(err ? String(err) : 'No result after compilation');
@@ -359,7 +363,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       return;
     }
     cleanupCalled = true;
-    await Promise.all(cleanupFunctions.map(async fn => fn()));
+    await Promise.all(cleanupFunctions.map(async fn => fn?.()));
     redraw();
   };
 

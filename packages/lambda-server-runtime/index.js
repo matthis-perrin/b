@@ -78,15 +78,12 @@ function removeUndefined(arr) {
   return arr.filter(notUndefined);
 }
 function removeUndefinedOrNullProps(obj) {
-  return Object.fromEntries(
-  // eslint-disable-next-line no-null/no-null
-  Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null));
+  return Object.fromEntries(Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null));
 }
 function neverHappens(value, errorMessage) {
   throw new Error(errorMessage);
 }
 function asMap(value, defaultValue) {
-  // eslint-disable-next-line no-null/no-null
   return typeof value === 'object' && value !== null ? value : defaultValue;
 }
 function asMapOrThrow(value) {
@@ -228,7 +225,6 @@ function asDateOrThrow(value) {
 // }
 
 function isNull(val) {
-  // eslint-disable-next-line no-null/no-null
   return val === null;
 }
 function asError(err) {
@@ -460,7 +456,6 @@ if (RUNTIME_LOG_FILE !== undefined) {
 // HANDLER LOADING
 //
 
-// eslint-disable-next-line no-null/no-null
 const logger = appLog.bind(null, node_fs__WEBPACK_IMPORTED_MODULE_1__.appendFileSync);
 function serialize(val) {
   return val instanceof Error ? (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.errorAndStackAsString)(val) : typeof val === 'string' ? val : JSON.stringify(val);
@@ -621,9 +616,7 @@ const server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res
               return internalError(`Invalid response: ${JSON.stringify(handlerRes)}`);
             }
             res.setHeader('Content-Type', 'application/json');
-            if (typeof handlerRes === 'object' &&
-            // eslint-disable-next-line no-null/no-null
-            handlerRes !== null && !Array.isArray(handlerRes)) {
+            if (typeof handlerRes === 'object' && handlerRes !== null && !Array.isArray(handlerRes)) {
               const {
                 body,
                 headers,

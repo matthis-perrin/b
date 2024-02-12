@@ -870,12 +870,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.11',
+  project: '1.9.17',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
-  webpack: '1.6.32',
-  runner: '1.5.17',
+  webpack: '1.6.33',
+  runner: '1.5.19',
   lambdaServerRuntime: '1.0.6'
 };
 const ESLINT_VERSION = '8.56.x';
@@ -1126,8 +1126,7 @@ output "${projectName}_function_url" {
   value       = aws_lambda_function_url.${projectName}.function_url
   description = "Function url of the \\"${workspaceName}-${projectName}\\" lambda"
 }` : ''}
-${cloudwatchTriggerMinutes !== undefined ? `
-# Cloudwatch trigger
+${cloudwatchTriggerMinutes !== undefined ? `# Cloudwatch trigger
 
 resource "aws_lambda_permission" "cloudwatch_invoke_${projectName}" {
   statement_id  = "AllowExecutionFromCloudWatch"
@@ -1145,7 +1144,8 @@ resource "aws_cloudwatch_event_rule" "${projectName}_trigger_rate" {
 resource "aws_cloudwatch_event_target" "${projectName}_trigger_target" {
   rule  = aws_cloudwatch_event_rule.${projectName}_trigger_rate.name
   arn   = aws_lambda_function.${projectName}.arn
-}` : ''}
+}
+` : ''}
 # IAM role
 
 resource "aws_iam_role" "${projectName}_role" {
@@ -1182,13 +1182,13 @@ resource "aws_iam_policy" "${projectName}_cloudwatch" {
     Statement = [
       {
         Action   = [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
         ]
         Effect   = "Allow"
         Resource = [
           "\${aws_cloudwatch_log_group.${projectName}.arn}",
+          "\${aws_cloudwatch_log_group.${projectName}.arn}:*",
         ]
       }
     ]
@@ -1204,7 +1204,7 @@ ${alarmEmail !== undefined ? `
 
 resource "aws_cloudwatch_log_metric_filter" "${projectName}_log_errors" {
   name           = "${workspaceName}-${projectName}-log-error-metric-filter"
-  pattern        = "{ $.level = \\"ERROR\\" }"
+  pattern        = "[ts, id, level = \\"ERROR\\", msg]"
   log_group_name = aws_cloudwatch_log_group.${projectName}.name
 
   metric_transformation {
@@ -1239,7 +1239,8 @@ resource "aws_sns_topic_subscription" "${projectName}_log_errors" {
   endpoint = "${alarmEmail}"
   protocol = "email"
   topic_arn = aws_sns_topic.${projectName}_log_errors.arn
-}`.trim() : ''}
+}
+` : ''}
 # Dummy source code useful only during the initial setup
 resource "aws_s3_object" "${projectName}_archive" {
   bucket       = aws_s3_bucket.code.id
@@ -1393,15 +1394,12 @@ function removeUndefined(arr) {
   return arr.filter(notUndefined);
 }
 function removeUndefinedOrNullProps(obj) {
-  return Object.fromEntries(
-  // eslint-disable-next-line no-null/no-null
-  Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null));
+  return Object.fromEntries(Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null));
 }
 function neverHappens(value, errorMessage) {
   throw new Error(errorMessage);
 }
 function asMap(value, defaultValue) {
-  // eslint-disable-next-line no-null/no-null
   return typeof value === 'object' && value !== null ? value : defaultValue;
 }
 function asMapOrThrow(value) {
@@ -1543,7 +1541,6 @@ function asDateOrThrow(value) {
 // }
 
 function isNull(val) {
-  // eslint-disable-next-line no-null/no-null
   return val === null;
 }
 function asError(err) {
@@ -1905,8 +1902,7 @@ async function generateEnvFile(overrides) {
     if (value.sensitive) {
       return undefined;
     }
-    if (Array.isArray(value.type) && value.type[0] === 'object' && typeof value.value === 'object' && value.value !== null // eslint-disable-line no-null/no-null
-    ) {
+    if (Array.isArray(value.type) && value.type[0] === 'object' && typeof value.value === 'object' && value.value !== null) {
       return [key.toUpperCase(), Object.fromEntries(Object.entries(value.value).map(([k, v]) => [k.toUpperCase(), v]))];
     }
     if (value.type === 'string' && typeof value.value === 'string') {
@@ -2642,6 +2638,19 @@ async function runWebpacks(opts) {
       lambdaServerEvents: {},
       webpackDevServerEvents: {}
     };
+    function updateStatus(fn) {
+      let current = statuses.get(projectName);
+      if (!current) {
+        current = intialStatus;
+        statuses.set(projectName, current);
+      }
+      fn(current);
+    }
+    function reportCompilationFailure(error) {
+      updateStatus(curr => {
+        curr.compilationFailure = error;
+      });
+    }
     statuses.set(projectName, intialStatus);
     // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
     const config = await import( /*webpackIgnore: true*/(0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'webpack.config.js')).then(({
@@ -2651,25 +2660,13 @@ async function runWebpacks(opts) {
       watch
     })).catch(err => {
       reportCompilationFailure(String(err));
+      return undefined;
     });
-    const reportCompilationFailure = error => {
-      updateStatus(curr => {
-        curr.compilationFailure = error;
-      });
-    };
     const updateLambdaServerEvents = fn => {
       updateStatus(curr => fn(curr.lambdaServerEvents));
     };
     const updateWebpackDevServerEvents = fn => {
       updateStatus(curr => fn(curr.webpackDevServerEvents));
-    };
-    const updateStatus = fn => {
-      let current = statuses.get(projectName);
-      if (!current) {
-        current = intialStatus;
-        statuses.set(projectName, current);
-      }
-      fn(current);
     };
 
     // Read events in the lambda server logs to update the globalInfo
@@ -2730,6 +2727,9 @@ async function runWebpacks(opts) {
         redraw();
       }
     }) : undefined;
+    if (!config) {
+      return;
+    }
     const compiler = (0,webpack__WEBPACK_IMPORTED_MODULE_3__.webpack)({
       ...config,
       watch
@@ -2785,7 +2785,7 @@ async function runWebpacks(opts) {
       return;
     }
     cleanupCalled = true;
-    await Promise.all(cleanupFunctions.map(async fn => fn()));
+    await Promise.all(cleanupFunctions.map(async fn => fn === null || fn === void 0 ? void 0 : fn()));
     redraw();
   };
   const reject = err => {

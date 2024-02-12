@@ -24,7 +24,6 @@ export function removeUndefined<T>(arr: (T | undefined)[]): T[] {
 
 export function removeUndefinedOrNullProps<T extends Record<string, unknown>>(obj: T): {} {
   return Object.fromEntries(
-    // eslint-disable-next-line no-null/no-null
     Object.entries(obj).filter(e => e[1] !== undefined && e[1] !== null)
   ) as T;
 }
@@ -42,7 +41,6 @@ export function asMap(
   value: unknown,
   defaultValue?: Record<string, unknown>
 ): Record<string, unknown> | undefined {
-  // eslint-disable-next-line no-null/no-null
   return typeof value === 'object' && value !== null
     ? (value as Record<string, unknown>)
     : defaultValue;
@@ -257,7 +255,6 @@ export function asDateOrThrow(value: unknown): Date {
 // }
 
 export function isNull<T>(val: T | null): val is null {
-  // eslint-disable-next-line no-null/no-null
   return val === null;
 }
 

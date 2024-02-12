@@ -86,8 +86,7 @@ output "${projectName}_function_url" {
 }
 ${
   cloudwatchTriggerMinutes !== undefined
-    ? `
-# Cloudwatch trigger
+    ? `# Cloudwatch trigger
 
 resource "aws_lambda_permission" "cloudwatch_invoke_${projectName}" {
   statement_id  = "AllowExecutionFromCloudWatch"
@@ -107,7 +106,8 @@ resource "aws_cloudwatch_event_rule" "${projectName}_trigger_rate" {
 resource "aws_cloudwatch_event_target" "${projectName}_trigger_target" {
   rule  = aws_cloudwatch_event_rule.${projectName}_trigger_rate.name
   arn   = aws_lambda_function.${projectName}.arn
-}`
+}
+`
     : ''
 }
 # IAM role
@@ -146,13 +146,13 @@ resource "aws_iam_policy" "${projectName}_cloudwatch" {
     Statement = [
       {
         Action   = [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
         ]
         Effect   = "Allow"
         Resource = [
           "\${aws_cloudwatch_log_group.${projectName}.arn}",
+          "\${aws_cloudwatch_log_group.${projectName}.arn}:*",
         ]
       }
     ]
@@ -170,7 +170,7 @@ ${
 
 resource "aws_cloudwatch_log_metric_filter" "${projectName}_log_errors" {
   name           = "${workspaceName}-${projectName}-log-error-metric-filter"
-  pattern        = "{ $.level = \\"ERROR\\" }"
+  pattern        = "[ts, id, level = \\"ERROR\\", msg]"
   log_group_name = aws_cloudwatch_log_group.${projectName}.name
 
   metric_transformation {
@@ -205,7 +205,8 @@ resource "aws_sns_topic_subscription" "${projectName}_log_errors" {
   endpoint = "${alarmEmail}"
   protocol = "email"
   topic_arn = aws_sns_topic.${projectName}_log_errors.arn
-}`.trim()
+}
+`
     : ''
 }
 # Dummy source code useful only during the initial setup
