@@ -7,7 +7,7 @@ export const apiCall = apiCaller('__BACKEND_NAME__', fetch, console.error, {
   schemaValidation: false,
   onHttpError: (statusCode: number) => {
     if (statusCode === FORBIDDEN_CODE) {
-      setUser({isConnected: false});
+      setUser(undefined);
     }
   },
 });

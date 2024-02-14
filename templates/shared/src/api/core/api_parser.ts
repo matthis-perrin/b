@@ -13,7 +13,7 @@ export function parseSchema(
   if (schema.optional && value === undefined) {
     return undefined;
   }
-  const errorPrefix = `${parameterName ?? 'body'}${schema.optional ? '' : ' is required and'} `;
+  const errorPrefix = `${parameterName ?? 'body'}${schema.optional ? '' : ' is required and'}`;
   if (schema.type === 'Unknown') {
     return value;
   }

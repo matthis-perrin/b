@@ -13,7 +13,6 @@ import {handleApi} from '@shared-node/api/api_router';
 import {getIndex, handleStatics} from '@shared-node/api/api_statics';
 
 import {loginHandler} from '@src/handlers/login_handler';
-import {testHandler} from '@src/handlers/test_handlers';
 import {session} from '@src/session';
 
 const frontendName = '__FRONTEND_NAME__';
@@ -41,7 +40,6 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
 
   // API handlers
   const apiRes = await handleApi(req, '__PROJECT_NAME__', {
-    'GET /test': testHandler,
     'POST /login': loginHandler,
   });
   if (apiRes) {

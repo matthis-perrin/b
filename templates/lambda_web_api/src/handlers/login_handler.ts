@@ -1,10 +1,10 @@
 import {BadRequestError} from '@shared/api/core/api_errors';
 import {ApiHandler} from '@shared/api/core/api_types';
 import {__WORKSPACE_NAME_UPPERCASE___USER_TABLE_NAME} from '@shared/env';
+import {UserItem} from '@shared/model';
 
 import {getItem} from '@shared-node/aws/dynamodb';
 import {hashPassword} from '@shared-node/lib/hash';
-import {UserItem} from '@shared-node/model';
 
 import {session} from '@src/session';
 
@@ -21,16 +21,14 @@ export const loginHandler: ApiHandler<'__PROJECT_NAME__', 'POST /login'> = async
   }
 
   // Check password
-  const {hash, salt, sessionDuration} = user;
+  const {hash, salt} = user;
   const passwordHash = hashPassword(password, salt);
   if (passwordHash !== hash) {
     throw new BadRequestError({userMessage: 'Invalid credentials'});
   }
 
   // Create the session
-  await session.createSession(context, user.id, sessionDuration);
-
-  return {};
+  return session.createSession(context, user);
 };
 
 // await createUser({

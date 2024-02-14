@@ -7,9 +7,16 @@ import {CODE_BUCKET, NODE_ENV} from '@shared/env';
 import {ApiRequest, ApiResponse} from '@shared-node/api/api_interface';
 import {SessionManager} from '@shared-node/api/api_session';
 
-export async function handleStatics(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnySessionManager = SessionManager<any, any>;
+
+export async function handleStatics<SessionManagerType extends AnySessionManager>(
   req: ApiRequest,
-  opts: {frontendName: string; websiteUrl: string; session: SessionManager}
+  opts: {
+    frontendName: string;
+    websiteUrl: string;
+    session?: SessionManagerType;
+  }
 ): Promise<ApiResponse | undefined> {
   const {method, path} = req;
   const {frontendName, websiteUrl, session} = opts;
@@ -71,11 +78,11 @@ async function loadStatic(opts: {
   return {body: staticsCache[cacheKey], opts: {contentType}};
 }
 
-export async function getIndex(
+export async function getIndex<SessionManagerType extends AnySessionManager>(
   req: ApiRequest,
   opts: {
     frontendName: string;
-    session: SessionManager;
+    session?: SessionManagerType;
   }
 ): Promise<ApiResponse> {
   const res = await loadStatic({
@@ -83,11 +90,17 @@ export async function getIndex(
     path: 'index.html',
     contentType: 'text/html',
   });
-  if (
-    res.body !== undefined &&
-    opts.session.isLikelyConnected({getRequestHeader: (h: string) => req.headers[h.toLowerCase()]})
-  ) {
-    res.body = res.body.replace('</head>', '<script>window.IS_CONNECTED = true</script></head>');
+  if (res.body !== undefined && opts.session) {
+    const frontendUser = await opts.session.getFrontendUser({
+      getRequestHeader: (h: string) => req.headers[h.toLowerCase()],
+      setResponseHeader: () => {},
+    });
+    if (frontendUser !== undefined) {
+      res.body = res.body.replace(
+        '</head>',
+        `<script>window.USER = ${JSON.stringify(frontendUser)}</script></head>`
+      );
+    }
   }
   return res;
 }

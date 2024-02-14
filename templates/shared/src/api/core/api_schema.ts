@@ -2,19 +2,21 @@ interface SchemaBase {
   description?: string;
 }
 
-interface StringSchema extends SchemaBase {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface StringSchema<T> extends SchemaBase {
   type: 'String';
   optional: false;
 }
-export function Str(): StringSchema {
+export function Str<T = string>(): StringSchema<T> {
   return {type: 'String', optional: false};
 }
 
-interface OptStringSchema extends SchemaBase {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface OptStringSchema<T> extends SchemaBase {
   type: 'String';
   optional: true;
 }
-export function OptStr(): OptStringSchema {
+export function OptStr<T = string>(): OptStringSchema<T> {
   return {type: 'String', optional: true};
 }
 
@@ -96,8 +98,8 @@ export function Unknown(): UnknownSchema {
 
 export type Schema =
   | UnknownSchema
-  | StringSchema
-  | OptStringSchema
+  | StringSchema<string>
+  | OptStringSchema<string>
   | NumberSchema
   | OptNumberSchema
   | BooleanSchema
@@ -109,10 +111,10 @@ export type Schema =
 
 export type SchemaToType<T extends Schema> = T extends UnknownSchema
   ? unknown
-  : T extends StringSchema
-    ? string
-    : T extends OptStringSchema
-      ? string | undefined
+  : T extends StringSchema<infer StringType>
+    ? StringType
+    : T extends OptStringSchema<infer StringType>
+      ? StringType | undefined
       : T extends NumberSchema
         ? number
         : T extends OptNumberSchema
@@ -146,8 +148,8 @@ export function Opt<T extends Schema>(schema: T): ToOptional<T> {
   return {...schema, optional: true} as unknown as ToOptional<T>;
 }
 
-type ToOptional<T extends Schema> = T extends StringSchema
-  ? OptStringSchema
+type ToOptional<T extends Schema> = T extends StringSchema<infer StringType>
+  ? OptStringSchema<StringType>
   : T extends NumberSchema
     ? OptNumberSchema
     : T extends BooleanSchema

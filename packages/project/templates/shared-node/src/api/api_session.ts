@@ -2,61 +2,61 @@ import {error} from 'node:console';
 
 import {ForbiddenError} from '@shared/api/core/api_errors';
 import {ApiContext} from '@shared/api/core/api_types';
-import {
-  __WORKSPACE_NAME_UPPERCASE___USER_SESSION_TABLE_NAME,
-  __WORKSPACE_NAME_UPPERCASE___USER_TABLE_NAME,
-  NODE_ENV,
-} from '@shared/env';
+import {NODE_ENV} from '@shared/env';
 import {splitOnce} from '@shared/lib/array_utils';
-import {asMapOrThrow, asNumberOrThrow, asStringOrThrow} from '@shared/lib/type_utils';
+import {asMapOrThrow, asNumberOrThrow, asStringOrThrow, Brand} from '@shared/lib/type_utils';
 
 import {getItem, putItem, updateItem} from '@shared-node/aws/dynamodb';
 import {uidSafe} from '@shared-node/lib/rand_safe';
 import {decrypt, encrypt} from '@shared-node/lib/symmetric_encryption';
-import {UserId, UserItem, UserSessionItem, UserSessionToken} from '@shared-node/model';
 
-export class SessionManager {
-  private static readonly COOKIE_ENCRYPTION_KEY = '__COOKIE_ENCRYPTION_KEY__';
+export interface UserSessionItem<UserId extends string> {
+  userId: UserId;
+  expiresAt: number;
+  token: string;
+}
+
+export type UserSessionToken = Brand<'UserSessionToken', string>;
+
+export class SessionManager<UserItem extends {id: string; sessionDuration: number}, FrontendUser> {
   private static readonly COOKIE_SECURE = NODE_ENV === 'development' ? '' : 'Secure; ';
 
-  public constructor(private readonly opts: {cookieName: string; domain: string}) {}
-
-  public isLikelyConnected<Context extends Pick<ApiContext, 'getRequestHeader'>>(
-    context: Context
-  ): boolean {
-    const session = this.getSessionCookie(context);
-    if (!session) {
-      return false;
+  public constructor(
+    private readonly opts: {
+      cookieName: string;
+      cookieEncryptionKey: string;
+      domain: string;
+      userTableName: string;
+      userSessionTableName: string;
+      userItemToFrontendUser: (userItem: UserItem) => FrontendUser | Promise<FrontendUser>;
     }
-    return Math.floor(Date.now() / 1000) < session.expiresAt;
-  }
+  ) {}
 
-  public async enforceSession(context: ApiContext): Promise<UserItem> {
+  private async getUser(context: ApiContext): Promise<UserItem | undefined> {
     const session = this.getSessionCookie(context);
-    const forbiddenMsg = {userMessage: 'Not connected'};
     if (!session) {
-      throw new ForbiddenError(forbiddenMsg);
+      return undefined;
     }
     if (Math.floor(Date.now() / 1000) < session.expiresAt) {
       try {
-        const sessionItem = await getItem<UserSessionItem>({
-          tableName: __WORKSPACE_NAME_UPPERCASE___USER_SESSION_TABLE_NAME,
+        const sessionItem = await getItem<UserSessionItem<UserItem['id']>>({
+          tableName: this.opts.userSessionTableName,
           key: {token: session.token},
         });
         if (!sessionItem) {
-          throw new ForbiddenError(forbiddenMsg);
+          return undefined;
         }
         const userItem = await getItem<UserItem>({
-          tableName: __WORKSPACE_NAME_UPPERCASE___USER_TABLE_NAME,
+          tableName: this.opts.userTableName,
           key: {id: sessionItem.userId},
         });
         if (!userItem) {
-          throw new ForbiddenError(forbiddenMsg);
+          return undefined;
         }
         // Extend session if we've passed half the session duration
         if (sessionItem.expiresAt - Math.floor(Date.now() / 1000) < userItem.sessionDuration / 2) {
           updateItem({
-            tableName: __WORKSPACE_NAME_UPPERCASE___USER_SESSION_TABLE_NAME,
+            tableName: this.opts.userSessionTableName,
             key: {token: session.token},
             updateExpression: {set: [`#expiresAt = :expiresAt`]},
             expressionAttributeNames: {'#expiresAt': 'expiresAt'},
@@ -70,25 +70,41 @@ export class SessionManager {
       } catch {}
     }
     this.removeSessionCookie(context);
-    throw new ForbiddenError(forbiddenMsg);
+    return undefined;
   }
 
-  public async createSession(
-    context: ApiContext,
-    userId: UserId,
-    sessionDuration: number
-  ): Promise<void> {
+  public async getFrontendUser(context: ApiContext): Promise<FrontendUser | undefined> {
+    const user = await this.getUser(context);
+    if (!user) {
+      return undefined;
+    }
+    return Promise.resolve(this.opts.userItemToFrontendUser(user)).catch(err => {
+      console.error('Failure to convert UserItem to FrontendUser', user, err);
+      return undefined;
+    });
+  }
+
+  public async enforceSession(context: ApiContext): Promise<UserItem> {
+    const user = await this.getUser(context);
+    if (!user) {
+      throw new ForbiddenError({userMessage: 'Not connected'});
+    }
+    return user;
+  }
+
+  public async createSession(context: ApiContext, user: UserItem): Promise<FrontendUser> {
     // Create session
     const token = uidSafe() as UserSessionToken;
-    const expiresAt = Math.floor(Date.now() / 1000) + sessionDuration;
-    const sessionItem: UserSessionItem = {userId, expiresAt, token};
-    await putItem<UserSessionItem>({
-      tableName: __WORKSPACE_NAME_UPPERCASE___USER_SESSION_TABLE_NAME,
+    const expiresAt = Math.floor(Date.now() / 1000) + user.sessionDuration;
+    const sessionItem: UserSessionItem<UserItem['id']> = {userId: user.id, expiresAt, token};
+    await putItem<UserSessionItem<UserItem['id']>>({
+      tableName: this.opts.userSessionTableName,
       item: sessionItem,
     });
 
     // Set session cookie
-    this.setSessionCookie(context, {token, expiresAt, sessionDuration});
+    this.setSessionCookie(context, {token, expiresAt, sessionDuration: user.sessionDuration});
+    return this.opts.userItemToFrontendUser(user);
   }
 
   // COOKIE MANIPULATION
@@ -141,14 +157,14 @@ export class SessionManager {
   // SESSION SERIALIZATION
 
   private serializeSession(token: UserSessionToken, expiresAt: number): string {
-    return encrypt(JSON.stringify({token, expiresAt}), SessionManager.COOKIE_ENCRYPTION_KEY);
+    return encrypt(JSON.stringify({token, expiresAt}), this.opts.cookieEncryptionKey);
   }
 
   private deserializeSession(
     raw: string
   ): {token: UserSessionToken; expiresAt: number} | undefined {
     try {
-      const rawMap = asMapOrThrow(JSON.parse(decrypt(raw, SessionManager.COOKIE_ENCRYPTION_KEY)));
+      const rawMap = asMapOrThrow(JSON.parse(decrypt(raw, this.opts.cookieEncryptionKey)));
       const token = asStringOrThrow<UserSessionToken>(rawMap['token']);
       const expiresAt = asNumberOrThrow(rawMap['expiresAt']);
       return {token, expiresAt};

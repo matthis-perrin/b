@@ -10,9 +10,9 @@ import {TestPage} from '@src/components/test_page';
 import {useUser} from '@src/stores/user_store';
 
 export const App: React.FC = () => {
-  const {isConnected} = useUser();
+  const user = useUser();
 
-  const routes = isConnected ? (
+  const routes = user ? (
     <>
       <Route path="/" component={HomePage} />
       <Route path="/test-page" component={TestPage} />

@@ -1,6 +1,12 @@
 import {AllApiSchema, Obj, OptStr, SchemaToType, Str} from '@shared/api/core/api_schema';
 import {ApiConfig, ApiName} from '@shared/api/core/api_types';
 import {__BACKEND_NAME_UPPERCASE___FUNCTION_URL} from '@shared/env';
+import {UserId} from '@shared/models';
+
+const FrontendUserSchema = Obj({
+  id: Str<UserId>(),
+});
+export type FrontendUser = SchemaToType<typeof FrontendUserSchema>;
 
 const TestSchema = Obj({
   val1: Str(),
@@ -14,7 +20,7 @@ export const ALL = {
     '/login': {
       POST: {
         req: Obj({id: Str(), password: Str()}),
-        res: Obj({}),
+        res: FrontendUserSchema,
       },
     },
     '/test': {

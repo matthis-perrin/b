@@ -806,7 +806,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.17',
+  project: '1.9.22',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
@@ -1019,6 +1019,7 @@ data "aws_iam_policy_document" "${projectName}_extra_policy" {
       "\${aws_dynamodb_table.${prefixLower}_user_session_table.arn}/index/*",
     ]
   }${web ? `
+
   statement {
     actions   = [
       "s3:GetObject",
@@ -1164,7 +1165,7 @@ resource "aws_cloudwatch_metric_alarm" "${projectName}_log_errors" {
   threshold           = 1
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.${projectName}_log_errors.arn]
-  # ok_actions          = [aws_sns_topic.sns.arn]
+  ok_actions          = [aws_sns_topic.${projectName}_log_errors.arn]
 }
 
 resource "aws_sns_topic" "${projectName}_log_errors" {

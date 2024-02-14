@@ -35,6 +35,7 @@ data "aws_iam_policy_document" "${projectName}_extra_policy" {
   }${
     web
       ? `
+
   statement {
     actions   = [
       "s3:GetObject",
@@ -194,7 +195,7 @@ resource "aws_cloudwatch_metric_alarm" "${projectName}_log_errors" {
   threshold           = 1
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.${projectName}_log_errors.arn]
-  # ok_actions          = [aws_sns_topic.sns.arn]
+  ok_actions          = [aws_sns_topic.${projectName}_log_errors.arn]
 }
 
 resource "aws_sns_topic" "${projectName}_log_errors" {

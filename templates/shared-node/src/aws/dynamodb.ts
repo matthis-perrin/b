@@ -12,6 +12,7 @@ import {
   ScanCommand,
   ScanCommandOutput,
   TableDescription,
+  TransactionInProgressException,
   TransactWriteItem,
   TransactWriteItemsCommand,
   Update,
@@ -29,6 +30,7 @@ import {chunkArray} from '@shared/lib/array_utils';
 import {AnyInterface, removeUndefined} from '@shared/lib/type_utils';
 
 import {readCredentials} from '@shared-node/aws/credentials';
+import {uidSafe} from '@shared-node/lib/rand_safe';
 
 const MAX_BATCH_GET_ITEMS = 100;
 const MAX_BATCH_WRITE_ITEMS = 25;
@@ -142,12 +144,22 @@ export async function batchGetItems<T extends AnyInterface<T>>(params: {
 // simple transaction function to put items in multiple tables
 export async function transactWriteItems(params: {
   transaction: TransactWriteItem[];
+  clientRequestToken?: string;
 }): Promise<void> {
-  await client.send(
-    new TransactWriteItemsCommand({
-      TransactItems: params.transaction,
-    })
-  );
+  const requestToken = params.clientRequestToken ?? uidSafe();
+  await client
+    .send(
+      new TransactWriteItemsCommand({
+        ClientRequestToken: requestToken,
+        TransactItems: params.transaction,
+      })
+    )
+    .catch(async err => {
+      if (err instanceof TransactionInProgressException) {
+        return transactWriteItems({...params, clientRequestToken: requestToken});
+      }
+      throw err;
+    });
 }
 
 export async function putItem<T extends AnyInterface<T>>(params: {

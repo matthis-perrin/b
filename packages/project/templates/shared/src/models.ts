@@ -8,11 +8,3 @@ export interface UserItem {
   salt: string;
   sessionDuration: number; // in seconds
 }
-
-export type UserSessionToken = Brand<'UserSessionToken', string>;
-
-export interface UserSessionItem {
-  token: UserSessionToken;
-  userId: UserId;
-  expiresAt: number; // in seconds
-}
