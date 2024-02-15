@@ -32,6 +32,8 @@ export function neverHappens(value: never, errorMessage?: string): never {
   throw new Error(errorMessage);
 }
 
+export type AnyInterface<T> = {[K in keyof T]: unknown};
+
 export function asMap(value: unknown): Record<string, unknown> | undefined;
 export function asMap(
   value: unknown,
@@ -110,6 +112,41 @@ export function asStringOrThrow<T extends string = string>(value: unknown): T {
   const valueAsString = asString<T>(value);
   if (valueAsString === undefined) {
     throw new Error(`Invalid value: \`${value}\` is not a string`);
+  }
+  return valueAsString;
+}
+
+export function asStringEnum<T extends Record<string, string>>(
+  value: unknown,
+  enu: T
+): T[keyof T] | undefined;
+export function asStringEnum<T extends Record<string, string>>(
+  value: unknown,
+  enu: T,
+  defaultValue: T[keyof T]
+): T[keyof T];
+export function asStringEnum<T extends Record<string, string>>(
+  value: unknown,
+  enu: T,
+  defaultValue?: T[keyof T]
+): T[keyof T] | undefined {
+  return (
+    typeof value === 'string' && Object.values(enu).includes(value as T[keyof T])
+      ? value
+      : defaultValue
+  ) as T[keyof T];
+}
+export function asStringEnumOrThrow<T extends Record<string, string>>(
+  value: unknown,
+  enu: T
+): T[keyof T] {
+  const valueAsString = asStringEnum<T>(value, enu);
+  if (valueAsString === undefined) {
+    throw new Error(
+      `Invalid value: \`${value}\` is not a string or not one of ${JSON.stringify(
+        Object.values(enu)
+      )}`
+    );
   }
   return valueAsString;
 }
@@ -358,6 +395,12 @@ export type NestedArray<T> = (T | RecursiveArray<T>)[];
 export type None = Record<string, never>;
 
 export type NonEmptyArray<T> = [T, ...T[]];
+export function isNonEmptyArray<T>(val: T[]): val is NonEmptyArray<T> {
+  return val.length > 0;
+}
+export function nonEmptyArray<T>(val: T[]): NonEmptyArray<T> | undefined {
+  return val.length === 0 ? undefined : (val as NonEmptyArray<T>);
+}
 
 export type AddPrefix<T, P extends string> = {
   [K in keyof T as K extends string ? `${P}${K}` : never]: T[K];
