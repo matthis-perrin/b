@@ -806,12 +806,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.22',
+  project: '1.9.28',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
   webpack: '1.6.33',
-  runner: '1.5.19',
+  runner: '1.5.20',
   lambdaServerRuntime: '1.0.6'
 };
 const ESLINT_VERSION = '8.56.x';
@@ -836,7 +836,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   generateWorkspaceProjectTerraform: () => (/* binding */ generateWorkspaceProjectTerraform)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
-/* harmony import */ var _src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(21);
+/* harmony import */ var _src_project_terraform_frontend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(21);
 /* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(22);
 /* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(23);
 /* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(24);
@@ -859,7 +859,7 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
   const cloudwatchTriggerMinutes = 'cloudwatchTriggerMinutes' in fromFragment ? fromFragment.cloudwatchTriggerMinutes : undefined;
   const alarmEmail = 'alarmEmail' in fromFragment ? fromFragment.alarmEmail : undefined;
   if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web) {
-    return (0,_src_project_terraform_cloudfront__WEBPACK_IMPORTED_MODULE_1__.generateCloudfrontDistributionTerraform)(workspaceName, projectName);
+    return (0,_src_project_terraform_frontend__WEBPACK_IMPORTED_MODULE_1__.generateFrontendTerraform)(projectName);
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaFunction) {
     return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
       api: false,
@@ -907,16 +907,18 @@ aws_secret_access_key=
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   generateCloudfrontDistributionTerraform: () => (/* binding */ generateCloudfrontDistributionTerraform)
+/* harmony export */   generateFrontendTerraform: () => (/* binding */ generateFrontendTerraform)
 /* harmony export */ });
-function generateCloudfrontDistributionTerraform(workspaceName, projectName) {
+function generateFrontendTerraform(projectName) {
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
   const originId = `${bucketName}-origin-id`;
   return `
 output "${projectName}_cloudfront_domain_name" {
   value       = aws_cloudfront_distribution.${projectName}.domain_name
-  description = "Domain (from cloudfront) where the \\"${workspaceName}-${projectName}\\" frontend is available."
+  description = "Domain (from cloudfront) where the \\"${projectName}\\" is available."
 }
+
+resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
   
 resource "aws_cloudfront_distribution" "${projectName}" {
   origin {
@@ -934,7 +936,7 @@ resource "aws_cloudfront_distribution" "${projectName}" {
   is_ipv6_enabled     = true
   price_class         = "PriceClass_100"
   
-  default_root_object   = "/index.html"
+  default_root_object = "/index.html"
   custom_error_response {
     error_code         = 400
     response_code      = 200
@@ -952,10 +954,10 @@ resource "aws_cloudfront_distribution" "${projectName}" {
   }
 
   default_cache_behavior {
-    allowed_methods  = ["HEAD", "GET"]
-    cached_methods   = ["HEAD", "GET"]
-    compress         = true
-    target_origin_id = "${originId}"
+    allowed_methods        = ["HEAD", "GET"]
+    cached_methods         = ["HEAD", "GET"]
+    compress               = true
+    target_origin_id       = "${originId}"
     viewer_protocol_policy = "redirect-to-https"
     
     forwarded_values {
@@ -976,8 +978,6 @@ resource "aws_cloudfront_distribution" "${projectName}" {
     cloudfront_default_certificate = true
   }
 }
-
-resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
   `.trim();
 }
 
@@ -1003,7 +1003,7 @@ function generateLambdaTerraform(workspaceName, projectName, opts) {
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_extra_policy" {
   statement {
-    actions   = [
+    actions = [
       "dynamodb:GetItem",
       "dynamodb:BatchGetItem",
       "dynamodb:Query",
@@ -1021,7 +1021,7 @@ data "aws_iam_policy_document" "${projectName}_extra_policy" {
   }${web ? `
 
   statement {
-    actions   = [
+    actions = [
       "s3:GetObject",
       "s3:GetObjectTagging"
     ]
@@ -1032,17 +1032,20 @@ data "aws_iam_policy_document" "${projectName}_extra_policy" {
 }
 
 resource "aws_lambda_function" "${projectName}" {
-  function_name     = "${workspaceName}-${projectName}"
-  s3_bucket         = aws_s3_object.${projectName}_archive.bucket
-  s3_key            = aws_s3_object.${projectName}_archive.key
-  handler           = "index.handler"
-  runtime           = "nodejs20.x"
-  role              = aws_iam_role.${projectName}_role.arn
-  timeout           = 900 // 15 minutes
-  memory_size       = 128 // Mo
+  function_name = "${workspaceName}-${projectName}"
+  s3_bucket     = aws_s3_object.${projectName}_archive.bucket
+  s3_key        = aws_s3_object.${projectName}_archive.key
+  handler       = "index.handler"
+  runtime       = "nodejs20.x"
+  role          = aws_iam_role.${projectName}_role.arn
+  timeout       = 900 // 15 minutes
+  memory_size   = 128 // Mo
   environment {
-    variables = {
-      NODE_OPTIONS = "--enable-source-maps"
+    variables = {${api ? `
+      NODE_OPTIONS            = "--enable-source-maps"
+      CLOUDFRONT_HEADER_NAME  = random_string.${projectName}_cloudfront_header_name.result
+      CLOUDFRONT_HEADER_VALUE = random_string.${projectName}_cloudfront_header_value.result` : `
+      NODE_OPTIONS = "--enable-source-maps"`}
     }
   }
 }
@@ -1059,9 +1062,70 @@ resource "aws_lambda_function_url" "${projectName}" {
   authorization_type = "NONE"
 }
 
-output "${projectName}_function_url" {
-  value       = aws_lambda_function_url.${projectName}.function_url
-  description = "Function url of the \\"${workspaceName}-${projectName}\\" lambda"
+output "${projectName}_url" {
+  value       = "https://\${aws_cloudfront_distribution.${projectName}.domain_name}/"
+  description = "Cloudfront URL of \\"${projectName}\\""
+}
+
+# Cloudfront Distribution
+
+resource "random_string" "${projectName}_cloudfront_header_name" {
+  length  = 16
+  upper   = false
+  numeric = false
+  special = false
+}
+
+resource "random_string" "${projectName}_cloudfront_header_value" {
+  length  = 32
+  special = false
+}
+
+resource "aws_cloudfront_distribution" "${projectName}" {
+  origin {
+    # Remove "https://" prefix and "/" suffix
+    domain_name = replace(replace(aws_lambda_function_url.${projectName}.function_url, "https://", ""), "/", "")
+    origin_id   = aws_lambda_function.${projectName}.function_name
+
+    custom_origin_config {
+      https_port             = 443
+      http_port              = 80
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+
+    custom_header {
+      name  = random_string.${projectName}_cloudfront_header_name.result
+      value = random_string.${projectName}_cloudfront_header_value.result
+    }
+  }
+
+  enabled             = true
+  wait_for_deployment = false
+  is_ipv6_enabled     = true
+  price_class         = "PriceClass_100"
+
+  default_cache_behavior {
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["HEAD", "GET"]
+    compress               = true
+    target_origin_id       = aws_lambda_function.${projectName}.function_name
+    viewer_protocol_policy = "redirect-to-https"
+    # Managed-CachingDisabled
+    cache_policy_id = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+    # Managed-AllViewerExceptHostHeader
+    origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
 }` : ''}
 ${cloudwatchTriggerMinutes !== undefined ? `# Cloudwatch trigger
 
@@ -1079,8 +1143,8 @@ resource "aws_cloudwatch_event_rule" "${projectName}_trigger_rate" {
 }
 
 resource "aws_cloudwatch_event_target" "${projectName}_trigger_target" {
-  rule  = aws_cloudwatch_event_rule.${projectName}_trigger_rate.name
-  arn   = aws_lambda_function.${projectName}.arn
+  rule = aws_cloudwatch_event_rule.${projectName}_trigger_rate.name
+  arn  = aws_lambda_function.${projectName}.arn
 }
 ` : ''}
 # IAM role
@@ -1091,17 +1155,17 @@ resource "aws_iam_role" "${projectName}_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action    = "sts:AssumeRole"
+        Action = "sts:AssumeRole"
         Principal = {
           Service = "lambda.amazonaws.com"
         }
-        Effect    = "Allow"
+        Effect = "Allow"
       },
     ]
   })
   
   inline_policy {
-    name = "${workspaceName}-${projectName}-extra-policy"
+    name   = "${workspaceName}-${projectName}-extra-policy"
     policy = data.aws_iam_policy_document.${projectName}_extra_policy.json
   }
 }
@@ -1118,11 +1182,11 @@ resource "aws_iam_policy" "${projectName}_cloudwatch" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = [
+        Action = [
           "logs:CreateLogStream",
           "logs:PutLogEvents",
         ]
-        Effect   = "Allow"
+        Effect = "Allow"
         Resource = [
           "\${aws_cloudwatch_log_group.${projectName}.arn}",
           "\${aws_cloudwatch_log_group.${projectName}.arn}:*",
@@ -1145,11 +1209,11 @@ resource "aws_cloudwatch_log_metric_filter" "${projectName}_log_errors" {
   log_group_name = aws_cloudwatch_log_group.${projectName}.name
 
   metric_transformation {
-    name      = "${workspaceName}-${projectName}-errors"
-    namespace = "${workspaceName}"
-    value     = "1"
+    name          = "${workspaceName}-${projectName}-errors"
+    namespace     = "${workspaceName}"
+    value         = "1"
     default_value = "0"
-    unit      = "Count"
+    unit          = "Count"
   }
 }
 
@@ -1157,7 +1221,6 @@ resource "aws_cloudwatch_metric_alarm" "${projectName}_log_errors" {
   alarm_name          = "${workspaceName}-${projectName}-log-error-metric-alarm"
   metric_name         = aws_cloudwatch_log_metric_filter.${projectName}_log_errors.metric_transformation[0].name
   namespace           = aws_cloudwatch_log_metric_filter.${projectName}_log_errors.metric_transformation[0].namespace
-  
   evaluation_periods  = 1
   period              = 3600
   statistic           = "Sum"
@@ -1173,15 +1236,15 @@ resource "aws_sns_topic" "${projectName}_log_errors" {
 }
 
 resource "aws_sns_topic_subscription" "${projectName}_log_errors" {
-  endpoint = "${alarmEmail}"
-  protocol = "email"
+  endpoint  = "${alarmEmail}"
+  protocol  = "email"
   topic_arn = aws_sns_topic.${projectName}_log_errors.arn
 }
 ` : ''}
 # Dummy source code useful only during the initial setup
 resource "aws_s3_object" "${projectName}_archive" {
-  bucket       = aws_s3_bucket.code.id
-  key          = "${projectName}/dist.zip"
+  bucket         = aws_s3_bucket.code.id
+  key            = "${projectName}/dist.zip"
   content_base64 = "UEsDBBQACAAIAGaKwlYAAAAAAAAAADYAAAAIACAAaW5kZXguanNVVA0AB3AIemRyCHpkcAh6ZHV4CwABBPUBAAAEFAAAAEutKMgvKinWy0jMS8lJLVKwVUgsrsxLVkgrzUsuyczPU9DQVKjmUlAoSi0pLcpTUFe35qq15gIAUEsHCP0ak1o4AAAANgAAAFBLAQIUAxQACAAIAGaKwlb9GpNaOAAAADYAAAAIACAAAAAAAAAAAACkgQAAAABpbmRleC5qc1VUDQAHcAh6ZHIIemRwCHpkdXgLAAEE9QEAAAQUAAAAUEsFBgAAAAABAAEAVgAAAI4AAAAAAA=="
 }
 
@@ -1221,6 +1284,11 @@ data "aws_region" "current" {}
 output "region" {
   value = data.aws_region.current.id
 }
+
+data "aws_caller_identity" "current" {}
+output "account_id" {
+  value = data.aws_caller_identity.current.account_id
+}
 `.trim();
 }
 
@@ -1244,10 +1312,10 @@ output "code_bucket" {
 }
 `.trim();
   const CLOUDFRONT_ACCESS = `
-data "aws_iam_policy_document" "cloudfront_access_to_code" {
+data "aws_iam_policy_document" "cloudfront_access_to_code_policy" {
   ${webProjectNames.map(p => `
   statement {
-    actions   = ["s3:GetObject"]
+    actions = ["s3:GetObject"]
     resources = [
       "\${aws_s3_bucket.code.arn}/${p}/*",
     ]
@@ -1259,9 +1327,9 @@ data "aws_iam_policy_document" "cloudfront_access_to_code" {
 `.trim()).join('\n\n')}
 }
 
-resource "aws_s3_bucket_policy" "code" {
+resource "aws_s3_bucket_policy" "cloudfront_access_to_code" {
   bucket = aws_s3_bucket.code.id
-  policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
+  policy = data.aws_iam_policy_document.cloudfront_access_to_code_policy.json
 }
 `.trim();
   const out = [CODE_BUCKET];
@@ -1299,15 +1367,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   asString: () => (/* binding */ asString),
 /* harmony export */   asStringArray: () => (/* binding */ asStringArray),
 /* harmony export */   asStringArrayOrThrow: () => (/* binding */ asStringArrayOrThrow),
+/* harmony export */   asStringEnum: () => (/* binding */ asStringEnum),
+/* harmony export */   asStringEnumOrThrow: () => (/* binding */ asStringEnumOrThrow),
 /* harmony export */   asStringOrThrow: () => (/* binding */ asStringOrThrow),
 /* harmony export */   errorAndStackAsString: () => (/* binding */ errorAndStackAsString),
 /* harmony export */   errorAsString: () => (/* binding */ errorAsString),
+/* harmony export */   isNonEmptyArray: () => (/* binding */ isNonEmptyArray),
 /* harmony export */   isNull: () => (/* binding */ isNull),
 /* harmony export */   isNumber: () => (/* binding */ isNumber),
 /* harmony export */   isString: () => (/* binding */ isString),
 /* harmony export */   iterNumberEnum: () => (/* binding */ iterNumberEnum),
 /* harmony export */   iterStringEnum: () => (/* binding */ iterStringEnum),
 /* harmony export */   neverHappens: () => (/* binding */ neverHappens),
+/* harmony export */   nonEmptyArray: () => (/* binding */ nonEmptyArray),
 /* harmony export */   parseJson: () => (/* binding */ parseJson),
 /* harmony export */   removeUndefined: () => (/* binding */ removeUndefined),
 /* harmony export */   removeUndefinedOrNullProps: () => (/* binding */ removeUndefinedOrNullProps)
@@ -1376,6 +1448,16 @@ function asStringOrThrow(value) {
   const valueAsString = asString(value);
   if (valueAsString === undefined) {
     throw new Error(`Invalid value: \`${value}\` is not a string`);
+  }
+  return valueAsString;
+}
+function asStringEnum(value, enu, defaultValue) {
+  return typeof value === 'string' && Object.values(enu).includes(value) ? value : defaultValue;
+}
+function asStringEnumOrThrow(value, enu) {
+  const valueAsString = asStringEnum(value, enu);
+  if (valueAsString === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a string or not one of ${JSON.stringify(Object.values(enu))}`);
   }
   return valueAsString;
 }
@@ -1540,6 +1622,12 @@ function parseJson(json) {
 
 // Type for an empty object (ie: {})
 
+function isNonEmptyArray(val) {
+  return val.length > 0;
+}
+function nonEmptyArray(val) {
+  return val.length === 0 ? undefined : val;
+}
 function addPrefix(attr, prefix) {
   return Object.fromEntries(Object.entries(attr).map(([key, value]) => [`${prefix}${key}`, value]));
 }
@@ -1676,10 +1764,19 @@ function generateCodeWorkspace(workspaceName, workspaceFragments) {
       'emmet.showExpandedAbbreviation': 'never',
       'files.associations': {
         '*.tf': 'terraform'
+      },
+      '[typescript]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode'
+      },
+      '[typescriptreact]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode'
+      },
+      '[terraform]': {
+        'editor.defaultFormatter': 'hashicorp.terraform'
       }
     },
     extensions: {
-      recommendations: ['dbaeumer.vscode-eslint', 'esbenp.prettier-vscode', 'VisualStudioExptTeam.vscodeintellicode', 'styled-components.vscode-styled-components', 'naumovs.color-highlight', 'eamodio.gitlens']
+      recommendations: ['dbaeumer.vscode-eslint', 'esbenp.prettier-vscode', 'VisualStudioExptTeam.vscodeintellicode', 'styled-components.vscode-styled-components', 'naumovs.color-highlight', 'eamodio.gitlens', 'hashicorp.terraform']
     }
   };
 }

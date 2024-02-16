@@ -15,7 +15,7 @@ export async function handleStatics<SessionManagerType extends AnySessionManager
   opts: {
     frontendName: string;
     websiteUrl: string;
-    session: SessionManagerType;
+    session?: SessionManagerType;
   }
 ): Promise<ApiResponse | undefined> {
   const {method, path} = req;
@@ -47,7 +47,7 @@ const s3Client = new S3Client();
 const replaceManifestPath = (str: string): string =>
   str.replaceAll(
     /<link rel="manifest" href="[^"]+">/gu,
-    '<link rel="manifest" href="manifest.webmanifest">'
+    '<link rel="manifest" href="/manifest.webmanifest">'
   );
 
 async function loadStatic(opts: {
@@ -82,7 +82,7 @@ export async function getIndex<SessionManagerType extends AnySessionManager>(
   req: ApiRequest,
   opts: {
     frontendName: string;
-    session: SessionManagerType;
+    session?: SessionManagerType;
   }
 ): Promise<ApiResponse> {
   const res = await loadStatic({
@@ -90,7 +90,7 @@ export async function getIndex<SessionManagerType extends AnySessionManager>(
     path: 'index.html',
     contentType: 'text/html',
   });
-  if (res.body !== undefined) {
+  if (res.body !== undefined && opts.session) {
     const frontendUser = await opts.session.getFrontendUser({
       getRequestHeader: (h: string) => req.headers[h.toLowerCase()],
       setResponseHeader: () => {},

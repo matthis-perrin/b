@@ -46,15 +46,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   asString: () => (/* binding */ asString),
 /* harmony export */   asStringArray: () => (/* binding */ asStringArray),
 /* harmony export */   asStringArrayOrThrow: () => (/* binding */ asStringArrayOrThrow),
+/* harmony export */   asStringEnum: () => (/* binding */ asStringEnum),
+/* harmony export */   asStringEnumOrThrow: () => (/* binding */ asStringEnumOrThrow),
 /* harmony export */   asStringOrThrow: () => (/* binding */ asStringOrThrow),
 /* harmony export */   errorAndStackAsString: () => (/* binding */ errorAndStackAsString),
 /* harmony export */   errorAsString: () => (/* binding */ errorAsString),
+/* harmony export */   isNonEmptyArray: () => (/* binding */ isNonEmptyArray),
 /* harmony export */   isNull: () => (/* binding */ isNull),
 /* harmony export */   isNumber: () => (/* binding */ isNumber),
 /* harmony export */   isString: () => (/* binding */ isString),
 /* harmony export */   iterNumberEnum: () => (/* binding */ iterNumberEnum),
 /* harmony export */   iterStringEnum: () => (/* binding */ iterStringEnum),
 /* harmony export */   neverHappens: () => (/* binding */ neverHappens),
+/* harmony export */   nonEmptyArray: () => (/* binding */ nonEmptyArray),
 /* harmony export */   parseJson: () => (/* binding */ parseJson),
 /* harmony export */   removeUndefined: () => (/* binding */ removeUndefined),
 /* harmony export */   removeUndefinedOrNullProps: () => (/* binding */ removeUndefinedOrNullProps)
@@ -123,6 +127,16 @@ function asStringOrThrow(value) {
   const valueAsString = asString(value);
   if (valueAsString === undefined) {
     throw new Error(`Invalid value: \`${value}\` is not a string`);
+  }
+  return valueAsString;
+}
+function asStringEnum(value, enu, defaultValue) {
+  return typeof value === 'string' && Object.values(enu).includes(value) ? value : defaultValue;
+}
+function asStringEnumOrThrow(value, enu) {
+  const valueAsString = asStringEnum(value, enu);
+  if (valueAsString === undefined) {
+    throw new Error(`Invalid value: \`${value}\` is not a string or not one of ${JSON.stringify(Object.values(enu))}`);
   }
   return valueAsString;
 }
@@ -287,6 +301,12 @@ function parseJson(json) {
 
 // Type for an empty object (ie: {})
 
+function isNonEmptyArray(val) {
+  return val.length > 0;
+}
+function nonEmptyArray(val) {
+  return val.length === 0 ? undefined : val;
+}
 function addPrefix(attr, prefix) {
   return Object.fromEntries(Object.entries(attr).map(([key, value]) => [`${prefix}${key}`, value]));
 }

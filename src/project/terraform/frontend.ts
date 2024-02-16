@@ -1,16 +1,15 @@
-import {ProjectName, WorkspaceName} from '@src/models';
+import {ProjectName} from '@src/models';
 
-export function generateCloudfrontDistributionTerraform(
-  workspaceName: WorkspaceName,
-  projectName: ProjectName
-): string {
+export function generateFrontendTerraform(projectName: ProjectName): string {
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
   const originId = `${bucketName}-origin-id`;
   return `
 output "${projectName}_cloudfront_domain_name" {
   value       = aws_cloudfront_distribution.${projectName}.domain_name
-  description = "Domain (from cloudfront) where the \\"${workspaceName}-${projectName}\\" frontend is available."
+  description = "Domain (from cloudfront) where the \\"${projectName}\\" is available."
 }
+
+resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
   
 resource "aws_cloudfront_distribution" "${projectName}" {
   origin {
@@ -28,7 +27,7 @@ resource "aws_cloudfront_distribution" "${projectName}" {
   is_ipv6_enabled     = true
   price_class         = "PriceClass_100"
   
-  default_root_object   = "/index.html"
+  default_root_object = "/index.html"
   custom_error_response {
     error_code         = 400
     response_code      = 200
@@ -46,10 +45,10 @@ resource "aws_cloudfront_distribution" "${projectName}" {
   }
 
   default_cache_behavior {
-    allowed_methods  = ["HEAD", "GET"]
-    cached_methods   = ["HEAD", "GET"]
-    compress         = true
-    target_origin_id = "${originId}"
+    allowed_methods        = ["HEAD", "GET"]
+    cached_methods         = ["HEAD", "GET"]
+    compress               = true
+    target_origin_id       = "${originId}"
     viewer_protocol_policy = "redirect-to-https"
     
     forwarded_values {
@@ -70,7 +69,5 @@ resource "aws_cloudfront_distribution" "${projectName}" {
     cloudfront_default_certificate = true
   }
 }
-
-resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
   `.trim();
 }

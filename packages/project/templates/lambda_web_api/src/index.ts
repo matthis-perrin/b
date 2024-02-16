@@ -1,8 +1,9 @@
 import {
-  __BACKEND_NAME_UPPERCASE___FUNCTION_URL,
+  __BACKEND_NAME_UPPERCASE___URL,
   __FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME,
 } from '@shared/env';
 
+import {enforceCloudfrontOrigin} from '@shared-node/api/api_cloudfront_origin';
 import {
   apiResponseToLambdaResonse,
   LambdaEvent,
@@ -17,9 +18,10 @@ import {session} from '@src/session';
 
 const frontendName = '__FRONTEND_NAME__';
 const frontendDomain = __FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME;
-const websiteUrl = __BACKEND_NAME_UPPERCASE___FUNCTION_URL;
+const websiteUrl = __BACKEND_NAME_UPPERCASE___URL;
 
 export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
+  enforceCloudfrontOrigin(event);
   const req = lambdaEventToApiRequest(event);
   const res = apiResponseToLambdaResonse({req, frontendDomain});
 

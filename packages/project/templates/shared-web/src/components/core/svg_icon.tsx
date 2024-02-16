@@ -12,9 +12,9 @@ export interface SvgIconData {
 
 interface SvgIconProps {
   icon: SvgIconData;
-  width?: number;
-  height?: number;
-  size?: number;
+  width?: number | string;
+  height?: number | string;
+  size?: number | string;
   color?: string;
   colorHover?: string;
 }
@@ -47,8 +47,8 @@ const ColoredSvg = styled.svg<{
   $fill?: string;
   $fillHover?: string;
   $clickable?: boolean;
-  $width: number | undefined;
-  $height: number | undefined;
+  $width: number | string | undefined;
+  $height: number | string | undefined;
 }>`
   ${p => optional('fill', p.$fill)}
   ${p => optionalRaw(p.$fillHover, v => `&:hover { fill: ${v}; }`)}

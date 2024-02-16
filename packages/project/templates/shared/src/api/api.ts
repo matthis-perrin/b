@@ -1,6 +1,6 @@
 import {AllApiSchema, Obj, OptStr, SchemaToType, Str} from '@shared/api/core/api_schema';
 import {ApiConfig, ApiName} from '@shared/api/core/api_types';
-import {__BACKEND_NAME_UPPERCASE___FUNCTION_URL} from '@shared/env';
+import {__BACKEND_NAME_UPPERCASE___URL} from '@shared/env';
 import {UserId} from '@shared/models';
 
 const FrontendUserSchema = Obj({
@@ -34,6 +34,6 @@ export const ALL = {
 
 export const API_CONFIGS = {
   __BACKEND_NAME__: {
-    host: __BACKEND_NAME_UPPERCASE___FUNCTION_URL,
+    host: __BACKEND_NAME_UPPERCASE___URL,
   },
 } satisfies Record<ApiName, ApiConfig>;

@@ -47,7 +47,7 @@ const s3Client = new S3Client();
 const replaceManifestPath = (str: string): string =>
   str.replaceAll(
     /<link rel="manifest" href="[^"]+">/gu,
-    '<link rel="manifest" href="manifest.webmanifest">'
+    '<link rel="manifest" href="/manifest.webmanifest">'
   );
 
 async function loadStatic(opts: {

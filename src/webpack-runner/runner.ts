@@ -84,8 +84,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
           const status = statuses.get(projectName);
           const port =
             status?.lambdaServerEvents.startEvent?.port ?? getPort(join(root, projectName));
-          overrides[`${projectName.toUpperCase()}_FUNCTION_URL`] =
-            `http://${getLocalIp()}:${port}/`;
+          overrides[`${projectName.toUpperCase()}_URL`] = `http://${getLocalIp()}:${port}/`;
         }
         if (type === ProjectType.Web) {
           const status = statuses.get(projectName);

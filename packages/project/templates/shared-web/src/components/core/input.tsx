@@ -170,6 +170,7 @@ const StyledInput = styled.input<AddPrefix<FrontendTheme['input'], '$'>>`
   display: block;
   ${p => optionalPx('width', p.width)}
   ${p => optionalPx('height', p.$height)}
+  ${p => optionalPx('line-height', p.$height)}
   box-sizing: border-box;
 
   outline: none;

@@ -17,12 +17,12 @@ output "code_bucket" {
 `.trim();
 
   const CLOUDFRONT_ACCESS = `
-data "aws_iam_policy_document" "cloudfront_access_to_code" {
+data "aws_iam_policy_document" "cloudfront_access_to_code_policy" {
   ${webProjectNames
     .map(p =>
       `
   statement {
-    actions   = ["s3:GetObject"]
+    actions = ["s3:GetObject"]
     resources = [
       "\${aws_s3_bucket.code.arn}/${p}/*",
     ]
@@ -36,9 +36,9 @@ data "aws_iam_policy_document" "cloudfront_access_to_code" {
     .join('\n\n')}
 }
 
-resource "aws_s3_bucket_policy" "code" {
+resource "aws_s3_bucket_policy" "cloudfront_access_to_code" {
   bucket = aws_s3_bucket.code.id
-  policy = data.aws_iam_policy_document.cloudfront_access_to_code.json
+  policy = data.aws_iam_policy_document.cloudfront_access_to_code_policy.json
 }
 `.trim();
 

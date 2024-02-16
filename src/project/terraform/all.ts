@@ -1,6 +1,6 @@
 import {ProjectType, WorkspaceName} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
-import {generateCloudfrontDistributionTerraform} from '@src/project/terraform/cloudfront';
+import {generateFrontendTerraform} from '@src/project/terraform/frontend';
 import {generateLambdaTerraform} from '@src/project/terraform/lambda';
 import {generateAwsProviderTerraform} from '@src/project/terraform/provider';
 import {generateS3BucketTerraform} from '@src/project/terraform/s3';
@@ -28,7 +28,7 @@ export function generateWorkspaceProjectTerraform(
     'cloudwatchTriggerMinutes' in fromFragment ? fromFragment.cloudwatchTriggerMinutes : undefined;
   const alarmEmail = 'alarmEmail' in fromFragment ? fromFragment.alarmEmail : undefined;
   if (type === ProjectType.Web) {
-    return generateCloudfrontDistributionTerraform(workspaceName, projectName);
+    return generateFrontendTerraform(projectName);
   } else if (type === ProjectType.LambdaFunction) {
     return generateLambdaTerraform(workspaceName, projectName, {
       api: false,

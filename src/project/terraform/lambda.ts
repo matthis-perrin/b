@@ -17,7 +17,7 @@ export function generateLambdaTerraform(
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_extra_policy" {
   statement {
-    actions   = [
+    actions = [
       "dynamodb:GetItem",
       "dynamodb:BatchGetItem",
       "dynamodb:Query",
@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "${projectName}_extra_policy" {
       ? `
 
   statement {
-    actions   = [
+    actions = [
       "s3:GetObject",
       "s3:GetObjectTagging"
     ]
@@ -50,17 +50,24 @@ data "aws_iam_policy_document" "${projectName}_extra_policy" {
 }
 
 resource "aws_lambda_function" "${projectName}" {
-  function_name     = "${workspaceName}-${projectName}"
-  s3_bucket         = aws_s3_object.${projectName}_archive.bucket
-  s3_key            = aws_s3_object.${projectName}_archive.key
-  handler           = "index.handler"
-  runtime           = "nodejs20.x"
-  role              = aws_iam_role.${projectName}_role.arn
-  timeout           = 900 // 15 minutes
-  memory_size       = 128 // Mo
+  function_name = "${workspaceName}-${projectName}"
+  s3_bucket     = aws_s3_object.${projectName}_archive.bucket
+  s3_key        = aws_s3_object.${projectName}_archive.key
+  handler       = "index.handler"
+  runtime       = "nodejs20.x"
+  role          = aws_iam_role.${projectName}_role.arn
+  timeout       = 900 // 15 minutes
+  memory_size   = 128 // Mo
   environment {
-    variables = {
-      NODE_OPTIONS = "--enable-source-maps"
+    variables = {${
+      api
+        ? `
+      NODE_OPTIONS            = "--enable-source-maps"
+      CLOUDFRONT_HEADER_NAME  = random_string.${projectName}_cloudfront_header_name.result
+      CLOUDFRONT_HEADER_VALUE = random_string.${projectName}_cloudfront_header_value.result`
+        : `
+      NODE_OPTIONS = "--enable-source-maps"`
+    }
     }
   }
 }
@@ -79,9 +86,70 @@ resource "aws_lambda_function_url" "${projectName}" {
   authorization_type = "NONE"
 }
 
-output "${projectName}_function_url" {
-  value       = aws_lambda_function_url.${projectName}.function_url
-  description = "Function url of the \\"${workspaceName}-${projectName}\\" lambda"
+output "${projectName}_url" {
+  value       = "https://\${aws_cloudfront_distribution.${projectName}.domain_name}/"
+  description = "Cloudfront URL of \\"${projectName}\\""
+}
+
+# Cloudfront Distribution
+
+resource "random_string" "${projectName}_cloudfront_header_name" {
+  length  = 16
+  upper   = false
+  numeric = false
+  special = false
+}
+
+resource "random_string" "${projectName}_cloudfront_header_value" {
+  length  = 32
+  special = false
+}
+
+resource "aws_cloudfront_distribution" "${projectName}" {
+  origin {
+    # Remove "https://" prefix and "/" suffix
+    domain_name = replace(replace(aws_lambda_function_url.${projectName}.function_url, "https://", ""), "/", "")
+    origin_id   = aws_lambda_function.${projectName}.function_name
+
+    custom_origin_config {
+      https_port             = 443
+      http_port              = 80
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+
+    custom_header {
+      name  = random_string.${projectName}_cloudfront_header_name.result
+      value = random_string.${projectName}_cloudfront_header_value.result
+    }
+  }
+
+  enabled             = true
+  wait_for_deployment = false
+  is_ipv6_enabled     = true
+  price_class         = "PriceClass_100"
+
+  default_cache_behavior {
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["HEAD", "GET"]
+    compress               = true
+    target_origin_id       = aws_lambda_function.${projectName}.function_name
+    viewer_protocol_policy = "redirect-to-https"
+    # Managed-CachingDisabled
+    cache_policy_id = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+    # Managed-AllViewerExceptHostHeader
+    origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
 }`
     : ''
 }
@@ -105,8 +173,8 @@ resource "aws_cloudwatch_event_rule" "${projectName}_trigger_rate" {
 }
 
 resource "aws_cloudwatch_event_target" "${projectName}_trigger_target" {
-  rule  = aws_cloudwatch_event_rule.${projectName}_trigger_rate.name
-  arn   = aws_lambda_function.${projectName}.arn
+  rule = aws_cloudwatch_event_rule.${projectName}_trigger_rate.name
+  arn  = aws_lambda_function.${projectName}.arn
 }
 `
     : ''
@@ -119,17 +187,17 @@ resource "aws_iam_role" "${projectName}_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action    = "sts:AssumeRole"
+        Action = "sts:AssumeRole"
         Principal = {
           Service = "lambda.amazonaws.com"
         }
-        Effect    = "Allow"
+        Effect = "Allow"
       },
     ]
   })
   
   inline_policy {
-    name = "${workspaceName}-${projectName}-extra-policy"
+    name   = "${workspaceName}-${projectName}-extra-policy"
     policy = data.aws_iam_policy_document.${projectName}_extra_policy.json
   }
 }
@@ -146,11 +214,11 @@ resource "aws_iam_policy" "${projectName}_cloudwatch" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = [
+        Action = [
           "logs:CreateLogStream",
           "logs:PutLogEvents",
         ]
-        Effect   = "Allow"
+        Effect = "Allow"
         Resource = [
           "\${aws_cloudwatch_log_group.${projectName}.arn}",
           "\${aws_cloudwatch_log_group.${projectName}.arn}:*",
@@ -175,11 +243,11 @@ resource "aws_cloudwatch_log_metric_filter" "${projectName}_log_errors" {
   log_group_name = aws_cloudwatch_log_group.${projectName}.name
 
   metric_transformation {
-    name      = "${workspaceName}-${projectName}-errors"
-    namespace = "${workspaceName}"
-    value     = "1"
+    name          = "${workspaceName}-${projectName}-errors"
+    namespace     = "${workspaceName}"
+    value         = "1"
     default_value = "0"
-    unit      = "Count"
+    unit          = "Count"
   }
 }
 
@@ -187,7 +255,6 @@ resource "aws_cloudwatch_metric_alarm" "${projectName}_log_errors" {
   alarm_name          = "${workspaceName}-${projectName}-log-error-metric-alarm"
   metric_name         = aws_cloudwatch_log_metric_filter.${projectName}_log_errors.metric_transformation[0].name
   namespace           = aws_cloudwatch_log_metric_filter.${projectName}_log_errors.metric_transformation[0].namespace
-  
   evaluation_periods  = 1
   period              = 3600
   statistic           = "Sum"
@@ -203,8 +270,8 @@ resource "aws_sns_topic" "${projectName}_log_errors" {
 }
 
 resource "aws_sns_topic_subscription" "${projectName}_log_errors" {
-  endpoint = "${alarmEmail}"
-  protocol = "email"
+  endpoint  = "${alarmEmail}"
+  protocol  = "email"
   topic_arn = aws_sns_topic.${projectName}_log_errors.arn
 }
 `
@@ -212,8 +279,8 @@ resource "aws_sns_topic_subscription" "${projectName}_log_errors" {
 }
 # Dummy source code useful only during the initial setup
 resource "aws_s3_object" "${projectName}_archive" {
-  bucket       = aws_s3_bucket.code.id
-  key          = "${projectName}/dist.zip"
+  bucket         = aws_s3_bucket.code.id
+  key            = "${projectName}/dist.zip"
   content_base64 = "UEsDBBQACAAIAGaKwlYAAAAAAAAAADYAAAAIACAAaW5kZXguanNVVA0AB3AIemRyCHpkcAh6ZHV4CwABBPUBAAAEFAAAAEutKMgvKinWy0jMS8lJLVKwVUgsrsxLVkgrzUsuyczPU9DQVKjmUlAoSi0pLcpTUFe35qq15gIAUEsHCP0ak1o4AAAANgAAAFBLAQIUAxQACAAIAGaKwlb9GpNaOAAAADYAAAAIACAAAAAAAAAAAACkgQAAAABpbmRleC5qc1VUDQAHcAh6ZHIIemRwCHpkdXgLAAEE9QEAAAQUAAAAUEsFBgAAAAABAAEAVgAAAI4AAAAAAA=="
 }
 

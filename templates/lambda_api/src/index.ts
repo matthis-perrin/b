@@ -1,3 +1,4 @@
+import {enforceCloudfrontOrigin} from '@shared-node/api/api_cloudfront_origin';
 import {
   apiResponseToLambdaResonse,
   LambdaEvent,
@@ -9,6 +10,7 @@ import {handleApi} from '@shared-node/api/api_router';
 import {testHandler} from '@src/handlers/test_handlers';
 
 export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
+  enforceCloudfrontOrigin(event);
   const req = lambdaEventToApiRequest(event);
   const res = apiResponseToLambdaResonse({req});
 
