@@ -48,6 +48,15 @@ export function generateCodeWorkspace(
       'files.associations': {
         '*.tf': 'terraform',
       },
+      '[typescript]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+      },
+      '[typescriptreact]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+      },
+      '[terraform]': {
+        'editor.defaultFormatter': 'hashicorp.terraform',
+      },
     },
     extensions: {
       recommendations: [
@@ -57,6 +66,7 @@ export function generateCodeWorkspace(
         'styled-components.vscode-styled-components',
         'naumovs.color-highlight',
         'eamodio.gitlens',
+        'hashicorp.terraform',
       ],
     },
   };

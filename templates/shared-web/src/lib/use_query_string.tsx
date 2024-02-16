@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useCallback, useEffect, useState} from 'react';
+import {Dispatch, SetStateAction, useCallback, useEffect, useRef, useState} from 'react';
 import {useLocation, useSearch} from 'wouter';
 
 import {asDate, asNumber, NumberBrand, StringBrand} from '@shared/lib/type_utils';
@@ -94,12 +94,18 @@ function useGenericOptionalQueryString<T>(
   const search = useSearch();
   const [location, setLocation] = useLocation();
   const current = getQueryString(key);
+
+  const initialValueRef = useRef(initialValue);
+  useEffect(() => {
+    initialValueRef.current = initialValue;
+  }, [initialValue]);
+
   const [state, setState] = useState<T | undefined>(
-    current === undefined ? initialValue : deserializer(current)
+    current === undefined ? initialValueRef.current : deserializer(current)
   );
 
   const setQueryString = useCallback(
-    (key: string, value?: string) => {
+    (key: string, value: string | undefined) => {
       const qs = new URLSearchParams(search);
       if (value === undefined) {
         qs.delete(key);
@@ -107,16 +113,25 @@ function useGenericOptionalQueryString<T>(
         qs.set(key, value);
       }
       const qss = qs.toString();
-      setLocation(location + (qss.length > 0 ? `?${qss}` : ''));
+      setLocation(location + (qss.length > 0 ? `?${qss}` : ''), {replace: true});
     },
     [location, search, setLocation]
   );
 
+  // On the first call, check if the value for "key" is not defined.
+  // If that's the case and we have a default value, we update the URL
   useEffect(() => {
     const current = getQueryString(key);
-    setQueryString(key, current);
-    setState(current === undefined ? initialValue : deserializer(current));
-  }, [deserializer, initialValue, key, search, setQueryString]);
+    if (current === undefined && initialValueRef.current !== undefined) {
+      setQueryString(key, serializer(initialValueRef.current));
+    }
+  }, [key, serializer, setQueryString]);
+
+  useEffect(() => {
+    const current = getQueryString(key);
+    const newVal = current === undefined ? initialValueRef.current : deserializer(current);
+    setState(newVal);
+  }, [deserializer, key, search, serializer, setQueryString]);
 
   const setParam = useCallback(
     (setter: T | undefined | ((current: T | undefined) => T | undefined)) => {
@@ -124,13 +139,13 @@ function useGenericOptionalQueryString<T>(
       const newVal =
         typeof setter === 'function'
           ? (setter as (current: T | undefined) => T | undefined)(
-              stringVal === undefined ? initialValue : deserializer(stringVal)
+              stringVal === undefined ? initialValueRef.current : deserializer(stringVal)
             )
           : setter;
       setQueryString(key, newVal === undefined ? undefined : serializer(newVal));
       setState(newVal);
     },
-    [deserializer, initialValue, key, serializer, setQueryString]
+    [deserializer, key, serializer, setQueryString]
   );
 
   return [state, setParam];
