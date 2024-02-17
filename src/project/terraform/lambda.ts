@@ -1,6 +1,11 @@
 import {ProjectName, WorkspaceName} from '@src/models';
 import {lowerCase} from '@src/string_utils';
 
+export interface LambdaDomain {
+  rootDomain: string;
+  subDomain: string;
+}
+
 export function generateLambdaTerraform(
   workspaceName: WorkspaceName,
   projectName: ProjectName,
@@ -9,9 +14,10 @@ export function generateLambdaTerraform(
     web: boolean;
     alarmEmail: string | undefined;
     cloudwatchTriggerMinutes: number | undefined;
+    domain: LambdaDomain | undefined;
   }
 ): string {
-  const {api, web, alarmEmail, cloudwatchTriggerMinutes} = opts;
+  const {api, web, alarmEmail, cloudwatchTriggerMinutes, domain} = opts;
   const prefixLower = lowerCase(workspaceName);
   return `
 # Define any extra role for the lambda here
@@ -89,7 +95,71 @@ resource "aws_lambda_function_url" "${projectName}" {
 output "${projectName}_url" {
   value       = "https://\${aws_cloudfront_distribution.${projectName}.domain_name}/"
   description = "Cloudfront URL of \\"${projectName}\\""
+}${
+        domain !== undefined
+          ? `
+
+# Domain
+
+data "aws_route53_zone" "${projectName}" {
+  name = "${domain.rootDomain}"
 }
+
+resource "aws_route53_record" "${projectName}_a" {
+  zone_id = data.aws_route53_zone.${projectName}.zone_id
+  name    = "${domain.subDomain}.${domain.rootDomain}"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.${projectName}.domain_name
+    zone_id                = aws_cloudfront_distribution.${projectName}.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "${projectName}_aaaa" {
+  zone_id = data.aws_route53_zone.${projectName}.zone_id
+  name    = "${domain.subDomain}.${domain.rootDomain}"
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.${projectName}.domain_name
+    zone_id                = aws_cloudfront_distribution.${projectName}.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_acm_certificate" "${projectName}" {
+  domain_name               = "*.${domain.subDomain}.${domain.rootDomain}"
+  subject_alternative_names = ["${domain.subDomain}.${domain.rootDomain}"]
+  validation_method         = "DNS"
+  provider                  = aws.us-east-1
+}
+
+resource "aws_route53_record" "${projectName}_certificate_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.${projectName}.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  provider        = aws.us-east-1
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.${projectName}.zone_id
+}
+
+resource "aws_acm_certificate_validation" "${projectName}" {
+  provider                = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.${projectName}.arn
+  validation_record_fqdns = [for record in aws_route53_record.backend_certificate_validation : record.fqdn]
+}`
+          : ''
+      }
 
 # Cloudfront Distribution
 
@@ -127,7 +197,12 @@ resource "aws_cloudfront_distribution" "${projectName}" {
   enabled             = true
   wait_for_deployment = false
   is_ipv6_enabled     = true
-  price_class         = "PriceClass_100"
+  price_class         = "PriceClass_100"${
+    domain
+      ? `
+  aliases             = ["${domain.subDomain}.${domain.rootDomain}"]`
+      : ''
+  }
 
   default_cache_behavior {
     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -147,8 +222,15 @@ resource "aws_cloudfront_distribution" "${projectName}" {
     }
   }
 
-  viewer_certificate {
-    cloudfront_default_certificate = true
+  viewer_certificate {${
+    domain
+      ? `
+    acm_certificate_arn      = aws_acm_certificate.${projectName}.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"`
+      : `
+    cloudfront_default_certificate = true`
+  }
   }
 }`
     : ''

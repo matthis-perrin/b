@@ -870,7 +870,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.28',
+  project: '1.9.31',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
@@ -922,6 +922,16 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
   } = project;
   const cloudwatchTriggerMinutes = 'cloudwatchTriggerMinutes' in fromFragment ? fromFragment.cloudwatchTriggerMinutes : undefined;
   const alarmEmail = 'alarmEmail' in fromFragment ? fromFragment.alarmEmail : undefined;
+  const domainStr = 'domain' in fromFragment ? fromFragment.domain : undefined;
+  let domain;
+  if (domainStr !== undefined) {
+    const [subDomain = '', ...rest] = domainStr.split('.');
+    const rootDomain = rest.join('.');
+    domain = {
+      subDomain,
+      rootDomain
+    };
+  }
   if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web) {
     return (0,_src_project_terraform_frontend__WEBPACK_IMPORTED_MODULE_1__.generateFrontendTerraform)(projectName);
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaFunction) {
@@ -929,21 +939,24 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
       api: false,
       web: false,
       alarmEmail,
-      cloudwatchTriggerMinutes
+      cloudwatchTriggerMinutes,
+      domain
     });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaApi) {
     return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
       api: true,
       web: false,
       alarmEmail,
-      cloudwatchTriggerMinutes
+      cloudwatchTriggerMinutes,
+      domain
     });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaWebApi) {
     return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
       api: true,
       web: true,
       alarmEmail,
-      cloudwatchTriggerMinutes
+      cloudwatchTriggerMinutes,
+      domain
     });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
     return undefined;
@@ -1060,7 +1073,8 @@ function generateLambdaTerraform(workspaceName, projectName, opts) {
     api,
     web,
     alarmEmail,
-    cloudwatchTriggerMinutes
+    cloudwatchTriggerMinutes,
+    domain
   } = opts;
   const prefixLower = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.lowerCase)(workspaceName);
   return `
@@ -1129,7 +1143,68 @@ resource "aws_lambda_function_url" "${projectName}" {
 output "${projectName}_url" {
   value       = "https://\${aws_cloudfront_distribution.${projectName}.domain_name}/"
   description = "Cloudfront URL of \\"${projectName}\\""
+}${domain !== undefined ? `
+
+# Domain
+
+data "aws_route53_zone" "${projectName}" {
+  name = "${domain.rootDomain}"
 }
+
+resource "aws_route53_record" "${projectName}_a" {
+  zone_id = data.aws_route53_zone.${projectName}.zone_id
+  name    = "${domain.subDomain}.${domain.rootDomain}"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.${projectName}.domain_name
+    zone_id                = aws_cloudfront_distribution.${projectName}.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "${projectName}_aaaa" {
+  zone_id = data.aws_route53_zone.${projectName}.zone_id
+  name    = "${domain.subDomain}.${domain.rootDomain}"
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.${projectName}.domain_name
+    zone_id                = aws_cloudfront_distribution.${projectName}.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_acm_certificate" "${projectName}" {
+  domain_name               = "*.${domain.subDomain}.${domain.rootDomain}"
+  subject_alternative_names = ["${domain.subDomain}.${domain.rootDomain}"]
+  validation_method         = "DNS"
+  provider                  = aws.us-east-1
+}
+
+resource "aws_route53_record" "${projectName}_certificate_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.${projectName}.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  provider        = aws.us-east-1
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.${projectName}.zone_id
+}
+
+resource "aws_acm_certificate_validation" "${projectName}" {
+  provider                = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.${projectName}.arn
+  validation_record_fqdns = [for record in aws_route53_record.backend_certificate_validation : record.fqdn]
+}
+` : ''}
 
 # Cloudfront Distribution
 
@@ -1167,7 +1242,8 @@ resource "aws_cloudfront_distribution" "${projectName}" {
   enabled             = true
   wait_for_deployment = false
   is_ipv6_enabled     = true
-  price_class         = "PriceClass_100"
+  price_class         = "PriceClass_100"${domain ? `
+  aliases             = ["${domain.subDomain}.${domain.rootDomain}"]` : ''}
 
   default_cache_behavior {
     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -1187,8 +1263,11 @@ resource "aws_cloudfront_distribution" "${projectName}" {
     }
   }
 
-  viewer_certificate {
-    cloudfront_default_certificate = true
+  viewer_certificate {${domain ? `
+    acm_certificate_arn      = aws_acm_certificate.${projectName}.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"` : `
+    cloudfront_default_certificate = true`}
   }
 }` : ''}
 ${cloudwatchTriggerMinutes !== undefined ? `# Cloudwatch trigger
@@ -1335,11 +1414,22 @@ terraform {
 }
 
 provider "aws" {
-  region  = "eu-west-3"
+  region                   = "eu-west-3"
   shared_credentials_files = ["./.aws-credentials"]
   default_tags {
     tags = {
       Project = "${workspaceName}"
+    }
+  }
+}
+
+provider "aws" {
+  alias                    = "us-east-1"
+  region                   = "us-east-1"
+  shared_credentials_files = ["./.aws-credentials"]
+  default_tags {
+    tags = {
+      Project = "homeassistant"
     }
   }
 }

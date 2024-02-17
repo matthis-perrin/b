@@ -119,12 +119,14 @@ export interface WorkspaceFragmentRegistry {
     type: WorkspaceFragmentType.ApiLambda;
     lambdaName: ProjectName;
     alarmEmail: string | undefined;
+    domain: string | undefined;
   };
   [WorkspaceFragmentType.WebApp]: {
     type: WorkspaceFragmentType.WebApp;
     websiteName: ProjectName;
     lambdaName: ProjectName;
     alarmEmail: string | undefined;
+    domain: string | undefined;
   };
   [WorkspaceFragmentType.NodeScript]: {
     type: WorkspaceFragmentType.NodeScript;

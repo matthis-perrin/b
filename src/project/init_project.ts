@@ -134,12 +134,14 @@ async function askForWorkspaceFragment(
   } else if (type === WorkspaceFragmentType.ApiLambda) {
     const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
     const alarmEmail = await askForAlarmEmail(false);
-    return {type, lambdaName, alarmEmail};
+    const domain = await askForDomainName();
+    return {type, lambdaName, alarmEmail, domain};
   } else if (type === WorkspaceFragmentType.WebApp) {
     const websiteName = await askForProjectName('Frontend project name', 'frontend', takenNames);
     const lambdaName = await askForProjectName('Backend project name', 'backend', takenNames);
     const alarmEmail = await askForAlarmEmail(false);
-    return {type, websiteName, lambdaName, alarmEmail};
+    const domain = await askForDomainName();
+    return {type, websiteName, lambdaName, alarmEmail, domain};
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === WorkspaceFragmentType.NodeScript) {
     const scriptName = await askForProjectName('Script project name', 'script', takenNames);
@@ -206,6 +208,27 @@ async function askForAlarmEmail(defaultVal: boolean): Promise<string | undefined
     return undefined;
   }
   return email.value;
+}
+
+async function askForDomainName(): Promise<string | undefined> {
+  const useDomain = await prompt({
+    type: 'confirm',
+    name: 'value',
+    message: 'Use a custom domain?',
+  });
+  if (useDomain.value !== true) {
+    return undefined;
+  }
+  const domain = await prompt({
+    type: 'text',
+    name: 'value',
+    message: 'Enter the domain name.',
+    validate: (v: string) => v.length > 0,
+  });
+  if (typeof domain.value !== 'string') {
+    return undefined;
+  }
+  return domain.value;
 }
 
 async function askForCloudwatchTrigger(): Promise<number | undefined> {

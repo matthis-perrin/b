@@ -12,11 +12,22 @@ terraform {
 }
 
 provider "aws" {
-  region  = "eu-west-3"
+  region                   = "eu-west-3"
   shared_credentials_files = ["./.aws-credentials"]
   default_tags {
     tags = {
       Project = "${workspaceName}"
+    }
+  }
+}
+
+provider "aws" {
+  alias                    = "us-east-1"
+  region                   = "us-east-1"
+  shared_credentials_files = ["./.aws-credentials"]
+  default_tags {
+    tags = {
+      Project = "homeassistant"
     }
   }
 }
