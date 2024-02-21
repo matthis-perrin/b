@@ -1,6 +1,7 @@
 import {
   __BACKEND_NAME_UPPERCASE___URL,
   __FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME,
+  __PROJECT_NAME_UPPERCASE___ROLE_ARN,
 } from '@shared/env';
 
 import {enforceCloudfrontOrigin} from '@shared-node/api/api_cloudfront_origin';
@@ -12,9 +13,12 @@ import {
 } from '@shared-node/api/api_lambda';
 import {handleApi} from '@shared-node/api/api_router';
 import {getIndex, handleStatics} from '@shared-node/api/api_statics';
+import {registerAwsRole} from '@shared-node/aws/credentials';
 
 import {loginHandler} from '@src/handlers/login_handler';
 import {session} from '@src/session';
+
+registerAwsRole(__PROJECT_NAME_UPPERCASE___ROLE_ARN);
 
 const frontendName = '__FRONTEND_NAME__';
 const frontendDomain = __FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME;

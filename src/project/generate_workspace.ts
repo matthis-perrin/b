@@ -64,6 +64,7 @@ export function getProjectsFromWorkspaceFragment(
         fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: fragment.lambdaName,
+          __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
         },
       },
     ];
@@ -75,6 +76,7 @@ export function getProjectsFromWorkspaceFragment(
         fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: fragment.lambdaName,
+          __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
           __BACKEND_NAME__: fragment.lambdaName,
           __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
         },
@@ -83,6 +85,7 @@ export function getProjectsFromWorkspaceFragment(
   } else if (fragment.type === WorkspaceFragmentType.WebApp) {
     const vars = {
       __PROJECT_NAME__: fragment.lambdaName,
+      __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
       __BACKEND_NAME__: fragment.lambdaName,
       __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
       __FRONTEND_NAME__: fragment.websiteName,

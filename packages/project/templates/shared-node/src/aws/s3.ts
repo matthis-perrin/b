@@ -13,10 +13,10 @@ import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 
 import {REGION} from '@shared/env';
 
-import {readCredentials} from '@shared-node/aws/credentials';
+import {credentialsProvider} from '@shared-node/aws/credentials';
 import {compress as gzipCompress, decompress as gzipDecompress} from '@shared-node/lib/gzip';
 
-const client = new S3Client({region: REGION, credentials: readCredentials()});
+const client = new S3Client({region: REGION, credentials: credentialsProvider()});
 
 export async function putObject(options: {
   bucket: string;

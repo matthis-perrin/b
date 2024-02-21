@@ -5,7 +5,9 @@ import {fileURLToPath} from 'node:url';
 import {NODE_ENV} from '@shared/env';
 import {splitOnceOrThrow} from '@shared/lib/array_utils';
 
-export function readCredentials(): {accessKeyId: string; secretAccessKey: string} | undefined {
+import {assumeRole} from '@shared-node/aws/sts';
+
+export function getAdminCredentials(): {accessKeyId: string; secretAccessKey: string} | undefined {
   if (NODE_ENV !== 'development') {
     return;
   }
@@ -28,4 +30,40 @@ export function readCredentials(): {accessKeyId: string; secretAccessKey: string
     return undefined;
   }
   return {accessKeyId: aws_access_key_id, secretAccessKey: aws_secret_access_key};
+}
+
+let awsRole: string | undefined;
+
+export function registerAwsRole(role: string): void {
+  awsRole = role;
+}
+
+interface AwsCredentialIdentity {
+  readonly accessKeyId: string;
+  readonly secretAccessKey: string;
+  readonly sessionToken?: string;
+}
+
+export function credentialsProvider(): (() => Promise<AwsCredentialIdentity>) | undefined {
+  if (NODE_ENV !== 'development') {
+    return;
+  }
+  return async () => {
+    if (awsRole === undefined) {
+      throw new Error(`No AWS role registered`);
+    }
+    const credentials = await assumeRole(awsRole);
+    if (!credentials) {
+      throw new Error(`Failure to retrieve credentials for role "${awsRole}"`);
+    }
+    const {AccessKeyId, SecretAccessKey, SessionToken} = credentials;
+    if (AccessKeyId === undefined || SecretAccessKey === undefined) {
+      throw new Error(`Invalid credentials for role "${awsRole}"`);
+    }
+    return {
+      accessKeyId: AccessKeyId,
+      secretAccessKey: SecretAccessKey,
+      sessionToken: SessionToken,
+    };
+  };
 }

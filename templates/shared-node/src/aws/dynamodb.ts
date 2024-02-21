@@ -29,14 +29,14 @@ import {REGION} from '@shared/env';
 import {chunkArray} from '@shared/lib/array_utils';
 import {AnyInterface, removeUndefined} from '@shared/lib/type_utils';
 
-import {readCredentials} from '@shared-node/aws/credentials';
+import {credentialsProvider} from '@shared-node/aws/credentials';
 import {uidSafe} from '@shared-node/lib/rand_safe';
 
 const MAX_BATCH_GET_ITEMS = 100;
 const MAX_BATCH_WRITE_ITEMS = 25;
 const PUT_ITEMS_MAX_RETRIES = 3;
 
-const client = new DynamoDBClient({region: REGION, credentials: readCredentials()});
+const client = new DynamoDBClient({region: REGION, credentials: credentialsProvider()});
 
 type Key = Record<string, unknown>;
 type AdditionalParams = Record<string, unknown>;

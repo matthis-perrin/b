@@ -276,6 +276,7 @@ resource "aws_iam_role" "${projectName}_role" {
         Action = "sts:AssumeRole"
         Principal = {
           Service = "lambda.amazonaws.com"
+          AWS     = data.aws_iam_roles.administrator_roles.arns
         }
         Effect = "Allow"
       },
@@ -286,6 +287,10 @@ resource "aws_iam_role" "${projectName}_role" {
     name   = "${workspaceName}-${projectName}-extra-policy"
     policy = data.aws_iam_policy_document.${projectName}_extra_policy.json
   }
+}
+
+output "${projectName}_role_arn" {
+  value = aws_iam_role.${projectName}_role.arn
 }
 
 # Cloudwatch logging

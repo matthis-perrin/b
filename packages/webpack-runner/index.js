@@ -283,7 +283,8 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
       type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.LambdaFunction,
       fromFragment: fragment,
       vars: {
-        __PROJECT_NAME__: fragment.lambdaName
+        __PROJECT_NAME__: fragment.lambdaName,
+        __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase()
       }
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.ApiLambda) {
@@ -293,6 +294,7 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: fragment.lambdaName,
+        __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
         __BACKEND_NAME__: fragment.lambdaName,
         __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase()
       }
@@ -300,6 +302,7 @@ function getProjectsFromWorkspaceFragment(fragment, allFragments) {
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp) {
     const vars = {
       __PROJECT_NAME__: fragment.lambdaName,
+      __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
       __BACKEND_NAME__: fragment.lambdaName,
       __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
       __FRONTEND_NAME__: fragment.websiteName,
@@ -870,7 +873,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.32',
+  project: '1.9.35',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
@@ -1300,6 +1303,7 @@ resource "aws_iam_role" "${projectName}_role" {
         Action = "sts:AssumeRole"
         Principal = {
           Service = "lambda.amazonaws.com"
+          AWS     = data.aws_iam_roles.administrator_roles.arns
         }
         Effect = "Allow"
       },
@@ -1310,6 +1314,10 @@ resource "aws_iam_role" "${projectName}_role" {
     name   = "${workspaceName}-${projectName}-extra-policy"
     policy = data.aws_iam_policy_document.${projectName}_extra_policy.json
   }
+}
+
+output "${projectName}_role_arn" {
+  value = aws_iam_role.${projectName}_role.arn
 }
 
 # Cloudwatch logging
@@ -1428,7 +1436,7 @@ provider "aws" {
   shared_credentials_files = ["./.aws-credentials"]
   default_tags {
     tags = {
-      Project = "homeassistant"
+      Project = "${workspaceName}"
     }
   }
 }
@@ -1441,6 +1449,10 @@ output "region" {
 data "aws_caller_identity" "current" {}
 output "account_id" {
   value = data.aws_caller_identity.current.account_id
+}
+
+data "aws_iam_roles" "administrator_roles" {
+  name_regex = "AdministratorAccess"
 }
 `.trim();
 }
