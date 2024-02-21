@@ -93,7 +93,11 @@ resource "aws_lambda_function_url" "${projectName}" {
 }
 
 output "${projectName}_url" {
-  value       = "https://\${aws_cloudfront_distribution.${projectName}.domain_name}/"
+  value       = "${
+    domain
+      ? `https://${domain.subDomain}.${domain.rootDomain}/`
+      : `https://\${aws_cloudfront_distribution.${projectName}.domain_name}/`
+  }"
   description = "Cloudfront URL of \\"${projectName}\\""
 }${
         domain !== undefined

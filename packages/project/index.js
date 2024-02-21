@@ -806,7 +806,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.31',
+  project: '1.9.32',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
@@ -1077,7 +1077,7 @@ resource "aws_lambda_function_url" "${projectName}" {
 }
 
 output "${projectName}_url" {
-  value       = "https://\${aws_cloudfront_distribution.${projectName}.domain_name}/"
+  value       = "${domain ? `https://${domain.subDomain}.${domain.rootDomain}/` : `https://\${aws_cloudfront_distribution.${projectName}.domain_name}/`}"
   description = "Cloudfront URL of \\"${projectName}\\""
 }${domain !== undefined ? `
 
@@ -1139,8 +1139,7 @@ resource "aws_acm_certificate_validation" "${projectName}" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.${projectName}.arn
   validation_record_fqdns = [for record in aws_route53_record.backend_certificate_validation : record.fqdn]
-}
-` : ''}
+}` : ''}
 
 # Cloudfront Distribution
 
