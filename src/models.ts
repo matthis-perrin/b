@@ -117,14 +117,13 @@ export interface WorkspaceFragmentRegistry {
   };
   [WorkspaceFragmentType.ApiLambda]: {
     type: WorkspaceFragmentType.ApiLambda;
-    lambdaName: ProjectName;
+    apiName: ProjectName;
     alarmEmail: string | undefined;
     domain: string | undefined;
   };
   [WorkspaceFragmentType.WebApp]: {
     type: WorkspaceFragmentType.WebApp;
-    websiteName: ProjectName;
-    lambdaName: ProjectName;
+    appName: string;
     alarmEmail: string | undefined;
     domain: string | undefined;
   };
@@ -152,6 +151,13 @@ type RegistryIsValid = WorkspaceFragmentRegistry extends Record<
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function validateRegistry(): RegistryIsValid {
   return true;
+}
+
+export function filterFragments<T extends WorkspaceFragmentType>(
+  frags: WorkspaceFragment[],
+  type: T
+): WorkspaceFragmentRegistry[T][] {
+  return frags.filter(frag => frag.type === type) as WorkspaceFragmentRegistry[T][];
 }
 
 export type WorkspaceFragment = WorkspaceFragmentRegistry[keyof WorkspaceFragmentRegistry];

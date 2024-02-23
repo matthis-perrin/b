@@ -72,9 +72,7 @@ function exit(): void {
 export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   const {root, workspaceFragments, watch} = opts;
   const statuses = new Map<ProjectName, ProjectStatus>();
-  const projects = workspaceFragments.flatMap(f =>
-    getProjectsFromWorkspaceFragment(f, workspaceFragments)
-  );
+  const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f));
 
   async function regenerateEnvFile(): Promise<void> {
     const overrides: Record<string, string> = {};

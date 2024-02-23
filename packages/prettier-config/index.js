@@ -5,4 +5,5 @@ module.exports = {
   bracketSpacing: false,
   arrowParens: 'avoid',
   endOfLine: 'auto',
+  overrides: [{files: '*.json', options: {parser: 'json'}}],
 };

@@ -42,9 +42,7 @@ async function initProject(): Promise<void> {
     workspaceName = basename(workspacePath);
     for (const fragment of workspace.fragments) {
       frags.push(fragment);
-      const projectNames = getProjectsFromWorkspaceFragment(fragment, workspace.fragments).map(
-        p => p.projectName
-      );
+      const projectNames = getProjectsFromWorkspaceFragment(fragment).map(p => p.projectName);
       takenNames.push(...projectNames);
     }
   } else {
@@ -77,7 +75,7 @@ async function initProject(): Promise<void> {
       }
       if (frag) {
         frags.push(frag);
-        takenNames.push(...getProjectsFromWorkspaceFragment(frag, frags).map(p => p.projectName));
+        takenNames.push(...getProjectsFromWorkspaceFragment(frag).map(p => p.projectName));
       } else {
         break;
       }
@@ -132,16 +130,15 @@ async function askForWorkspaceFragment(
     const cloudwatchTriggerMinutes = await askForCloudwatchTrigger();
     return {type, lambdaName, alarmEmail, cloudwatchTriggerMinutes};
   } else if (type === WorkspaceFragmentType.ApiLambda) {
-    const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
+    const apiName = await askForProjectName('API name', 'api', takenNames);
     const alarmEmail = await askForAlarmEmail(false);
     const domain = await askForDomainName();
-    return {type, lambdaName, alarmEmail, domain};
+    return {type, apiName, alarmEmail, domain};
   } else if (type === WorkspaceFragmentType.WebApp) {
-    const websiteName = await askForProjectName('Frontend project name', 'frontend', takenNames);
-    const lambdaName = await askForProjectName('Backend project name', 'backend', takenNames);
+    const appName = await askForProjectName('App name', 'app', takenNames);
     const alarmEmail = await askForAlarmEmail(false);
     const domain = await askForDomainName();
-    return {type, websiteName, lambdaName, alarmEmail, domain};
+    return {type, appName, alarmEmail, domain};
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === WorkspaceFragmentType.NodeScript) {
     const scriptName = await askForProjectName('Script project name', 'script', takenNames);

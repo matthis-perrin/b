@@ -9,6 +9,7 @@ import {
   ProjectName,
   ProjectType,
   WorkspaceFragment,
+  WorkspaceFragmentRegistry,
   WorkspaceFragmentType,
   WorkspaceName,
 } from '@src/models';
@@ -28,7 +29,7 @@ import {
   Workspace,
   writeWorkspace,
 } from '@src/project/vscode_workspace';
-import {lowerCase} from '@src/string_utils';
+import {lowerCase, pascalCase} from '@src/string_utils';
 import {neverHappens, removeUndefined} from '@src/type_utils';
 import {PACKAGE_VERSIONS} from '@src/versions';
 
@@ -41,10 +42,7 @@ export interface WorkspaceProject {
   vars: Record<string, string>;
 }
 
-export function getProjectsFromWorkspaceFragment(
-  fragment: WorkspaceFragment,
-  allFragments: WorkspaceFragment[]
-): WorkspaceProject[] {
+export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): WorkspaceProject[] {
   if (fragment.type === WorkspaceFragmentType.StaticWebsite) {
     return [
       {
@@ -71,35 +69,32 @@ export function getProjectsFromWorkspaceFragment(
   } else if (fragment.type === WorkspaceFragmentType.ApiLambda) {
     return [
       {
-        projectName: fragment.lambdaName,
+        projectName: fragment.apiName,
         type: ProjectType.LambdaApi,
         fromFragment: fragment,
         vars: {
-          __PROJECT_NAME__: fragment.lambdaName,
-          __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
-          __BACKEND_NAME__: fragment.lambdaName,
-          __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
+          __PROJECT_NAME__: fragment.apiName,
+          __PROJECT_NAME_UPPERCASE__: fragment.apiName.toUpperCase(),
         },
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.WebApp) {
+    const backendName = `${fragment.appName}_backend` as ProjectName;
+    const frontendName = `${fragment.appName}_frontend` as ProjectName;
     const vars = {
-      __PROJECT_NAME__: fragment.lambdaName,
-      __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
-      __BACKEND_NAME__: fragment.lambdaName,
-      __BACKEND_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
-      __FRONTEND_NAME__: fragment.websiteName,
-      __FRONTEND_NAME_UPPERCASE__: fragment.websiteName.toUpperCase(),
+      __APP_NAME__: fragment.appName,
+      __APP_NAME_UPPERCASE__: fragment.appName.toUpperCase(),
+      __APP_NAME_PASCALCASE__: pascalCase(fragment.appName),
     };
     return [
       {
-        projectName: fragment.websiteName,
+        projectName: frontendName,
         type: ProjectType.Web,
         fromFragment: fragment,
         vars,
       },
       {
-        projectName: fragment.lambdaName,
+        projectName: backendName,
         type: ProjectType.LambdaWebApi,
         fromFragment: fragment,
         vars,
@@ -143,21 +138,6 @@ export function getProjectsFromWorkspaceFragment(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (fragment.type === WorkspaceFragmentType.Shared) {
     const projectName = 'shared' as ProjectName;
-    const otherVars: Record<string, string> = {};
-    const [bestBackend] = removeUndefined(
-      allFragments.map(frag => {
-        if (frag.type === WorkspaceFragmentType.WebApp) {
-          return {name: frag.lambdaName, prio: 1};
-        } else if (frag.type === WorkspaceFragmentType.ApiLambda) {
-          return {name: frag.lambdaName, prio: 2};
-        }
-        return undefined;
-      })
-    ).sort((a, b) => a.prio - b.prio);
-    if (bestBackend) {
-      otherVars['__BACKEND_NAME__'] = bestBackend.name;
-      otherVars['__BACKEND_NAME_UPPERCASE__'] = bestBackend.name.toUpperCase();
-    }
     return [
       {
         projectName,
@@ -165,7 +145,6 @@ export function getProjectsFromWorkspaceFragment(
         fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: projectName,
-          ...otherVars,
         },
       },
     ];
@@ -179,13 +158,13 @@ export async function generateWorkspace(
   workspaceFragments: WorkspaceFragment[],
   workspace: Workspace | undefined
 ): Promise<void> {
-  const projects = workspaceFragments.flatMap(f =>
-    getProjectsFromWorkspaceFragment(f, workspaceFragments)
-  );
+  const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f));
 
   // Create projects files from templates
   const projectFiles = await Promise.all(
-    projects.map(async project => generateProject(dst, project, workspace, workspaceName))
+    projects.map(async project =>
+      generateProject({dst, project, allFragments: workspaceFragments, workspace, workspaceName})
+    )
   );
 
   // Generate workspace root files
@@ -226,25 +205,35 @@ export async function generateWorkspace(
   );
 
   // Terraform folder generation
-  const tablePrefix = lowerCase(workspaceName);
   const terraformFiles = await Promise.all([
     writeFile(join('terraform', '.aws-credentials'), generateDummyTerraformCredentials()),
+    ...(
+      workspaceFragments.filter(
+        frag => frag.type === WorkspaceFragmentType.WebApp
+      ) as WorkspaceFragmentRegistry['web-app'][]
+    ).flatMap(frag => {
+      return [
+        writeFile(
+          join('terraform', `dynamo_table_${lowerCase(frag.appName)}_user.tf`),
+          addLineBreak(generateDynamoUserTerraform(workspaceName, frag.appName))
+        ),
+        writeFile(
+          join('terraform', `dynamo_table_${lowerCase(frag.appName)}_user_session.tf`),
+          addLineBreak(generateDynamoUserSessionTerraform(workspaceName, frag.appName))
+        ),
+      ];
+    }),
     writeFile(
-      join('terraform', `dynamo_table_${tablePrefix}_user.tf`),
-      generateDynamoUserTerraform(workspaceName)
+      join('terraform', 'base.tf'),
+      addLineBreak(generateCommonTerraform(workspaceName, projects))
     ),
-    writeFile(
-      join('terraform', `dynamo_table_${tablePrefix}_user_session.tf`),
-      generateDynamoUserSessionTerraform(workspaceName)
-    ),
-    writeFile(join('terraform', 'base.tf'), generateCommonTerraform(workspaceName, projects)),
     ...projects.map(async p => {
       const content = generateWorkspaceProjectTerraform(workspaceName, p);
       if (content === undefined) {
         return;
       }
       const name = `${p.projectName}_terraform`;
-      return writeFile(join('terraform', `${name}.tf`), content);
+      return writeFile(join('terraform', `${name}.tf`), addLineBreak(content));
     }),
   ]);
 
@@ -284,3 +273,6 @@ export async function writeWorkspaceFile(
   }
   return {path, hash: newHash};
 }
+
+const addLineBreak = (content: string): string =>
+  content.endsWith('\n') ? content : `${content}\n`;

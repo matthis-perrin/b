@@ -28,6 +28,7 @@ export function generateWorkspaceProjectTerraform(
     'cloudwatchTriggerMinutes' in fromFragment ? fromFragment.cloudwatchTriggerMinutes : undefined;
   const alarmEmail = 'alarmEmail' in fromFragment ? fromFragment.alarmEmail : undefined;
   const domainStr = 'domain' in fromFragment ? fromFragment.domain : undefined;
+  const webAppName = 'appName' in fromFragment ? fromFragment.appName : undefined;
   let domain: LambdaDomain | undefined;
   if (domainStr !== undefined) {
     const [subDomain = '', ...rest] = domainStr.split('.');
@@ -39,7 +40,7 @@ export function generateWorkspaceProjectTerraform(
   } else if (type === ProjectType.LambdaFunction) {
     return generateLambdaTerraform(workspaceName, projectName, {
       api: false,
-      web: false,
+      webAppName,
       alarmEmail,
       cloudwatchTriggerMinutes,
       domain,
@@ -47,7 +48,7 @@ export function generateWorkspaceProjectTerraform(
   } else if (type === ProjectType.LambdaApi) {
     return generateLambdaTerraform(workspaceName, projectName, {
       api: true,
-      web: false,
+      webAppName,
       alarmEmail,
       cloudwatchTriggerMinutes,
       domain,
@@ -55,7 +56,7 @@ export function generateWorkspaceProjectTerraform(
   } else if (type === ProjectType.LambdaWebApi) {
     return generateLambdaTerraform(workspaceName, projectName, {
       api: true,
-      web: true,
+      webAppName,
       alarmEmail,
       cloudwatchTriggerMinutes,
       domain,

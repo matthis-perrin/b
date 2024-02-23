@@ -11,14 +11,13 @@ export function generateLambdaTerraform(
   projectName: ProjectName,
   opts: {
     api: boolean;
-    web: boolean;
+    webAppName?: string;
     alarmEmail: string | undefined;
     cloudwatchTriggerMinutes: number | undefined;
     domain: LambdaDomain | undefined;
   }
 ): string {
-  const {api, web, alarmEmail, cloudwatchTriggerMinutes, domain} = opts;
-  const prefixLower = lowerCase(workspaceName);
+  const {api, webAppName, alarmEmail, cloudwatchTriggerMinutes, domain} = opts;
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_extra_policy" {
@@ -32,14 +31,18 @@ data "aws_iam_policy_document" "${projectName}_extra_policy" {
       "dynamodb:UpdateItem",
       "dynamodb:DeleteItem",
     ]
-    resources = [
-      "\${aws_dynamodb_table.${prefixLower}_user_table.arn}",
-      "\${aws_dynamodb_table.${prefixLower}_user_table.arn}/index/*",
-      "\${aws_dynamodb_table.${prefixLower}_user_session_table.arn}",
-      "\${aws_dynamodb_table.${prefixLower}_user_session_table.arn}/index/*",
-    ]
+    resources = [${
+      webAppName === undefined
+        ? ''
+        : `
+      "\${aws_dynamodb_table.${lowerCase(webAppName)}_user_table.arn}",
+      "\${aws_dynamodb_table.${lowerCase(webAppName)}_user_table.arn}/index/*",
+      "\${aws_dynamodb_table.${lowerCase(webAppName)}_user_session_table.arn}",
+      "\${aws_dynamodb_table.${lowerCase(webAppName)}_user_session_table.arn}/index/*",
+    `
+    }]
   }${
-    web
+    webAppName !== undefined
       ? `
 
   statement {

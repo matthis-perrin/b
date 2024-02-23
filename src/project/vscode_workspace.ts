@@ -9,9 +9,7 @@ export function generateCodeWorkspace(
   workspaceName: string,
   workspaceFragments: WorkspaceFragment[]
 ): Record<string, unknown> {
-  const projects = workspaceFragments.flatMap(f =>
-    getProjectsFromWorkspaceFragment(f, workspaceFragments)
-  );
+  const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f));
   const projectNames = projects.map(p => p.projectName);
   return {
     folders: [

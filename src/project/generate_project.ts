@@ -1,7 +1,9 @@
 import {join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {listFiles, prettierFormat, prettyJson, readFile} from '@src/fs';
+import {listFiles, prettierFormat, readFile} from '@src/fs';
+import {filterFragments, ProjectType, WorkspaceFragment, WorkspaceFragmentType} from '@src/models';
+import {generateSharedFiles} from '@src/project/dynamic_template';
 import {WorkspaceProject, writeWorkspaceFile} from '@src/project/generate_workspace';
 import {FileHash, Workspace} from '@src/project/vscode_workspace';
 import {randomStringSafe} from '@src/rand_safe';
@@ -9,12 +11,15 @@ import {upperCase} from '@src/string_utils';
 
 const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 
-export async function generateProject(
-  dst: string,
-  project: WorkspaceProject,
-  workspace: Workspace | undefined,
-  workspaceName: string
-): Promise<FileHash[]> {
+export async function generateProject(opts: {
+  dst: string;
+  project: WorkspaceProject;
+  allFragments: WorkspaceFragment[];
+  workspace: Workspace | undefined;
+  workspaceName: string;
+}): Promise<FileHash[]> {
+  const {dst, project, allFragments, workspace, workspaceName} = opts;
+
   const written: FileHash[] = [];
   const writeFile = async (path: string, file: string): Promise<FileHash> =>
     writeWorkspaceFile(workspace, dst, path, file);
@@ -29,28 +34,45 @@ export async function generateProject(
   // Copy template files
   const templatePath = join(TEMPLATES_PATH, type);
   const files = await listFiles(templatePath);
-  await Promise.all(
-    files.map(async file => {
-      const relativePath = relative(templatePath, file);
-      const dstPath = join(projectName, relativePath);
-      const content = await readFile(file);
-      let newContent = content;
-      for (const [varName, varValue] of Object.entries({...vars, ...defaultVars})) {
-        newContent = newContent.replaceAll(varName, varValue);
-      }
-      if (file.endsWith('.ts') || file.endsWith('.tsx')) {
-        newContent = await prettierFormat(newContent, 'typescript');
-      }
-      if (file.endsWith('.json')) {
+  const filesToWrite = [
+    ...(await Promise.all(
+      files.map(async file => {
+        const relativePath = relative(templatePath, file);
+        const dstPath = join(projectName, relativePath);
+
+        let content = await readFile(file);
         if (file.endsWith('package.json')) {
           const packageJson = JSON.parse(await readFile(file));
           packageJson['name'] = projectName;
-          newContent = await prettyJson(packageJson);
-        } else {
-          newContent = await prettierFormat(newContent, 'json');
+          content = JSON.stringify(packageJson, undefined, 2);
         }
+        for (const [varName, varValue] of Object.entries({...vars, ...defaultVars})) {
+          content = content.replaceAll(varName, varValue);
+        }
+
+        return {path: dstPath, content};
+      })
+    )),
+  ];
+  if (type === ProjectType.Shared) {
+    filesToWrite.push(
+      ...generateSharedFiles({
+        webApps: filterFragments(allFragments, WorkspaceFragmentType.WebApp),
+        apiLambdas: filterFragments(allFragments, WorkspaceFragmentType.ApiLambda),
+      })
+    );
+  }
+
+  await Promise.all(
+    filesToWrite.map(async ({path, content}) => {
+      let formattedContent = content;
+      if (path.endsWith('.ts') || path.endsWith('.tsx')) {
+        formattedContent = await prettierFormat(formattedContent, 'typescript');
       }
-      written.push(await writeFile(dstPath, newContent));
+      if (path.endsWith('.json')) {
+        formattedContent = await prettierFormat(formattedContent, 'json');
+      }
+      written.push(await writeFile(path, formattedContent));
     })
   );
 

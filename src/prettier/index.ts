@@ -23,6 +23,7 @@ function generatePrettierConfig(): Record<string, unknown> {
     bracketSpacing: false,
     arrowParens: 'avoid',
     endOfLine: 'auto',
+    overrides: [{files: '*.json', options: {parser: 'json'}}],
   };
 }
 

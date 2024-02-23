@@ -1,7 +1,7 @@
 import {
-  __BACKEND_NAME_UPPERCASE___URL,
-  __FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME,
-  __PROJECT_NAME_UPPERCASE___ROLE_ARN,
+  __APP_NAME_UPPERCASE___BACKEND_ROLE_ARN,
+  __APP_NAME_UPPERCASE___BACKEND_URL,
+  __APP_NAME_UPPERCASE___FRONTEND_CLOUDFRONT_DOMAIN_NAME,
 } from '@shared/env';
 
 import {enforceCloudfrontOrigin} from '@shared-node/api/api_cloudfront_origin';
@@ -18,11 +18,11 @@ import {registerAwsRole} from '@shared-node/aws/credentials';
 import {loginHandler} from '@src/handlers/login_handler';
 import {session} from '@src/session';
 
-registerAwsRole(__PROJECT_NAME_UPPERCASE___ROLE_ARN);
+registerAwsRole(__APP_NAME_UPPERCASE___BACKEND_ROLE_ARN);
 
-const frontendName = '__FRONTEND_NAME__';
-const frontendDomain = __FRONTEND_NAME_UPPERCASE___CLOUDFRONT_DOMAIN_NAME;
-const websiteUrl = __BACKEND_NAME_UPPERCASE___URL;
+const frontendName = '__APP_NAME___frontend';
+const frontendDomain = __APP_NAME_UPPERCASE___FRONTEND_CLOUDFRONT_DOMAIN_NAME;
+const websiteUrl = __APP_NAME_UPPERCASE___BACKEND_URL;
 
 export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   enforceCloudfrontOrigin(event);
@@ -45,7 +45,7 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   }
 
   // API handlers
-  const apiRes = await handleApi(req, '__PROJECT_NAME__', {
+  const apiRes = await handleApi(req, '__APP_NAME___backend', {
     'POST /login': loginHandler,
   });
   if (apiRes) {
