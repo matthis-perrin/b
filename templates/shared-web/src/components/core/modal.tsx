@@ -24,6 +24,7 @@ interface ModalState {
   children?: JSX.Element;
   props?: DivProps;
   mode: ModalMode;
+  width?: number;
   noCross?: boolean;
   backdropColor?: string;
   onHide?: () => void;
@@ -93,7 +94,15 @@ export function hideModal(): void {
 }
 
 export const Modal: FC = () => {
-  const {shownState, mode, noCross, backdropColor = '#000000dd', children, props} = useModalState();
+  const {
+    shownState,
+    mode,
+    width,
+    noCross,
+    backdropColor = '#000000dd',
+    children,
+    props,
+  } = useModalState();
   const handleHideModal = useCallback(() => hideModal(), []);
   const {
     main: {textColor},
@@ -113,17 +122,12 @@ export const Modal: FC = () => {
 
   return (
     // eslint-disable-next-line react/forbid-component-props
-    <Wrapper id="modal" $shownState={shownState} $mode={mode}>
-      <Backdrop
-        onClick={handleHideModal}
-        $mode={mode}
-        $shownState={shownState}
-        $backgroundColor={backdropColor}
-      />
-      <Dialog $shownState={shownState} $mode={mode} {...props}>
+    <Wrapper id="modal" $shownState={shownState} $mode={mode} $backgroundColor={backdropColor}>
+      <Backdrop onClick={handleHideModal} />
+      <Dialog $shownState={shownState} $mode={mode} $width={width} {...props}>
         {noCross ? undefined : (
           <CloseButton $color={textColor} onClick={handleHideModal}>
-            x{/* <ThinCross color={GRAY_1} size={14} /> */}
+            {/* <ThinCross color={GRAY_1} size={14} /> */}x
           </CloseButton>
         )}
         {children}
@@ -149,7 +153,11 @@ const NoScroll = createGlobalStyle<{$shownState: ModalShownState}>`
   }
 `;
 
-const Wrapper = styled.div<{$shownState: ModalShownState; $mode: ModalMode}>`
+const Wrapper = styled.div<{
+  $shownState: ModalShownState;
+  $mode: ModalMode;
+  $backgroundColor: string;
+}>`
   position: fixed;
   top: 0;
   right: 0;
@@ -166,8 +174,6 @@ const Wrapper = styled.div<{$shownState: ModalShownState; $mode: ModalMode}>`
       : $mode === 'fade-center'
         ? `
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
       `
         : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           $mode === 'slide-right'
@@ -178,25 +184,6 @@ const Wrapper = styled.div<{$shownState: ModalShownState; $mode: ModalMode}>`
           : false}
   overflow: ${({$shownState}) => ($shownState === ModalShownState.Showing ? 'auto' : 'hidden')};
   pointer-events: ${({$shownState}) => ($shownState === ModalShownState.Showing ? 'all' : 'none')};
-  @media print {
-    position: initial;
-    top: initial;
-    right: initial;
-    bottom: initial;
-    left: initial;
-  }
-`;
-
-const Backdrop = styled.div<{
-  $shownState: ModalShownState;
-  $mode: ModalMode;
-  $backgroundColor: string;
-}>`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
 
   ${({$shownState, $backgroundColor}) =>
     $shownState === ModalShownState.Hidden
@@ -213,18 +200,33 @@ const Backdrop = styled.div<{
         transition: background-color 300ms ease;
         background-color: ${$backgroundColor};
       `}
+
+  @media print {
+    position: initial;
+    top: initial;
+    right: initial;
+    bottom: initial;
+    left: initial;
+  }
+`;
+
+const Backdrop = styled.div`
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
   @media print {
     display: none;
   }
 `;
 
-const Dialog = styled.div<{$shownState: ModalShownState; $mode: ModalMode}>`
+const Dialog = styled.div<{$shownState: ModalShownState; $mode: ModalMode; $width?: number}>`
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
   box-sizing: border-box;
-  max-width: 100vw;
 
   ${({$shownState, $mode}) => {
     if ($shownState === ModalShownState.Hidden) {
@@ -246,7 +248,7 @@ const Dialog = styled.div<{$shownState: ModalShownState; $mode: ModalMode}>`
     `;
   }}
 
-  ${({$shownState, $mode}) => {
+  ${({$shownState, $mode, $width}) => {
     if ($mode === 'slide-down') {
       if ($shownState === ModalShownState.Showing) {
         return `
@@ -261,16 +263,21 @@ const Dialog = styled.div<{$shownState: ModalShownState; $mode: ModalMode}>`
           margin-top: 80px;
         `;
     } else if ($mode === 'fade-center') {
-      if ($shownState === ModalShownState.Showing) {
-        return `opacity: 1;`;
-      }
-      return `opacity: 0;`;
+      const opacity = $shownState === ModalShownState.Showing ? 1 : 0;
+      return `
+        opacity: ${opacity};
+        margin: auto;
+      `;
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if ($mode === 'slide-right') {
-      if ($shownState === ModalShownState.Showing) {
-        return `margin-right: 0;`;
-      }
-      return `margin-right: -600px;`;
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+      const width = $width ?? 600;
+      const marginRight = $shownState === ModalShownState.Showing ? 0 : -width;
+      return `
+        margin-right: ${marginRight}px;
+        width: ${width}px;
+        overflow: auto;
+      `;
     }
     return false;
   }}
