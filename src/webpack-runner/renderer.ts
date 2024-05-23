@@ -1,5 +1,6 @@
 import {bgRed, bgYellow, cyan, gray, green, red} from 'ansi-colors';
 
+import {WorkspaceFragmentType} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
 import {neverHappens} from '@src/type_utils';
 import {LambdaServerEvent} from '@src/webpack/plugins/lambda_server_plugin';
@@ -56,7 +57,10 @@ export function renderProjectStatus(
   if (lambdaServerEvents.startEvent) {
     column3.push(renderLambdaServerEvent(lambdaServerEvents.startEvent));
   }
-  if (webpackDevServerEvents.startEvent) {
+  if (
+    webpackDevServerEvents.startEvent &&
+    project.fromFragment.type !== WorkspaceFragmentType.WebApp
+  ) {
     column3.push(renderWebpackDevServerEvent(webpackDevServerEvents.startEvent));
   }
   if (compilationFailure !== undefined) {

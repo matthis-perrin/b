@@ -1,7 +1,7 @@
 import {BadRequestError} from '@shared/api/core/api_errors';
 import {ApiHandler} from '@shared/api/core/api_types';
 import {__APP_NAME_UPPERCASE___USER_TABLE_NAME} from '@shared/env';
-import {__APP_NAME_PASCALCASE__UserItem} from '@shared/model';
+import {__APP_NAME_PASCALCASE__UserItem} from '@shared/models';
 
 import {getItem} from '@shared-node/aws/dynamodb';
 import {hashPassword} from '@shared-node/lib/hash';

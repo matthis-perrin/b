@@ -163,7 +163,7 @@ resource "aws_route53_record" "${projectName}_certificate_validation" {
 resource "aws_acm_certificate_validation" "${projectName}" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.${projectName}.arn
-  validation_record_fqdns = [for record in aws_route53_record.backend_certificate_validation : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.${projectName}_certificate_validation : record.fqdn]
 }`
           : ''
       }

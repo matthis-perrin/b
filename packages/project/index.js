@@ -914,7 +914,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.48',
+  project: '1.9.50',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
@@ -1246,7 +1246,7 @@ resource "aws_route53_record" "${projectName}_certificate_validation" {
 resource "aws_acm_certificate_validation" "${projectName}" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.${projectName}.arn
-  validation_record_fqdns = [for record in aws_route53_record.backend_certificate_validation : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.${projectName}_certificate_validation : record.fqdn]
 }` : ''}
 
 # Cloudfront Distribution
@@ -1858,7 +1858,7 @@ output "${prefixLower}_user_table_name" {
 
 output "${prefixLower}_user_index_name" {
   value = {
-    for obj in aws_dynamodb_table.${prefixLower}_user_table.global_secondary_index : "\${aws_dynamodb_table.${prefixLower}_user_table.name }_By_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_Sorted_By_\${obj.range_key}" : "" }" => obj.name
+    for obj in aws_dynamodb_table.${prefixLower}_user_table.global_secondary_index : "\${prefixLower}_user_by_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_sorted_by_\${obj.range_key}" : "" }" => obj.name
   }
 }
 
@@ -1893,7 +1893,7 @@ function generateDynamoUserSessionTerraform(workspaceName, appName) {
 
 output "${prefixLower}_user_session_index_name" {
   value = {
-    for obj in aws_dynamodb_table.${prefixLower}_user_session_table.global_secondary_index : "\${aws_dynamodb_table.${prefixLower}_user_session_table.name }_By_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_Sorted_By_\${obj.range_key}" : "" }" => obj.name
+    for obj in aws_dynamodb_table.${prefixLower}_user_session_table.global_secondary_index : "${prefixLower}_user_session_by_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_sorted_by_\${obj.range_key}" : "" }" => obj.name
   }
 }
 
@@ -2299,7 +2299,7 @@ async function askForAlarmEmail(defaultVal) {
     initial: alarmEmailDefault,
     validate: v => v.length > 0
   });
-  if (typeof alarm.value !== 'string') {
+  if (typeof email.value !== 'string') {
     return undefined;
   }
   return email.value;
@@ -2341,10 +2341,12 @@ async function askForCloudwatchTrigger() {
     initial: 1,
     validate: v => v >= 1 && Math.round(v) === v
   });
-  if (typeof minutes.value !== 'number') {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const minutesValue = parseFloat(minutes.value);
+  if (Number.isNaN(minutesValue)) {
     return undefined;
   }
-  return minutes.value;
+  return minutesValue;
 }
 initProject().catch(_src_logger__WEBPACK_IMPORTED_MODULE_4__.error);
 })();

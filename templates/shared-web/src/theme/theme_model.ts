@@ -79,7 +79,9 @@ export interface FrontendTheme {
   };
   radio: {
     color: string | undefined;
+    radioColor: string | undefined;
     fontSize: number;
+    fontWeight: number;
     size: number | undefined;
     labelPaddingTop: string | number | undefined;
     labelPaddingRight: string | number | undefined;

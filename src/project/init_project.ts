@@ -201,7 +201,7 @@ async function askForAlarmEmail(defaultVal: boolean): Promise<string | undefined
     initial: alarmEmailDefault,
     validate: (v: string) => v.length > 0,
   });
-  if (typeof alarm.value !== 'string') {
+  if (typeof email.value !== 'string') {
     return undefined;
   }
   return email.value;
@@ -245,10 +245,12 @@ async function askForCloudwatchTrigger(): Promise<number | undefined> {
     initial: 1,
     validate: (v: number) => v >= 1 && Math.round(v) === v,
   });
-  if (typeof minutes.value !== 'number') {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const minutesValue = parseFloat(minutes.value);
+  if (Number.isNaN(minutesValue)) {
     return undefined;
   }
-  return minutes.value;
+  return minutesValue;
 }
 
 initProject().catch(error);

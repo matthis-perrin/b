@@ -4,7 +4,7 @@ import {
   __APP_NAME_UPPERCASE___USER_SESSION_TABLE_NAME,
   __APP_NAME_UPPERCASE___USER_TABLE_NAME,
 } from '@shared/env';
-import {__APP_NAME_PASCALCASE__UserItem} from '@shared/model';
+import {__APP_NAME_PASCALCASE__UserItem} from '@shared/models';
 
 import {SessionManager} from '@shared-node/api/api_session';
 

@@ -11,7 +11,7 @@ output "${prefixLower}_user_table_name" {
 
 output "${prefixLower}_user_index_name" {
   value = {
-    for obj in aws_dynamodb_table.${prefixLower}_user_table.global_secondary_index : "\${prefixLower}_user_by_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_sorted_by_\${obj.range_key}" : "" }" => obj.name
+    for obj in aws_dynamodb_table.${prefixLower}_user_table.global_secondary_index : "${prefixLower}_user_by_\${obj.hash_key}\${length(obj.range_key) > 0 ? "_sorted_by_\${obj.range_key}" : ""}" => obj.name
   }
 }
 

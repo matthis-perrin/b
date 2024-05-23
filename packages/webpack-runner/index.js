@@ -978,7 +978,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.48',
+  project: '1.9.50',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
@@ -1310,7 +1310,7 @@ resource "aws_route53_record" "${projectName}_certificate_validation" {
 resource "aws_acm_certificate_validation" "${projectName}" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.${projectName}.arn
-  validation_record_fqdns = [for record in aws_route53_record.backend_certificate_validation : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.${projectName}_certificate_validation : record.fqdn]
 }` : ''}
 
 # Cloudfront Distribution
@@ -1922,7 +1922,7 @@ output "${prefixLower}_user_table_name" {
 
 output "${prefixLower}_user_index_name" {
   value = {
-    for obj in aws_dynamodb_table.${prefixLower}_user_table.global_secondary_index : "\${aws_dynamodb_table.${prefixLower}_user_table.name }_By_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_Sorted_By_\${obj.range_key}" : "" }" => obj.name
+    for obj in aws_dynamodb_table.${prefixLower}_user_table.global_secondary_index : "\${prefixLower}_user_by_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_sorted_by_\${obj.range_key}" : "" }" => obj.name
   }
 }
 
@@ -1957,7 +1957,7 @@ function generateDynamoUserSessionTerraform(workspaceName, appName) {
 
 output "${prefixLower}_user_session_index_name" {
   value = {
-    for obj in aws_dynamodb_table.${prefixLower}_user_session_table.global_secondary_index : "\${aws_dynamodb_table.${prefixLower}_user_session_table.name }_By_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_Sorted_By_\${obj.range_key}" : "" }" => obj.name
+    for obj in aws_dynamodb_table.${prefixLower}_user_session_table.global_secondary_index : "${prefixLower}_user_session_by_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_sorted_by_\${obj.range_key}" : "" }" => obj.name
   }
 }
 
@@ -2472,9 +2472,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(29);
-/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(42);
-/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(38);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(29);
+/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(42);
+/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(38);
+
 
 
 
@@ -2486,19 +2488,19 @@ function renderErrors(errors) {
   } = errors;
   const blocks = [];
   for (const globalError of globalErrors) {
-    blocks.push((0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(globalError));
+    blocks.push((0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_3__.formatError)(globalError));
   }
   for (const [projectName, projectErrors] of errorsByProjectByFile.entries()) {
     blocks.push((0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.cyan)(projectName));
     for (const [file, errors] of projectErrors.entries()) {
-      blocks.push([(0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatFilePath)(file), ...errors.map(err => (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatError)(err))].join('\n'));
+      blocks.push([(0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_3__.formatFilePath)(file), ...errors.map(err => (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_3__.formatError)(err))].join('\n'));
     }
   }
   return blocks.join('\n\n');
 }
 function renderProjectStatus(project, firstRun, isRunning, errors, compilationFailure, lambdaServerEvents, webpackDevServerEvents) {
   // First column
-  const column1 = (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_2__.formatProject)(project);
+  const column1 = (0,_src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_3__.formatProject)(project);
 
   // Second column
   let column2 = '';
@@ -2516,7 +2518,7 @@ function renderProjectStatus(project, firstRun, isRunning, errors, compilationFa
   if (lambdaServerEvents.startEvent) {
     column3.push(renderLambdaServerEvent(lambdaServerEvents.startEvent));
   }
-  if (webpackDevServerEvents.startEvent) {
+  if (webpackDevServerEvents.startEvent && project.fromFragment.type !== _src_models__WEBPACK_IMPORTED_MODULE_1__.WorkspaceFragmentType.WebApp) {
     column3.push(renderWebpackDevServerEvent(webpackDevServerEvents.startEvent));
   }
   if (compilationFailure !== undefined) {
@@ -2544,7 +2546,7 @@ function renderErrorWarningCount(errors) {
 function renderLambdaServerEvent(event) {
   const type = event.event;
   if (type === 'start') {
-    return `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_3__.getLocalIp)()}:${event.port}`;
+    return `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_4__.getLocalIp)()}:${event.port}`;
   }
   const req = (0,ansi_colors__WEBPACK_IMPORTED_MODULE_0__.gray)(`${event.method} ${event.path}`);
   if (type === 'error') {
@@ -2560,13 +2562,13 @@ function renderLambdaServerEvent(event) {
     const color = event.statusCode >= 400 ? ansi_colors__WEBPACK_IMPORTED_MODULE_0__.red : ansi_colors__WEBPACK_IMPORTED_MODULE_0__.green;
     return `${req} ${color(`${httpCode} ${size} ${duration}`)}`;
   }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_1__.neverHappens)(type);
+  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_2__.neverHappens)(type);
 }
 function renderWebpackDevServerEvent(event) {
   const type = event.event;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (type === 'start') {
-    return `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_3__.getLocalIp)()}:${event.port}`;
+    return `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_4__.getLocalIp)()}:${event.port}`;
   }
   // const req = gray(`${event.method} ${event.path}`);
   // if (type === 'error') {
@@ -2582,7 +2584,7 @@ function renderWebpackDevServerEvent(event) {
   //   const color = event.statusCode >= 400 ? red : green;
   //   return `${req} ${color(`${httpCode} ${size} ${duration}`)}`;
   // }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_1__.neverHappens)(type);
+  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_2__.neverHappens)(type);
 }
 
 /***/ }),
