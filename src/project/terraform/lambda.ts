@@ -357,6 +357,7 @@ resource "aws_cloudwatch_metric_alarm" "${projectName}_log_errors" {
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.${projectName}_log_errors.arn]
   ok_actions          = [aws_sns_topic.${projectName}_log_errors.arn]
+  treat_missing_data  = "notBreaching"
 }
 
 resource "aws_sns_topic" "${projectName}_log_errors" {
