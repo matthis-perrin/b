@@ -49,7 +49,7 @@ async function run() {
   // Deploy each lambda
   const projects = getProjects();
   const lambdaProjects = projects
-    .map(p => p.lambdaName ?? (p.appName ? `${p.appName}_backend` : undefined))
+    .map(p => p.lambdaName ?? p.apiName ?? (p.appName ? `${p.appName}_backend` : undefined))
     .filter(Boolean);
   for (const lambdaName of lambdaProjects) {
     const lambdaUrl = outputs[`${lambdaName}_url`] ?? '';
