@@ -82,6 +82,7 @@ export function Radios<T>(
         value={label}
         $paddingLeft={radioTheme.$labelPaddingLeft ?? 0}
         $fontSize={radioTheme.$fontSize}
+        $color={radioTheme.$color}
         $marginBottom={radioTheme.$titleMarginBottom}
       >
         {radios}
@@ -101,6 +102,7 @@ const Wrapper = styled.div<{$column?: boolean}>`
 const StyledLabel = styled(Label)<{
   $paddingLeft: number | string | undefined;
   $fontSize: number | string | undefined;
+  $color: string | undefined;
   $marginBottom: number | string;
 }>`
   display: inline-block;
@@ -108,6 +110,7 @@ const StyledLabel = styled(Label)<{
   font-weight: 700;
   opacity: 0.6;
   ${p => optionalRaw(p.$fontSize, v => `font-size: calc(${cssPx(v)} * 0.8);`)}
+  ${p => optionalRaw(p.$color, v => `color: ${v};`)}
   ${p => optionalPx('padding-left', p.$paddingLeft)}
   margin-bottom: ${p => cssPx(p.$marginBottom)};
 `;

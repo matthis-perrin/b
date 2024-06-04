@@ -56,7 +56,7 @@ const BaseLabel = styled(Label)<AddPrefix<FrontendTheme['radio'], '$'>>`
   ${p => optional('color', p.$color)}
   border-radius: ${p => p.$labelBorderRadius}px;
 `;
-const EnabledLabel = styled(BaseLabel)<AddPrefix<FrontendTheme['checkbox'], '$'>>`
+const EnabledLabel = styled(BaseLabel)<AddPrefix<FrontendTheme['radio'], '$'>>`
   cursor: pointer;
   &:hover {
     background-color: ${p => p.$labelHoverColor};

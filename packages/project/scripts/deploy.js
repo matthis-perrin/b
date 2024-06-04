@@ -49,7 +49,7 @@ async function run() {
   // Deploy each lambda
   const projects = getProjects();
   const lambdaProjects = projects
-    .map(p => p.lambdaName ?? (p.appName ? `${p.appName}_backend` : undefined))
+    .map(p => p.lambdaName ?? p.apiName ?? (p.appName ? `${p.appName}_backend` : undefined))
     .filter(Boolean);
   for (const lambdaName of lambdaProjects) {
     const lambdaUrl = outputs[`${lambdaName}_url`] ?? '';
@@ -57,9 +57,12 @@ async function run() {
     const tmp = tmpdir();
     const zipPath = join(tmp, randomUUID()) + '.zip';
     execSync(`pushd ${lambdaName}/dist; zip -q -r ${zipPath} *; popd`);
-    execSync(`aws s3 cp ${zipPath} s3://${code_bucket}/${lambdaName}/dist.zip`, {
-      env: {AWS_SHARED_CREDENTIALS_FILE: 'terraform/.aws-credentials'},
-    });
+    execSync(
+      `aws s3api put-object --bucket ${code_bucket} --key ${lambdaName}/dist.zip --tagging "Project=__WORKSPACE_NAME__" --body ${zipPath}`,
+      {
+        env: {AWS_SHARED_CREDENTIALS_FILE: 'terraform/.aws-credentials'},
+      }
+    );
     execSync(
       `aws lambda update-function-code --function-name ${
         outputs[`${lambdaName}_function_name`]

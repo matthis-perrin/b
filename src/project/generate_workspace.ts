@@ -187,7 +187,14 @@ export async function generateWorkspace(
     // setup.js
     writeFile('setup.js', await prettyJs(await readFile(join(SCRIPTS_PATH, 'setup.js')))),
     // deploy.js
-    writeFile('deploy.js', await prettyJs(await readFile(join(SCRIPTS_PATH, 'deploy.js')))),
+    writeFile(
+      'deploy.js',
+      await prettyJs(
+        await readFile(join(SCRIPTS_PATH, 'deploy.js')).then(res =>
+          res.replaceAll('__WORKSPACE_NAME__', workspaceName)
+        )
+      )
+    ),
     // build.js
     writeFile('build.js', await prettyJs(await readFile(join(SCRIPTS_PATH, 'build.js')))),
   ]);

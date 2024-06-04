@@ -35,23 +35,23 @@ export interface ButtonTheme {
 }
 
 interface TextfieldTheme {
-  textColor: string | undefined;
-  textColorDisabled: string | undefined;
-  backgroundColor: string | undefined;
-  backgroundColorHover: string | undefined;
-  backgroundColorFocus: string | undefined;
-  backgroundColorDisabled: string | undefined;
-  borderColor: string | undefined;
-  borderWidth: number | undefined;
-  hoverBorderColor: string | undefined;
-  focusBorderColor: string | undefined;
-  focusBorderWidth: number | undefined;
-  focusOutlineColor: string | undefined;
-  focusOutlineWidth: number | undefined;
-  focusTextColor: string | undefined;
-  borderRadius: number | undefined;
-  fontSize: string | number | undefined;
-  fontWeight: string | number | undefined;
+  textColor: string;
+  textColorDisabled: string;
+  backgroundColor: string;
+  backgroundColorHover: string;
+  backgroundColorFocus: string;
+  backgroundColorDisabled: string;
+  borderColor: string;
+  borderWidth: number;
+  hoverBorderColor: string;
+  focusBorderColor: string;
+  focusBorderWidth: number;
+  focusOutlineColor: string;
+  focusOutlineWidth: number;
+  focusTextColor: string;
+  borderRadius: number;
+  fontSize: string | number;
+  fontWeight: string | number;
   fontFamily: string | undefined;
   titleMarginBottom: string | number;
 }
@@ -70,16 +70,25 @@ export interface FrontendTheme {
   link: ButtonTheme;
   checkbox: {
     size: number | undefined;
+    marginRight: number | undefined;
     labelPaddingTop: string | number | undefined;
     labelPaddingRight: string | number | undefined;
     labelPaddingBottom: string | number | undefined;
     labelPaddingLeft: string | number | undefined;
     labelBorderRadius: number | undefined;
     labelHoverColor: string | undefined;
+    borderWidth: number | undefined;
+    borderRadius: number | undefined;
+    backgroundColor: string | undefined;
+    borderColor: string | undefined;
+    backgroundColorChecked: string | undefined;
+    borderColorChecked: string | undefined;
   };
   radio: {
     color: string | undefined;
+    radioColor: string | undefined;
     fontSize: number;
+    fontWeight: number;
     size: number | undefined;
     labelPaddingTop: string | number | undefined;
     labelPaddingRight: string | number | undefined;
@@ -91,14 +100,14 @@ export interface FrontendTheme {
     inputHeight: string | number | undefined;
   };
   input: TextfieldTheme & {
-    paddingRight: string | number | undefined;
-    paddingLeft: string | number | undefined;
+    paddingRight: string | number;
+    paddingLeft: string | number;
     height: number | undefined;
   };
   textarea: TextfieldTheme & {
-    paddingTop: string | number | undefined;
-    paddingRight: string | number | undefined;
-    paddingBottom: string | number | undefined;
-    paddingLeft: string | number | undefined;
+    paddingTop: string | number;
+    paddingRight: string | number;
+    paddingBottom: string | number;
+    paddingLeft: string | number;
   };
 }

@@ -34,7 +34,7 @@ export const Radio: CustomWithout<RadioProps, 'input', 'children'> = ({
         type="radio"
         name={name}
         value={value}
-        $color={radioTheme.$color}
+        $radioColor={radioTheme.$radioColor}
         $height={radioTheme.$inputHeight}
         {...inputProps}
       />
@@ -52,9 +52,11 @@ const BaseLabel = styled(Label)<AddPrefix<FrontendTheme['radio'], '$'>>`
   ${p => optionalPx('padding-bottom', p.$labelPaddingBottom)};
   ${p => optionalPx('padding-left', p.$labelPaddingLeft)};
   ${p => optionalPx('font-size', p.$fontSize)};
+  ${p => optional('font-weight', p.$fontWeight)};
+  ${p => optional('color', p.$color)}
   border-radius: ${p => p.$labelBorderRadius}px;
 `;
-const EnabledLabel = styled(BaseLabel)<AddPrefix<FrontendTheme['checkbox'], '$'>>`
+const EnabledLabel = styled(BaseLabel)<AddPrefix<FrontendTheme['radio'], '$'>>`
   cursor: pointer;
   &:hover {
     background-color: ${p => p.$labelHoverColor};
@@ -63,8 +65,8 @@ const EnabledLabel = styled(BaseLabel)<AddPrefix<FrontendTheme['checkbox'], '$'>
 const DisabledLabel = styled(BaseLabel)`
   opacity: 0.4;
 `;
-const Input = styled.input<{$color: string | undefined; $height: string | number | undefined}>`
+const Input = styled.input<{$radioColor: string | undefined; $height: string | number | undefined}>`
   margin-right: 8px;
-  ${p => optional('accent-color', p.$color)}
+  ${p => optional('accent-color', p.$radioColor)}
   ${p => optionalPx('height', p.$height)}
 `;

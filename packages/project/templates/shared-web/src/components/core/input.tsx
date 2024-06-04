@@ -140,7 +140,7 @@ function InputInternal<T>(props: FullInputProps<T>, ref: Ref<HTMLInputElement>):
   );
 
   if (label !== undefined) {
-    const labelBaseColor = inputTheme.$textColor ?? '#000000';
+    const labelBaseColor = inputTheme.$textColor;
     const labelColor = /#[\dA-Fa-f]{6}/u.test(labelBaseColor)
       ? `${labelBaseColor}99`
       : /#[\dA-Fa-f]{3}/u.test(labelBaseColor)
@@ -149,7 +149,7 @@ function InputInternal<T>(props: FullInputProps<T>, ref: Ref<HTMLInputElement>):
     return (
       <StyledLabel
         value={label}
-        $paddingLeft={noLabelOffset ? 0 : inputTheme.$paddingLeft ?? 0}
+        $paddingLeft={noLabelOffset ? 0 : inputTheme.$paddingLeft}
         $labelPosition={labelPosition ?? 'left'}
         $fontSize={inputTheme.$fontSize}
         $marginBottom={inputTheme.$titleMarginBottom}
@@ -166,52 +166,89 @@ InputInternal.displayName = 'Input';
 
 export const Input = forwardRef(InputInternal) as typeof InputInternal;
 
+export function borderAndBackground(opts: {
+  borderWidth: number;
+  borderColor: string;
+  backgroundColor: string;
+}): string {
+  const {borderWidth, borderColor, backgroundColor} = opts;
+  if (borderColor.startsWith('linear-gradient')) {
+    return `
+      border: double ${borderWidth}px transparent;
+      background-image: linear-gradient(${backgroundColor}, ${backgroundColor}), ${borderColor};
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+    `;
+  }
+  return `
+      border-style: solid;
+      border-width: ${borderWidth}px;
+      border-color: ${borderColor};
+      background-color: ${backgroundColor};
+      background-image: none;
+      background-origin: inherit;
+      background-clip: inherit;
+    `;
+}
+
 const StyledInput = styled.input<AddPrefix<FrontendTheme['input'], '$'>>`
   display: block;
   ${p => optionalPx('width', p.width)}
   ${p => optionalPx('height', p.$height)}
-  ${p => optionalPx('line-height', p.$height)}
   box-sizing: border-box;
 
   outline: none;
   ${p => optionalPx('padding-right', p.$paddingRight)}
   ${p => optionalPx('padding-left', p.$paddingLeft)}
-  ${p => optionalPx('border-radius', p.$borderRadius)}
-
+  
   ${p => optional('font-family', p.$fontFamily)}
-  ${p => optional('font-family', p.$fontWeight)}
+  ${p => optional('font-weight', p.$fontWeight)}
   ${p => optionalPx('font-size', p.$fontSize)}
-
   ${p => optional('color', p.$textColor)}
-  ${p => optionalRaw(p.$borderWidth, v => `border: solid ${cssPx(v)} ${p.$borderColor};`)}
-  ${p => optional('background-color', p.$backgroundColor)}
+  
+  ${p => optionalPx('border-radius', p.$borderRadius)}
+  ${p =>
+    borderAndBackground({
+      borderColor: p.$borderColor,
+      backgroundColor: p.$backgroundColor,
+      borderWidth: p.$borderWidth,
+    })}
 
   &:hover {
-    ${p => optional('background-color', p.$backgroundColorHover)}
-    ${p => optional('border-color', p.$hoverBorderColor)}
+    ${p =>
+      borderAndBackground({
+        borderColor: p.$hoverBorderColor,
+        backgroundColor: p.$backgroundColorHover,
+        borderWidth: p.$borderWidth,
+      })}
   }
 
   &:active:not([disabled]),
   &:focus:not([disabled]) {
     ${p =>
-      optionalRaw(
-        p.$focusBorderWidth,
-        v => `border: solid ${cssPx(v)} ${p.$focusBorderColor ?? 'transparent'};`
-      )}
+      borderAndBackground({
+        borderColor: p.$focusBorderColor,
+        backgroundColor: p.$backgroundColorFocus,
+        borderWidth: p.$focusBorderWidth,
+      })}
     ${p =>
       optionalRaw(
         p.$focusOutlineWidth,
-        v => `box-shadow: 0 0 0 ${cssPx(v)} ${p.$focusOutlineColor ?? 'transparent'};`
+        v => `box-shadow: 0 0 0 ${cssPx(v)} ${p.$focusOutlineColor};`
       )}
     ${p => optional('color', p.$focusTextColor)}
-    ${p => optional('background-color', p.$backgroundColorFocus)}
   }
 
   &:disabled {
     ${p => optional('color', p.$textColorDisabled)}
-    ${p => optional('background-color', p.$backgroundColorDisabled)}
     box-shadow: none;
-    ${p => optionalRaw(p.$borderWidth, v => `border: solid ${cssPx(v)} ${p.$borderColor};`)}
+    pointer-events: none;
+    ${p =>
+      borderAndBackground({
+        borderColor: p.$borderColor,
+        backgroundColor: p.$backgroundColorDisabled,
+        borderWidth: p.$borderWidth,
+      })}
   }
 `;
 

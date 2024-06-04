@@ -388,7 +388,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   // setup.js
   writeFile('setup.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'setup.js')))),
   // deploy.js
-  writeFile('deploy.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'deploy.js')))),
+  writeFile('deploy.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'deploy.js')).then(res => res.replaceAll('__WORKSPACE_NAME__', workspaceName)))),
   // build.js
   writeFile('build.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'build.js'))))]);
 
@@ -978,13 +978,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.50',
+  project: '1.9.53',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
-  webpack: '1.6.33',
-  runner: '1.5.21',
-  lambdaServerRuntime: '1.0.6'
+  webpack: '1.6.34',
+  runner: '1.5.22',
+  lambdaServerRuntime: '1.0.7'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.1.x';
@@ -1484,6 +1484,7 @@ resource "aws_cloudwatch_metric_alarm" "${projectName}_log_errors" {
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.${projectName}_log_errors.arn]
   ok_actions          = [aws_sns_topic.${projectName}_log_errors.arn]
+  treat_missing_data  = "notBreaching"
 }
 
 resource "aws_sns_topic" "${projectName}_log_errors" {
@@ -1922,7 +1923,7 @@ output "${prefixLower}_user_table_name" {
 
 output "${prefixLower}_user_index_name" {
   value = {
-    for obj in aws_dynamodb_table.${prefixLower}_user_table.global_secondary_index : "\${prefixLower}_user_by_\${obj.hash_key}\${ length(obj.range_key) > 0 ? "_sorted_by_\${obj.range_key}" : "" }" => obj.name
+    for obj in aws_dynamodb_table.${prefixLower}_user_table.global_secondary_index : "${prefixLower}_user_by_\${obj.hash_key}\${length(obj.range_key) > 0 ? "_sorted_by_\${obj.range_key}" : ""}" => obj.name
   }
 }
 

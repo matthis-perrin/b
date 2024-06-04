@@ -1,3 +1,5 @@
+import {ConditionalCheckFailedException} from '@aws-sdk/client-dynamodb';
+
 import {Brand} from '@shared/lib/type_utils';
 
 import {marshall, putItem, updateItem} from '@shared-node/aws/dynamodb';
@@ -20,8 +22,12 @@ export async function withLock<T>(
   const issuer = uidSafe() as Issuer;
   try {
     await takeLock({tableName, lockName, issuer, durationMs: lockTimeout});
-  } catch {
-    return {lockStatus: 'taken'};
+  } catch (err: unknown) {
+    if (err instanceof ConditionalCheckFailedException) {
+      console.log(`lockAlreadyTaken(${lockName})`);
+      return {lockStatus: 'taken'};
+    }
+    throw err;
   }
 
   // Start a loop to automatically extent the lock
