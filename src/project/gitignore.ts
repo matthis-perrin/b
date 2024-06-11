@@ -15,5 +15,6 @@ terraform/.aws-credentials
 terraform/archives
 */log
 /shared/src/env.ts
+/.build.lock
     `.trim();
 }
