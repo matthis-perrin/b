@@ -1,11 +1,10 @@
 import {readFile} from 'node:fs/promises';
 
-import {GetObjectCommand, S3Client} from '@aws-sdk/client-s3';
-
 import {CODE_BUCKET, NODE_ENV} from '@shared/env';
 
 import {ApiRequest, ApiResponse} from '@shared-node/api/api_interface';
 import {SessionManager} from '@shared-node/api/api_session';
+import {getObject} from '@shared-node/aws/s3';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnySessionManager = SessionManager<any, any>;
@@ -42,7 +41,6 @@ export async function handleStatics<SessionManagerType extends AnySessionManager
 }
 
 const staticsCache: Record<string, string> = {};
-const s3Client = new S3Client();
 
 const replaceManifestPath = (str: string): string =>
   str.replaceAll(
@@ -66,10 +64,11 @@ async function loadStatic(opts: {
     staticsCache[cacheKey] = replaceManifestPath(buffer.toString());
     return {body: staticsCache[cacheKey], opts: {contentType}};
   }
-  const res = await s3Client.send(
-    new GetObjectCommand({Bucket: CODE_BUCKET, Key: `${frontendName}/${path}`})
-  );
-  const content = await res.Body?.transformToString();
+  const content = await getObject({
+    bucket: CODE_BUCKET,
+    key: `${frontendName}/${path}`,
+    noDecompress: true,
+  });
   if (content === undefined) {
     return {body: '', opts: {contentType}};
   }

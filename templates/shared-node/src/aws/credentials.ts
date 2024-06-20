@@ -1,36 +1,6 @@
-import {readFileSync} from 'node:fs';
-import {join} from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {ACCOUNT_ID, NODE_ENV} from '@shared/env';
 
-import {NODE_ENV} from '@shared/env';
-import {splitOnceOrThrow} from '@shared/lib/array_utils';
-
-import {assumeRole} from '@shared-node/aws/sts';
-
-export function getAdminCredentials(): {accessKeyId: string; secretAccessKey: string} | undefined {
-  if (NODE_ENV !== 'development') {
-    return;
-  }
-  const credentialsFilePath = join(
-    fileURLToPath(import.meta.url),
-    '../../../terraform/.aws-credentials'
-  );
-  const credentialsFile = readFileSync(credentialsFilePath).toString();
-  const credentialsLines = credentialsFile.split('\n');
-  const credentials = Object.fromEntries(
-    credentialsLines
-      .filter(line => line.includes('='))
-      .map(line => {
-        const [key, value] = splitOnceOrThrow(line, '=');
-        return [key.trim(), value.trim()];
-      })
-  );
-  const {aws_access_key_id, aws_secret_access_key} = credentials;
-  if (aws_access_key_id === undefined || aws_secret_access_key === undefined) {
-    return undefined;
-  }
-  return {accessKeyId: aws_access_key_id, secretAccessKey: aws_secret_access_key};
-}
+import {assumeRole, getCallerAccountId} from '@shared-node/aws/sts';
 
 let awsRole: string | undefined;
 
@@ -42,6 +12,7 @@ interface AwsCredentialIdentity {
   readonly accessKeyId: string;
   readonly secretAccessKey: string;
   readonly sessionToken?: string;
+  readonly expiration?: Date;
 }
 
 export function credentialsProvider(): (() => Promise<AwsCredentialIdentity>) | undefined {
@@ -49,14 +20,23 @@ export function credentialsProvider(): (() => Promise<AwsCredentialIdentity>) | 
     return;
   }
   return async () => {
+    // Ensure the aws credentials are for the correct account id
+    const currentAccountId = await getCallerAccountId();
+    if (currentAccountId !== ACCOUNT_ID) {
+      throw new Error(
+        `AWS credentials are for the account ${currentAccountId}, expected ${ACCOUNT_ID}`
+      );
+    }
+
     if (awsRole === undefined) {
       throw new Error(`No AWS role registered`);
     }
+
     const credentials = await assumeRole(awsRole);
     if (!credentials) {
       throw new Error(`Failure to retrieve credentials for role "${awsRole}"`);
     }
-    const {AccessKeyId, SecretAccessKey, SessionToken} = credentials;
+    const {AccessKeyId, SecretAccessKey, SessionToken, Expiration} = credentials;
     if (AccessKeyId === undefined || SecretAccessKey === undefined) {
       throw new Error(`Invalid credentials for role "${awsRole}"`);
     }
@@ -64,6 +44,7 @@ export function credentialsProvider(): (() => Promise<AwsCredentialIdentity>) | 
       accessKeyId: AccessKeyId,
       secretAccessKey: SecretAccessKey,
       sessionToken: SessionToken,
+      expiration: Expiration,
     };
   };
 }

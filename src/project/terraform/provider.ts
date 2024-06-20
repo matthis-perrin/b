@@ -45,5 +45,8 @@ output "account_id" {
 data "aws_iam_roles" "administrator_roles" {
   name_regex = "AdministratorAccess"
 }
+output "administrator_role_arn" {
+  value = tolist(data.aws_iam_roles.administrator_roles.arns)[0]
+}
 `.trim();
 }
