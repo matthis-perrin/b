@@ -979,12 +979,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.56',
+  project: '1.9.59',
   eslint: '1.5.6',
   prettier: '1.3.0',
   tsconfig: '1.6.1',
   webpack: '1.6.34',
-  runner: '1.5.24',
+  runner: '1.5.26',
   lambdaServerRuntime: '1.0.7'
 };
 const ESLINT_VERSION = '8.56.x';
@@ -1561,6 +1561,9 @@ output "account_id" {
 data "aws_iam_roles" "administrator_roles" {
   name_regex = "AdministratorAccess"
 }
+output "administrator_role_arn" {
+  value = tolist(data.aws_iam_roles.administrator_roles.arns)[0]
+}
 `.trim();
 }
 
@@ -1681,7 +1684,7 @@ function neverHappens(value, errorMessage) {
   throw new Error(errorMessage);
 }
 function asMap(value, defaultValue) {
-  return typeof value === 'object' && value !== null ? value : defaultValue;
+  return typeof value === 'object' && value !== null && !Array.isArray(value) ? value : defaultValue;
 }
 function asMapOrThrow(value) {
   const valueAsMap = asMap(value);
@@ -2807,7 +2810,9 @@ __webpack_require__.r(__webpack_exports__);
 const name = 'WebpackRunner';
 let globalRoot = '';
 function exit() {
-  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.rmSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(globalRoot, '.build.lock'));
+  (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.rmSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(globalRoot, '.build.lock'), {
+    force: true
+  });
   process.stdin.setRawMode(false);
   (0,_src_logger__WEBPACK_IMPORTED_MODULE_9__.log)('See you soon!');
   // eslint-disable-next-line node/no-process-exit
@@ -3102,6 +3107,8 @@ async function runWebpacks(opts) {
     cleanupCalled = true;
     await Promise.all(cleanupFunctions.map(async fn => fn === null || fn === void 0 ? void 0 : fn()));
     redraw();
+    (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.rmSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(globalRoot, '.build.lock'));
+    process.stdin.setRawMode(false);
   };
   const reject = err => {
     cleanup().then(() => rejectPromise(err)).catch(cleanupErr => {
@@ -3121,7 +3128,12 @@ async function runWebpacks(opts) {
       const str = data.toString();
       // Handle ctrl+c
       if (str === '\u0003') {
-        process.emit('SIGINT', 'SIGINT');
+        console.log('ctrl-c received, cleaning up...');
+        cleanup().then(() => {
+          process.emit('SIGINT', 'SIGINT');
+        }).catch(() => {
+          process.emit('SIGINT', 'SIGINT');
+        });
       } else if (str === 'o') {
         const errorPaths = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_13__.removeUndefined)([...statuses.values()].flatMap(status => status.errors).map(err => 'loc' in err ? err.loc.absolutePath : undefined));
         const files = [...new Set([...errorPaths]).values()];

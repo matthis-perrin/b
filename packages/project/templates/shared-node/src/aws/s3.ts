@@ -16,7 +16,13 @@ import {REGION} from '@shared/env';
 import {credentialsProvider} from '@shared-node/aws/credentials';
 import {compress as gzipCompress, decompress as gzipDecompress} from '@shared-node/lib/gzip';
 
-const client = new S3Client({region: REGION, credentials: credentialsProvider()});
+let client: S3Client | undefined;
+function getClient(): S3Client {
+  if (!client) {
+    client = new S3Client({region: REGION, credentials: credentialsProvider()});
+  }
+  return client;
+}
 
 export async function putObject(options: {
   bucket: string;
@@ -27,7 +33,7 @@ export async function putObject(options: {
   const {bucket, key, body, compress} = options;
   const contentEncodingHeader = compress ? 'gzip' : undefined;
   const finalBody = compress ? await gzipCompress(body) : body;
-  await client.send(
+  await getClient().send(
     new PutObjectCommand({
       Bucket: bucket,
       Key: key,
@@ -45,7 +51,7 @@ export async function headObject(options: {
 }): Promise<HeadObjectOutput | undefined> {
   const {bucket, key} = options;
   try {
-    const res = await client.send(new HeadObjectCommand({Bucket: bucket, Key: key}));
+    const res = await getClient().send(new HeadObjectCommand({Bucket: bucket, Key: key}));
     return res;
   } catch (err: unknown) {
     if (err instanceof NotFoundError) {
@@ -58,16 +64,20 @@ export async function headObject(options: {
 export async function getObject(options: {
   bucket: string;
   key: string;
+  noDecompress?: boolean;
 }): Promise<string | undefined> {
-  const {bucket, key} = options;
+  const {bucket, key, noDecompress} = options;
   try {
-    const res = await client.send(new GetObjectCommand({Bucket: bucket, Key: key}));
-    const content = await res.Body?.transformToByteArray();
-    if (content === undefined) {
+    const res = await getClient().send(new GetObjectCommand({Bucket: bucket, Key: key}));
+    const body = await (noDecompress
+      ? res.Body?.transformToString()
+      : res.Body?.transformToByteArray()
+          .then(async arr => gzipDecompress(arr))
+          .then(buff => buff.toString()));
+    if (body === undefined) {
       throw new Error('Failure to retrieve object body');
     }
-    const body = await gzipDecompress(content);
-    return body.toString();
+    return body;
   } catch (err: unknown) {
     if (err instanceof NoSuchKey) {
       return undefined;
@@ -83,7 +93,7 @@ export async function getPresignedUploadUrl(
 ): Promise<string> {
   const {expiresInSeconds, contentType} = opts ?? {};
   return getSignedUrl(
-    client,
+    getClient(),
     new PutObjectCommand({Bucket: bucket, Key: key, ContentType: contentType}),
     {
       expiresIn: expiresInSeconds,
@@ -98,7 +108,7 @@ export async function getPresignedDownloadUrl(
 ): Promise<string> {
   const o = opts ?? {};
   return getSignedUrl(
-    client,
+    getClient(),
     new GetObjectCommand({
       Bucket: bucket,
       Key: key,
@@ -118,7 +128,7 @@ export async function listObjects(options: {
   continuationToken?: string;
 }): Promise<ListObjectsV2Output> {
   const {bucket, prefix, startAfter, limit, continuationToken} = options;
-  return client.send(
+  return getClient().send(
     new ListObjectsV2Command({
       Bucket: bucket,
       Prefix: prefix,

@@ -8,9 +8,19 @@ export interface LambdaContext {
   getRemainingTimeInMillis: () => number;
 }
 
-const client = new LambdaClient({region: REGION, credentials: credentialsProvider()});
+let client: LambdaClient | undefined;
+function getClient(): LambdaClient {
+  if (!client) {
+    client = new LambdaClient({region: REGION, credentials: credentialsProvider()});
+  }
+  return client;
+}
 
 export async function invokeFunctionAsync(opts: {functionName: string}): Promise<void> {
   const {functionName} = opts;
-  await client.send(new InvokeCommand({FunctionName: functionName, InvocationType: 'Event'}));
+  if (functionName === 'DISABLED') {
+    console.log('Function is disabled in Terraform');
+    return;
+  }
+  await getClient().send(new InvokeCommand({FunctionName: functionName, InvocationType: 'Event'}));
 }

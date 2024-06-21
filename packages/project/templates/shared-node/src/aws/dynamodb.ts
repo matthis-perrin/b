@@ -36,7 +36,13 @@ const MAX_BATCH_GET_ITEMS = 100;
 const MAX_BATCH_WRITE_ITEMS = 25;
 const PUT_ITEMS_MAX_RETRIES = 3;
 
-const client = new DynamoDBClient({region: REGION, credentials: credentialsProvider()});
+let client: DynamoDBClient | undefined;
+function getClient(): DynamoDBClient {
+  if (!client) {
+    client = new DynamoDBClient({region: REGION, credentials: credentialsProvider()});
+  }
+  return client;
+}
 
 type Key = Record<string, unknown>;
 type AdditionalParams = Record<string, unknown>;
@@ -55,7 +61,7 @@ export async function deleteItem(params: {
   key: Record<string, unknown>;
   additionalParams?: Record<string, unknown>;
 }): Promise<{itemExisted: boolean}> {
-  const res = await client.send(
+  const res = await getClient().send(
     new DeleteItemCommand({
       TableName: params.tableName,
       Key: marshall(params.key),
@@ -71,7 +77,7 @@ export async function getItemRaw(params: {
   key: Key;
   additionalParams?: AdditionalParams;
 }): Promise<Record<string, AttributeValue> | undefined> {
-  const {Item} = await client.send(
+  const {Item} = await getClient().send(
     new GetItemCommand({
       TableName: params.tableName,
       Key: marshall(params.key),
@@ -115,7 +121,7 @@ export async function batchGetItems<T extends AnyInterface<T>>(params: {
   while (chunked.length > 0) {
     const chunk = chunked.pop();
     if (chunk) {
-      const data = await client.send(
+      const data = await getClient().send(
         new BatchGetItemCommand({
           RequestItems: {[params.tableName]: {Keys: chunk, ConsistentRead}},
         })
@@ -147,7 +153,7 @@ export async function transactWriteItems(params: {
   clientRequestToken?: string;
 }): Promise<void> {
   const requestToken = params.clientRequestToken ?? uidSafe();
-  await client
+  await getClient()
     .send(
       new TransactWriteItemsCommand({
         ClientRequestToken: requestToken,
@@ -167,7 +173,7 @@ export async function putItem<T extends AnyInterface<T>>(params: {
   item: T;
   additionalParams?: Omit<PutItemCommandInput, 'TableName' | 'Item'>;
 }): Promise<void> {
-  await client.send(
+  await getClient().send(
     new PutItemCommand({
       TableName: params.tableName,
       Item: marshall(params.item),
@@ -186,7 +192,7 @@ export async function putItems<T extends AnyInterface<T>>(params: {
   while (chunked.length > 0) {
     const chunk = chunked.pop();
     if (chunk) {
-      const {UnprocessedItems} = await client.send(
+      const {UnprocessedItems} = await getClient().send(
         new BatchWriteItemCommand({
           RequestItems: {
             [params.tableName]: chunk.map(item => ({
@@ -258,7 +264,7 @@ export async function queryItems<T extends AnyInterface<T>>(
   const items: Record<string, AttributeValue>[] = [];
   let count = 0;
   do {
-    const {Items, LastEvaluatedKey, Count} = await client.send(
+    const {Items, LastEvaluatedKey, Count} = await getClient().send(
       new QueryCommand({
         TableName: params.tableName,
         IndexName: params.indexName,
@@ -321,7 +327,7 @@ export async function countItems(params: CountParams): Promise<number> {
 
   let counter = 0;
   do {
-    const {LastEvaluatedKey, Count} = await client.send(
+    const {LastEvaluatedKey, Count} = await getClient().send(
       new QueryCommand({
         TableName: params.tableName,
         IndexName: params.indexName,
@@ -367,7 +373,7 @@ export async function scanItems<T extends AnyInterface<T>>(params: {
     }
   }
 
-  const {Items, LastEvaluatedKey} = await client.send(
+  const {Items, LastEvaluatedKey} = await getClient().send(
     new ScanCommand({
       TableName: params.tableName,
       IndexName: params.indexName,
@@ -408,7 +414,7 @@ export async function scanAllItems<T extends AnyInterface<T>>(params: {
   const items: T[] = [];
   let lastEvaluatedKey;
   do {
-    const {Items, LastEvaluatedKey}: ScanCommandOutput = await client.send(
+    const {Items, LastEvaluatedKey}: ScanCommandOutput = await getClient().send(
       new ScanCommand({
         TableName: params.tableName,
         IndexName: params.indexName,
@@ -490,7 +496,7 @@ export function updateItemParamsToUpdateItemCommandInput(
 }
 
 export async function updateItem(params: UpdateItemParams): Promise<UpdateItemCommandOutput> {
-  return client.send(new UpdateItemCommand(updateItemParamsToUpdateItemCommandInput(params)));
+  return getClient().send(new UpdateItemCommand(updateItemParamsToUpdateItemCommandInput(params)));
 }
 
 export function makeUpdateBatchParams(
@@ -531,6 +537,6 @@ export function makeUpdateBatchParams(
 }
 
 export async function describeTable(tableName: string): Promise<TableDescription | undefined> {
-  const res = await client.send(new DescribeTableCommand({TableName: tableName}));
+  const res = await getClient().send(new DescribeTableCommand({TableName: tableName}));
   return res.Table;
 }

@@ -1237,7 +1237,7 @@ function neverHappens(value, errorMessage) {
   throw new Error(errorMessage);
 }
 function asMap(value, defaultValue) {
-  return typeof value === 'object' && value !== null ? value : defaultValue;
+  return typeof value === 'object' && value !== null && !Array.isArray(value) ? value : defaultValue;
 }
 function asMapOrThrow(value) {
   const valueAsMap = asMap(value);

@@ -66,7 +66,7 @@ const name = 'WebpackRunner';
 
 let globalRoot = '';
 function exit(): void {
-  rmSync(join(globalRoot, '.build.lock'));
+  rmSync(join(globalRoot, '.build.lock'), {force: true});
   process.stdin.setRawMode(false);
   log('See you soon!');
   // eslint-disable-next-line node/no-process-exit
@@ -366,6 +366,8 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     cleanupCalled = true;
     await Promise.all(cleanupFunctions.map(async fn => fn?.()));
     redraw();
+    rmSync(join(globalRoot, '.build.lock'));
+    process.stdin.setRawMode(false);
   };
 
   const reject = (err?: unknown): void => {
@@ -391,7 +393,14 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       const str = data.toString();
       // Handle ctrl+c
       if (str === '\u0003') {
-        process.emit('SIGINT', 'SIGINT');
+        console.log('ctrl-c received, cleaning up...');
+        cleanup()
+          .then(() => {
+            process.emit('SIGINT', 'SIGINT');
+          })
+          .catch(() => {
+            process.emit('SIGINT', 'SIGINT');
+          });
       } else if (str === 'o') {
         const errorPaths = removeUndefined(
           [...statuses.values()]
