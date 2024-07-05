@@ -271,12 +271,15 @@ export async function writeWorkspaceFile(
   path: string,
   file: string
 ): Promise<FileHash> {
-  const newHash = md5(file);
+  const fileLines = file.split('\n');
+  const fileToHash = fileLines.filter(line => !line.endsWith(' // @matthis/ignore')).join('\n');
+  const newHash = md5(fileToHash);
   const oldHash = workspace?.files.find(f => f.path === path)?.hash;
   // Only write the file if it is different since last time we've generated the project.
   // Prevent needlessly overwriting changes made in the project in between.
   if (newHash !== oldHash) {
-    await writeRawFile(join(root, path), file);
+    const fileToWrite = fileLines.map(l => l.replaceAll(' // @matthis/ignore', '')).join('\n');
+    await writeRawFile(join(root, path), fileToWrite);
   }
   return {path, hash: newHash};
 }

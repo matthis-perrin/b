@@ -602,12 +602,15 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
 }
 async function writeWorkspaceFile(workspace, root, path, file) {
   var _workspace$files$find;
-  const newHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_4__.md5)(file);
+  const fileLines = file.split('\n');
+  const fileToHash = fileLines.filter(line => !line.endsWith(' // @matthis/ignore')).join('\n');
+  const newHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_4__.md5)(fileToHash);
   const oldHash = workspace === null || workspace === void 0 || (_workspace$files$find = workspace.files.find(f => f.path === path)) === null || _workspace$files$find === void 0 ? void 0 : _workspace$files$find.hash;
   // Only write the file if it is different since last time we've generated the project.
   // Prevent needlessly overwriting changes made in the project in between.
   if (newHash !== oldHash) {
-    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, path), file);
+    const fileToWrite = fileLines.map(l => l.replaceAll(' // @matthis/ignore', '')).join('\n');
+    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, path), fileToWrite);
   }
   return {
     path,
@@ -979,9 +982,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.9.59',
+  project: '1.9.61',
   eslint: '1.5.6',
-  prettier: '1.3.0',
+  prettier: '1.4.0',
   tsconfig: '1.6.1',
   webpack: '1.6.34',
   runner: '1.5.26',
