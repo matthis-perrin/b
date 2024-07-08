@@ -1,5 +1,6 @@
 export const NOT_FOUND_CODE = 404;
 export const BAD_REQUEST_CODE = 400;
+export const UNAUTHORIZED_CODE = 401;
 export const FORBIDDEN_CODE = 403;
 
 export class HttpError extends Error {
@@ -27,6 +28,14 @@ export class BadRequestError extends HttpError {
     const {userMessage = 'Bad Request', internalMessage, extra} = opts ?? {};
     super(BAD_REQUEST_CODE, userMessage, internalMessage ?? userMessage, extra);
     this.name = 'BadRequestError';
+  }
+}
+
+export class UnauthorizedError extends HttpError {
+  public constructor(opts?: {userMessage?: string; internalMessage?: string; extra?: unknown}) {
+    const {userMessage = 'Unauthorized', internalMessage, extra} = opts ?? {};
+    super(UNAUTHORIZED_CODE, userMessage, internalMessage ?? userMessage, extra);
+    this.name = 'UnauthorizedError';
   }
 }
 

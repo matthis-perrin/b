@@ -8,7 +8,7 @@ export type ApiMethod<T extends ApiName, U extends ApiPath<T>> = keyof (typeof A
 export type Request<
   Name extends ApiName,
   Path extends ApiPath<Name>,
-  Method extends ApiMethod<Name, Path>
+  Method extends ApiMethod<Name, Path>,
 > = (typeof ALL)[Name][Path][Method] extends {req: infer Req}
   ? Req extends Schema
     ? SchemaToType<Req>
@@ -18,7 +18,7 @@ export type Request<
 export type Response<
   Name extends ApiName,
   Path extends ApiPath<Name>,
-  Method extends ApiMethod<Name, Path>
+  Method extends ApiMethod<Name, Path>,
 > = (typeof ALL)[Name][Path][Method] extends {res: infer Res}
   ? Res extends Schema
     ? SchemaToType<Res>
@@ -49,9 +49,9 @@ export type FlatApi<Name extends ApiName> = {
     ValueOf<SimpleFlatten<GenerateRouteKeys<Name>>>
   >]: Key extends `${infer Method} ${infer Path}`
     ? {
-        // @ts-expect-error
+        // @ts-expect-error ts does not infer the Name <-> Path relationship
         req: Request<Name, Path, Method>;
-        // @ts-expect-error
+        // @ts-expect-error ts does not infer the Name <-> Path relationship
         res: Response<Name, Path, Method>;
       }
     : never;

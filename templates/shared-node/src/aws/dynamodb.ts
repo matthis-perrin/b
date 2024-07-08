@@ -160,7 +160,7 @@ export async function transactWriteItems(params: {
         TransactItems: params.transaction,
       })
     )
-    .catch(async err => {
+    .catch(async (err: unknown) => {
       if (err instanceof TransactionInProgressException) {
         return transactWriteItems({...params, clientRequestToken: requestToken});
       }

@@ -1,6 +1,6 @@
 import {error} from 'node:console';
 
-import {ForbiddenError} from '@shared/api/core/api_errors';
+import {UnauthorizedError} from '@shared/api/core/api_errors';
 import {ApiContext} from '@shared/api/core/api_types';
 import {NODE_ENV} from '@shared/env';
 import {splitOnce} from '@shared/lib/array_utils';
@@ -63,7 +63,7 @@ export class SessionManager<UserItem extends {id: string; sessionDuration: numbe
             expressionAttributeValues: {
               ':expiresAt': Math.floor(Date.now() / 1000) + userItem.sessionDuration,
             },
-          }).catch(err => console.error('Failure to extent session', {session}, err));
+          }).catch((err: unknown) => console.error('Failure to extent session', {session}, err));
         }
         return userItem;
         // eslint-disable-next-line no-empty
@@ -78,7 +78,7 @@ export class SessionManager<UserItem extends {id: string; sessionDuration: numbe
     if (!user) {
       return undefined;
     }
-    return Promise.resolve(this.opts.userItemToFrontendUser(user)).catch(err => {
+    return Promise.resolve(this.opts.userItemToFrontendUser(user)).catch((err: unknown) => {
       console.error('Failure to convert UserItem to FrontendUser', user, err);
       return undefined;
     });
@@ -87,7 +87,7 @@ export class SessionManager<UserItem extends {id: string; sessionDuration: numbe
   public async enforceSession(context: ApiContext): Promise<UserItem> {
     const user = await this.getUser(context);
     if (!user) {
-      throw new ForbiddenError({userMessage: 'Not connected'});
+      throw new UnauthorizedError({userMessage: 'Not connected'});
     }
     return user;
   }

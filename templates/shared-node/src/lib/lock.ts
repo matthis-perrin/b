@@ -33,7 +33,7 @@ export async function withLock<T>(
   // Start a loop to automatically extent the lock
   const extendLockInterval = setInterval(() => {
     console.log(`extendLock(${lockName})`);
-    extendLock({tableName, lockName, issuer, durationMs: lockTimeout}).catch(err => {
+    extendLock({tableName, lockName, issuer, durationMs: lockTimeout}).catch((err: unknown) => {
       throw new Error(`Failure to extendLock(${lockName}): ${String(err)}`);
     });
   }, lockTimeout - 1000);
@@ -43,7 +43,7 @@ export async function withLock<T>(
   let cleanupFunction: (() => Promise<void>) | undefined;
   function executeCleanupFunction(): void {
     console.log('Emergency cleanup');
-    cleanupFunction?.().catch(err => {
+    cleanupFunction?.().catch((err: unknown) => {
       console.error('Cleanup failure');
       console.error(err);
     });
