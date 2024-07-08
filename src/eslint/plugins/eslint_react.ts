@@ -10,7 +10,7 @@ const forbiddenProps = [
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
-    'eslint-plugin-react': '7.33.x',
+    'eslint-plugin-react': '7.34.x',
   },
   settings: {
     react: {
@@ -20,6 +20,7 @@ export const eslintReact: EslintMetadata = {
   allOff: {
     'react/boolean-prop-naming': 'off',
     'react/button-has-type': 'off',
+    'react/checked-requires-onchange-or-readonly': 'off',
     'react/default-props-match-prop-types': 'off',
     'react/destructuring-assignment': 'off',
     'react/display-name': 'off',
@@ -115,6 +116,7 @@ export const eslintReact: EslintMetadata = {
   },
   onlyOn: {
     'react/button-has-type': 'warn',
+    'react/checked-requires-onchange-or-readonly': 'warn',
     'react/destructuring-assignment': ['warn', 'always'],
     'react/display-name': ['warn', {ignoreTranspilerName: true}],
     'react/forbid-component-props': ['warn', {forbid: forbiddenProps}],

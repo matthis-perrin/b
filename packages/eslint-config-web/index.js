@@ -740,6 +740,7 @@ module.exports = {
     'unicorn/prefer-array-flat': 'warn',
     'react/boolean-prop-naming': 'off',
     'react/button-has-type': 'warn',
+    'react/checked-requires-onchange-or-readonly': 'warn',
     'react/default-props-match-prop-types': 'off',
     'react/destructuring-assignment': ['warn', 'always'],
     'react/display-name': ['warn', {ignoreTranspilerName: true}],
