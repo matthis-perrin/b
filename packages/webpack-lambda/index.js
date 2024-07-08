@@ -494,10 +494,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   error: () => (/* binding */ error),
 /* harmony export */   log: () => (/* binding */ log)
 /* harmony export */ });
-const {
-  log,
-  error
-} = console;
+const error = console.error;
+const log = console.log;
 
 /***/ }),
 /* 14 */

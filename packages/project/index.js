@@ -210,10 +210,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   error: () => (/* binding */ error),
 /* harmony export */   log: () => (/* binding */ log)
 /* harmony export */ });
-const {
-  log,
-  error
-} = console;
+const error = console.error;
+const log = console.log;
 
 /***/ }),
 /* 9 */
@@ -918,7 +916,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.10.2',
+  project: '1.10.3',
   eslint: '1.6.4',
   prettier: '1.5.0',
   tsconfig: '1.7.0',
