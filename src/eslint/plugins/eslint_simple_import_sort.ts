@@ -5,7 +5,7 @@ const importGroups = ['@shared/', '@shared-node/', '@shared-web/', '@src/'];
 export const eslintSimpleImportSort: EslintMetadata = {
   plugin: ['simple-import-sort'],
   dependencies: {
-    'eslint-plugin-simple-import-sort': '10.0.x',
+    'eslint-plugin-simple-import-sort': '12.1.x',
   },
   settings: {},
   allOff: {
