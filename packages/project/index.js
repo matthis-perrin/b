@@ -919,7 +919,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
   project: '1.10.2',
-  eslint: '1.6.3',
+  eslint: '1.6.4',
   prettier: '1.5.0',
   tsconfig: '1.7.0',
   webpack: '1.7.2',

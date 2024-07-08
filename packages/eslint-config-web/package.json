@@ -1,6 +1,6 @@
 {
   "name": "@matthis/eslint-config-web",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "license": "UNLICENSED",
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "7.15.x",
