@@ -32,9 +32,9 @@ async function compileWebpackConfig(type: WebpackType, path: string): Promise<vo
       '@matthis/lambda-server-runtime': PACKAGE_VERSIONS.lambdaServerRuntime,
     });
   } else if (type === WebpackType.Web) {
-    await injectDependencies('webpack-web', {favicons: '7.1.x', sharp: '0.33.x'});
+    await injectDependencies('webpack-web', {favicons: '7.2.x', sharp: '0.33.x'});
   }
-  await injectDependencies(`webpack-${type}`, {tsx: '4.7.x'});
+  await injectDependencies(`webpack-${type}`, {tsx: '4.16.x'});
 }
 
 async function injectDependencies(

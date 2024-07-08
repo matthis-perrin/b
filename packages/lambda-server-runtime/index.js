@@ -1,4 +1,4 @@
-import { createRequire as __WEBPACK_EXTERNAL_createRequire } from "module";
+import { createRequire as __WEBPACK_EXTERNAL_createRequire } from "node:module";
 /******/ var __webpack_modules__ = ([
 /* 0 */,
 /* 1 */
@@ -381,8 +381,6 @@ function addPrefix(attr, prefix) {
 /******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
@@ -689,7 +687,5 @@ process.on('unhandledRejection', err => {
   globalError(err);
   cleanup();
 });
-})();
-
 
 //# sourceMappingURL=index.js.map
