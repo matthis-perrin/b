@@ -9,7 +9,6 @@ import {
   ProjectName,
   ProjectType,
   WorkspaceFragment,
-  WorkspaceFragmentRegistry,
   WorkspaceFragmentType,
   WorkspaceName,
 } from '@src/models';
@@ -214,22 +213,20 @@ export async function generateWorkspace(
   // Terraform folder generation
   const terraformFiles = await Promise.all([
     writeFile(join('terraform', '.aws-credentials'), generateDummyTerraformCredentials()),
-    ...(
-      workspaceFragments.filter(
-        frag => frag.type === WorkspaceFragmentType.WebApp
-      ) as WorkspaceFragmentRegistry['web-app'][]
-    ).flatMap(frag => {
-      return [
-        writeFile(
-          join('terraform', `dynamo_table_${lowerCase(frag.appName)}_user.tf`),
-          addLineBreak(generateDynamoUserTerraform(workspaceName, frag.appName))
-        ),
-        writeFile(
-          join('terraform', `dynamo_table_${lowerCase(frag.appName)}_user_session.tf`),
-          addLineBreak(generateDynamoUserSessionTerraform(workspaceName, frag.appName))
-        ),
-      ];
-    }),
+    ...workspaceFragments
+      .filter(frag => frag.type === WorkspaceFragmentType.WebApp)
+      .flatMap(frag => {
+        return [
+          writeFile(
+            join('terraform', `dynamo_table_${lowerCase(frag.appName)}_user.tf`),
+            addLineBreak(generateDynamoUserTerraform(workspaceName, frag.appName))
+          ),
+          writeFile(
+            join('terraform', `dynamo_table_${lowerCase(frag.appName)}_user_session.tf`),
+            addLineBreak(generateDynamoUserSessionTerraform(workspaceName, frag.appName))
+          ),
+        ];
+      }),
     writeFile(
       join('terraform', 'base.tf'),
       addLineBreak(generateCommonTerraform(workspaceName, projects))

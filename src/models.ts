@@ -142,12 +142,10 @@ export interface WorkspaceFragmentRegistry {
   };
 }
 
-type RegistryIsValid = WorkspaceFragmentRegistry extends Record<
-  WorkspaceFragmentType,
-  WorkspaceFragmentBase
->
-  ? boolean
-  : never;
+type RegistryIsValid =
+  WorkspaceFragmentRegistry extends Record<WorkspaceFragmentType, WorkspaceFragmentBase>
+    ? boolean
+    : never;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function validateRegistry(): RegistryIsValid {
   return true;

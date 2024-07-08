@@ -9,7 +9,9 @@ function runCallbacks(): void {
   }
   called = true;
   for (const fn of callbacks) {
-    Promise.resolve(fn()).catch(err => globalError('Failure to run exit cleanup callback', err));
+    Promise.resolve(fn()).catch((err: unknown) =>
+      globalError('Failure to run exit cleanup callback', err)
+    );
   }
 }
 

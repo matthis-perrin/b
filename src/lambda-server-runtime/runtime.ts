@@ -102,7 +102,7 @@ import(/* webpackIgnore: true */ HANDLER_PATH)
     }
     handler = importedHandler;
   })
-  .catch(err => {
+  .catch((err: unknown) => {
     runtimeLog({
       event: 'error',
       err: `Failure to load lambda handler: ${errorAndStackAsString(err)}`,

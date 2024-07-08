@@ -39,7 +39,7 @@ export abstract class StandalonePlugin {
       return;
     }
     this.hasExited = true;
-    Promise.resolve(this.teardown(compiler)).catch(err => {
+    Promise.resolve(this.teardown(compiler)).catch((err: unknown) => {
       globalError(`Error during teardown of plugin ${this.name}`, err);
     });
   }

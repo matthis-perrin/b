@@ -314,7 +314,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
         return;
       }
 
-      const compiler = webpack({...config, watch}, (err?: Error, res?: Stats) => {
+      const compiler = webpack({...config, watch}, (err: Error | null, res?: Stats) => {
         if (err || !res) {
           reportCompilationFailure(err ? String(err) : 'No result after compilation');
           if (!watch) {
@@ -342,7 +342,12 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
             compiler.close(err => (err ? reject(err) : resolve()));
           };
           if (devServer) {
-            devServer.stop().then(closeCompiler).catch(reject);
+            devServer
+              .stop()
+              .then(closeCompiler)
+              .catch((err: unknown) => {
+                reject(err instanceof Error ? err : new Error(String(err)));
+              });
           } else {
             closeCompiler();
           }
@@ -373,7 +378,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   const reject = (err?: unknown): void => {
     cleanup()
       .then(() => rejectPromise(err))
-      .catch(cleanupErr => {
+      .catch((cleanupErr: unknown) => {
         globalError('webpack runner cleanup error', cleanupErr);
         rejectPromise(err);
       });
@@ -381,7 +386,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   const resolve = (): void => {
     cleanup()
       .then(resolvePromise)
-      .catch(cleanupErr => {
+      .catch((cleanupErr: unknown) => {
         globalError('webpack runner cleanup error', cleanupErr);
         resolvePromise();
       });

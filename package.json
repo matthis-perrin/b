@@ -36,7 +36,7 @@
     "@matthis/eslint-config-node": "latest",
     "@matthis/prettier-config": "latest",
     "@matthis/tsconfig-node": "latest",
-    "@matthis/webpack-node": "latest",
+    "@matthis/webpack-node-script": "latest",
     "@types/node": "20.11.x",
     "@types/prompts": "2.0.x",
     "@types/semver": "7.3.x",
