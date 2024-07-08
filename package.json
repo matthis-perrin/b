@@ -14,9 +14,7 @@
   },
   "prettier": "@matthis/prettier-config",
   "eslintConfig": {
-    "extends": [
-      "@matthis/eslint-config-node"
-    ],
+    "extends": ["@matthis/eslint-config-node"],
     "rules": {
       "no-console": "off",
       "no-object-constructor": "off"
@@ -31,10 +29,10 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "7.23.x",
-    "@babel/preset-env": "7.23.x",
-    "@babel/preset-react": "7.23.x",
-    "@babel/preset-typescript": "7.23.x",
+    "@babel/core": "7.24.x",
+    "@babel/preset-env": "7.24.x",
+    "@babel/preset-react": "7.24.x",
+    "@babel/preset-typescript": "7.24.x",
     "@matthis/eslint-config-node": "latest",
     "@matthis/prettier-config": "latest",
     "@matthis/tsconfig-node": "latest",
@@ -45,14 +43,15 @@
     "ansi-colors": "4.1.x",
     "babel-loader": "9.1.x",
     "babel-plugin-react-remove-properties": "0.3.x",
-    "chokidar": "3.5.x",
-    "favicons": "7.1.x",
+    "chokidar": "3.6.x",
+    "favicons": "7.2.x",
     "favicons-webpack-plugin": "6.0.x",
     "fork-ts-checker-webpack-plugin": "9.0.x",
     "html-webpack-plugin": "5.6.x",
     "package-json": "8.1.x",
+    "prettier": "3.3.x",
     "semver": "7.3.x",
-    "source-map-loader": "4.0.x",
+    "source-map-loader": "5.0.x",
     "terser-webpack-plugin": "5.3.x",
     "ts-node": "10.9.x",
     "webpack": "5.89.x",
@@ -61,7 +60,7 @@
   },
   "dependencies": {
     "prompts": "2.4.x",
-    "typescript": "5.3.x"
+    "typescript": "5.5.x"
   },
   "version": "0.0.0"
 }

@@ -284,6 +284,7 @@ export const eslintCore: EslintMetadata = {
     'prefer-numeric-literals': 'off',
     'prefer-object-has-own': 'off',
     'prefer-object-spread': 'off',
+    // Use @typescript-eslint/prefer-promise-reject-errors
     'prefer-promise-reject-errors': 'off',
     'prefer-reflect': 'off',
     'prefer-regex-literals': 'off',
@@ -507,7 +508,6 @@ export const eslintCore: EslintMetadata = {
     'prefer-exponentiation-operator': 'warn',
     'prefer-named-capture-group': 'warn',
     'prefer-object-spread': 'warn',
-    'prefer-promise-reject-errors': 'warn',
     'prefer-regex-literals': ['warn', {disallowRedundantWrapping: true}],
     'prefer-rest-params': 'warn',
     'prefer-spread': 'warn',
