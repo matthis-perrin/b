@@ -20,7 +20,6 @@ function generateTsConfig(type: TsConfigType): Record<string, unknown> {
     allowUnusedLabels: false,
     alwaysStrict: true,
     exactOptionalPropertyTypes: false, // disabled
-    isolatedDeclarations: true,
     noFallthroughCasesInSwitch: true,
     noImplicitAny: true,
     noImplicitOverride: true,

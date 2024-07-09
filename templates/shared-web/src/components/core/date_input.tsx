@@ -19,7 +19,7 @@ import {localeDate, localeDateString} from '@shared/lib/time_format';
 import {Calendar} from '@shared-web/components/core/calendar';
 import {Input} from '@shared-web/components/core/input';
 import {TimePicker} from '@shared-web/components/core/time_picker';
-import {EmptyFragment, NULL_REF} from '@shared-web/lib/react';
+import {EmptyFragment} from '@shared-web/lib/react';
 import {useClickOutside} from '@shared-web/lib/use_click_outside';
 import {useTheme} from '@shared-web/theme/theme_context';
 import {FrontendTheme} from '@shared-web/theme/theme_model';
@@ -50,8 +50,8 @@ export const DateTimeInput: FC<DateTimeInputProps> = props => {
     main: {accentColor},
   } = useTheme();
 
-  const inputRef = useRef<HTMLInputElement>(NULL_REF);
-  const wrapperRef = useRef<HTMLDivElement>(NULL_REF);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const [inputText, setInputText] = useState(ts !== undefined ? tsToString(ts) : '');
   const [calendarShown, setCalendarShown] = useState(false);
