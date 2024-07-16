@@ -5,7 +5,13 @@ import {prompt} from 'prompts';
 
 import {rmDir} from '@src/fs';
 import {error, log} from '@src/logger';
-import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '@src/models';
+import {
+  ProjectName,
+  WebAppAuthentication,
+  WorkspaceFragment,
+  WorkspaceFragmentType,
+  WorkspaceName,
+} from '@src/models';
 import {generateWorkspace, getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
 import {readWorkspace} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
@@ -138,7 +144,8 @@ async function askForWorkspaceFragment(
     const appName = await askForProjectName('App name', 'app', takenNames);
     const alarmEmail = await askForAlarmEmail(false);
     const domain = await askForDomainName();
-    return {type, appName, alarmEmail, domain};
+    const authentication = await askForAuthentication();
+    return {type, appName, alarmEmail, domain, authentication};
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === WorkspaceFragmentType.NodeScript) {
     const scriptName = await askForProjectName('Script project name', 'script', takenNames);
@@ -226,6 +233,15 @@ async function askForDomainName(): Promise<string | undefined> {
     return undefined;
   }
   return domain.value;
+}
+
+async function askForAuthentication(): Promise<WebAppAuthentication> {
+  const authenticationEnabled = await prompt({
+    type: 'confirm',
+    name: 'value',
+    message: 'Add authentication?',
+  });
+  return {enabled: authenticationEnabled.value === true};
 }
 
 async function askForCloudwatchTrigger(): Promise<number | undefined> {

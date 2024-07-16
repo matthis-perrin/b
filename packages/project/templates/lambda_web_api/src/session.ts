@@ -1,4 +1,5 @@
-import {Frontend__APP_NAME_PASCALCASE__User} from '@shared/api/api';
+// @matthis/skip-file:AUTHENTICATION:not:true
+import {Frontend__APP_NAME_PASCALCASE__User} from '@shared/api/__APP_NAME___api';
 import {
   __APP_NAME_UPPERCASE___BACKEND_URL,
   __APP_NAME_UPPERCASE___USER_SESSION_TABLE_NAME,

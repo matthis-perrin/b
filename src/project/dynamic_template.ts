@@ -6,58 +6,22 @@ interface TemplateFile {
   content: string;
 }
 
-export function generateSharedFiles(opts: {
+interface GenerateSharedFilesOpts {
   webApps: WorkspaceFragmentRegistry['web-app'][];
   apiLambdas: WorkspaceFragmentRegistry['api-lambda'][];
-}): TemplateFile[] {
+}
+
+export function generateSharedFiles(opts: GenerateSharedFilesOpts): TemplateFile[] {
   const {webApps, apiLambdas} = opts;
+  const webAppsWithAuth = webApps.filter(app => app.authentication.enabled);
   return [
-    {
-      path: 'shared/src/api/api.ts',
-      content: `
-${webApps
-  .map(
-    webApp =>
-      `import {${webApp.appName.toUpperCase()}_API} from '@shared/api/${webApp.appName}_api';`
-  )
-  .join('\n')}
-  ${apiLambdas
-    .map(
-      apiLambda =>
-        `import {${apiLambda.apiName.toUpperCase()}} from '@shared/api/${apiLambda.apiName}';`
-    )
-    .join('\n')}
-import {AllApiSchema} from '@shared/api/core/api_schema';
-import {ApiConfig, ApiName} from '@shared/api/core/api_types';
-import {${[
-        ...webApps.map(webApp => `${webApp.appName.toUpperCase()}_BACKEND_URL`),
-        ...apiLambdas.map(apiLambda => `${apiLambda.apiName.toUpperCase()}_URL`),
-      ].join(', ')}} from '@shared/env';
-
-export const ALL = {
-    ${[
-      ...webApps.map(webApp => `${webApp.appName}_backend: ${webApp.appName.toUpperCase()}_API,`),
-      ...apiLambdas.map(apiLambda => `${apiLambda.apiName}: ${apiLambda.apiName.toUpperCase()},`),
-    ].join('\n')}
-} satisfies AllApiSchema;
-
-export const API_CONFIGS = {
-    ${[
-      ...webApps.map(
-        webApp => `${webApp.appName}_backend: {host: ${webApp.appName.toUpperCase()}_BACKEND_URL},`
-      ),
-      ...apiLambdas.map(
-        apiLambda => `${apiLambda.apiName}: {host: ${apiLambda.apiName.toUpperCase()}_URL},`
-      ),
-    ].join('\n')}
-} satisfies Record<ApiName, ApiConfig>;
-      `,
-    },
+    generateSharedApiFile(opts),
     ...webApps.map(webApp => {
       const userType = `${pascalCase(webApp.appName)}User`;
       return {
         path: `shared/src/api/${webApp.appName}_api.ts`,
-        content: `
+        content: webApp.authentication.enabled
+          ? `
 import {Obj, SchemaToType, Str} from '@shared/api/core/api_schema';
 import {${userType}Id} from '@shared/models';
 
@@ -73,8 +37,26 @@ export const ${webApp.appName.toUpperCase()}_API = {
             res: Frontend${userType}Schema,
         },
     },
+    '/test': {
+        POST: {
+            req: Obj({query: Str()}),
+            res: Obj({data: Str()}),
+        },
+    },
 };
-      `,
+      `
+          : `
+import {Obj, Str} from '@shared/api/core/api_schema';
+
+export const ${webApp.appName.toUpperCase()}_API = {
+    '/test': {
+        POST: {
+            req: Obj({query: Str()}),
+            res: Obj({data: Str()}),
+        },
+    },
+};
+          `,
       };
     }),
     ...apiLambdas.map(apiLambda => ({
@@ -92,27 +74,85 @@ export const ${webApp.appName.toUpperCase()}_API = {
   };
         `,
     })),
-    {
-      path: 'shared/src/models.ts',
-      content: `
+    ...(webAppsWithAuth.length === 0 ? [] : [generateSharedModelFile(webAppsWithAuth)]),
+  ];
+}
+
+function generateSharedApiFile(opts: GenerateSharedFilesOpts): TemplateFile {
+  const {webApps, apiLambdas} = opts;
+
+  // IMPORTS
+  const imports = [
+    ...webApps.map(
+      webApp =>
+        `import {${webApp.appName.toUpperCase()}_API} from '@shared/api/${webApp.appName}_api';`
+    ),
+    ...apiLambdas.map(
+      apiLambda =>
+        `import {${apiLambda.apiName.toUpperCase()}} from '@shared/api/${apiLambda.apiName}';`
+    ),
+    `import {AllApiSchema} from '@shared/api/core/api_schema';`,
+    `import {ApiConfig, ApiName} from '@shared/api/core/api_types';`,
+    `import {${[
+      ...webApps.map(webApp => `${webApp.appName.toUpperCase()}_BACKEND_URL`),
+      ...apiLambdas.map(apiLambda => `${apiLambda.apiName.toUpperCase()}_URL`),
+    ].join(', ')}} from '@shared/env';`,
+  ].join('\n');
+
+  // APIs DEF
+  const apisDef = `
+    export const ALL = {
+      ${[
+        ...webApps.map(webApp => `${webApp.appName}_backend: ${webApp.appName.toUpperCase()}_API,`),
+        ...apiLambdas.map(apiLambda => `${apiLambda.apiName}: ${apiLambda.apiName.toUpperCase()},`),
+      ].join('\n')}
+    } satisfies AllApiSchema;
+  `.trim();
+
+  // APIs CONFIG
+  const apisConfig = `
+    export const API_CONFIGS = {
+      ${[
+        ...webApps.map(
+          webApp =>
+            `${webApp.appName}_backend: {host: ${webApp.appName.toUpperCase()}_BACKEND_URL},`
+        ),
+        ...apiLambdas.map(
+          apiLambda => `${apiLambda.apiName}: {host: ${apiLambda.apiName.toUpperCase()}_URL},`
+        ),
+      ].join('\n')}
+    } satisfies Record<ApiName, ApiConfig>;
+  `.trim();
+
+  return {
+    path: 'shared/src/api/api.ts',
+    content: [imports, apisDef, apisConfig].join('\n\n'),
+  };
+}
+
+function generateSharedModelFile(
+  webAppsWithAuth: WorkspaceFragmentRegistry['web-app'][]
+): TemplateFile {
+  return {
+    path: 'shared/src/models.ts',
+    content: `
 import {Brand} from '@shared/lib/type_utils';
 
-${webApps
+${webAppsWithAuth
   .map(webApp => {
     const userType = `${pascalCase(webApp.appName)}User`;
     return `
 export type ${userType}Id = Brand<'${userType}Id', string>;
 
 export interface ${userType}Item {
-  id: ${userType}Id;
-  hash: string;
-  salt: string;
-  sessionDuration: number; // in seconds
+id: ${userType}Id;
+hash: string;
+salt: string;
+sessionDuration: number; // in seconds
 }
 `.trim();
   })
   .join('\n\n')}
-      `,
-    },
-  ];
+`,
+  };
 }

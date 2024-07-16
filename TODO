@@ -1,5 +1,3 @@
-- SVGIcon tool (Nounce -> Remove credits -> SVGGO -> SvgCrop -> svgIconEntry)
-
 composite
 incremental
 isolatedDeclarations

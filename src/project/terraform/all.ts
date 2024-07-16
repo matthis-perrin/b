@@ -23,7 +23,7 @@ export function generateWorkspaceProjectTerraform(
   workspaceName: WorkspaceName,
   project: WorkspaceProject
 ): string | undefined {
-  const {projectName, type, fromFragment} = project;
+  const {projectName, type, fromFragment, flags} = project;
   const cloudwatchTriggerMinutes =
     'cloudwatchTriggerMinutes' in fromFragment ? fromFragment.cloudwatchTriggerMinutes : undefined;
   const alarmEmail = 'alarmEmail' in fromFragment ? fromFragment.alarmEmail : undefined;
@@ -44,6 +44,7 @@ export function generateWorkspaceProjectTerraform(
       alarmEmail,
       cloudwatchTriggerMinutes,
       domain,
+      authentication: false,
     });
   } else if (type === ProjectType.LambdaApi) {
     return generateLambdaTerraform(workspaceName, projectName, {
@@ -52,6 +53,7 @@ export function generateWorkspaceProjectTerraform(
       alarmEmail,
       cloudwatchTriggerMinutes,
       domain,
+      authentication: false,
     });
   } else if (type === ProjectType.LambdaWebApi) {
     return generateLambdaTerraform(workspaceName, projectName, {
@@ -60,6 +62,7 @@ export function generateWorkspaceProjectTerraform(
       alarmEmail,
       cloudwatchTriggerMinutes,
       domain,
+      authentication: flags['AUTHENTICATION'] === 'true',
     });
   } else if (type === ProjectType.NodeScript) {
     return undefined;
@@ -72,12 +75,4 @@ export function generateWorkspaceProjectTerraform(
     return undefined;
   }
   neverHappens(type, 'ProjectType');
-}
-
-export function generateDummyTerraformCredentials(): string {
-  return `
-[default]
-aws_access_key_id=
-aws_secret_access_key=
-`.trim();
 }

@@ -1,6 +1,6 @@
 {
   "name": "@matthis/tsconfig-node",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "license": "UNLICENSED",
   "type": "module",
   "main": "tsconfig.json",

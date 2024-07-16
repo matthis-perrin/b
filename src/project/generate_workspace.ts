@@ -17,7 +17,6 @@ import {generateGitIgnore} from '@src/project/gitignore';
 import {generateWorkspacePackageJson} from '@src/project/package_json';
 import {
   generateCommonTerraform,
-  generateDummyTerraformCredentials,
   generateWorkspaceProjectTerraform,
 } from '@src/project/terraform/all';
 import {generateDynamoUserTerraform} from '@src/project/terraform/dynamo_user';
@@ -39,6 +38,7 @@ export interface WorkspaceProject {
   type: ProjectType;
   fromFragment: WorkspaceFragment;
   vars: Record<string, string>;
+  flags: Record<string, string>;
 }
 
 export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): WorkspaceProject[] {
@@ -51,6 +51,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: fragment.websiteName,
         },
+        flags: {},
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.StandaloneLambda) {
@@ -63,6 +64,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME__: fragment.lambdaName,
           __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
         },
+        flags: {},
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.ApiLambda) {
@@ -75,6 +77,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME__: fragment.apiName,
           __PROJECT_NAME_UPPERCASE__: fragment.apiName.toUpperCase(),
         },
+        flags: {},
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.WebApp) {
@@ -85,18 +88,23 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
       __APP_NAME_UPPERCASE__: fragment.appName.toUpperCase(),
       __APP_NAME_PASCALCASE__: pascalCase(fragment.appName),
     };
+    const flags = {
+      AUTHENTICATION: fragment.authentication.enabled ? 'true' : 'false',
+    };
     return [
       {
         projectName: frontendName,
         type: ProjectType.Web,
         fromFragment: fragment,
         vars,
+        flags,
       },
       {
         projectName: backendName,
         type: ProjectType.LambdaWebApi,
         fromFragment: fragment,
         vars,
+        flags,
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.NodeScript) {
@@ -108,6 +116,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: fragment.scriptName,
         },
+        flags: {},
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.SharedNode) {
@@ -120,6 +129,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: projectName,
         },
+        flags: {},
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.SharedWeb) {
@@ -132,6 +142,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: projectName,
         },
+        flags: {},
       },
     ];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -145,6 +156,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: projectName,
         },
+        flags: {},
       },
     ];
   }
@@ -212,9 +224,9 @@ export async function generateWorkspace(
 
   // Terraform folder generation
   const terraformFiles = await Promise.all([
-    writeFile(join('terraform', '.aws-credentials'), generateDummyTerraformCredentials()),
     ...workspaceFragments
       .filter(frag => frag.type === WorkspaceFragmentType.WebApp)
+      .filter(frag => frag.authentication.enabled)
       .flatMap(frag => {
         return [
           writeFile(

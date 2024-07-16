@@ -11,7 +11,6 @@ yarn.lock
 terraform/.terraform
 terraform/.terraform*
 terraform/*.tfstate.backup
-terraform/.aws-credentials
 terraform/archives
 */log
 /shared/src/env.ts

@@ -14,7 +14,7 @@
     "eslint-plugin-react-hooks": "4.6.x",
     "eslint-plugin-simple-import-sort": "12.1.x",
     "eslint-plugin-unicorn": "54.0.x",
-    "prettier": "3.3.x",
+    "prettier": "3.3.3",
     "typescript": "5.5.x"
   }
 }

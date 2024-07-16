@@ -383,7 +383,8 @@ function getProjectsFromWorkspaceFragment(fragment) {
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: fragment.websiteName
-      }
+      },
+      flags: {}
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.StandaloneLambda) {
     return [{
@@ -393,7 +394,8 @@ function getProjectsFromWorkspaceFragment(fragment) {
       vars: {
         __PROJECT_NAME__: fragment.lambdaName,
         __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase()
-      }
+      },
+      flags: {}
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.ApiLambda) {
     return [{
@@ -403,7 +405,8 @@ function getProjectsFromWorkspaceFragment(fragment) {
       vars: {
         __PROJECT_NAME__: fragment.apiName,
         __PROJECT_NAME_UPPERCASE__: fragment.apiName.toUpperCase()
-      }
+      },
+      flags: {}
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp) {
     const backendName = `${fragment.appName}_backend`;
@@ -413,16 +416,21 @@ function getProjectsFromWorkspaceFragment(fragment) {
       __APP_NAME_UPPERCASE__: fragment.appName.toUpperCase(),
       __APP_NAME_PASCALCASE__: (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_14__.pascalCase)(fragment.appName)
     };
+    const flags = {
+      AUTHENTICATION: fragment.authentication.enabled ? 'true' : 'false'
+    };
     return [{
       projectName: frontendName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.Web,
       fromFragment: fragment,
-      vars
+      vars,
+      flags
     }, {
       projectName: backendName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.LambdaWebApi,
       fromFragment: fragment,
-      vars
+      vars,
+      flags
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.NodeScript) {
     return [{
@@ -431,7 +439,8 @@ function getProjectsFromWorkspaceFragment(fragment) {
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: fragment.scriptName
-      }
+      },
+      flags: {}
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.SharedNode) {
     const projectName = 'shared-node';
@@ -441,7 +450,8 @@ function getProjectsFromWorkspaceFragment(fragment) {
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: projectName
-      }
+      },
+      flags: {}
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.SharedWeb) {
     const projectName = 'shared-web';
@@ -451,7 +461,8 @@ function getProjectsFromWorkspaceFragment(fragment) {
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: projectName
-      }
+      },
+      flags: {}
     }];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.Shared) {
@@ -462,7 +473,8 @@ function getProjectsFromWorkspaceFragment(fragment) {
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: projectName
-      }
+      },
+      flags: {}
     }];
   }
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_15__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
@@ -507,7 +519,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   }));
 
   // Terraform folder generation
-  const terraformFiles = await Promise.all([writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', '.aws-credentials'), (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateDummyTerraformCredentials)()), ...workspaceFragments.filter(frag => frag.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp).flatMap(frag => {
+  const terraformFiles = await Promise.all([...workspaceFragments.filter(frag => frag.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp).filter(frag => frag.authentication.enabled).flatMap(frag => {
     return [writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_14__.lowerCase)(frag.appName)}_user.tf`), addLineBreak((0,_src_project_terraform_dynamo_user__WEBPACK_IMPORTED_MODULE_11__.generateDynamoUserTerraform)(workspaceName, frag.appName))), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_14__.lowerCase)(frag.appName)}_user_session.tf`), addLineBreak((0,_src_project_terraform_dynamo_user_session__WEBPACK_IMPORTED_MODULE_12__.generateDynamoUserSessionTerraform)(workspaceName, frag.appName)))];
   }), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', 'base.tf'), addLineBreak((0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects))), ...projects.map(async p => {
     const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateWorkspaceProjectTerraform)(workspaceName, p);
@@ -621,7 +633,6 @@ async function generateProject(opts) {
     workspaceName
   } = opts;
   const written = [];
-  const writeFile = async (path, file) => (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.writeWorkspaceFile)(workspace, dst, path, file);
   const {
     projectName,
     type,
@@ -668,15 +679,78 @@ async function generateProject(opts) {
     content
   }) => {
     let formattedContent = content;
+
+    // Handle @matthis/skip-file directives
+    const skipFileMatches = content.matchAll(/\/\/ @matthis\/skip-file:(?<flagName>[^:]+)(?<negate>:not)?:(?<flagValue>[^\s]*)/gu);
+    for (const skipFileMatch of skipFileMatches) {
+      const {
+        flagName,
+        negate,
+        flagValue
+      } = skipFileMatch.groups ?? {};
+      if (flagMatch({
+        flagName,
+        negate,
+        flagValue
+      }, project)) {
+        return;
+      }
+    }
+    // Remove the lines that contain the @matthis/skip-file directives
+    formattedContent = formattedContent.replaceAll(/ *\/\/ @matthis\/skip-file:[^:]+(?::not)?:[^\n]*\n/gu, '');
+
+    // Handle @matthis/start and @matthis/end directives
+    const fileLines = [];
+    const depth = ['include'];
+    for (const line of formattedContent.split('\n')) {
+      // Look for @matthis/end
+      if (line.includes('@matthis/end')) {
+        depth.pop();
+        continue;
+      }
+
+      // Look for @matthis/start
+      const matchStart = /.*\/\/ @matthis\/start:(?<flagName>[^:]+)(?<negate>:not)?:(?<flagValue>[^\s]*).*/u.exec(line);
+      if (matchStart) {
+        const {
+          flagName,
+          negate,
+          flagValue
+        } = matchStart.groups ?? {};
+        depth.push(flagMatch({
+          flagName,
+          negate,
+          flagValue
+        }, project) ? 'include' : 'exclude');
+        continue;
+      }
+      if (depth.at(-1) === 'include') {
+        fileLines.push(line);
+      }
+    }
+    formattedContent = fileLines.join('\n');
     if (path.endsWith('.ts') || path.endsWith('.tsx')) {
       formattedContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.prettierFormat)(formattedContent, 'typescript');
     }
     if (path.endsWith('.json')) {
       formattedContent = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_2__.prettierFormat)(formattedContent, 'json');
     }
-    written.push(await writeFile(path, formattedContent));
+    written.push(await (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__.writeWorkspaceFile)(workspace, dst, path, formattedContent));
   }));
   return written;
+}
+function flagMatch(flag, project) {
+  const {
+    flagName,
+    negate,
+    flagValue
+  } = flag;
+  if (flagName === undefined || flagValue === undefined) {
+    return false;
+  }
+  const projectFlagValue = project.flags[flagName];
+  const projectFlagMatchValue = projectFlagValue === flagValue;
+  return negate !== undefined ? !projectFlagMatchValue : projectFlagMatchValue;
 }
 
 /***/ }),
@@ -694,28 +768,12 @@ function generateSharedFiles(opts) {
     webApps,
     apiLambdas
   } = opts;
-  return [{
-    path: 'shared/src/api/api.ts',
-    content: `
-${webApps.map(webApp => `import {${webApp.appName.toUpperCase()}_API} from '@shared/api/${webApp.appName}_api';`).join('\n')}
-  ${apiLambdas.map(apiLambda => `import {${apiLambda.apiName.toUpperCase()}} from '@shared/api/${apiLambda.apiName}';`).join('\n')}
-import {AllApiSchema} from '@shared/api/core/api_schema';
-import {ApiConfig, ApiName} from '@shared/api/core/api_types';
-import {${[...webApps.map(webApp => `${webApp.appName.toUpperCase()}_BACKEND_URL`), ...apiLambdas.map(apiLambda => `${apiLambda.apiName.toUpperCase()}_URL`)].join(', ')}} from '@shared/env';
-
-export const ALL = {
-    ${[...webApps.map(webApp => `${webApp.appName}_backend: ${webApp.appName.toUpperCase()}_API,`), ...apiLambdas.map(apiLambda => `${apiLambda.apiName}: ${apiLambda.apiName.toUpperCase()},`)].join('\n')}
-} satisfies AllApiSchema;
-
-export const API_CONFIGS = {
-    ${[...webApps.map(webApp => `${webApp.appName}_backend: {host: ${webApp.appName.toUpperCase()}_BACKEND_URL},`), ...apiLambdas.map(apiLambda => `${apiLambda.apiName}: {host: ${apiLambda.apiName.toUpperCase()}_URL},`)].join('\n')}
-} satisfies Record<ApiName, ApiConfig>;
-      `
-  }, ...webApps.map(webApp => {
+  const webAppsWithAuth = webApps.filter(app => app.authentication.enabled);
+  return [generateSharedApiFile(opts), ...webApps.map(webApp => {
     const userType = `${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.pascalCase)(webApp.appName)}User`;
     return {
       path: `shared/src/api/${webApp.appName}_api.ts`,
-      content: `
+      content: webApp.authentication.enabled ? `
 import {Obj, SchemaToType, Str} from '@shared/api/core/api_schema';
 import {${userType}Id} from '@shared/models';
 
@@ -731,8 +789,25 @@ export const ${webApp.appName.toUpperCase()}_API = {
             res: Frontend${userType}Schema,
         },
     },
+    '/test': {
+        POST: {
+            req: Obj({query: Str()}),
+            res: Obj({data: Str()}),
+        },
+    },
 };
-      `
+      ` : `
+import {Obj, Str} from '@shared/api/core/api_schema';
+
+export const ${webApp.appName.toUpperCase()}_API = {
+    '/test': {
+        POST: {
+            req: Obj({query: Str()}),
+            res: Obj({data: Str()}),
+        },
+    },
+};
+          `
     };
   }), ...apiLambdas.map(apiLambda => ({
     path: `shared/src/api/${apiLambda.apiName}.ts`,
@@ -748,26 +823,56 @@ export const ${webApp.appName.toUpperCase()}_API = {
       },
   };
         `
-  })), {
+  })), ...(webAppsWithAuth.length === 0 ? [] : [generateSharedModelFile(webAppsWithAuth)])];
+}
+function generateSharedApiFile(opts) {
+  const {
+    webApps,
+    apiLambdas
+  } = opts;
+
+  // IMPORTS
+  const imports = [...webApps.map(webApp => `import {${webApp.appName.toUpperCase()}_API} from '@shared/api/${webApp.appName}_api';`), ...apiLambdas.map(apiLambda => `import {${apiLambda.apiName.toUpperCase()}} from '@shared/api/${apiLambda.apiName}';`), `import {AllApiSchema} from '@shared/api/core/api_schema';`, `import {ApiConfig, ApiName} from '@shared/api/core/api_types';`, `import {${[...webApps.map(webApp => `${webApp.appName.toUpperCase()}_BACKEND_URL`), ...apiLambdas.map(apiLambda => `${apiLambda.apiName.toUpperCase()}_URL`)].join(', ')}} from '@shared/env';`].join('\n');
+
+  // APIs DEF
+  const apisDef = `
+    export const ALL = {
+      ${[...webApps.map(webApp => `${webApp.appName}_backend: ${webApp.appName.toUpperCase()}_API,`), ...apiLambdas.map(apiLambda => `${apiLambda.apiName}: ${apiLambda.apiName.toUpperCase()},`)].join('\n')}
+    } satisfies AllApiSchema;
+  `.trim();
+
+  // APIs CONFIG
+  const apisConfig = `
+    export const API_CONFIGS = {
+      ${[...webApps.map(webApp => `${webApp.appName}_backend: {host: ${webApp.appName.toUpperCase()}_BACKEND_URL},`), ...apiLambdas.map(apiLambda => `${apiLambda.apiName}: {host: ${apiLambda.apiName.toUpperCase()}_URL},`)].join('\n')}
+    } satisfies Record<ApiName, ApiConfig>;
+  `.trim();
+  return {
+    path: 'shared/src/api/api.ts',
+    content: [imports, apisDef, apisConfig].join('\n\n')
+  };
+}
+function generateSharedModelFile(webAppsWithAuth) {
+  return {
     path: 'shared/src/models.ts',
     content: `
 import {Brand} from '@shared/lib/type_utils';
 
-${webApps.map(webApp => {
+${webAppsWithAuth.map(webApp => {
       const userType = `${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.pascalCase)(webApp.appName)}User`;
       return `
 export type ${userType}Id = Brand<'${userType}Id', string>;
 
 export interface ${userType}Item {
-  id: ${userType}Id;
-  hash: string;
-  salt: string;
-  sessionDuration: number; // in seconds
+id: ${userType}Id;
+hash: string;
+salt: string;
+sessionDuration: number; // in seconds
 }
 `.trim();
     }).join('\n\n')}
-      `
-  }];
+`
+  };
 }
 
 /***/ }),
@@ -855,7 +960,6 @@ yarn.lock
 terraform/.terraform
 terraform/.terraform*
 terraform/*.tfstate.backup
-terraform/.aws-credentials
 terraform/archives
 */log
 /shared/src/env.ts
@@ -916,16 +1020,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.10.7',
+  project: '1.10.16',
   eslint: '1.6.5',
   prettier: '1.5.0',
-  tsconfig: '1.7.0',
+  tsconfig: '1.7.1',
   webpack: '1.7.2',
-  runner: '1.5.26',
+  runner: '1.5.28',
   lambdaServerRuntime: '1.0.7'
 };
 const ESLINT_VERSION = '8.56.x';
-const PRETTIER_VERSION = '3.3.x';
+const PRETTIER_VERSION = '3.3.3';
 const TYPESCRIPT_VERSION = '5.5.x';
 const LIB_VERSIONS = {
   '@types/react': '18.2.x',
@@ -942,7 +1046,6 @@ const LIB_VERSIONS = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateCommonTerraform: () => (/* binding */ generateCommonTerraform),
-/* harmony export */   generateDummyTerraformCredentials: () => (/* binding */ generateDummyTerraformCredentials),
 /* harmony export */   generateWorkspaceProjectTerraform: () => (/* binding */ generateWorkspaceProjectTerraform)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
@@ -964,7 +1067,8 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
   const {
     projectName,
     type,
-    fromFragment
+    fromFragment,
+    flags
   } = project;
   const cloudwatchTriggerMinutes = 'cloudwatchTriggerMinutes' in fromFragment ? fromFragment.cloudwatchTriggerMinutes : undefined;
   const alarmEmail = 'alarmEmail' in fromFragment ? fromFragment.alarmEmail : undefined;
@@ -987,7 +1091,8 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
       webAppName,
       alarmEmail,
       cloudwatchTriggerMinutes,
-      domain
+      domain,
+      authentication: false
     });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaApi) {
     return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
@@ -995,7 +1100,8 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
       webAppName,
       alarmEmail,
       cloudwatchTriggerMinutes,
-      domain
+      domain,
+      authentication: false
     });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaWebApi) {
     return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
@@ -1003,7 +1109,8 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
       webAppName,
       alarmEmail,
       cloudwatchTriggerMinutes,
-      domain
+      domain,
+      authentication: flags['AUTHENTICATION'] === 'true'
     });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
     return undefined;
@@ -1016,13 +1123,6 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
     return undefined;
   }
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_5__.neverHappens)(type, 'ProjectType');
-}
-function generateDummyTerraformCredentials() {
-  return `
-[default]
-aws_access_key_id=
-aws_secret_access_key=
-`.trim();
 }
 
 /***/ }),
@@ -1121,12 +1221,13 @@ function generateLambdaTerraform(workspaceName, projectName, opts) {
     webAppName,
     alarmEmail,
     cloudwatchTriggerMinutes,
-    domain
+    domain,
+    authentication
   } = opts;
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_extra_policy" {
-  statement {
+  ${authentication ? `statement {
     actions = [
       "dynamodb:GetItem",
       "dynamodb:BatchGetItem",
@@ -1142,7 +1243,7 @@ data "aws_iam_policy_document" "${projectName}_extra_policy" {
       "\${aws_dynamodb_table.${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.lowerCase)(webAppName)}_user_session_table.arn}",
       "\${aws_dynamodb_table.${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.lowerCase)(webAppName)}_user_session_table.arn}/index/*",
     `}]
-  }${webAppName !== undefined ? `
+  }` : ''}${webAppName !== undefined ? `
 
   statement {
     actions = [
@@ -1466,7 +1567,6 @@ terraform {
 
 provider "aws" {
   region                   = "eu-west-3"
-  shared_credentials_files = ["./.aws-credentials"]
   default_tags {
     tags = {
       Project = "${workspaceName}"
@@ -1477,7 +1577,6 @@ provider "aws" {
 provider "aws" {
   alias                    = "us-east-1"
   region                   = "us-east-1"
-  shared_credentials_files = ["./.aws-credentials"]
   default_tags {
     tags = {
       Project = "${workspaceName}"
@@ -2239,11 +2338,13 @@ async function askForWorkspaceFragment(takenNames) {
     const appName = await askForProjectName('App name', 'app', takenNames);
     const alarmEmail = await askForAlarmEmail(false);
     const domain = await askForDomainName();
+    const authentication = await askForAuthentication();
     return {
       type,
       appName,
       alarmEmail,
-      domain
+      domain,
+      authentication
     };
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeScript) {
@@ -2327,6 +2428,16 @@ async function askForDomainName() {
     return undefined;
   }
   return domain.value;
+}
+async function askForAuthentication() {
+  const authenticationEnabled = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({
+    type: 'confirm',
+    name: 'value',
+    message: 'Add authentication?'
+  });
+  return {
+    enabled: authenticationEnabled.value === true
+  };
 }
 async function askForCloudwatchTrigger() {
   const trigger = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({

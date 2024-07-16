@@ -15,8 +15,13 @@ import {handleApi} from '@shared-node/api/api_router';
 import {getIndex, handleStatics} from '@shared-node/api/api_statics';
 import {registerAwsRole} from '@shared-node/aws/credentials';
 
+// @matthis/start:AUTHENTICATION:true
 import {loginHandler} from '@src/handlers/login_handler';
+// @matthis/end
+import {testHandler} from '@src/handlers/test_handler';
+// @matthis/start:AUTHENTICATION:true
 import {session} from '@src/session';
+// @matthis/end
 
 registerAwsRole(__APP_NAME_UPPERCASE___BACKEND_ROLE_ARN);
 
@@ -38,7 +43,9 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
   const staticsRes = await handleStatics(req, {
     frontendName,
     websiteUrl,
+    // @matthis/start:AUTHENTICATION:true
     session,
+    // @matthis/end
   });
   if (staticsRes) {
     return res(staticsRes);
@@ -46,13 +53,21 @@ export async function handler(event: LambdaEvent): Promise<LambdaResponse> {
 
   // API handlers
   const apiRes = await handleApi(req, '__APP_NAME___backend', {
+    // @matthis/start:AUTHENTICATION:true
     'POST /login': loginHandler,
+    // @matthis/end
+    'POST /test': testHandler,
   });
   if (apiRes) {
     return res(apiRes);
   }
 
   // Default to the index
-  const indexRes = await getIndex(req, {frontendName, session});
+  const indexRes = await getIndex(req, {
+    frontendName,
+    // @matthis/start:AUTHENTICATION:true
+    session,
+    // @matthis/end
+  });
   return res(indexRes);
 }

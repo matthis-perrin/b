@@ -15,13 +15,16 @@ export function generateLambdaTerraform(
     alarmEmail: string | undefined;
     cloudwatchTriggerMinutes: number | undefined;
     domain: LambdaDomain | undefined;
+    authentication: boolean | undefined;
   }
 ): string {
-  const {api, webAppName, alarmEmail, cloudwatchTriggerMinutes, domain} = opts;
+  const {api, webAppName, alarmEmail, cloudwatchTriggerMinutes, domain, authentication} = opts;
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_extra_policy" {
-  statement {
+  ${
+    authentication
+      ? `statement {
     actions = [
       "dynamodb:GetItem",
       "dynamodb:BatchGetItem",
@@ -41,6 +44,8 @@ data "aws_iam_policy_document" "${projectName}_extra_policy" {
       "\${aws_dynamodb_table.${lowerCase(webAppName)}_user_session_table.arn}/index/*",
     `
     }]
+  }`
+      : ''
   }${
     webAppName !== undefined
       ? `

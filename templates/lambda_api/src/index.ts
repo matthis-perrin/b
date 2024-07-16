@@ -10,7 +10,7 @@ import {
 import {handleApi} from '@shared-node/api/api_router';
 import {registerAwsRole} from '@shared-node/aws/credentials';
 
-import {testHandler} from '@src/handlers/test_handlers';
+import {testHandler} from '@src/handlers/test_handler';
 
 registerAwsRole(__PROJECT_NAME_UPPERCASE___ROLE_ARN);
 

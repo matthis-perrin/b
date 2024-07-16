@@ -21,8 +21,6 @@ export async function generateProject(opts: {
   const {dst, project, allFragments, workspace, workspaceName} = opts;
 
   const written: FileHash[] = [];
-  const writeFile = async (path: string, file: string): Promise<FileHash> =>
-    writeWorkspaceFile(workspace, dst, path, file);
   const {projectName, type, vars} = project;
   const defaultVars = {
     __WORKSPACE_NAME__: workspaceName,
@@ -66,15 +64,72 @@ export async function generateProject(opts: {
   await Promise.all(
     filesToWrite.map(async ({path, content}) => {
       let formattedContent = content;
+
+      // Handle @matthis/skip-file directives
+      const skipFileMatches = content.matchAll(
+        /\/\/ @matthis\/skip-file:(?<flagName>[^:]+)(?<negate>:not)?:(?<flagValue>[^\s]*)/gu
+      );
+      for (const skipFileMatch of skipFileMatches) {
+        const {flagName, negate, flagValue} = skipFileMatch.groups ?? {};
+        if (flagMatch({flagName, negate, flagValue}, project)) {
+          return;
+        }
+      }
+      // Remove the lines that contain the @matthis/skip-file directives
+      formattedContent = formattedContent.replaceAll(
+        / *\/\/ @matthis\/skip-file:[^:]+(?::not)?:[^\n]*\n/gu,
+        ''
+      );
+
+      // Handle @matthis/start and @matthis/end directives
+      const fileLines: string[] = [];
+      const depth: ('include' | 'exclude')[] = ['include'];
+      for (const line of formattedContent.split('\n')) {
+        // Look for @matthis/end
+        if (line.includes('@matthis/end')) {
+          depth.pop();
+          continue;
+        }
+
+        // Look for @matthis/start
+        const matchStart =
+          /.*\/\/ @matthis\/start:(?<flagName>[^:]+)(?<negate>:not)?:(?<flagValue>[^\s]*).*/u.exec(
+            line
+          );
+        if (matchStart) {
+          const {flagName, negate, flagValue} = matchStart.groups ?? {};
+          depth.push(flagMatch({flagName, negate, flagValue}, project) ? 'include' : 'exclude');
+          continue;
+        }
+
+        if (depth.at(-1) === 'include') {
+          fileLines.push(line);
+        }
+      }
+      formattedContent = fileLines.join('\n');
+
       if (path.endsWith('.ts') || path.endsWith('.tsx')) {
         formattedContent = await prettierFormat(formattedContent, 'typescript');
       }
       if (path.endsWith('.json')) {
         formattedContent = await prettierFormat(formattedContent, 'json');
       }
-      written.push(await writeFile(path, formattedContent));
+      written.push(await writeWorkspaceFile(workspace, dst, path, formattedContent));
     })
   );
 
   return written;
+}
+
+function flagMatch(
+  flag: {flagName?: string; negate?: string; flagValue?: string},
+  project: WorkspaceProject
+): boolean {
+  const {flagName, negate, flagValue} = flag;
+  if (flagName === undefined || flagValue === undefined) {
+    return false;
+  }
+  const projectFlagValue = project.flags[flagName];
+  const projectFlagMatchValue = projectFlagValue === flagValue;
+  return negate !== undefined ? !projectFlagMatchValue : projectFlagMatchValue;
 }

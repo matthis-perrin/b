@@ -104,6 +104,10 @@ interface WorkspaceFragmentBase {
   type: WorkspaceFragmentType;
 }
 
+export interface WebAppAuthentication {
+  enabled: boolean;
+}
+
 export interface WorkspaceFragmentRegistry {
   [WorkspaceFragmentType.StaticWebsite]: {
     type: WorkspaceFragmentType.StaticWebsite;
@@ -126,6 +130,7 @@ export interface WorkspaceFragmentRegistry {
     appName: string;
     alarmEmail: string | undefined;
     domain: string | undefined;
+    authentication: WebAppAuthentication;
   };
   [WorkspaceFragmentType.NodeScript]: {
     type: WorkspaceFragmentType.NodeScript;

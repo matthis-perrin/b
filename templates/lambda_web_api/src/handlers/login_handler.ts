@@ -1,3 +1,4 @@
+// @matthis/skip-file:AUTHENTICATION:not:true
 import {BadRequestError} from '@shared/api/core/api_errors';
 import {ApiHandler} from '@shared/api/core/api_types';
 import {__APP_NAME_UPPERCASE___USER_TABLE_NAME} from '@shared/env';
