@@ -4,6 +4,7 @@ import '@babel/preset-env';
 import '@babel/preset-typescript';
 import 'babel-loader';
 
+import {MIN_NODE_VERSION} from '@src/versions';
 import {WebpackLoader} from '@src/webpack/models';
 /* eslint-enable import/no-unassigned-import */
 
@@ -18,7 +19,7 @@ export function babelLoaderNode(): WebpackLoader {
           '@babel/preset-env',
           {
             targets: {
-              node: 16,
+              node: MIN_NODE_VERSION,
             },
           },
         ],

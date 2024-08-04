@@ -47,6 +47,10 @@ function generateTsConfig(type: TsConfigType): Record<string, unknown> {
     pretty: true,
     // Completeness
     skipLibCheck: true,
+    // Declaration files & faster generation?
+    isolatedDeclarations: true,
+    composite: true,
+    declaration: true,
   };
 
   let additionalCompilerOptions:

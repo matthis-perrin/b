@@ -611,11 +611,10 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   (0,_src_logger__WEBPACK_IMPORTED_MODULE_5__.log)(`cd ${(0,node_path__WEBPACK_IMPORTED_MODULE_1__.relative)(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
 }
 async function writeWorkspaceFile(workspace, root, path, file) {
-  var _workspace$files$find;
   const fileLines = file.split('\n');
   const fileToHash = fileLines.filter(line => !line.endsWith(' // @matthis/ignore')).join('\n');
   const newHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_4__.md5)(fileToHash);
-  const oldHash = workspace === null || workspace === void 0 || (_workspace$files$find = workspace.files.find(f => f.path === path)) === null || _workspace$files$find === void 0 ? void 0 : _workspace$files$find.hash;
+  const oldHash = workspace?.files.find(f => f.path === path)?.hash;
   // Only write the file if it is different since last time we've generated the project.
   // Prevent needlessly overwriting changes made in the project in between.
   if (newHash !== oldHash) {
@@ -1055,7 +1054,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
     license: 'UNLICENSED',
     type: 'module',
     engines: {
-      node: '>=20.10'
+      node: _src_versions__WEBPACK_IMPORTED_MODULE_1__.NODE_VERSION
     },
     scripts: {
       setup: 'node ./setup.js',
@@ -1077,24 +1076,30 @@ function generateWorkspacePackageJson(workspaceName, projects) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CORE_JS_VERSION: () => (/* binding */ CORE_JS_VERSION),
 /* harmony export */   ESLINT_VERSION: () => (/* binding */ ESLINT_VERSION),
 /* harmony export */   LIB_VERSIONS: () => (/* binding */ LIB_VERSIONS),
+/* harmony export */   MIN_NODE_VERSION: () => (/* binding */ MIN_NODE_VERSION),
+/* harmony export */   NODE_VERSION: () => (/* binding */ NODE_VERSION),
 /* harmony export */   PACKAGE_VERSIONS: () => (/* binding */ PACKAGE_VERSIONS),
 /* harmony export */   PRETTIER_VERSION: () => (/* binding */ PRETTIER_VERSION),
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.10.16',
-  eslint: '1.6.5',
+  project: '1.11.0',
+  eslint: '1.7.0',
   prettier: '1.5.0',
-  tsconfig: '1.7.1',
-  webpack: '1.7.2',
+  tsconfig: '1.7.2',
+  webpack: '1.7.3',
   runner: '1.5.28',
   lambdaServerRuntime: '1.0.7'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.3.3';
 const TYPESCRIPT_VERSION = '5.5.x';
+const MIN_NODE_VERSION = '20.10';
+const NODE_VERSION = `>=${MIN_NODE_VERSION}`;
+const CORE_JS_VERSION = '3.37';
 const LIB_VERSIONS = {
   '@types/react': '18.2.x',
   '@types/react-dom': '18.2.x',
@@ -2330,10 +2335,7 @@ async function generateEnvFile(root, overrides) {
   const terraformFilesContent = await Promise.all(terraformFiles.map(async f => (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, f))));
   const allTerraform = terraformFilesContent.join('\n');
   const outputMatches = allTerraform.matchAll(/output "(?<outputName>[^"]+)" \{/gu);
-  const defaultOutputs = Object.fromEntries([...outputMatches].map(o => {
-    var _o$groups;
-    return (_o$groups = o.groups) === null || _o$groups === void 0 ? void 0 : _o$groups['outputName'];
-  }).filter(o => o !== undefined).map(o => [o.toUpperCase(), 'RUN_TERRAFORM_APPLY']));
+  const defaultOutputs = Object.fromEntries([...outputMatches].map(o => o.groups?.['outputName']).filter(o => o !== undefined).map(o => [o.toUpperCase(), 'RUN_TERRAFORM_APPLY']));
   const envConstants = {
     ...defaultOutputs,
     ...Object.fromEntries(outputsEntries),
@@ -2528,8 +2530,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_os__WEBPACK_IMPORTED_MODULE_0__);
 
 function getLocalIp() {
-  var _Object$values$flat$f;
-  return ((_Object$values$flat$f = Object.values((0,node_os__WEBPACK_IMPORTED_MODULE_0__.networkInterfaces)()).flat().find(net => net !== undefined && net.family === 'IPv4' && net.address.startsWith('192.168.'))) === null || _Object$values$flat$f === void 0 ? void 0 : _Object$values$flat$f.address) ?? '127.0.0.1';
+  return Object.values((0,node_os__WEBPACK_IMPORTED_MODULE_0__.networkInterfaces)()).flat().find(net => net !== undefined && net.family === 'IPv4' && net.address.startsWith('192.168.'))?.address ?? '127.0.0.1';
 }
 
 /***/ }),
@@ -2946,15 +2947,13 @@ async function runWebpacks(opts) {
         type
       } of projects) {
         if (type === _src_models__WEBPACK_IMPORTED_MODULE_10__.ProjectType.LambdaApi || type === _src_models__WEBPACK_IMPORTED_MODULE_10__.ProjectType.LambdaWebApi) {
-          var _status$lambdaServerE;
           const status = statuses.get(projectName);
-          const port = (status === null || status === void 0 || (_status$lambdaServerE = status.lambdaServerEvents.startEvent) === null || _status$lambdaServerE === void 0 ? void 0 : _status$lambdaServerE.port) ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_14__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(root, projectName));
+          const port = status?.lambdaServerEvents.startEvent?.port ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_14__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(root, projectName));
           overrides[`${projectName.toUpperCase()}_URL`] = `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_18__.getLocalIp)()}:${port}/`;
         }
         if (type === _src_models__WEBPACK_IMPORTED_MODULE_10__.ProjectType.Web) {
-          var _status$webpackDevSer;
           const status = statuses.get(projectName);
-          const port = (status === null || status === void 0 || (_status$webpackDevSer = status.webpackDevServerEvents.startEvent) === null || _status$webpackDevSer === void 0 ? void 0 : _status$webpackDevSer.port) ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_14__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(root, projectName));
+          const port = status?.webpackDevServerEvents.startEvent?.port ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_14__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(root, projectName));
           overrides[`${projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`] = `${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_18__.getLocalIp)()}:${port}`;
         }
       }
@@ -2984,7 +2983,6 @@ async function runWebpacks(opts) {
     });
   }
   function handleResults(project, stats) {
-    var _statuses$get, _statuses$get2, _statuses$get3;
     const {
       projectName
     } = project;
@@ -2995,9 +2993,9 @@ async function runWebpacks(opts) {
       root,
       severity: 'warning'
     }))];
-    const lambdaServerEvents = ((_statuses$get = statuses.get(projectName)) === null || _statuses$get === void 0 ? void 0 : _statuses$get.lambdaServerEvents) ?? {};
-    const webpackDevServerEvents = ((_statuses$get2 = statuses.get(projectName)) === null || _statuses$get2 === void 0 ? void 0 : _statuses$get2.webpackDevServerEvents) ?? {};
-    const compilationFailure = (_statuses$get3 = statuses.get(projectName)) === null || _statuses$get3 === void 0 ? void 0 : _statuses$get3.compilationFailure;
+    const lambdaServerEvents = statuses.get(projectName)?.lambdaServerEvents ?? {};
+    const webpackDevServerEvents = statuses.get(projectName)?.webpackDevServerEvents ?? {};
+    const compilationFailure = statuses.get(projectName)?.compilationFailure;
     statuses.set(projectName, {
       project,
       firstRun: false,
@@ -3193,8 +3191,8 @@ async function runWebpacks(opts) {
     return async () => {
       return new Promise((resolve, reject) => {
         const closeCompiler = () => {
-          tailLambdaServerCleanup === null || tailLambdaServerCleanup === void 0 || tailLambdaServerCleanup();
-          tailWebpackServerCleanup === null || tailWebpackServerCleanup === void 0 || tailWebpackServerCleanup();
+          tailLambdaServerCleanup?.();
+          tailWebpackServerCleanup?.();
           compiler.close(err => err ? reject(err) : resolve());
         };
         if (devServer) {
@@ -3219,7 +3217,7 @@ async function runWebpacks(opts) {
       return;
     }
     cleanupCalled = true;
-    await Promise.all(cleanupFunctions.map(async fn => fn === null || fn === void 0 ? void 0 : fn()));
+    await Promise.all(cleanupFunctions.map(async fn => fn?.()));
     redraw();
     (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.rmSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(globalRoot, '.build.lock'));
     process.stdin.setRawMode(false);

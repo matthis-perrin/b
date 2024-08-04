@@ -664,6 +664,7 @@ module.exports = {
     'unicorn/no-invalid-fetch-options': 'warn',
     'unicorn/no-invalid-remove-event-listener': 'warn',
     'unicorn/no-keyword-prefix': 'off',
+    'unicorn/no-length-as-slice-end': 'warn',
     'unicorn/no-lonely-if': 'warn',
     'unicorn/no-magic-array-flat-depth': 'warn',
     'unicorn/no-negated-condition': 'off',
@@ -793,10 +794,7 @@ module.exports = {
     'react/jsx-filename-extension': 'off',
     'react/jsx-first-prop-new-line': 'off',
     'react/jsx-fragments': ['warn', 'syntax'],
-    'react/jsx-handler-names': [
-      'warn',
-      {eventHandlerPrefix: 'handle', eventHandlerPropPrefix: 'on', checkLocalVariables: true},
-    ],
+    'react/jsx-handler-names': 'off',
     'react/jsx-indent-props': 'off',
     'react/jsx-indent': 'off',
     'react/jsx-key': [
@@ -818,6 +816,7 @@ module.exports = {
     'react/jsx-one-expression-per-line': 'off',
     'react/jsx-pascal-case': ['warn', {allowAllCaps: true, ignore: []}],
     'react/jsx-props-no-multi-spaces': 'off',
+    'react/jsx-props-no-spread-multi': 'warn',
     'react/jsx-props-no-spreading': 'off',
     'react/jsx-sort-props': 'off',
     'react/jsx-space-before-closing': 'off',

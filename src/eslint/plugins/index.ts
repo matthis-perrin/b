@@ -2,7 +2,7 @@ import {EslintMetadata} from '@src/eslint/models';
 import {eslintComments} from '@src/eslint/plugins/eslint_comments';
 import {eslintCore} from '@src/eslint/plugins/eslint_core';
 import {eslintImport} from '@src/eslint/plugins/eslint_import';
-import {eslintNode} from '@src/eslint/plugins/eslint_node';
+import {eslintN} from '@src/eslint/plugins/eslint_n';
 import {eslintPrettier} from '@src/eslint/plugins/eslint_prettier';
 import {eslintReact} from '@src/eslint/plugins/eslint_react';
 import {eslintReactHooks} from '@src/eslint/plugins/eslint_react_hooks';
@@ -23,6 +23,6 @@ const BASE_PLUGINS = [
 
 export const PLUGINS_FOR_TYPE: Record<EslintType, EslintMetadata[]> = {
   [EslintType.Web]: [...BASE_PLUGINS, eslintReact, eslintReactHooks],
-  [EslintType.Node]: [...BASE_PLUGINS, eslintNode],
+  [EslintType.Node]: [...BASE_PLUGINS, eslintN],
   [EslintType.Lib]: [...BASE_PLUGINS],
 };

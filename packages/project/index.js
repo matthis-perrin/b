@@ -547,11 +547,10 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   (0,_src_logger__WEBPACK_IMPORTED_MODULE_5__.log)(`cd ${(0,node_path__WEBPACK_IMPORTED_MODULE_1__.relative)(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
 }
 async function writeWorkspaceFile(workspace, root, path, file) {
-  var _workspace$files$find;
   const fileLines = file.split('\n');
   const fileToHash = fileLines.filter(line => !line.endsWith(' // @matthis/ignore')).join('\n');
   const newHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_4__.md5)(fileToHash);
-  const oldHash = workspace === null || workspace === void 0 || (_workspace$files$find = workspace.files.find(f => f.path === path)) === null || _workspace$files$find === void 0 ? void 0 : _workspace$files$find.hash;
+  const oldHash = workspace?.files.find(f => f.path === path)?.hash;
   // Only write the file if it is different since last time we've generated the project.
   // Prevent needlessly overwriting changes made in the project in between.
   if (newHash !== oldHash) {
@@ -991,7 +990,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
     license: 'UNLICENSED',
     type: 'module',
     engines: {
-      node: '>=20.10'
+      node: _src_versions__WEBPACK_IMPORTED_MODULE_1__.NODE_VERSION
     },
     scripts: {
       setup: 'node ./setup.js',
@@ -1013,24 +1012,30 @@ function generateWorkspacePackageJson(workspaceName, projects) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CORE_JS_VERSION: () => (/* binding */ CORE_JS_VERSION),
 /* harmony export */   ESLINT_VERSION: () => (/* binding */ ESLINT_VERSION),
 /* harmony export */   LIB_VERSIONS: () => (/* binding */ LIB_VERSIONS),
+/* harmony export */   MIN_NODE_VERSION: () => (/* binding */ MIN_NODE_VERSION),
+/* harmony export */   NODE_VERSION: () => (/* binding */ NODE_VERSION),
 /* harmony export */   PACKAGE_VERSIONS: () => (/* binding */ PACKAGE_VERSIONS),
 /* harmony export */   PRETTIER_VERSION: () => (/* binding */ PRETTIER_VERSION),
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.10.16',
-  eslint: '1.6.5',
+  project: '1.11.0',
+  eslint: '1.7.0',
   prettier: '1.5.0',
-  tsconfig: '1.7.1',
-  webpack: '1.7.2',
+  tsconfig: '1.7.2',
+  webpack: '1.7.3',
   runner: '1.5.28',
   lambdaServerRuntime: '1.0.7'
 };
 const ESLINT_VERSION = '8.56.x';
 const PRETTIER_VERSION = '3.3.3';
 const TYPESCRIPT_VERSION = '5.5.x';
+const MIN_NODE_VERSION = '20.10';
+const NODE_VERSION = `>=${MIN_NODE_VERSION}`;
+const CORE_JS_VERSION = '3.37';
 const LIB_VERSIONS = {
   '@types/react': '18.2.x',
   '@types/react-dom': '18.2.x',

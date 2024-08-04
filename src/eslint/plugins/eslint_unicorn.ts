@@ -3,7 +3,7 @@ import {EslintMetadata} from '@src/eslint/models';
 export const eslintUnicorn: EslintMetadata = {
   plugin: ['unicorn'],
   dependencies: {
-    'eslint-plugin-unicorn': '54.0.x',
+    'eslint-plugin-unicorn': '55.0.x',
   },
   settings: {},
   allOff: {
@@ -40,6 +40,7 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/no-invalid-fetch-options': 'off',
     'unicorn/no-invalid-remove-event-listener': 'off',
     'unicorn/no-keyword-prefix': 'off',
+    'unicorn/no-length-as-slice-end': 'off',
     'unicorn/no-lonely-if': 'off',
     'unicorn/no-magic-array-flat-depth': 'off',
     'unicorn/no-negated-condition': 'off',
@@ -145,6 +146,7 @@ export const eslintUnicorn: EslintMetadata = {
     'unicorn/no-instanceof-array': 'warn',
     'unicorn/no-invalid-fetch-options': 'warn',
     'unicorn/no-invalid-remove-event-listener': 'warn',
+    'unicorn/no-length-as-slice-end': 'warn',
     'unicorn/no-lonely-if': 'warn',
     'unicorn/no-magic-array-flat-depth': 'warn',
     'unicorn/no-negation-in-equality-check': 'warn',

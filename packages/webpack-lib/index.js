@@ -603,9 +603,8 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
     });
   }
   async teardown() {
-    var _this$watcher;
     clearInterval(this.runEslintInterval);
-    await ((_this$watcher = this.watcher) === null || _this$watcher === void 0 ? void 0 : _this$watcher.close());
+    await this.watcher?.close();
   }
 }
 function eslintPlugin() {

@@ -6,6 +6,7 @@ import 'babel-loader';
 import '@babel/preset-react';
 import 'babel-plugin-react-remove-properties';
 
+import {CORE_JS_VERSION} from '@src/versions';
 import {WebpackLoader} from '@src/webpack/models';
 import {isSelenium} from '@src/webpack/utils';
 /* eslint-enable import/no-unassigned-import */
@@ -23,7 +24,7 @@ export function babelLoaderWeb(): WebpackLoader {
             targets: '> 10%',
             bugfixes: true,
             useBuiltIns: 'usage',
-            corejs: {version: '3.10'},
+            corejs: {version: CORE_JS_VERSION},
           },
         ],
         ['@babel/preset-react', {runtime: 'automatic'}],

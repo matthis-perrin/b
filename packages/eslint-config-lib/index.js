@@ -661,6 +661,7 @@ module.exports = {
     'unicorn/no-invalid-fetch-options': 'warn',
     'unicorn/no-invalid-remove-event-listener': 'warn',
     'unicorn/no-keyword-prefix': 'off',
+    'unicorn/no-length-as-slice-end': 'warn',
     'unicorn/no-lonely-if': 'warn',
     'unicorn/no-magic-array-flat-depth': 'warn',
     'unicorn/no-negated-condition': 'off',

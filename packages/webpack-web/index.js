@@ -14,10 +14,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
 /* harmony import */ var _src_webpack_loaders_babel_loader_web__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(26);
-/* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(33);
-/* harmony import */ var _src_webpack_plugins_favicons_webpack_plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(35);
-/* harmony import */ var _src_webpack_plugins_html_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(38);
-/* harmony import */ var _src_webpack_plugins_webpack_dev_server__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(40);
+/* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(34);
+/* harmony import */ var _src_webpack_plugins_favicons_webpack_plugin__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(36);
+/* harmony import */ var _src_webpack_plugins_html_plugin__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(39);
+/* harmony import */ var _src_webpack_plugins_webpack_dev_server__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(41);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(7);
 
 
@@ -42,7 +42,7 @@ function webConfig(opts) {
   const envVariableFilePath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(context, '../shared/src/env.ts');
   const domainNameEnvVariable = `${(0,node_path__WEBPACK_IMPORTED_MODULE_1__.basename)(context).toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`;
   const match = new RegExp(`export const ${domainNameEnvVariable} =\\s*'(?<domainName>[^']*)'`, 'u').exec((0,node_fs__WEBPACK_IMPORTED_MODULE_0__.readFileSync)(envVariableFilePath).toString());
-  const domainName = (match === null || match === void 0 ? void 0 : match[1]) ?? 'domain-not-found';
+  const domainName = match?.[1] ?? 'domain-not-found';
   const publicUrl = `http${(0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_8__.isProd)() ? 's' : ''}://${domainName}`;
   return {
     ...base,
@@ -689,9 +689,8 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
     });
   }
   async teardown() {
-    var _this$watcher;
     clearInterval(this.runEslintInterval);
-    await ((_this$watcher = this.watcher) === null || _this$watcher === void 0 ? void 0 : _this$watcher.close());
+    await this.watcher?.close();
   }
 }
 function eslintPlugin() {
@@ -965,8 +964,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_preset_react__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_react__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var babel_plugin_react_remove_properties__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(32);
 /* harmony import */ var babel_plugin_react_remove_properties__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(babel_plugin_react_remove_properties__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7);
+/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(33);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(7);
 /* eslint-disable import/no-unassigned-import */
+
 
 
 
@@ -987,12 +988,12 @@ function babelLoaderWeb() {
         bugfixes: true,
         useBuiltIns: 'usage',
         corejs: {
-          version: '3.10'
+          version: _src_versions__WEBPACK_IMPORTED_MODULE_6__.CORE_JS_VERSION
         }
       }], ['@babel/preset-react', {
         runtime: 'automatic'
       }], ['@babel/preset-typescript']],
-      plugins: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_6__.isSelenium)() ? [] : [['react-remove-properties', {
+      plugins: (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_7__.isSelenium)() ? [] : [['react-remove-properties', {
         properties: ['data-test-id']
       }]]
     }
@@ -1041,6 +1042,44 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("babel-plugin
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CORE_JS_VERSION: () => (/* binding */ CORE_JS_VERSION),
+/* harmony export */   ESLINT_VERSION: () => (/* binding */ ESLINT_VERSION),
+/* harmony export */   LIB_VERSIONS: () => (/* binding */ LIB_VERSIONS),
+/* harmony export */   MIN_NODE_VERSION: () => (/* binding */ MIN_NODE_VERSION),
+/* harmony export */   NODE_VERSION: () => (/* binding */ NODE_VERSION),
+/* harmony export */   PACKAGE_VERSIONS: () => (/* binding */ PACKAGE_VERSIONS),
+/* harmony export */   PRETTIER_VERSION: () => (/* binding */ PRETTIER_VERSION),
+/* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
+/* harmony export */ });
+const PACKAGE_VERSIONS = {
+  project: '1.11.0',
+  eslint: '1.7.0',
+  prettier: '1.5.0',
+  tsconfig: '1.7.2',
+  webpack: '1.7.3',
+  runner: '1.5.28',
+  lambdaServerRuntime: '1.0.7'
+};
+const ESLINT_VERSION = '8.56.x';
+const PRETTIER_VERSION = '3.3.3';
+const TYPESCRIPT_VERSION = '5.5.x';
+const MIN_NODE_VERSION = '20.10';
+const NODE_VERSION = `>=${MIN_NODE_VERSION}`;
+const CORE_JS_VERSION = '3.37';
+const LIB_VERSIONS = {
+  '@types/react': '18.2.x',
+  '@types/react-dom': '18.2.x',
+  react: '18.2.x',
+  'react-dom': '18.2.x',
+  'styled-components': '6.1.x'
+};
+
+/***/ }),
+/* 34 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   sourceMapLoader: () => (/* binding */ sourceMapLoader)
 /* harmony export */ });
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(27);
@@ -1051,7 +1090,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(babel_loader__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(34);
+/* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(35);
 /* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(source_map_loader__WEBPACK_IMPORTED_MODULE_4__);
 /* eslint-disable import/no-unassigned-import */
 
@@ -1070,13 +1109,13 @@ function sourceMapLoader() {
 }
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("source-map-loader");
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1087,10 +1126,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var favicons_webpack_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(36);
+/* harmony import */ var favicons_webpack_plugin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(37);
 /* harmony import */ var favicons_webpack_plugin__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(favicons_webpack_plugin__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(10);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(37);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(38);
 
 
 
@@ -1160,13 +1199,13 @@ function faviconsWebpackPlugin(context, publicUrl) {
 }
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("favicons-webpack-plugin");
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1459,7 +1498,7 @@ function addPrefix(attr, prefix) {
 }
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1468,7 +1507,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var html_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(39);
+/* harmony import */ var html_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(40);
 /* harmony import */ var html_webpack_plugin__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(html_webpack_plugin__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
 
@@ -1483,13 +1522,13 @@ function htmlPlugin(context, publicUrl) {
 }
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("html-webpack-plugin");
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);

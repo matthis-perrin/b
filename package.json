@@ -29,8 +29,8 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "7.24.x",
-    "@babel/preset-env": "7.24.x",
+    "@babel/core": "7.25.x",
+    "@babel/preset-env": "7.25.x",
     "@babel/preset-react": "7.24.x",
     "@babel/preset-typescript": "7.24.x",
     "@matthis/eslint-config-node": "latest",
@@ -55,7 +55,7 @@
     "terser-webpack-plugin": "5.3.x",
     "ts-node": "10.9.x",
     "tsx": "4.16.x",
-    "webpack": "5.92.x",
+    "webpack": "5.93.x",
     "webpack-cli": "4.10.x",
     "webpack-dev-server": "5.0.x"
   },

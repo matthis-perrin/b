@@ -483,8 +483,7 @@ console.error = (...args) => logger(args.map(serialize));
 let handler;
 // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
 import( /* webpackIgnore: true */HANDLER_PATH).then(imported => {
-  var _asMap;
-  const importedHandler = (_asMap = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.asMap)(imported)) === null || _asMap === void 0 ? void 0 : _asMap['handler'];
+  const importedHandler = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.asMap)(imported)?.['handler'];
   if (typeof importedHandler !== 'function') {
     runtimeLog({
       event: 'error',

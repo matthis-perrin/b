@@ -12,8 +12,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_webpack_common_configs_base_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 /* harmony import */ var _src_webpack_loaders_babel_loader_node__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(26);
-/* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(31);
-/* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(33);
+/* harmony import */ var _src_webpack_loaders_source_map_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(32);
+/* harmony import */ var _src_webpack_plugins_dependency_packer_plugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(34);
 /* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
 
 
@@ -87,7 +87,7 @@ function nodeConfig(opts) {
       if (request.startsWith('node:')) {
         return cb(undefined, `node-commonjs ${request}`);
       }
-      const resolver = getResolve === null || getResolve === void 0 ? void 0 : getResolve();
+      const resolver = getResolve?.();
       if (!resolver) {
         return cb(new Error('No resolver when checking for externals'));
       }
@@ -102,7 +102,7 @@ function nodeConfig(opts) {
           cb(undefined, `node-commonjs ${request}`);
         }).catch(() => cb(undefined, `node-commonjs ${request}`));
       }).catch(() => {
-        cb(new Error(`Can't resolve '${request}' in '${contextInfo === null || contextInfo === void 0 ? void 0 : contextInfo.issuer}'`));
+        cb(new Error(`Can't resolve '${request}' in '${contextInfo?.issuer}'`));
       });
     },
     experiments: {
@@ -715,9 +715,8 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
     });
   }
   async teardown() {
-    var _this$watcher;
     clearInterval(this.runEslintInterval);
-    await ((_this$watcher = this.watcher) === null || _this$watcher === void 0 ? void 0 : _this$watcher.close());
+    await this.watcher?.close();
   }
 }
 function eslintPlugin() {
@@ -987,7 +986,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(babel_loader__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(31);
 /* eslint-disable import/no-unassigned-import */
+
 
 
 
@@ -1002,7 +1003,7 @@ function babelLoaderNode() {
     options: {
       presets: [['@babel/preset-env', {
         targets: {
-          node: 16
+          node: _src_versions__WEBPACK_IMPORTED_MODULE_4__.MIN_NODE_VERSION
         }
       }], ['@babel/preset-typescript']]
     }
@@ -1039,6 +1040,44 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("babel-loader
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CORE_JS_VERSION: () => (/* binding */ CORE_JS_VERSION),
+/* harmony export */   ESLINT_VERSION: () => (/* binding */ ESLINT_VERSION),
+/* harmony export */   LIB_VERSIONS: () => (/* binding */ LIB_VERSIONS),
+/* harmony export */   MIN_NODE_VERSION: () => (/* binding */ MIN_NODE_VERSION),
+/* harmony export */   NODE_VERSION: () => (/* binding */ NODE_VERSION),
+/* harmony export */   PACKAGE_VERSIONS: () => (/* binding */ PACKAGE_VERSIONS),
+/* harmony export */   PRETTIER_VERSION: () => (/* binding */ PRETTIER_VERSION),
+/* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
+/* harmony export */ });
+const PACKAGE_VERSIONS = {
+  project: '1.11.0',
+  eslint: '1.7.0',
+  prettier: '1.5.0',
+  tsconfig: '1.7.2',
+  webpack: '1.7.3',
+  runner: '1.5.28',
+  lambdaServerRuntime: '1.0.7'
+};
+const ESLINT_VERSION = '8.56.x';
+const PRETTIER_VERSION = '3.3.3';
+const TYPESCRIPT_VERSION = '5.5.x';
+const MIN_NODE_VERSION = '20.10';
+const NODE_VERSION = `>=${MIN_NODE_VERSION}`;
+const CORE_JS_VERSION = '3.37';
+const LIB_VERSIONS = {
+  '@types/react': '18.2.x',
+  '@types/react-dom': '18.2.x',
+  react: '18.2.x',
+  'react-dom': '18.2.x',
+  'styled-components': '6.1.x'
+};
+
+/***/ }),
+/* 32 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   sourceMapLoader: () => (/* binding */ sourceMapLoader)
 /* harmony export */ });
 /* harmony import */ var _babel_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(27);
@@ -1049,7 +1088,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_preset_typescript__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
 /* harmony import */ var babel_loader__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(babel_loader__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(32);
+/* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(33);
 /* harmony import */ var source_map_loader__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(source_map_loader__WEBPACK_IMPORTED_MODULE_4__);
 /* eslint-disable import/no-unassigned-import */
 
@@ -1068,13 +1107,13 @@ function sourceMapLoader() {
 }
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("source-map-loader");
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);

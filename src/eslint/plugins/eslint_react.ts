@@ -10,7 +10,7 @@ const forbiddenProps = [
 export const eslintReact: EslintMetadata = {
   plugin: ['react'],
   dependencies: {
-    'eslint-plugin-react': '7.34.x',
+    'eslint-plugin-react': '7.35.x',
   },
   settings: {
     react: {
@@ -62,6 +62,7 @@ export const eslintReact: EslintMetadata = {
     'react/jsx-one-expression-per-line': 'off',
     'react/jsx-pascal-case': 'off',
     'react/jsx-props-no-multi-spaces': 'off',
+    'react/jsx-props-no-spread-multi': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/jsx-sort-props': 'off',
     'react/jsx-space-before-closing': 'off',
@@ -129,14 +130,6 @@ export const eslintReact: EslintMetadata = {
     'react/hook-use-state': ['warn', {allowDestructuredState: true}],
     'react/jsx-boolean-value': 'warn',
     'react/jsx-fragments': ['warn', 'syntax'],
-    'react/jsx-handler-names': [
-      'warn',
-      {
-        eventHandlerPrefix: 'handle',
-        eventHandlerPropPrefix: 'on',
-        checkLocalVariables: true,
-      },
-    ],
     'react/jsx-key': [
       'warn',
       {checkFragmentShorthand: true, checkKeyMustBeforeSpread: true, warnOnDuplicates: true},
@@ -146,6 +139,7 @@ export const eslintReact: EslintMetadata = {
     'react/jsx-no-constructed-context-values': 'warn',
     'react/jsx-no-leaked-render': 'warn',
     'react/jsx-no-script-url': 'warn',
+    'react/jsx-props-no-spread-multi': 'warn',
     'react/jsx-no-target-blank': ['warn', {warnOnSpreadAttributes: true}],
     'react/jsx-no-undef': 'warn',
     'react/jsx-pascal-case': ['warn', {allowAllCaps: true, ignore: []}],

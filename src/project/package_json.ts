@@ -1,6 +1,6 @@
 import {PROJECT_TYPE_TO_METADATA, WorkspaceName} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
-import {PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '@src/versions';
+import {NODE_VERSION, PACKAGE_VERSIONS, TYPESCRIPT_VERSION} from '@src/versions';
 
 function uniq<T>(val: T[]): T[] {
   return [...new Set(val).values()];
@@ -19,7 +19,7 @@ export function generateWorkspacePackageJson(
     license: 'UNLICENSED',
     type: 'module',
     engines: {
-      node: '>=20.10',
+      node: NODE_VERSION,
     },
     scripts: {
       setup: 'node ./setup.js',
