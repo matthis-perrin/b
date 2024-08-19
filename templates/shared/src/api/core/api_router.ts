@@ -31,7 +31,6 @@ export function createRouter<Name extends ApiName>(
       throw new Error('NOT_FOUND');
     }
     const req = parseSchema(body, schema.req);
-    // eslint-disable-next-line unicorn/no-useless-promise-resolve-reject
-    return Promise.resolve(handler(req, context));
+    return await Promise.resolve(handler(req, context));
   };
 }

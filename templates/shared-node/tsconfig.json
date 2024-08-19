@@ -1,6 +1,7 @@
 {
   "extends": "@matthis/tsconfig-node/tsconfig",
   "compilerOptions": {
+    "rootDir": "..",
     "baseUrl": ".",
     "paths": {
       "*": [
@@ -11,12 +12,8 @@
         "../shared-node/node_modules/*",
         "../shared-node/node_modules/@types/*"
       ],
-      "@shared/*": [
-        "../shared/src/*"
-      ],
-      "@shared-node/*": [
-        "./src/*"
-      ]
+      "@shared/*": ["../shared/src/*"],
+      "@shared-node/*": ["./src/*"]
     }
   },
   "include": ["src", "../shared"]

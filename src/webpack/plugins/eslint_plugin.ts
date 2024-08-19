@@ -164,8 +164,10 @@ class EslintPlugin extends StandalonePlugin {
               },
             },
           },
-          parserOptions: {
-            project: tsConfigPath,
+          languageOptions: {
+            parserOptions: {
+              project: tsConfigPath,
+            },
           },
         },
       });

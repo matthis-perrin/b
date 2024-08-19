@@ -6,11 +6,6 @@
   "scripts": {
     "test": "node --import tsx --test **/*.test.tsx"
   },
-  "eslintConfig": {
-    "extends": [
-      "@matthis/eslint-config-web"
-    ]
-  },
   "devDependencies": {},
   "dependencies": {}
 }

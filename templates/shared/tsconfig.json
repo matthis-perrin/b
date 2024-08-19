@@ -1,6 +1,7 @@
 {
   "extends": "@matthis/tsconfig-lib/tsconfig",
   "compilerOptions": {
+    "rootDir": "..",
     "baseUrl": ".",
     "paths": {
       "*": [
@@ -9,9 +10,7 @@
         "../shared/node_modules/*",
         "../shared/node_modules/@types/*"
       ],
-      "@shared/*": [
-        "../shared/src/*"
-      ]
+      "@shared/*": ["../shared/src/*"]
     }
   },
   "include": ["src"]

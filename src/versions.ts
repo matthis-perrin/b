@@ -1,14 +1,14 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.11.0',
-  eslint: '1.7.0',
+  project: '1.11.5',
+  eslint: '1.8.3',
   prettier: '1.5.0',
-  tsconfig: '1.7.2',
-  webpack: '1.7.3',
+  tsconfig: '1.7.3',
+  webpack: '1.7.4',
   runner: '1.5.28',
   lambdaServerRuntime: '1.0.7',
 };
 
-export const ESLINT_VERSION = '8.56.x';
+export const ESLINT_VERSION = '9.8.x';
 export const PRETTIER_VERSION = '3.3.3';
 export const TYPESCRIPT_VERSION = '5.5.x';
 export const MIN_NODE_VERSION = '20.10';

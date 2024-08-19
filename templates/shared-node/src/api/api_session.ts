@@ -1,5 +1,3 @@
-import {error} from 'node:console';
-
 import {UnauthorizedError} from '@shared/api/core/api_errors';
 import {ApiContext} from '@shared/api/core/api_types';
 import {NODE_ENV} from '@shared/env';
@@ -132,7 +130,7 @@ export class SessionManager<UserItem extends {id: string; sessionDuration: numbe
     if (raw === undefined) {
       return undefined;
     }
-    const rawCookies = (Array.isArray(raw) ? raw[0] ?? '' : raw)
+    const rawCookies = (Array.isArray(raw) ? (raw[0] ?? '') : raw)
       .split(/; */u)
       .filter(str => str.trim().length > 0);
     for (const rawCookie of rawCookies) {
@@ -169,7 +167,7 @@ export class SessionManager<UserItem extends {id: string; sessionDuration: numbe
       const expiresAt = asNumberOrThrow(rawMap['expiresAt']);
       return {token, expiresAt};
     } catch (err: unknown) {
-      error('Cannot deserialize session', err, {raw});
+      console.error('Cannot deserialize session', err, {raw});
       return undefined;
     }
   }

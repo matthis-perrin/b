@@ -1,11 +1,10 @@
 {
   "extends": "@matthis/tsconfig-web/tsconfig",
   "compilerOptions": {
+    "rootDir": "..",
     "baseUrl": ".",
     "paths": {
-      "@src/*": [
-        "./src/*"
-      ],
+      "@src/*": ["./src/*"],
       "*": [
         "./node_modules/*",
         "./node_modules/@types/*",
@@ -14,12 +13,8 @@
         "../shared-web/node_modules/*",
         "../shared-web/node_modules/@types/*"
       ],
-      "@shared/*": [
-        "../shared/src/*"
-      ],
-      "@shared-web/*": [
-        "../shared-web/src/*"
-      ]
+      "@shared/*": ["../shared/src/*"],
+      "@shared-web/*": ["../shared-web/src/*"]
     }
   },
   "include": ["src", "../shared-web", "../shared"]

@@ -520,8 +520,10 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
               }
             }
           },
-          parserOptions: {
-            project: tsConfigPath
+          languageOptions: {
+            parserOptions: {
+              project: tsConfigPath
+            }
           }
         }
       });

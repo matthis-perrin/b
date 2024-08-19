@@ -2,6 +2,7 @@
   "extends": "@matthis/tsconfig-node/tsconfig",
   "compilerOptions": {
     "module": "ES2022",
+    "rootDir": "..",
     "baseUrl": ".",
     "paths": {
       "@src/*": ["./src/*"],

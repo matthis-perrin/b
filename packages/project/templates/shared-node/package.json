@@ -6,9 +6,6 @@
   "scripts": {
     "test": "node --import tsx --test **/*.test.ts"
   },
-  "eslintConfig": {
-    "extends": ["@matthis/eslint-config-node"]
-  },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.395.x",
     "@aws-sdk/client-iot-data-plane": "3.509.x",

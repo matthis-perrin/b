@@ -1,5 +1,5 @@
 export interface EslintMetadata {
-  plugin: string[];
+  plugin?: {name: string; importName: string; module: string; requireFixup?: boolean};
   dependencies: Record<string, string>;
   settings: Record<string, unknown>;
   allOff: Record<string, 'off'>;

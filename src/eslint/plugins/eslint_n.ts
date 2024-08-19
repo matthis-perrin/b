@@ -2,11 +2,21 @@ import {EslintMetadata} from '@src/eslint/models';
 import {NODE_VERSION} from '@src/versions';
 
 export const eslintN: EslintMetadata = {
-  plugin: ['n'],
+  plugin: {name: 'n', importName: 'n', module: 'eslint-plugin-n'},
   dependencies: {
     'eslint-plugin-n': '17.10.x',
   },
-  settings: {},
+  settings: {
+    'node/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
+    'node/extensions': ['.ts', '.tsx'],
+    'node/resolver': {
+      typescript: {
+        project: './tsconfig.json',
+      },
+    },
+  },
   allOff: {
     'n/callback-return': 'off',
     'n/exports-style': 'off',
@@ -55,7 +65,6 @@ export const eslintN: EslintMetadata = {
     'n/no-deprecated-api': 'warn',
     'n/no-exports-assign': 'warn',
     'n/no-extraneous-import': 'warn',
-    'n/no-missing-import': 'warn',
     'n/no-new-require': 'warn',
     'n/no-path-concat': 'warn',
     'n/no-process-env': 'warn',

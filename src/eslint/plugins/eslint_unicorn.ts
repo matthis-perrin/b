@@ -1,7 +1,7 @@
 import {EslintMetadata} from '@src/eslint/models';
 
 export const eslintUnicorn: EslintMetadata = {
-  plugin: ['unicorn'],
+  plugin: {name: 'unicorn', importName: 'unicorn', module: 'eslint-plugin-unicorn'},
   dependencies: {
     'eslint-plugin-unicorn': '55.0.x',
   },

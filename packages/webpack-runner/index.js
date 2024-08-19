@@ -1062,9 +1062,6 @@ function generateWorkspacePackageJson(workspaceName, projects) {
       build: 'NODE_ENV=production node ./build.js',
       watch: 'NODE_ENV=development node ./build.js --watch'
     },
-    eslintConfig: {
-      ignorePatterns: ['**/*.js']
-    },
     prettier: '@matthis/prettier-config',
     devDependencies: Object.fromEntries([...eslintRuntimes.map(runtime => [`@matthis/eslint-config-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.eslint]), ['@matthis/prettier-config', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.prettier], ...tsconfigRuntimes.map(runtime => [`@matthis/tsconfig-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.tsconfig]), ...webpackRuntimes.map(runtime => [`@matthis/webpack-${runtime}`, _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.webpack]), ['@matthis/webpack-runner', _src_versions__WEBPACK_IMPORTED_MODULE_1__.PACKAGE_VERSIONS.runner], ['typescript', _src_versions__WEBPACK_IMPORTED_MODULE_1__.TYPESCRIPT_VERSION]].sort((d1, d2) => d1[0].localeCompare(d2[0])))
   };
@@ -1086,15 +1083,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.0',
-  eslint: '1.7.0',
+  project: '1.11.5',
+  eslint: '1.8.3',
   prettier: '1.5.0',
-  tsconfig: '1.7.2',
-  webpack: '1.7.3',
+  tsconfig: '1.7.3',
+  webpack: '1.7.4',
   runner: '1.5.28',
   lambdaServerRuntime: '1.0.7'
 };
-const ESLINT_VERSION = '8.56.x';
+const ESLINT_VERSION = '9.8.x';
 const PRETTIER_VERSION = '3.3.3';
 const TYPESCRIPT_VERSION = '5.5.x';
 const MIN_NODE_VERSION = '20.10';
@@ -2131,9 +2128,6 @@ function generateCodeWorkspace(workspaceName, workspaceFragments) {
       'typescript.preferences.importModuleSpecifier': 'non-relative',
       'eslint.lintTask.enable': true,
       'eslint.useESLintClass': true,
-      'eslint.options': {
-        reportUnusedDisableDirectives: 'warn'
-      },
       'editor.formatOnSave': true,
       'editor.codeActionsOnSave': {
         'source.fixAll': 'never',

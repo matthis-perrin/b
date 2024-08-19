@@ -27,9 +27,6 @@ export function generateWorkspacePackageJson(
       build: 'NODE_ENV=production node ./build.js',
       watch: 'NODE_ENV=development node ./build.js --watch',
     },
-    eslintConfig: {
-      ignorePatterns: ['**/*.js'],
-    },
     prettier: '@matthis/prettier-config',
     devDependencies: Object.fromEntries(
       (

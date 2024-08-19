@@ -1,7 +1,6 @@
 import {EslintMetadata} from '@src/eslint/models';
 
 export const eslintCore: EslintMetadata = {
-  plugin: [],
   dependencies: {},
   settings: {},
   allOff: {
@@ -69,7 +68,6 @@ export const eslintCore: EslintMetadata = {
     'key-spacing': 'off',
     // Use @typescript-eslint/keyword-spacing
     'keyword-spacing': 'off',
-    'line-comment-position': 'off',
     'linebreak-style': 'off',
     'lines-around-comment': 'off',
     'lines-around-directive': 'off',
@@ -85,7 +83,6 @@ export const eslintCore: EslintMetadata = {
     'max-params': 'off',
     'max-statements-per-line': 'off',
     'max-statements': 'off',
-    'multiline-comment-style': 'off',
     'multiline-ternary': 'off',
     'new-cap': 'off',
     'new-parens': 'off',
@@ -163,7 +160,6 @@ export const eslintCore: EslintMetadata = {
     'no-lonely-if': 'off',
     // Use @typescript-eslint/no-loop-func
     'no-loop-func': 'off',
-    // Use @typescript-eslint/no-loss-of-precision
     'no-loss-of-precision': 'off',
     // Use @typescript-eslint/no-magic-numbers
     'no-magic-numbers': 'off',
@@ -248,6 +244,7 @@ export const eslintCore: EslintMetadata = {
     'no-unused-vars': 'off',
     // Use @typescript-eslint/no-use-before-define
     'no-use-before-define': 'off',
+    'no-useless-assignment': 'off',
     'no-useless-backreference': 'off',
     'no-useless-call': 'off',
     'no-useless-catch': 'off',
@@ -350,7 +347,7 @@ export const eslintCore: EslintMetadata = {
     'no-cond-assign': 'warn',
     'no-const-assign': 'warn',
     'no-constant-binary-expression': 'warn',
-    'no-constant-condition': ['warn', {checkLoops: false}],
+    'no-constant-condition': 'warn',
     'no-constructor-return': 'warn',
     'no-control-regex': 'warn',
     'no-debugger': 'warn',
@@ -368,9 +365,9 @@ export const eslintCore: EslintMetadata = {
     'no-ex-assign': 'warn',
     'no-extend-native': 'warn',
     'no-extra-bind': 'warn',
-    'no-extra-boolean-cast': 'warn',
+    'no-extra-boolean-cast': ['warn', {enforceForInnerExpressions: true}],
     'no-extra-label': 'warn',
-    'no-fallthrough': 'warn',
+    'no-fallthrough': ['warn', {reportUnusedFallthroughComment: true}],
     'no-func-assign': 'warn',
     'no-global-assign': 'warn',
     'no-implicit-coercion': ['warn', {disallowTemplateShorthand: true}],
@@ -464,7 +461,6 @@ export const eslintCore: EslintMetadata = {
       'toolbar',
       'top',
     ],
-    'no-return-await': 'warn',
     'no-script-url': 'warn',
     'no-self-assign': 'warn',
     'no-self-compare': 'warn',
@@ -488,6 +484,7 @@ export const eslintCore: EslintMetadata = {
     'no-unreachable': 'warn',
     'no-unsafe-finally': 'warn',
     'no-unused-labels': 'warn',
+    'no-useless-assignment': 'warn',
     'no-useless-call': 'warn',
     'no-useless-catch': 'warn',
     'no-useless-computed-key': 'warn',

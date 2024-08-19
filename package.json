@@ -13,21 +13,6 @@
     "clean": "node clean.js"
   },
   "prettier": "@matthis/prettier-config",
-  "eslintConfig": {
-    "extends": ["@matthis/eslint-config-node"],
-    "rules": {
-      "no-console": "off",
-      "no-object-constructor": "off"
-    },
-    "overrides": [
-      {
-        "files": "src/webpack/*.ts",
-        "rules": {
-          "unicorn/filename-case": "off"
-        }
-      }
-    ]
-  },
   "devDependencies": {
     "@babel/core": "7.25.x",
     "@babel/preset-env": "7.25.x",

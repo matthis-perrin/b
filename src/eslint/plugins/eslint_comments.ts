@@ -1,7 +1,11 @@
 import {EslintMetadata} from '@src/eslint/models';
 
 export const eslintComments: EslintMetadata = {
-  plugin: ['eslint-comments'],
+  plugin: {
+    name: 'eslint-comments',
+    importName: 'eslintComments',
+    module: 'eslint-plugin-eslint-comments',
+  },
   dependencies: {
     'eslint-plugin-eslint-comments': '3.2.x',
   },
