@@ -319,6 +319,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   prettierFormat: () => (/* binding */ prettierFormat),
 /* harmony export */   prettyJs: () => (/* binding */ prettyJs),
 /* harmony export */   prettyJson: () => (/* binding */ prettyJson),
+/* harmony export */   prettyJsonc: () => (/* binding */ prettyJsonc),
 /* harmony export */   prettyTs: () => (/* binding */ prettyTs),
 /* harmony export */   readFile: () => (/* binding */ readFile),
 /* harmony export */   readFileInternal: () => (/* binding */ readFileInternal),
@@ -381,6 +382,12 @@ async function prettyJson(json, opts) {
     compact
   } = opts ?? {};
   return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('json'));
+}
+async function prettyJsonc(json, opts) {
+  const {
+    compact
+  } = opts ?? {};
+  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('jsonc'));
 }
 async function writeJsonFile(path, json) {
   await writeRawFile(path, await prettyJson(json));
@@ -1052,7 +1059,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.9',
+  project: '1.11.11',
   eslint: '1.8.4',
   prettier: '1.5.0',
   tsconfig: '1.7.4',

@@ -2,7 +2,7 @@ import {execSync} from 'node:child_process';
 import {join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {listFiles, prettyJs, prettyJson, readFile, writeRawFile} from '@src/fs';
+import {listFiles, prettyJs, prettyJson, prettyJsonc, readFile, writeRawFile} from '@src/fs';
 import {md5} from '@src/hash';
 import {log} from '@src/logger';
 import {
@@ -191,7 +191,7 @@ export async function generateWorkspace(
     // app.code-workspace
     writeFile(
       'app.code-workspace',
-      await prettyJson(generateCodeWorkspace(workspaceName, workspaceFragments))
+      await prettyJsonc(generateCodeWorkspace(workspaceName, workspaceFragments))
     ),
     // .gitignore
     writeFile('.gitignore', generateGitIgnore()),

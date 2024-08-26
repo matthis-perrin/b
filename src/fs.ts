@@ -39,6 +39,13 @@ export async function prettyJson(json: unknown, opts?: {compact?: boolean}): Pro
     prettierConfig('json')
   );
 }
+export async function prettyJsonc(json: unknown, opts?: {compact?: boolean}): Promise<string> {
+  const {compact} = opts ?? {};
+  return format(
+    compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2),
+    prettierConfig('jsonc')
+  );
+}
 export async function writeJsonFile(path: string, json: unknown): Promise<void> {
   await writeRawFile(path, await prettyJson(json));
 }
