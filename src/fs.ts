@@ -24,7 +24,7 @@ const prettierConfig = (parser: BuiltInParserName) =>
   }) as const;
 
 export async function prettierFormat(str: string, parser: BuiltInParserName): Promise<string> {
-  return format(str, prettierConfig(parser));
+  return await format(str, prettierConfig(parser));
 }
 
 export async function writeRawFile(path: string, content: string): Promise<void> {
@@ -34,14 +34,14 @@ export async function writeRawFile(path: string, content: string): Promise<void>
 
 export async function prettyJson(json: unknown, opts?: {compact?: boolean}): Promise<string> {
   const {compact} = opts ?? {};
-  return format(
+  return await format(
     compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2),
     prettierConfig('json')
   );
 }
 export async function prettyJsonc(json: unknown, opts?: {compact?: boolean}): Promise<string> {
   const {compact} = opts ?? {};
-  return format(
+  return await format(
     compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2),
     prettierConfig('jsonc')
   );
@@ -51,14 +51,14 @@ export async function writeJsonFile(path: string, json: unknown): Promise<void> 
 }
 
 export async function prettyJs(js: string): Promise<string> {
-  return format(js, prettierConfig('babel'));
+  return await format(js, prettierConfig('babel'));
 }
 export async function writeJsFile(path: string, js: string): Promise<void> {
   await writeRawFile(path, await prettyJs(js));
 }
 
 export async function prettyTs(ts: string): Promise<string> {
-  return format(ts, prettierConfig('typescript'));
+  return await format(ts, prettierConfig('typescript'));
 }
 export async function writeTsFile(path: string, ts: string): Promise<void> {
   await writeRawFile(path, await prettyTs(ts));
@@ -84,7 +84,7 @@ export async function cleanDir(dirPath: string): Promise<void> {
 }
 
 export async function cp(from: string, to: string): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     exec(`cp -R ${from} ${to}`, err => (err ? reject(err) : resolve()));
   });
 }

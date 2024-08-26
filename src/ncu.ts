@@ -2,11 +2,11 @@
 import {readdir, readFile} from 'node:fs/promises';
 import {join, resolve} from 'node:path';
 
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports, node/file-extension-in-import
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports, n/file-extension-in-import
 import {error, log} from './logger.js';
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports, node/file-extension-in-import
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports, n/file-extension-in-import
 import {removeUndefined} from './type_utils.js';
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports, node/file-extension-in-import
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports, n/file-extension-in-import
 import {table} from './webpack-runner/text_table.js';
 // eslint-disable-next-line import/default
 import colors from 'ansi-colors';
@@ -64,12 +64,12 @@ export async function check(): Promise<void> {
 
   if (errors.length > 0) {
     error(errors.join('\n'));
-    process.exit(1); // eslint-disable-line node/no-process-exit
+    process.exit(1); // eslint-disable-line n/no-process-exit
   }
 
   const res = await Promise.all(
-    Object.entries(dependencies).map(async ([name, {version, projects, dev}]) =>
-      checkPackage(name, projects, dev, version)
+    Object.entries(dependencies).map(
+      async ([name, {version, projects, dev}]) => await checkPackage(name, projects, dev, version)
     )
   );
   const outdated = removeUndefined(res).sort(([name1], [name2]) => name1.localeCompare(name2));

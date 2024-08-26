@@ -5,8 +5,8 @@ import {generateForType} from '@src/webpack/generators';
 
 export async function webpackPackages(types: WebpackType[]): Promise<void> {
   await Promise.all(
-    types.map(async type =>
-      generateForType(join(resolve('.'), 'packages', `webpack-${type}`), type)
+    types.map(
+      async type => await generateForType(join(resolve('.'), 'packages', `webpack-${type}`), type)
     )
   );
 }

@@ -11,10 +11,9 @@ export default {
     ...base.plugins.filter(p => !(p instanceof webpack.DefinePlugin)),
     new (class CleanTerminalPlugin {
       apply(compiler) {
-        const hook = compiler.hooks.beforeCompile ?? compiler.hooks.afterCompile;
-        hook.tap('CleanTerminalPlugin', () => {
+        compiler.hooks.beforeCompile.tap('CleanTerminalPlugin', () => {
           if (compiler.watchMode) {
-            process.stdout.write('\u001Bc\u001B[3J');
+            process.stdout.write('\u001B[2J\u001B[3J\u001B[H');
           }
         });
       }

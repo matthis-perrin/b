@@ -5,7 +5,7 @@ import {join} from 'path';
 async function execAsync(cmd, options) {
   const cwd = options.cwd ?? process.cwd();
   console.log(`Running \`${cmd}\` in ${cwd}`);
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     exec(cmd, {cwd}, (error, stdout, stderr) => {
       if (!error) {
         if (stderr.trim().length > 0) {

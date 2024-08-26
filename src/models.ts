@@ -112,6 +112,7 @@ export interface WorkspaceFragmentRegistry {
   [WorkspaceFragmentType.StaticWebsite]: {
     type: WorkspaceFragmentType.StaticWebsite;
     websiteName: ProjectName;
+    domain: string | undefined;
   };
   [WorkspaceFragmentType.StandaloneLambda]: {
     type: WorkspaceFragmentType.StandaloneLambda;

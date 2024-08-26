@@ -1,10 +1,6 @@
 import {ProjectName, WorkspaceName} from '@src/models';
+import {AppDomain} from '@src/project/terraform/all';
 import {lowerCase} from '@src/string_utils';
-
-export interface LambdaDomain {
-  rootDomain: string;
-  subDomain: string;
-}
 
 export function generateLambdaTerraform(
   workspaceName: WorkspaceName,
@@ -14,7 +10,7 @@ export function generateLambdaTerraform(
     webAppName?: string;
     alarmEmail: string | undefined;
     cloudwatchTriggerMinutes: number | undefined;
-    domain: LambdaDomain | undefined;
+    domain: AppDomain | undefined;
     authentication: boolean | undefined;
   }
 ): string {
@@ -106,7 +102,7 @@ output "${projectName}_url" {
       ? `https://${domain.subDomain}.${domain.rootDomain}/`
       : `https://\${aws_cloudfront_distribution.${projectName}.domain_name}/`
   }"
-  description = "Cloudfront URL of \\"${projectName}\\""
+  description = "URL of \\"${projectName}\\""
 }${
         domain !== undefined
           ? `

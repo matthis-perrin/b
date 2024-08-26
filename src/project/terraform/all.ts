@@ -1,10 +1,15 @@
 import {ProjectType, WorkspaceName} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
 import {generateFrontendTerraform} from '@src/project/terraform/frontend';
-import {generateLambdaTerraform, LambdaDomain} from '@src/project/terraform/lambda';
+import {generateLambdaTerraform} from '@src/project/terraform/lambda';
 import {generateAwsProviderTerraform} from '@src/project/terraform/provider';
 import {generateS3BucketTerraform} from '@src/project/terraform/s3';
 import {neverHappens} from '@src/type_utils';
+
+export interface AppDomain {
+  rootDomain: string;
+  subDomain: string;
+}
 
 export function generateCommonTerraform(
   workspaceName: WorkspaceName,
@@ -29,14 +34,16 @@ export function generateWorkspaceProjectTerraform(
   const alarmEmail = 'alarmEmail' in fromFragment ? fromFragment.alarmEmail : undefined;
   const domainStr = 'domain' in fromFragment ? fromFragment.domain : undefined;
   const webAppName = 'appName' in fromFragment ? fromFragment.appName : undefined;
-  let domain: LambdaDomain | undefined;
+  let domain: AppDomain | undefined;
   if (domainStr !== undefined) {
     const [subDomain = '', ...rest] = domainStr.split('.');
     const rootDomain = rest.join('.');
     domain = {subDomain, rootDomain};
   }
   if (type === ProjectType.Web) {
-    return generateFrontendTerraform(projectName);
+    return generateFrontendTerraform(projectName, {
+      domain,
+    });
   } else if (type === ProjectType.LambdaFunction) {
     return generateLambdaTerraform(workspaceName, projectName, {
       api: false,

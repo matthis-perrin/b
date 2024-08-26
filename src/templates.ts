@@ -63,7 +63,7 @@ export async function copyTemplatesDirs(dst: string): Promise<void> {
       await mkdir(dstDir);
       const dirEnts = await readdir(srcDir, {withFileTypes: true});
       const toCopy = dirEnts.filter(ent => !['node_modules', 'yarn.lock'].includes(ent.name));
-      await Promise.all(toCopy.map(async ent => cp(join(srcDir, ent.name), dstDir)));
+      await Promise.all(toCopy.map(async ent => await cp(join(srcDir, ent.name), dstDir)));
     })
   );
 }

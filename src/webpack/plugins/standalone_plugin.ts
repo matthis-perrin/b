@@ -11,9 +11,12 @@ export abstract class StandalonePlugin {
 
   public apply(compiler: Compiler): void {
     this.context = compiler.context;
-    compiler.hooks.beforeRun.tapPromise(this.name, async () => this.setupHandler(compiler));
-    compiler.hooks.watchRun.tapPromise(this.name, async () => this.setupHandler(compiler));
-    compiler.hooks.shutdown.tapPromise(this.name, async () => this.exitHandlerAsync(compiler));
+    compiler.hooks.beforeRun.tapPromise(this.name, async () => await this.setupHandler(compiler));
+    compiler.hooks.watchRun.tapPromise(this.name, async () => await this.setupHandler(compiler));
+    compiler.hooks.shutdown.tapPromise(
+      this.name,
+      async () => await this.exitHandlerAsync(compiler)
+    );
     registerExitCallback(() => this.exitHandler(compiler));
   }
 

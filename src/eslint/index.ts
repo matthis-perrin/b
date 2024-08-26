@@ -5,8 +5,9 @@ import {EslintType} from '@src/models';
 
 export async function eslintPackages(types: EslintType[]): Promise<void> {
   await Promise.all(
-    types.map(async type =>
-      generateForType(join(resolve('.'), 'packages', `eslint-config-${type}`), type)
+    types.map(
+      async type =>
+        await generateForType(join(resolve('.'), 'packages', `eslint-config-${type}`), type)
     )
   );
 }

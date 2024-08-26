@@ -173,15 +173,22 @@ export async function generateWorkspace(
 
   // Create projects files from templates
   const projectFiles = await Promise.all(
-    projects.map(async project =>
-      generateProject({dst, project, allFragments: workspaceFragments, workspace, workspaceName})
+    projects.map(
+      async project =>
+        await generateProject({
+          dst,
+          project,
+          allFragments: workspaceFragments,
+          workspace,
+          workspaceName,
+        })
     )
   );
 
   // Generate workspace root files
   const SCRIPTS_PATH = join(fileURLToPath(import.meta.url), '../scripts');
   const writeFile = async (path: string, file: string): Promise<FileHash> =>
-    writeWorkspaceFile(workspace, dst, path, file);
+    await writeWorkspaceFile(workspace, dst, path, file);
   const workspaceFiles = await Promise.all([
     // package.json
     writeFile(
@@ -218,7 +225,7 @@ export async function generateWorkspace(
       const relativePath = relative(vscodePath, file);
       const dstPath = join('.vscode', relativePath);
       const content = await readFile(file);
-      return writeFile(dstPath, content);
+      return await writeFile(dstPath, content);
     })
   );
 
@@ -249,7 +256,7 @@ export async function generateWorkspace(
         return;
       }
       const name = `${p.projectName}_terraform`;
-      return writeFile(join('terraform', `${name}.tf`), addLineBreak(content));
+      return await writeFile(join('terraform', `${name}.tf`), addLineBreak(content));
     }),
   ]);
 

@@ -2,6 +2,7 @@ import {existsSync, readdirSync} from 'node:fs';
 import {join} from 'node:path';
 
 import {FSWatcher, watch} from 'chokidar';
+// eslint-disable-next-line n/no-extraneous-import
 import {ESLint, Linter} from 'eslint';
 import {Compilation, Compiler, WebpackError} from 'webpack';
 
@@ -73,7 +74,7 @@ class EslintPlugin extends StandalonePlugin {
   private shouldRun = false;
 
   protected async setup(compiler: Compiler): Promise<void> {
-    return new Promise<void>(resolve => {
+    return await new Promise<void>(resolve => {
       this.runEslintInterval = setInterval(() => this.runEslint(), RUN_ESLINT_INTERVAL);
 
       // Generate the patterns of all the files across the workspace
@@ -274,7 +275,7 @@ class EslintPlugin extends StandalonePlugin {
   }
 
   private async awaitIdle(): Promise<void> {
-    return new Promise<void>(resolve => {
+    return await new Promise<void>(resolve => {
       this.resolveAwaitIdlePromise = resolve;
       this.checkIdle();
     });

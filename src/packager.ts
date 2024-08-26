@@ -27,7 +27,7 @@ export async function compile(
     plugins,
   };
 
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     webpack(config, (err, stats) => {
       if (err) {
         error(`Failure to compile ${entry}`);

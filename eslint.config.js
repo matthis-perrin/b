@@ -3,10 +3,10 @@ import baseConfig from '@matthis/eslint-config-node';
 export default [
   ...baseConfig,
   {
-    files: ['*.ts'],
+    files: ['**/*.ts'],
     rules: {
-      'no-console': 'off',
       'no-object-constructor': 'off',
+      'n/no-sync': 'off',
     },
   },
   {

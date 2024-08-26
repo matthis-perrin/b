@@ -69,7 +69,7 @@ function exit(): void {
   rmSync(join(globalRoot, '.build.lock'), {force: true});
   process.stdin.setRawMode(false);
   log('See you soon!');
-  // eslint-disable-next-line node/no-process-exit
+  // eslint-disable-next-line n/no-process-exit
   process.exit(0);
 }
 
@@ -225,7 +225,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       }
 
       statuses.set(projectName, intialStatus);
-      // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
+      // eslint-disable-next-line import/dynamic-import-chunkname
       const config = await import(/*webpackIgnore: true*/ join(projectPath, 'webpack.config.js'))
         .then(({getConfig}) => getConfig({context: projectPath, watch}) as Configuration)
         .catch((err: unknown) => {
@@ -335,7 +335,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
         await devServer.start();
       }
       return async (): Promise<void> => {
-        return new Promise<void>((resolve, reject) => {
+        return await new Promise<void>((resolve, reject) => {
           const closeCompiler = (): void => {
             tailLambdaServerCleanup?.();
             tailWebpackServerCleanup?.();
@@ -369,7 +369,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       return;
     }
     cleanupCalled = true;
-    await Promise.all(cleanupFunctions.map(async fn => fn?.()));
+    await Promise.all(cleanupFunctions.map(async fn => await fn?.()));
     redraw();
     rmSync(join(globalRoot, '.build.lock'));
     process.stdin.setRawMode(false);
@@ -441,7 +441,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   }
 
   registerExitCallback(cleanup);
-  return globalPromise;
+  return await globalPromise;
 }
 
 export async function runAllWebpacks(

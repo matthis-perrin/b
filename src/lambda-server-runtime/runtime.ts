@@ -9,13 +9,13 @@ import {LambdaServerEvent} from '@src/webpack/plugins/lambda_server_plugin';
 // ENV VARIABLES LOADING
 //
 
-// eslint-disable-next-line node/no-process-env
+// eslint-disable-next-line n/no-process-env
 const {PORT, RUNTIME_LOG_FILE, APP_LOG_FILE, HANDLER_PATH, TIMEOUT_MS} = process.env;
 
 const port = parseFloat(PORT ?? '');
 if (isNaN(port)) {
   runtimeLog({event: 'error', err: `Invalid process.env.PORT: ${PORT}`, path: '', method: ''});
-  // eslint-disable-next-line node/no-process-exit
+  // eslint-disable-next-line n/no-process-exit
   process.exit(0);
 }
 
@@ -27,13 +27,13 @@ if (isNaN(timeoutMs)) {
     path: '',
     method: '',
   });
-  // eslint-disable-next-line node/no-process-exit
+  // eslint-disable-next-line n/no-process-exit
   process.exit(0);
 }
 
 if (HANDLER_PATH === undefined) {
   runtimeLog({event: 'error', err: `Missing process.env.HANDLER_PATH`, path: '', method: ''});
-  // eslint-disable-next-line node/no-process-exit
+  // eslint-disable-next-line n/no-process-exit
   process.exit(0);
 }
 
@@ -86,7 +86,7 @@ console.log = (...args: unknown[]) => logger(args.map(serialize));
 console.error = (...args: unknown[]) => logger(args.map(serialize));
 
 let handler: Function | undefined;
-// eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
+// eslint-disable-next-line import/dynamic-import-chunkname
 import(/* webpackIgnore: true */ HANDLER_PATH)
   .then(imported => {
     const importedHandler = asMap(imported)?.['handler'];
@@ -97,7 +97,7 @@ import(/* webpackIgnore: true */ HANDLER_PATH)
         path: '',
         method: '',
       });
-      // eslint-disable-next-line node/no-process-exit
+      // eslint-disable-next-line n/no-process-exit
       process.exit(0);
     }
     handler = importedHandler;
@@ -109,7 +109,7 @@ import(/* webpackIgnore: true */ HANDLER_PATH)
       path: '',
       method: '',
     });
-    // eslint-disable-next-line node/no-process-exit
+    // eslint-disable-next-line n/no-process-exit
     process.exit(0);
   });
 

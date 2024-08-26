@@ -15,7 +15,7 @@ export function readLines(filePath: string, cb: (newLines: string[]) => void): (
   p.stdout.on('data', chunk => {
     data += chunk;
     const lines = data.split('\n');
-    // eslint-disable-next-line node/callback-return
+    // eslint-disable-next-line n/callback-return
     cb(lines.slice(0, -1));
     data = lines.at(-1) ?? '';
   });

@@ -42,7 +42,7 @@ export async function generateEnvFile(
   const terraformDir = await readdir(terraformPath);
   const terraformFiles = terraformDir.filter(f => f.endsWith('.tf'));
   const terraformFilesContent = await Promise.all(
-    terraformFiles.map(async f => readFile(join(terraformPath, f)))
+    terraformFiles.map(async f => await readFile(join(terraformPath, f)))
   );
   const allTerraform = terraformFilesContent.join('\n');
   const outputMatches = allTerraform.matchAll(/output "(?<outputName>[^"]+)" \{/gu);

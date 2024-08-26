@@ -8,7 +8,7 @@ const packageDirsEnt = await readdir(packagesDir, {withFileTypes: true});
 const packageDirs = packageDirsEnt.filter(ent => ent.isDirectory()).map(ent => ent.name);
 
 async function publish(p) {
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     exec(`npm publish --access public`, {cwd: join(packagesDir, p)}, (error, stdout, stderr) => {
       const errors = stderr
         .trim()
@@ -29,7 +29,7 @@ async function publish(p) {
 }
 
 async function version(p) {
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     exec(`npm search --json @matthis/${p}`, (error, stdout, stderr) => {
       if (!error) {
         resolve(JSON.parse(stdout)[0]);
