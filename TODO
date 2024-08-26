@@ -1,3 +1,4 @@
+- Cloudfront caching for static website
 - Use EventBridge instead of Cloudwatch event
 - Server side rendering
 - Pre-connected user in index.html

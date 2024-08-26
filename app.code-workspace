@@ -1,8 +1,8 @@
 {
   "folders": [
     {
-      "path": "."
-    }
+      "path": ".",
+    },
   ],
   "settings": {
     "window.title": "b${separator}${activeEditorShort}",
@@ -15,16 +15,13 @@
     "typescript.preferences.importModuleSpecifier": "non-relative",
     "eslint.lintTask.enable": true,
     "eslint.useESLintClass": true,
-    "eslint.options": {
-      "reportUnusedDisableDirectives": "warn"
-    },
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "never",
-      "source.fixAll.eslint": "always"
+      "source.fixAll.eslint": "explicit",
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "emmet.showExpandedAbbreviation": "never"
+    "emmet.showExpandedAbbreviation": "never",
   },
   "extensions": {
     "recommendations": [
@@ -33,7 +30,7 @@
       "VisualStudioExptTeam.vscodeintellicode",
       "styled-components.vscode-styled-components",
       "naumovs.color-highlight",
-      "eamodio.gitlens"
-    ]
-  }
+      "eamodio.gitlens",
+    ],
+  },
 }

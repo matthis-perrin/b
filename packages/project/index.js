@@ -1026,7 +1026,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.11',
+  project: '1.11.15',
   eslint: '1.8.4',
   prettier: '1.5.0',
   tsconfig: '1.7.4',
@@ -1093,7 +1093,9 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
     };
   }
   if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web) {
-    return (0,_src_project_terraform_frontend__WEBPACK_IMPORTED_MODULE_1__.generateFrontendTerraform)(projectName);
+    return (0,_src_project_terraform_frontend__WEBPACK_IMPORTED_MODULE_1__.generateFrontendTerraform)(projectName, {
+      domain
+    });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.LambdaFunction) {
     return (0,_src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__.generateLambdaTerraform)(workspaceName, projectName, {
       api: false,
@@ -1142,14 +1144,79 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateFrontendTerraform: () => (/* binding */ generateFrontendTerraform)
 /* harmony export */ });
-function generateFrontendTerraform(projectName) {
+function generateFrontendTerraform(projectName, opts) {
+  const {
+    domain
+  } = opts;
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');
   const originId = `${bucketName}-origin-id`;
   return `
 output "${projectName}_cloudfront_domain_name" {
-  value       = aws_cloudfront_distribution.${projectName}.domain_name
+  value       = ${domain ? `"${domain.subDomain}.${domain.rootDomain}"` : `aws_cloudfront_distribution.${projectName}.domain_name`}
   description = "Domain (from cloudfront) where the \\"${projectName}\\" is available."
+}${domain !== undefined ? `
+
+# Domain
+
+data "aws_route53_zone" "${projectName}" {
+  name = "${domain.rootDomain}"
 }
+
+resource "aws_route53_record" "${projectName}_a" {
+  zone_id = data.aws_route53_zone.${projectName}.zone_id
+  name    = "${domain.subDomain}.${domain.rootDomain}"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.${projectName}.domain_name
+    zone_id                = aws_cloudfront_distribution.${projectName}.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "${projectName}_aaaa" {
+  zone_id = data.aws_route53_zone.${projectName}.zone_id
+  name    = "${domain.subDomain}.${domain.rootDomain}"
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.${projectName}.domain_name
+    zone_id                = aws_cloudfront_distribution.${projectName}.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_acm_certificate" "${projectName}" {
+  domain_name               = "*.${domain.subDomain}.${domain.rootDomain}"
+  subject_alternative_names = ["${domain.subDomain}.${domain.rootDomain}"]
+  validation_method         = "DNS"
+  provider                  = aws.us-east-1
+}
+
+resource "aws_route53_record" "${projectName}_certificate_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.${projectName}.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  provider        = aws.us-east-1
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.${projectName}.zone_id
+}
+
+resource "aws_acm_certificate_validation" "${projectName}" {
+  provider                = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.${projectName}.arn
+  validation_record_fqdns = [for record in aws_route53_record.${projectName}_certificate_validation : record.fqdn]
+}` : ''}
+
+# Cloudfront Distribution
 
 resource "aws_cloudfront_origin_access_identity" "${projectName}" {}
   
@@ -1167,7 +1234,8 @@ resource "aws_cloudfront_distribution" "${projectName}" {
   enabled             = true
   wait_for_deployment = false
   is_ipv6_enabled     = true
-  price_class         = "PriceClass_100"
+  price_class         = "PriceClass_100"${domain ? `
+  aliases             = ["${domain.subDomain}.${domain.rootDomain}"]` : ''}
   
   default_root_object = "/index.html"
   custom_error_response {
@@ -1207,8 +1275,11 @@ resource "aws_cloudfront_distribution" "${projectName}" {
     }
   }
 
-  viewer_certificate {
-    cloudfront_default_certificate = true
+  viewer_certificate {${domain ? `
+    acm_certificate_arn      = aws_acm_certificate.${projectName}.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"` : `
+    cloudfront_default_certificate = true`}
   }
 }
   `.trim();
@@ -1298,7 +1369,7 @@ resource "aws_lambda_function_url" "${projectName}" {
 
 output "${projectName}_url" {
   value       = "${domain ? `https://${domain.subDomain}.${domain.rootDomain}/` : `https://\${aws_cloudfront_distribution.${projectName}.domain_name}/`}"
-  description = "Cloudfront URL of \\"${projectName}\\""
+  description = "URL of \\"${projectName}\\""
 }${domain !== undefined ? `
 
 # Domain
@@ -2333,8 +2404,8 @@ const WorkspaceFragmentTypeToString = {
   [_src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.ApiLambda]: 'API Lambda',
   [_src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeScript]: 'Node Script'
 };
+const I_AM_DONE = 'i_am_done';
 async function askForWorkspaceFragment(takenNames) {
-  const DONE_GENERATING = 'done_generating';
   const {
     workspaceFragmentType
   } = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({
@@ -2346,10 +2417,10 @@ async function askForWorkspaceFragment(takenNames) {
       title
     })), {
       title: `I'm done`,
-      value: DONE_GENERATING
+      value: I_AM_DONE
     }]
   });
-  if (workspaceFragmentType === undefined || workspaceFragmentType === DONE_GENERATING) {
+  if (workspaceFragmentType === undefined || workspaceFragmentType === I_AM_DONE) {
     return undefined;
   }
   const type = workspaceFragmentType;
@@ -2400,6 +2471,26 @@ async function askForWorkspaceFragment(takenNames) {
     };
   }
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_8__.neverHappens)(type, `Unknown WorkspaceFragmentType "${type}"`);
+}
+async function askForWorkspaceUpdate() {
+  const DONE_GENERATING = 'done_generating';
+  const {
+    workspaceFragmentType
+  } = await (0,prompts__WEBPACK_IMPORTED_MODULE_2__.prompt)({
+    type: 'select',
+    name: 'workspaceFragmentType',
+    message: 'Choose a type of project to add to the workspace',
+    choices: [...Object.entries(WorkspaceFragmentTypeToString).map(([value, title]) => ({
+      value,
+      title
+    })), {
+      title: `I'm done`,
+      value: I_AM_DONE
+    }]
+  });
+  if (workspaceFragmentType === undefined || workspaceFragmentType === I_AM_DONE) {
+    return undefined;
+  }
 }
 const VALID_PROJECT_NAME = /^[a-zA-Z0-9_]+$/u;
 async function askForProjectName(question, defaultValue, takenNames) {
