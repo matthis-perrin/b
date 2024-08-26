@@ -31,6 +31,50 @@ const BASE_FRAGMENTS = [
   {type: WorkspaceFragmentType.SharedWeb},
 ] as const;
 
+function addBaseFragments(frags: WorkspaceFragment[]): WorkspaceFragment[] {
+  // Analyze what type of fragments we have/need
+  let hasShared = false;
+  let hasSharedWeb = false;
+  let hasSharedNode = false;
+  let needSharedWeb = false;
+  let needSharedNode = false;
+  for (const frag of frags) {
+    if (frag.type === WorkspaceFragmentType.Shared) {
+      hasShared = true;
+    } else if (frag.type === WorkspaceFragmentType.SharedNode) {
+      hasSharedNode = true;
+    } else if (frag.type === WorkspaceFragmentType.SharedWeb) {
+      hasSharedWeb = true;
+    } else if (
+      frag.type === WorkspaceFragmentType.ApiLambda ||
+      frag.type === WorkspaceFragmentType.NodeScript ||
+      frag.type === WorkspaceFragmentType.StandaloneLambda
+    ) {
+      needSharedNode = true;
+    } else if (frag.type === WorkspaceFragmentType.WebApp) {
+      needSharedNode = true;
+      needSharedWeb = true;
+    } else if (frag.type === WorkspaceFragmentType.StaticWebsite) {
+      needSharedWeb = true;
+    } else {
+      neverHappens(frag);
+    }
+  }
+
+  // Add the necessary fragments if needed
+  const newFrags = [...frags];
+  if (!hasShared) {
+    newFrags.push({type: WorkspaceFragmentType.Shared});
+  }
+  if (!hasSharedNode && needSharedNode) {
+    newFrags.push({type: WorkspaceFragmentType.SharedNode});
+  }
+  if (!hasSharedWeb && needSharedWeb) {
+    newFrags.push({type: WorkspaceFragmentType.SharedWeb});
+  }
+  return newFrags;
+}
+
 async function initProject(): Promise<void> {
   let workspaceName: string;
   let workspacePath = process.cwd();
@@ -40,11 +84,6 @@ async function initProject(): Promise<void> {
   // Check if we are already in a workspace
   const workspace = await readWorkspace(workspacePath);
   if (workspace !== undefined) {
-    for (const baseFrag of BASE_FRAGMENTS) {
-      if (!workspace.fragments.find(f => f.type === baseFrag.type)) {
-        frags.push(baseFrag);
-      }
-    }
     workspaceName = basename(workspacePath);
     for (const fragment of workspace.fragments) {
       frags.push(fragment);
@@ -52,7 +91,6 @@ async function initProject(): Promise<void> {
       takenNames.push(...projectNames);
     }
   } else {
-    frags.push(...BASE_FRAGMENTS);
     // Ask for workspace name
     const {workspaceName: newWorkspaceName} = await prompt({
       type: 'text',
@@ -89,7 +127,7 @@ async function initProject(): Promise<void> {
 
     const name = workspaceName as WorkspaceName;
 
-    await generateWorkspace(workspacePath, name, frags, workspace);
+    await generateWorkspace(workspacePath, name, addBaseFragments(frags), workspace);
   } catch (err: unknown) {
     error(String(err));
     await cancel(workspaceName);

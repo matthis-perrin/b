@@ -40,6 +40,7 @@ export function webpackDevServer(context: string): Configuration {
     static: join(context, 'dist'),
     compress: true,
     hot: true,
+    historyApiFallback: true,
     port,
     headers: {
       'Access-Control-Allow-Origin': '*',

@@ -8,8 +8,8 @@ export const eslintTypescript: EslintMetadata = {
     module: '@typescript-eslint/eslint-plugin',
   },
   dependencies: {
-    '@typescript-eslint/eslint-plugin': '8.0.x',
-    '@typescript-eslint/parser': '8.0.x',
+    '@typescript-eslint/eslint-plugin': '8.1.x',
+    '@typescript-eslint/parser': '8.1.x',
     typescript: TYPESCRIPT_VERSION,
   },
   settings: {},

@@ -1019,11 +1019,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.5',
-  eslint: '1.8.3',
+  project: '1.11.9',
+  eslint: '1.8.4',
   prettier: '1.5.0',
-  tsconfig: '1.7.3',
-  webpack: '1.7.4',
+  tsconfig: '1.7.4',
+  webpack: '1.7.5',
   runner: '1.5.28',
   lambdaServerRuntime: '1.0.7'
 };
@@ -2219,6 +2219,51 @@ const BASE_FRAGMENTS = [{
 }, {
   type: _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.SharedWeb
 }];
+function addBaseFragments(frags) {
+  // Analyze what type of fragments we have/need
+  let hasShared = false;
+  let hasSharedWeb = false;
+  let hasSharedNode = false;
+  let needSharedWeb = false;
+  let needSharedNode = false;
+  for (const frag of frags) {
+    if (frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.Shared) {
+      hasShared = true;
+    } else if (frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.SharedNode) {
+      hasSharedNode = true;
+    } else if (frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.SharedWeb) {
+      hasSharedWeb = true;
+    } else if (frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.ApiLambda || frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.NodeScript || frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StandaloneLambda) {
+      needSharedNode = true;
+    } else if (frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.WebApp) {
+      needSharedNode = true;
+      needSharedWeb = true;
+    } else if (frag.type === _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.StaticWebsite) {
+      needSharedWeb = true;
+    } else {
+      (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_8__.neverHappens)(frag);
+    }
+  }
+
+  // Add the necessary fragments if needed
+  const newFrags = [...frags];
+  if (!hasShared) {
+    newFrags.push({
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.Shared
+    });
+  }
+  if (!hasSharedNode && needSharedNode) {
+    newFrags.push({
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.SharedNode
+    });
+  }
+  if (!hasSharedWeb && needSharedWeb) {
+    newFrags.push({
+      type: _src_models__WEBPACK_IMPORTED_MODULE_5__.WorkspaceFragmentType.SharedWeb
+    });
+  }
+  return newFrags;
+}
 async function initProject() {
   let workspaceName;
   let workspacePath = process.cwd();
@@ -2228,11 +2273,6 @@ async function initProject() {
   // Check if we are already in a workspace
   const workspace = await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_7__.readWorkspace)(workspacePath);
   if (workspace !== undefined) {
-    for (const baseFrag of BASE_FRAGMENTS) {
-      if (!workspace.fragments.find(f => f.type === baseFrag.type)) {
-        frags.push(baseFrag);
-      }
-    }
     workspaceName = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.basename)(workspacePath);
     for (const fragment of workspace.fragments) {
       frags.push(fragment);
@@ -2240,7 +2280,6 @@ async function initProject() {
       takenNames.push(...projectNames);
     }
   } else {
-    frags.push(...BASE_FRAGMENTS);
     // Ask for workspace name
     const {
       workspaceName: newWorkspaceName
@@ -2274,7 +2313,7 @@ async function initProject() {
       }
     }
     const name = workspaceName;
-    await (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_6__.generateWorkspace)(workspacePath, name, frags, workspace);
+    await (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_6__.generateWorkspace)(workspacePath, name, addBaseFragments(frags), workspace);
   } catch (err) {
     (0,_src_logger__WEBPACK_IMPORTED_MODULE_4__.error)(String(err));
     await cancel(workspaceName);

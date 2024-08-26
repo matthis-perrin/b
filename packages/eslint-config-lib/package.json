@@ -1,13 +1,13 @@
 {
   "name": "@matthis/eslint-config-lib",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "type": "module",
   "main": "index.js",
   "license": "UNLICENSED",
   "dependencies": {
     "@eslint/compat": "1.1.x",
-    "@typescript-eslint/eslint-plugin": "8.0.x",
-    "@typescript-eslint/parser": "8.0.x",
+    "@typescript-eslint/eslint-plugin": "8.1.x",
+    "@typescript-eslint/parser": "8.1.x",
     "eslint": "9.8.x",
     "eslint-import-resolver-typescript": "3.6.x",
     "eslint-plugin-eslint-comments": "3.2.x",

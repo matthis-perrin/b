@@ -39,7 +39,7 @@
     "source-map-loader": "5.0.x",
     "terser-webpack-plugin": "5.3.x",
     "ts-node": "10.9.x",
-    "tsx": "4.16.x",
+    "tsx": "4.17.x",
     "webpack": "5.93.x",
     "webpack-cli": "4.10.x",
     "webpack-dev-server": "5.0.x"
