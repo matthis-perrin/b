@@ -60,7 +60,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function definePlugin() {
   const envPrefix = 'MATTHIS_';
-  const extraEnv = Object.fromEntries(Object.entries(process.env) // eslint-disable-line node/no-process-env
+  const extraEnv = Object.fromEntries(Object.entries(process.env) // eslint-disable-line n/no-process-env
   .filter(([name]) => name.startsWith(envPrefix)).map(([name, value]) => [String(name.slice(envPrefix.length)), JSON.stringify(value)]));
   return new (webpack__WEBPACK_IMPORTED_MODULE_0___default().DefinePlugin)({
     'process.env.NODE_ENV': JSON.stringify((0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_1__.getEnv)()),
@@ -101,10 +101,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function isProd() {
-  return process.env['NODE_ENV'] === 'production'; // eslint-disable-line node/no-process-env
+  return process.env['NODE_ENV'] === 'production'; // eslint-disable-line n/no-process-env
 }
 function isSelenium() {
-  return process.env['IS_SELENIUM'] === '1'; // eslint-disable-line node/no-process-env
+  return process.env['IS_SELENIUM'] === '1'; // eslint-disable-line n/no-process-env
 }
 function getEnv() {
   return isProd() ? 'production' : 'development';
@@ -170,7 +170,7 @@ async function lookupRoot(fromPath) {
   if (parent === fromPath) {
     throw new Error('Failure to lookup root');
   }
-  return lookupRoot(parent);
+  return await lookupRoot(parent);
 }
 
 /***/ }),
@@ -257,7 +257,7 @@ const prettierConfig = parser => ({
   endOfLine: 'auto'
 });
 async function prettierFormat(str, parser) {
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
 }
 async function writeRawFile(path, content) {
   await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
@@ -269,25 +269,25 @@ async function prettyJson(json, opts) {
   const {
     compact
   } = opts ?? {};
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('json'));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('json'));
 }
 async function prettyJsonc(json, opts) {
   const {
     compact
   } = opts ?? {};
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('jsonc'));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('jsonc'));
 }
 async function writeJsonFile(path, json) {
   await writeRawFile(path, await prettyJson(json));
 }
 async function prettyJs(js) {
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(js, prettierConfig('babel'));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(js, prettierConfig('babel'));
 }
 async function writeJsFile(path, js) {
   await writeRawFile(path, await prettyJs(js));
 }
 async function prettyTs(ts) {
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(ts, prettierConfig('typescript'));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(ts, prettierConfig('typescript'));
 }
 async function writeTsFile(path, ts) {
   await writeRawFile(path, await prettyTs(ts));
@@ -314,7 +314,7 @@ async function cleanDir(dirPath) {
   }
 }
 async function cp(from, to) {
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(`cp -R ${from} ${to}`, err => err ? reject(err) : resolve());
   });
 }
@@ -416,6 +416,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+// eslint-disable-next-line n/no-extraneous-import
 
 
 
@@ -440,7 +441,7 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
   fileStates = new Map();
   shouldRun = false;
   async setup(compiler) {
-    return new Promise(resolve => {
+    return await new Promise(resolve => {
       this.runEslintInterval = setInterval(() => this.runEslint(), RUN_ESLINT_INTERVAL);
 
       // Generate the patterns of all the files across the workspace
@@ -606,7 +607,7 @@ class EslintPlugin extends _src_webpack_plugins_standalone_plugin__WEBPACK_IMPOR
     this.resolveAwaitIdlePromise();
   }
   async awaitIdle() {
-    return new Promise(resolve => {
+    return await new Promise(resolve => {
       this.resolveAwaitIdlePromise = resolve;
       this.checkIdle();
     });
@@ -662,9 +663,9 @@ class StandalonePlugin {
 
   apply(compiler) {
     this.context = compiler.context;
-    compiler.hooks.beforeRun.tapPromise(this.name, async () => this.setupHandler(compiler));
-    compiler.hooks.watchRun.tapPromise(this.name, async () => this.setupHandler(compiler));
-    compiler.hooks.shutdown.tapPromise(this.name, async () => this.exitHandlerAsync(compiler));
+    compiler.hooks.beforeRun.tapPromise(this.name, async () => await this.setupHandler(compiler));
+    compiler.hooks.watchRun.tapPromise(this.name, async () => await this.setupHandler(compiler));
+    compiler.hooks.shutdown.tapPromise(this.name, async () => await this.exitHandlerAsync(compiler));
     (0,_src_exit_handler__WEBPACK_IMPORTED_MODULE_0__.registerExitCallback)(() => this.exitHandler(compiler));
   }
   // SETUP

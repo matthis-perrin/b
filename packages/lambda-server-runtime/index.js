@@ -397,7 +397,7 @@ __webpack_require__.r(__webpack_exports__);
 // ENV VARIABLES LOADING
 //
 
-// eslint-disable-next-line node/no-process-env
+// eslint-disable-next-line n/no-process-env
 const {
   PORT,
   RUNTIME_LOG_FILE,
@@ -413,7 +413,7 @@ if (isNaN(port)) {
     path: '',
     method: ''
   });
-  // eslint-disable-next-line node/no-process-exit
+  // eslint-disable-next-line n/no-process-exit
   process.exit(0);
 }
 const timeoutMs = parseFloat(TIMEOUT_MS ?? '');
@@ -424,7 +424,7 @@ if (isNaN(timeoutMs)) {
     path: '',
     method: ''
   });
-  // eslint-disable-next-line node/no-process-exit
+  // eslint-disable-next-line n/no-process-exit
   process.exit(0);
 }
 if (HANDLER_PATH === undefined) {
@@ -434,7 +434,7 @@ if (HANDLER_PATH === undefined) {
     path: '',
     method: ''
   });
-  // eslint-disable-next-line node/no-process-exit
+  // eslint-disable-next-line n/no-process-exit
   process.exit(0);
 }
 
@@ -481,7 +481,7 @@ function serialize(val) {
 console.log = (...args) => logger(args.map(serialize));
 console.error = (...args) => logger(args.map(serialize));
 let handler;
-// eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
+// eslint-disable-next-line import/dynamic-import-chunkname
 import( /* webpackIgnore: true */HANDLER_PATH).then(imported => {
   const importedHandler = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.asMap)(imported)?.['handler'];
   if (typeof importedHandler !== 'function') {
@@ -491,7 +491,7 @@ import( /* webpackIgnore: true */HANDLER_PATH).then(imported => {
       path: '',
       method: ''
     });
-    // eslint-disable-next-line node/no-process-exit
+    // eslint-disable-next-line n/no-process-exit
     process.exit(0);
   }
   handler = importedHandler;
@@ -502,7 +502,7 @@ import( /* webpackIgnore: true */HANDLER_PATH).then(imported => {
     path: '',
     method: ''
   });
-  // eslint-disable-next-line node/no-process-exit
+  // eslint-disable-next-line n/no-process-exit
   process.exit(0);
 });
 

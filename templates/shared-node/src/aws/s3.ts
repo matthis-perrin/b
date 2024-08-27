@@ -72,7 +72,7 @@ export async function getObject(options: {
     const body = await (noDecompress
       ? res.Body?.transformToString()
       : res.Body?.transformToByteArray()
-          .then(async arr => gzipDecompress(arr))
+          .then(async arr => await gzipDecompress(arr))
           .then(buff => buff.toString()));
     if (body === undefined) {
       throw new Error('Failure to retrieve object body');
@@ -92,7 +92,7 @@ export async function getPresignedUploadUrl(
   opts?: {expiresInSeconds?: number; contentType?: string}
 ): Promise<string> {
   const {expiresInSeconds, contentType} = opts ?? {};
-  return getSignedUrl(
+  return await getSignedUrl(
     getClient(),
     new PutObjectCommand({Bucket: bucket, Key: key, ContentType: contentType}),
     {
@@ -107,7 +107,7 @@ export async function getPresignedDownloadUrl(
   opts?: {expiresInSeconds?: number; responseContentDisposition?: string}
 ): Promise<string> {
   const o = opts ?? {};
-  return getSignedUrl(
+  return await getSignedUrl(
     getClient(),
     new GetObjectCommand({
       Bucket: bucket,
@@ -128,7 +128,7 @@ export async function listObjects(options: {
   continuationToken?: string;
 }): Promise<ListObjectsV2Output> {
   const {bucket, prefix, startAfter, limit, continuationToken} = options;
-  return getClient().send(
+  return await getClient().send(
     new ListObjectsV2Command({
       Bucket: bucket,
       Prefix: prefix,

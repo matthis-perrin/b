@@ -484,7 +484,6 @@ export const eslintCore: EslintMetadata = {
     'no-unreachable': 'warn',
     'no-unsafe-finally': 'warn',
     'no-unused-labels': 'warn',
-    'no-useless-assignment': 'warn',
     'no-useless-call': 'warn',
     'no-useless-catch': 'warn',
     'no-useless-computed-key': 'warn',

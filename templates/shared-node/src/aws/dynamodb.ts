@@ -162,7 +162,7 @@ export async function transactWriteItems(params: {
     )
     .catch(async (err: unknown) => {
       if (err instanceof TransactionInProgressException) {
-        return transactWriteItems({...params, clientRequestToken: requestToken});
+        return await transactWriteItems({...params, clientRequestToken: requestToken});
       }
       throw err;
     });
@@ -496,7 +496,9 @@ export function updateItemParamsToUpdateItemCommandInput(
 }
 
 export async function updateItem(params: UpdateItemParams): Promise<UpdateItemCommandOutput> {
-  return getClient().send(new UpdateItemCommand(updateItemParamsToUpdateItemCommandInput(params)));
+  return await getClient().send(
+    new UpdateItemCommand(updateItemParamsToUpdateItemCommandInput(params))
+  );
 }
 
 export function makeUpdateBatchParams(

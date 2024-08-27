@@ -22,7 +22,7 @@ export async function handleStatics<SessionManagerType extends AnySessionManager
 
   // index.html
   if (method === 'GET' && (path === '' || path === '/' || path === '/index.html')) {
-    return getIndex(req, {frontendName, session});
+    return await getIndex(req, {frontendName, session});
   }
   // manifest.webmanifest
   if (method === 'GET' && path === '/manifest.webmanifest') {

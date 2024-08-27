@@ -21,5 +21,5 @@ export async function publish(options: {
   payload: string;
 }): Promise<PublishCommandOutput> {
   const {topic, payload} = options;
-  return getClient().send(new PublishCommand({topic, payload}));
+  return await getClient().send(new PublishCommand({topic, payload}));
 }

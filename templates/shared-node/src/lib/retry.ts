@@ -65,11 +65,11 @@ async function retryInternal<T>(
     const timeout = Math.min(random * minTimeout * factor ** currentAttempt, maxTimeout);
     console.log(`retrying in ${timeout} ms...`, {options, currentAttempt, timeout});
     await sleep(timeout);
-    return retryInternal(fn, options, currentAttempt + 1);
+    return await retryInternal(fn, options, currentAttempt + 1);
   }
 }
 
 export async function retry<T>(fn: () => Promise<T>, options?: Partial<RetryOptions>): Promise<T> {
   const optionsWithDefault = {...defaultRetryOptions, ...options};
-  return retryInternal(fn, optionsWithDefault, 0);
+  return await retryInternal(fn, optionsWithDefault, 0);
 }

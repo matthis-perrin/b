@@ -76,7 +76,7 @@ export class SessionManager<UserItem extends {id: string; sessionDuration: numbe
     if (!user) {
       return undefined;
     }
-    return Promise.resolve(this.opts.userItemToFrontendUser(user)).catch((err: unknown) => {
+    return await Promise.resolve(this.opts.userItemToFrontendUser(user)).catch((err: unknown) => {
       console.error('Failure to convert UserItem to FrontendUser', user, err);
       return undefined;
     });
@@ -102,7 +102,7 @@ export class SessionManager<UserItem extends {id: string; sessionDuration: numbe
 
     // Set session cookie
     this.setSessionCookie(context, {token, expiresAt, sessionDuration: user.sessionDuration});
-    return this.opts.userItemToFrontendUser(user);
+    return await this.opts.userItemToFrontendUser(user);
   }
 
   // COOKIE MANIPULATION

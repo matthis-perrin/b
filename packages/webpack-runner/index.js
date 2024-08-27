@@ -173,7 +173,7 @@ const prettierConfig = parser => ({
   endOfLine: 'auto'
 });
 async function prettierFormat(str, parser) {
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(str, prettierConfig(parser));
 }
 async function writeRawFile(path, content) {
   await mkdir((0,node_path__WEBPACK_IMPORTED_MODULE_2__.dirname)(path), {
@@ -185,25 +185,25 @@ async function prettyJson(json, opts) {
   const {
     compact
   } = opts ?? {};
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('json'));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('json'));
 }
 async function prettyJsonc(json, opts) {
   const {
     compact
   } = opts ?? {};
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('jsonc'));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(compact ? JSON.stringify(json) : JSON.stringify(json, undefined, 2), prettierConfig('jsonc'));
 }
 async function writeJsonFile(path, json) {
   await writeRawFile(path, await prettyJson(json));
 }
 async function prettyJs(js) {
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(js, prettierConfig('babel'));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(js, prettierConfig('babel'));
 }
 async function writeJsFile(path, js) {
   await writeRawFile(path, await prettyJs(js));
 }
 async function prettyTs(ts) {
-  return (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(ts, prettierConfig('typescript'));
+  return await (0,prettier__WEBPACK_IMPORTED_MODULE_3__.format)(ts, prettierConfig('typescript'));
 }
 async function writeTsFile(path, ts) {
   await writeRawFile(path, await prettyTs(ts));
@@ -230,7 +230,7 @@ async function cleanDir(dirPath) {
   }
 }
 async function cp(from, to) {
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.exec)(`cp -R ${from} ${to}`, err => err ? reject(err) : resolve());
   });
 }
@@ -554,7 +554,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f));
 
   // Create projects files from templates
-  const projectFiles = await Promise.all(projects.map(async project => (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_7__.generateProject)({
+  const projectFiles = await Promise.all(projects.map(async project => await (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_7__.generateProject)({
     dst,
     project,
     allFragments: workspaceFragments,
@@ -564,7 +564,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
 
   // Generate workspace root files
   const SCRIPTS_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_2__.fileURLToPath)(import.meta.url), '../scripts');
-  const writeFile = async (path, file) => writeWorkspaceFile(workspace, dst, path, file);
+  const writeFile = async (path, file) => await writeWorkspaceFile(workspace, dst, path, file);
   const workspaceFiles = await Promise.all([
   // package.json
   writeFile('package.json', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJson)((0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_9__.generateWorkspacePackageJson)(workspaceName, projects))),
@@ -586,7 +586,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
     const relativePath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.relative)(vscodePath, file);
     const dstPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('.vscode', relativePath);
     const content = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)(file);
-    return writeFile(dstPath, content);
+    return await writeFile(dstPath, content);
   }));
 
   // Terraform folder generation
@@ -598,7 +598,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
       return;
     }
     const name = `${p.projectName}_terraform`;
-    return writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `${name}.tf`), addLineBreak(content));
+    return await writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `${name}.tf`), addLineBreak(content));
   })]);
   await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_13__.writeWorkspace)(dst, {
     files: (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_15__.removeUndefined)([...projectFiles.flat(), ...workspaceFiles, ...terraformFiles, ...vscodeFiles]),
@@ -1090,7 +1090,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.15',
+  project: '1.11.19',
   eslint: '1.8.4',
   prettier: '1.5.0',
   tsconfig: '1.7.4',
@@ -2281,10 +2281,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function isProd() {
-  return process.env['NODE_ENV'] === 'production'; // eslint-disable-line node/no-process-env
+  return process.env['NODE_ENV'] === 'production'; // eslint-disable-line n/no-process-env
 }
 function isSelenium() {
-  return process.env['IS_SELENIUM'] === '1'; // eslint-disable-line node/no-process-env
+  return process.env['IS_SELENIUM'] === '1'; // eslint-disable-line n/no-process-env
 }
 function getEnv() {
   return isProd() ? 'production' : 'development';
@@ -2350,7 +2350,7 @@ async function lookupRoot(fromPath) {
   if (parent === fromPath) {
     throw new Error('Failure to lookup root');
   }
-  return lookupRoot(parent);
+  return await lookupRoot(parent);
 }
 
 /***/ }),
@@ -2404,7 +2404,7 @@ async function generateEnvFile(root, overrides) {
   // Parse the outputs from the tf files to create defaults
   const terraformDir = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.readdir)(terraformPath);
   const terraformFiles = terraformDir.filter(f => f.endsWith('.tf'));
-  const terraformFilesContent = await Promise.all(terraformFiles.map(async f => (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, f))));
+  const terraformFilesContent = await Promise.all(terraformFiles.map(async f => await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(terraformPath, f))));
   const allTerraform = terraformFilesContent.join('\n');
   const outputMatches = allTerraform.matchAll(/output "(?<outputName>[^"]+)" \{/gu);
   const defaultOutputs = Object.fromEntries([...outputMatches].map(o => o.groups?.['outputName']).filter(o => o !== undefined).map(o => [o.toUpperCase(), 'RUN_TERRAFORM_APPLY']));
@@ -2640,7 +2640,7 @@ function readLines(filePath, cb) {
   p.stdout.on('data', chunk => {
     data += chunk;
     const lines = data.split('\n');
-    // eslint-disable-next-line node/callback-return
+    // eslint-disable-next-line n/callback-return
     cb(lines.slice(0, -1));
     data = lines.at(-1) ?? '';
   });
@@ -3000,7 +3000,7 @@ function exit() {
   });
   process.stdin.setRawMode(false);
   (0,_src_logger__WEBPACK_IMPORTED_MODULE_9__.log)('See you soon!');
-  // eslint-disable-next-line node/no-process-exit
+  // eslint-disable-next-line n/no-process-exit
   process.exit(0);
 }
 async function runWebpacks(opts) {
@@ -3154,7 +3154,7 @@ async function runWebpacks(opts) {
       });
     }
     statuses.set(projectName, intialStatus);
-    // eslint-disable-next-line import/dynamic-import-chunkname, node/no-unsupported-features/es-syntax
+    // eslint-disable-next-line import/dynamic-import-chunkname
     const config = await import( /*webpackIgnore: true*/(0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(projectPath, 'webpack.config.js')).then(({
       getConfig
     }) => getConfig({
@@ -3261,7 +3261,7 @@ async function runWebpacks(opts) {
       await devServer.start();
     }
     return async () => {
-      return new Promise((resolve, reject) => {
+      return await new Promise((resolve, reject) => {
         const closeCompiler = () => {
           tailLambdaServerCleanup?.();
           tailWebpackServerCleanup?.();
@@ -3289,7 +3289,7 @@ async function runWebpacks(opts) {
       return;
     }
     cleanupCalled = true;
-    await Promise.all(cleanupFunctions.map(async fn => fn?.()));
+    await Promise.all(cleanupFunctions.map(async fn => await fn?.()));
     redraw();
     (0,node_fs__WEBPACK_IMPORTED_MODULE_1__.rmSync)((0,node_path__WEBPACK_IMPORTED_MODULE_2__.join)(globalRoot, '.build.lock'));
     process.stdin.setRawMode(false);
@@ -3347,7 +3347,7 @@ async function runWebpacks(opts) {
     });
   }
   (0,_src_exit_handler__WEBPACK_IMPORTED_MODULE_6__.registerExitCallback)(cleanup);
-  return globalPromise;
+  return await globalPromise;
 }
 async function runAllWebpacks(options) {
   const {
