@@ -333,7 +333,7 @@ export default [
       'no-unused-labels': 'warn',
       'no-unused-vars': 'off',
       'no-use-before-define': 'off',
-      'no-useless-assignment': 'warn',
+      'no-useless-assignment': 'off',
       'no-useless-backreference': 'off',
       'no-useless-call': 'warn',
       'no-useless-catch': 'warn',

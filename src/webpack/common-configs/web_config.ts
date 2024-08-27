@@ -5,6 +5,7 @@ import {Configuration} from 'webpack';
 
 import {baseConfig} from '@src/webpack/common-configs/base_config';
 import {babelLoaderWeb} from '@src/webpack/loaders/babel_loader_web';
+import {imagesLoader} from '@src/webpack/loaders/images_loader';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {faviconsWebpackPlugin} from '@src/webpack/plugins/favicons_webpack_plugin';
 import {htmlPlugin} from '@src/webpack/plugins/html_plugin';
@@ -36,7 +37,7 @@ export function webConfig(opts: {context: string; watch: boolean}): Configuratio
       publicPath: '/',
     },
     module: {
-      rules: [babelLoaderWeb(), sourceMapLoader()],
+      rules: [babelLoaderWeb(), sourceMapLoader(), imagesLoader()],
     },
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
