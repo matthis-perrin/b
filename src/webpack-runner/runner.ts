@@ -1,5 +1,4 @@
 import {execSync} from 'node:child_process';
-import {rmSync} from 'node:fs';
 import {join} from 'node:path';
 
 import {underline} from 'ansi-colors';
@@ -7,7 +6,6 @@ import {Configuration, Stats, webpack} from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 
 import {registerExitCallback} from '@src/exit_handler';
-import {exists, writeRawFile} from '@src/fs';
 import {globalError} from '@src/global_error';
 import {error, log} from '@src/logger';
 import {ProjectName, ProjectType, WorkspaceFragment} from '@src/models';
@@ -34,6 +32,7 @@ import {
   renderErrorWarningCount,
   renderProjectStatus,
 } from '@src/webpack-runner/renderer';
+import {releaseLock, takelock} from '@src/webpack-runner/runner_lock';
 import {table} from '@src/webpack-runner/text_table';
 
 interface RunWebpacksOptions {
@@ -66,7 +65,7 @@ const name = 'WebpackRunner';
 
 let globalRoot = '';
 function exit(): void {
-  rmSync(join(globalRoot, '.build.lock'), {force: true});
+  releaseLock(globalRoot);
   process.stdin.setRawMode(false);
   log('See you soon!');
   // eslint-disable-next-line n/no-process-exit
@@ -371,7 +370,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     cleanupCalled = true;
     await Promise.all(cleanupFunctions.map(async fn => await fn?.()));
     redraw();
-    rmSync(join(globalRoot, '.build.lock'));
+    releaseLock(globalRoot);
     process.stdin.setRawMode(false);
   };
 
@@ -449,15 +448,7 @@ export async function runAllWebpacks(
 ): Promise<void> {
   const {root, watch} = options;
   globalRoot = root;
-
-  // Take a lock to ensure nothing else is running
-  const lockFilePath = join(root, '.build.lock');
-  const isLocked = await exists(lockFilePath);
-  if (isLocked) {
-    throw new Error(`File ${lockFilePath} already exists. Is another build running?`);
-  } else {
-    await writeRawFile(lockFilePath, '');
-  }
+  await takelock(root);
 
   const {fragments} = (await readWorkspace(root)) ?? {};
   if (!fragments) {

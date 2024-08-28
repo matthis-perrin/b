@@ -1,0 +1,11 @@
+{
+  "name": "web",
+  "license": "UNLICENSED",
+  "type": "module",
+  "prettier": "@matthis/prettier-config",
+  "scripts": {
+    "test": "node --import tsx --test **/*.test.tsx"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}

@@ -1,0 +1,9 @@
+{
+  "name": "__PROJECT_NAME__",
+  "license": "UNLICENSED",
+  "type": "module",
+  "prettier": "@matthis/prettier-config",
+  "scripts": {
+    "test": "node --import tsx --test **/*.test.ts"
+  }
+}
