@@ -1,5 +1,5 @@
 /* eslint-disable import/no-named-as-default-member */
-import {readdir, readFile} from 'node:fs/promises';
+import {readdir} from 'node:fs/promises';
 import {join, resolve} from 'node:path';
 
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports, n/file-extension-in-import
@@ -13,6 +13,8 @@ import colors from 'ansi-colors';
 import packageMetadata from 'package-json';
 import {satisfies} from 'semver';
 
+import {maybeReadFile} from '@src/fs.js';
+
 function sameVersion(v1: string, v2: string): boolean {
   // eslint-disable-next-line unicorn/no-for-loop
   for (let index = 0; index < v1.length; index++) {
@@ -23,21 +25,22 @@ function sameVersion(v1: string, v2: string): boolean {
   return true;
 }
 
-export async function check(): Promise<void> {
-  const packagePath = join(resolve('.'), 'packages');
-  const packageDirs = await readdir(packagePath);
+export async function check(mode: 'packages' | 'templates'): Promise<void> {
+  const packageTemplates = join(resolve('.'), mode);
+  const packageDirs = await readdir(packageTemplates);
   const packageJsonFiles = await Promise.all(
-    packageDirs.map(async d => ({
-      project: d,
-      content: JSON.parse(
-        await readFile(join(packagePath, d, 'package.json')).then(buff => buff.toString())
-      ),
-    }))
+    packageDirs.map(async d => {
+      const packageContent = await maybeReadFile(join(packageTemplates, d, 'package.json'));
+      if (packageContent === undefined) {
+        return undefined;
+      }
+      return {project: d, content: JSON.parse(packageContent)};
+    })
   );
 
   const dependencies: Record<string, {version: string; projects: string[]; dev: boolean}> = {};
   const errors: string[] = [];
-  for (const {content, project} of packageJsonFiles) {
+  for (const {content, project} of removeUndefined(packageJsonFiles)) {
     const dep = (content.dependencies ?? {}) as Record<string, string>;
     const devDep = (content.devDependencies ?? {}) as Record<string, string>;
     for (const {name, version, dev} of [
@@ -80,25 +83,43 @@ export async function check(): Promise<void> {
   }
 }
 
+type Row = [string, string, string, string, string];
+
 async function checkPackage(
   name: string,
   projects: string[],
   dev: boolean,
   version: string
-): Promise<[string, string, string, string, string] | undefined> {
+): Promise<Row> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const latest = ((await packageMetadata(name)) as any).version as string;
+  const maxProjectsListed = 3;
+  const projectsList =
+    projects.length > maxProjectsListed
+      ? `${projects.slice(0, maxProjectsListed).join(', ')}...`
+      : projects.join(', ');
+  const projectsString = `${colors.gray(projectsList)}${dev ? ' (dev)' : ''}`;
   if (!satisfies(latest, version)) {
-    return [
-      name,
+    const res: Row = [
+      colors.red(name),
       [...version].map((c, i) => (latest[i] !== c ? colors.red(c) : c)).join(''),
       colors.gray('->'),
       [...latest].map((c, i) => (version[i] !== c ? colors.green(c) : c)).join(''),
-      `${colors.gray(projects.join(', '))}${dev ? ' (dev)' : ''}`,
+      projectsString,
     ];
+    return res;
   }
-  return undefined;
+  return [
+    colors.green(name),
+    [...version].map((c, i) => (latest[i] !== c ? colors.gray(c) : c)).join(''),
+    colors.gray('->'),
+    [...latest].map((c, i) => (version[i] !== c ? colors.gray(c) : c)).join(''),
+    `${colors.green('✔︎')} ${projectsString}`,
+  ];
 }
 
-check().catch(error);
+log(colors.cyan('\nRUNTIME\n'));
+await check('templates');
+log(colors.cyan('\nBUILD\n'));
+await check('packages');
 /* eslint-enable import/no-named-as-default-member */
