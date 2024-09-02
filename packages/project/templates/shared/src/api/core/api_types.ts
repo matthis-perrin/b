@@ -25,6 +25,12 @@ export type Response<
     : never
   : never;
 
+export type Raw<
+  Name extends ApiName,
+  Path extends ApiPath<Name>,
+  Method extends ApiMethod<Name, Path>,
+> = (typeof ALL)[Name][Path][Method] extends {raw: infer Raw} ? Raw : false;
+
 type ForceString<T> = T extends string ? T : never;
 type MethodPath<M, P> = `${ForceString<M>} ${ForceString<P>}`;
 type GenerateRouteKeys<Name extends ApiName> = {
@@ -53,6 +59,8 @@ export type FlatApi<Name extends ApiName> = {
         req: Request<Name, Path, Method>;
         // @ts-expect-error ts does not infer the Name <-> Path relationship
         res: Response<Name, Path, Method>;
+        // @ts-expect-error ts does not infer the Name <-> Path relationship
+        raw: Response<Name, Path, Method>;
       }
     : never;
 };
@@ -65,8 +73,13 @@ export interface ApiContext {
 export type ApiHandler<Name extends ApiName, Endpoint extends keyof FlatApi<Name>> = (
   req: FlatApi<Name>[Endpoint]['req'],
   context: ApiContext
-) => FlatApi<Name>[Endpoint]['res'] | Promise<FlatApi<Name>[Endpoint]['res']>;
+) => ApiRes<Name, Endpoint> | Promise<ApiRes<Name, Endpoint>>;
 
 export interface ApiConfig {
   host: string;
 }
+
+export type ApiRes<
+  Name extends ApiName,
+  Endpoint extends keyof FlatApi<Name>,
+> = FlatApi<Name>[Endpoint]['raw'] extends true ? string : FlatApi<Name>[Endpoint]['res'];

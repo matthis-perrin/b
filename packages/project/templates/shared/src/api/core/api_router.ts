@@ -1,7 +1,7 @@
 import {ALL} from '@shared/api/api';
 import {parseSchema} from '@shared/api/core/api_parser';
 import {AllApiSchema} from '@shared/api/core/api_schema';
-import {ApiContext, ApiName, FlatApi} from '@shared/api/core/api_types';
+import {ApiContext, ApiName, ApiRes, FlatApi} from '@shared/api/core/api_types';
 
 export function createRouter<Name extends ApiName>(
   apiName: Name,
@@ -9,7 +9,7 @@ export function createRouter<Name extends ApiName>(
     [Endpoint in keyof FlatApi<Name>]: (
       req: FlatApi<Name>[Endpoint]['req'],
       context: ApiContext
-    ) => FlatApi<Name>[Endpoint]['res'] | Promise<FlatApi<Name>[Endpoint]['res']>;
+    ) => ApiRes<Name, Endpoint> | Promise<ApiRes<Name, Endpoint>>;
   }
 ): (
   path: string,

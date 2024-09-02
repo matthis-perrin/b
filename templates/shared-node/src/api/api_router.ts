@@ -2,7 +2,7 @@ import {ALL} from '@shared/api/api';
 import {HttpError} from '@shared/api/core/api_errors';
 import {parseSchema} from '@shared/api/core/api_parser';
 import {AllApiSchema} from '@shared/api/core/api_schema';
-import {ApiContext, ApiName, FlatApi} from '@shared/api/core/api_types';
+import {ApiContext, ApiName, ApiRes, FlatApi} from '@shared/api/core/api_types';
 
 import {ApiRequest, ApiResponse} from '@shared-node/api/api_interface';
 import {compress} from '@shared-node/lib/gzip';
@@ -14,7 +14,7 @@ export async function handleApi<Name extends ApiName>(
     [Endpoint in keyof FlatApi<Name>]: (
       req: FlatApi<Name>[Endpoint]['req'],
       context: ApiContext
-    ) => FlatApi<Name>[Endpoint]['res'] | Promise<FlatApi<Name>[Endpoint]['res']>;
+    ) => ApiRes<Name, Endpoint> | Promise<ApiRes<Name, Endpoint>>;
   }
 ): Promise<ApiResponse | undefined> {
   // Retrieve handler and request schema
@@ -55,6 +55,9 @@ export async function handleApi<Name extends ApiName>(
       return {body: compressedRes.toString('base64'), opts: {extraHeaders, isBase64Encoded: true}};
     }
 
+    if (schema.raw) {
+      return {body: handlerRes as string, opts: {extraHeaders}};
+    }
     const stringifyStart = Date.now();
     const stringified = JSON.stringify(handlerRes);
     console.log(`Stringify took ${Date.now() - stringifyStart}ms`);

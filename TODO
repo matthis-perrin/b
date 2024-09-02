@@ -1,3 +1,5 @@
+- Static website templates
+- Easier theming
 - Cloudfront caching for static website
 - Use EventBridge instead of Cloudwatch event
 - Server side rendering

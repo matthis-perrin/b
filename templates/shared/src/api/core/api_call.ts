@@ -1,7 +1,7 @@
 import {ALL, API_CONFIGS} from '@shared/api/api';
 import {parseSchema} from '@shared/api/core/api_parser';
 import {AllApiSchema} from '@shared/api/core/api_schema';
-import {ApiName, FlatApi} from '@shared/api/core/api_types';
+import {ApiName, ApiRes, FlatApi} from '@shared/api/core/api_types';
 import {asJson, asString} from '@shared/lib/type_utils';
 
 interface RequestInit {
@@ -30,7 +30,7 @@ export function apiCaller<Name extends ApiName>(
   async function apiCall<Endpoint extends keyof FlatApi<Name>>(
     endpoint: Endpoint,
     req: FlatApi<Name>[Endpoint]['req']
-  ): Promise<FlatApi<Name>[Endpoint]['res']> {
+  ): Promise<ApiRes<Name, Endpoint>> {
     const [method = 'GET', path = ''] = endpoint.split(' ', 2);
 
     const schema = apiSchemas?.[path]?.[method];
@@ -81,9 +81,10 @@ export function apiCaller<Name extends ApiName>(
         throw new Error('Unexpected error');
       }
       try {
-        return (
-          schemaValidation ? parseSchema(resJson, schema.res) : resJson
-        ) as FlatApi<Name>[Endpoint]['res'];
+        return (schemaValidation ? parseSchema(resJson, schema.res) : resJson) as ApiRes<
+          Name,
+          Endpoint
+        >;
       } catch (err: unknown) {
         logger(`Invalid API response, schema not respected`, debugInfo, err);
         throw new Error('Unexpected error');

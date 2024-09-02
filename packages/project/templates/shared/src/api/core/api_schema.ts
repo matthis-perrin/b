@@ -141,21 +141,22 @@ export type SchemaToType<T extends Schema> = T extends UnknownSchema
 
 export type AllApiSchema = Record<
   string,
-  Record<string, Record<string, {req?: Schema; res?: Schema}>>
+  Record<string, Record<string, {req?: Schema; res?: Schema; raw?: boolean}>>
 >;
 
 export function Opt<T extends Schema>(schema: T): ToOptional<T> {
   return {...schema, optional: true} as unknown as ToOptional<T>;
 }
 
-type ToOptional<T extends Schema> = T extends StringSchema<infer StringType>
-  ? OptStringSchema<StringType>
-  : T extends NumberSchema
-    ? OptNumberSchema
-    : T extends BooleanSchema
-      ? OptBooleanSchema
-      : T extends ArraySchema<infer Item>
-        ? OptArraySchema<Item>
-        : T extends ObjectSchema<infer Properties>
-          ? OptObjectSchema<Properties>
-          : never;
+type ToOptional<T extends Schema> =
+  T extends StringSchema<infer StringType>
+    ? OptStringSchema<StringType>
+    : T extends NumberSchema
+      ? OptNumberSchema
+      : T extends BooleanSchema
+        ? OptBooleanSchema
+        : T extends ArraySchema<infer Item>
+          ? OptArraySchema<Item>
+          : T extends ObjectSchema<infer Properties>
+            ? OptObjectSchema<Properties>
+            : never;
