@@ -1,3 +1,4 @@
+// @matthis/skip-file:HAS_API:not:true
 import {apiCaller} from '@shared/api/core/api_call';
 // @matthis/start:AUTHENTICATION:true
 import {FORBIDDEN_CODE} from '@shared/api/core/api_errors';

@@ -1,4 +1,10 @@
-import {WorkspaceFragmentRegistry} from '@src/models';
+import {
+  filterFragments,
+  WorkspaceFragment,
+  WorkspaceFragmentRegistry,
+  WorkspaceFragmentType,
+} from '@src/models';
+import {hasApi} from '@src/project/generate_workspace';
 import {pascalCase} from '@src/string_utils';
 
 interface TemplateFile {
@@ -6,16 +12,12 @@ interface TemplateFile {
   content: string;
 }
 
-interface GenerateSharedFilesOpts {
-  webApps: WorkspaceFragmentRegistry['web-app'][];
-  apiLambdas: WorkspaceFragmentRegistry['api-lambda'][];
-}
-
-export function generateSharedFiles(opts: GenerateSharedFilesOpts): TemplateFile[] {
-  const {webApps, apiLambdas} = opts;
+export function generateSharedFiles(allFragments: WorkspaceFragment[]): TemplateFile[] {
+  const webApps = filterFragments(allFragments, WorkspaceFragmentType.WebApp);
+  const apiLambdas = filterFragments(allFragments, WorkspaceFragmentType.ApiLambda);
   const webAppsWithAuth = webApps.filter(app => app.authentication.enabled);
   return [
-    generateSharedApiFile(opts),
+    ...(hasApi(allFragments) ? [generateSharedApiFile({webApps, apiLambdas})] : []),
     ...webApps.map(webApp => {
       const userType = `${pascalCase(webApp.appName)}User`;
       return {
@@ -78,7 +80,10 @@ export const ${webApp.appName.toUpperCase()}_API = {
   ];
 }
 
-function generateSharedApiFile(opts: GenerateSharedFilesOpts): TemplateFile {
+function generateSharedApiFile(opts: {
+  webApps: WorkspaceFragmentRegistry['web-app'][];
+  apiLambdas: WorkspaceFragmentRegistry['api-lambda'][];
+}): TemplateFile {
   const {webApps, apiLambdas} = opts;
 
   // IMPORTS

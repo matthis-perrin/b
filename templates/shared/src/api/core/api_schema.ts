@@ -1,3 +1,4 @@
+// @matthis/skip-file:HAS_API:not:true
 interface SchemaBase {
   description?: string;
 }

@@ -33,12 +33,32 @@ import {PACKAGE_VERSIONS} from '@src/versions';
 
 const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 
+type Flag = Record<string, string>;
+const booleanFlag = (bool: boolean): string => (bool ? 'true' : 'false');
+
+export function hasApi(allFragments: WorkspaceFragment[]): boolean {
+  return (
+    allFragments.find(
+      f => f.type === WorkspaceFragmentType.ApiLambda || f.type === WorkspaceFragmentType.WebApp
+    ) !== undefined
+  );
+}
+
 export interface WorkspaceProject {
   projectName: ProjectName;
   type: ProjectType;
   fromFragment: WorkspaceFragment;
   vars: Record<string, string>;
-  flags: Record<string, string>;
+  flags: (allFragments: WorkspaceFragment[]) => Flag;
+}
+
+function fragmentFlags(baseFlags: Flag): (allFragments: WorkspaceFragment[]) => Flag {
+  return (allFragments: WorkspaceFragment[]): Flag => {
+    const workspaceFlags: Flag = {
+      HAS_API: booleanFlag(hasApi(allFragments)),
+    };
+    return {...workspaceFlags, ...baseFlags};
+  };
 }
 
 export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): WorkspaceProject[] {
@@ -51,7 +71,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: fragment.websiteName,
         },
-        flags: {},
+        flags: fragmentFlags({}),
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.StandaloneLambda) {
@@ -64,7 +84,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME__: fragment.lambdaName,
           __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
         },
-        flags: {},
+        flags: fragmentFlags({}),
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.ApiLambda) {
@@ -77,7 +97,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME__: fragment.apiName,
           __PROJECT_NAME_UPPERCASE__: fragment.apiName.toUpperCase(),
         },
-        flags: {},
+        flags: fragmentFlags({}),
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.WebApp) {
@@ -88,9 +108,9 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
       __APP_NAME_UPPERCASE__: fragment.appName.toUpperCase(),
       __APP_NAME_PASCALCASE__: pascalCase(fragment.appName),
     };
-    const flags = {
-      AUTHENTICATION: fragment.authentication.enabled ? 'true' : 'false',
-    };
+    const flags = fragmentFlags({
+      AUTHENTICATION: booleanFlag(fragment.authentication.enabled),
+    });
     return [
       {
         projectName: frontendName,
@@ -116,7 +136,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: fragment.scriptName,
         },
-        flags: {},
+        flags: fragmentFlags({}),
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.SharedNode) {
@@ -129,7 +149,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: projectName,
         },
-        flags: {},
+        flags: fragmentFlags({}),
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.SharedWeb) {
@@ -142,7 +162,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: projectName,
         },
-        flags: {},
+        flags: fragmentFlags({}),
       },
     ];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -156,7 +176,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         vars: {
           __PROJECT_NAME__: projectName,
         },
-        flags: {},
+        flags: fragmentFlags({}),
       },
     ];
   }
@@ -251,7 +271,7 @@ export async function generateWorkspace(
       addLineBreak(generateCommonTerraform(workspaceName, projects))
     ),
     ...projects.map(async p => {
-      const content = generateWorkspaceProjectTerraform(workspaceName, p);
+      const content = generateWorkspaceProjectTerraform(workspaceName, p, workspaceFragments);
       if (content === undefined) {
         return;
       }

@@ -668,6 +668,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateWorkspace: () => (/* binding */ generateWorkspace),
 /* harmony export */   getProjectsFromWorkspaceFragment: () => (/* binding */ getProjectsFromWorkspaceFragment),
+/* harmony export */   hasApi: () => (/* binding */ hasApi),
 /* harmony export */   writeWorkspaceFile: () => (/* binding */ writeWorkspaceFile)
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
@@ -708,6 +709,21 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_2__.fileURLToPath)(import.meta.url), '../templates');
+const booleanFlag = bool => bool ? 'true' : 'false';
+function hasApi(allFragments) {
+  return allFragments.find(f => f.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.ApiLambda || f.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp) !== undefined;
+}
+function fragmentFlags(baseFlags) {
+  return allFragments => {
+    const workspaceFlags = {
+      HAS_API: booleanFlag(hasApi(allFragments))
+    };
+    return {
+      ...workspaceFlags,
+      ...baseFlags
+    };
+  };
+}
 function getProjectsFromWorkspaceFragment(fragment) {
   if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.StaticWebsite) {
     return [{
@@ -717,7 +733,7 @@ function getProjectsFromWorkspaceFragment(fragment) {
       vars: {
         __PROJECT_NAME__: fragment.websiteName
       },
-      flags: {}
+      flags: fragmentFlags({})
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.StandaloneLambda) {
     return [{
@@ -728,7 +744,7 @@ function getProjectsFromWorkspaceFragment(fragment) {
         __PROJECT_NAME__: fragment.lambdaName,
         __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase()
       },
-      flags: {}
+      flags: fragmentFlags({})
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.ApiLambda) {
     return [{
@@ -739,7 +755,7 @@ function getProjectsFromWorkspaceFragment(fragment) {
         __PROJECT_NAME__: fragment.apiName,
         __PROJECT_NAME_UPPERCASE__: fragment.apiName.toUpperCase()
       },
-      flags: {}
+      flags: fragmentFlags({})
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp) {
     const backendName = `${fragment.appName}_backend`;
@@ -749,9 +765,9 @@ function getProjectsFromWorkspaceFragment(fragment) {
       __APP_NAME_UPPERCASE__: fragment.appName.toUpperCase(),
       __APP_NAME_PASCALCASE__: (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_14__.pascalCase)(fragment.appName)
     };
-    const flags = {
-      AUTHENTICATION: fragment.authentication.enabled ? 'true' : 'false'
-    };
+    const flags = fragmentFlags({
+      AUTHENTICATION: booleanFlag(fragment.authentication.enabled)
+    });
     return [{
       projectName: frontendName,
       type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.Web,
@@ -773,7 +789,7 @@ function getProjectsFromWorkspaceFragment(fragment) {
       vars: {
         __PROJECT_NAME__: fragment.scriptName
       },
-      flags: {}
+      flags: fragmentFlags({})
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.SharedNode) {
     const projectName = 'shared-node';
@@ -784,7 +800,7 @@ function getProjectsFromWorkspaceFragment(fragment) {
       vars: {
         __PROJECT_NAME__: projectName
       },
-      flags: {}
+      flags: fragmentFlags({})
     }];
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.SharedWeb) {
     const projectName = 'shared-web';
@@ -795,7 +811,7 @@ function getProjectsFromWorkspaceFragment(fragment) {
       vars: {
         __PROJECT_NAME__: projectName
       },
-      flags: {}
+      flags: fragmentFlags({})
     }];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.Shared) {
@@ -807,7 +823,7 @@ function getProjectsFromWorkspaceFragment(fragment) {
       vars: {
         __PROJECT_NAME__: projectName
       },
-      flags: {}
+      flags: fragmentFlags({})
     }];
   }
   (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_15__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
@@ -855,7 +871,7 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   const terraformFiles = await Promise.all([...workspaceFragments.filter(frag => frag.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp).filter(frag => frag.authentication.enabled).flatMap(frag => {
     return [writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_14__.lowerCase)(frag.appName)}_user.tf`), addLineBreak((0,_src_project_terraform_dynamo_user__WEBPACK_IMPORTED_MODULE_11__.generateDynamoUserTerraform)(workspaceName, frag.appName))), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_14__.lowerCase)(frag.appName)}_user_session.tf`), addLineBreak((0,_src_project_terraform_dynamo_user_session__WEBPACK_IMPORTED_MODULE_12__.generateDynamoUserSessionTerraform)(workspaceName, frag.appName)))];
   }), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', 'base.tf'), addLineBreak((0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects))), ...projects.map(async p => {
-    const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateWorkspaceProjectTerraform)(workspaceName, p);
+    const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateWorkspaceProjectTerraform)(workspaceName, p, workspaceFragments);
     if (content === undefined) {
       return;
     }
@@ -1001,10 +1017,7 @@ async function generateProject(opts) {
     };
   })))];
   if (type === _src_models__WEBPACK_IMPORTED_MODULE_3__.ProjectType.Shared) {
-    filesToWrite.push(...(0,_src_project_dynamic_template__WEBPACK_IMPORTED_MODULE_4__.generateSharedFiles)({
-      webApps: (0,_src_models__WEBPACK_IMPORTED_MODULE_3__.filterFragments)(allFragments, _src_models__WEBPACK_IMPORTED_MODULE_3__.WorkspaceFragmentType.WebApp),
-      apiLambdas: (0,_src_models__WEBPACK_IMPORTED_MODULE_3__.filterFragments)(allFragments, _src_models__WEBPACK_IMPORTED_MODULE_3__.WorkspaceFragmentType.ApiLambda)
-    }));
+    filesToWrite.push(...(0,_src_project_dynamic_template__WEBPACK_IMPORTED_MODULE_4__.generateSharedFiles)(allFragments));
   }
   await Promise.all(filesToWrite.map(async ({
     path,
@@ -1024,7 +1037,7 @@ async function generateProject(opts) {
         flagName,
         negate,
         flagValue
-      }, project)) {
+      }, project, allFragments)) {
         return;
       }
     }
@@ -1053,7 +1066,7 @@ async function generateProject(opts) {
           flagName,
           negate,
           flagValue
-        }, project) ? 'include' : 'exclude');
+        }, project, allFragments) ? 'include' : 'exclude');
         continue;
       }
       if (depth.at(-1) === 'include') {
@@ -1071,7 +1084,7 @@ async function generateProject(opts) {
   }));
   return written;
 }
-function flagMatch(flag, project) {
+function flagMatch(flag, project, allFragments) {
   const {
     flagName,
     negate,
@@ -1080,7 +1093,7 @@ function flagMatch(flag, project) {
   if (flagName === undefined || flagValue === undefined) {
     return false;
   }
-  const projectFlagValue = project.flags[flagName];
+  const projectFlagValue = project.flags(allFragments)[flagName];
   const projectFlagMatchValue = projectFlagValue === flagValue;
   return negate !== undefined ? !projectFlagMatchValue : projectFlagMatchValue;
 }
@@ -1093,16 +1106,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateSharedFiles: () => (/* binding */ generateSharedFiles)
 /* harmony export */ });
-/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
+/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(19);
 
-function generateSharedFiles(opts) {
-  const {
+
+
+function generateSharedFiles(allFragments) {
+  const webApps = (0,_src_models__WEBPACK_IMPORTED_MODULE_0__.filterFragments)(allFragments, _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.WebApp);
+  const apiLambdas = (0,_src_models__WEBPACK_IMPORTED_MODULE_0__.filterFragments)(allFragments, _src_models__WEBPACK_IMPORTED_MODULE_0__.WorkspaceFragmentType.ApiLambda);
+  const webAppsWithAuth = webApps.filter(app => app.authentication.enabled);
+  return [...((0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_1__.hasApi)(allFragments) ? [generateSharedApiFile({
     webApps,
     apiLambdas
-  } = opts;
-  const webAppsWithAuth = webApps.filter(app => app.authentication.enabled);
-  return [generateSharedApiFile(opts), ...webApps.map(webApp => {
-    const userType = `${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.pascalCase)(webApp.appName)}User`;
+  })] : []), ...webApps.map(webApp => {
+    const userType = `${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_2__.pascalCase)(webApp.appName)}User`;
     return {
       path: `shared/src/api/${webApp.appName}_api.ts`,
       content: webApp.authentication.enabled ? `
@@ -1191,7 +1209,7 @@ function generateSharedModelFile(webAppsWithAuth) {
 import {Brand} from '@shared/lib/type_utils';
 
 ${webAppsWithAuth.map(webApp => {
-      const userType = `${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.pascalCase)(webApp.appName)}User`;
+      const userType = `${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_2__.pascalCase)(webApp.appName)}User`;
       return `
 export type ${userType}Id = Brand<'${userType}Id', string>;
 
@@ -1352,7 +1370,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.25',
+  project: '1.11.27',
   eslint: '1.8.5',
   prettier: '1.5.0',
   tsconfig: '1.7.4',
@@ -1398,7 +1416,7 @@ __webpack_require__.r(__webpack_exports__);
 function generateCommonTerraform(workspaceName, projects) {
   return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__.generateAwsProviderTerraform)(workspaceName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__.generateS3BucketTerraform)(workspaceName, projects.filter(p => p.type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web).map(p => p.projectName))].join('\n\n');
 }
-function generateWorkspaceProjectTerraform(workspaceName, project) {
+function generateWorkspaceProjectTerraform(workspaceName, project, allFragments) {
   const {
     projectName,
     type,
@@ -1447,7 +1465,7 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
       alarmEmail,
       cloudwatchTriggerMinutes,
       domain,
-      authentication: flags['AUTHENTICATION'] === 'true'
+      authentication: flags(allFragments)['AUTHENTICATION'] === 'true'
     });
   } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.NodeScript) {
     return undefined;

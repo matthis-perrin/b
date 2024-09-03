@@ -1,3 +1,4 @@
+// @matthis/skip-file:HAS_API:not:true
 import {ALL} from '@shared/api/api';
 import {Schema, SchemaToType} from '@shared/api/core/api_schema';
 

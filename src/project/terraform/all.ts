@@ -1,4 +1,4 @@
-import {ProjectType, WorkspaceName} from '@src/models';
+import {ProjectType, WorkspaceFragment, WorkspaceName} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
 import {generateFrontendTerraform} from '@src/project/terraform/frontend';
 import {generateLambdaTerraform} from '@src/project/terraform/lambda';
@@ -26,7 +26,8 @@ export function generateCommonTerraform(
 
 export function generateWorkspaceProjectTerraform(
   workspaceName: WorkspaceName,
-  project: WorkspaceProject
+  project: WorkspaceProject,
+  allFragments: WorkspaceFragment[]
 ): string | undefined {
   const {projectName, type, fromFragment, flags} = project;
   const cloudwatchTriggerMinutes =
@@ -69,7 +70,7 @@ export function generateWorkspaceProjectTerraform(
       alarmEmail,
       cloudwatchTriggerMinutes,
       domain,
-      authentication: flags['AUTHENTICATION'] === 'true',
+      authentication: flags(allFragments)['AUTHENTICATION'] === 'true',
     });
   } else if (type === ProjectType.NodeScript) {
     return undefined;

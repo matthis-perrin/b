@@ -2,7 +2,7 @@ import {join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {listFiles, prettierFormat, readFile} from '@src/fs';
-import {filterFragments, ProjectType, WorkspaceFragment, WorkspaceFragmentType} from '@src/models';
+import {ProjectType, WorkspaceFragment} from '@src/models';
 import {generateSharedFiles} from '@src/project/dynamic_template';
 import {WorkspaceProject, writeWorkspaceFile} from '@src/project/generate_workspace';
 import {FileHash, Workspace} from '@src/project/vscode_workspace';
@@ -53,12 +53,7 @@ export async function generateProject(opts: {
     )),
   ];
   if (type === ProjectType.Shared) {
-    filesToWrite.push(
-      ...generateSharedFiles({
-        webApps: filterFragments(allFragments, WorkspaceFragmentType.WebApp),
-        apiLambdas: filterFragments(allFragments, WorkspaceFragmentType.ApiLambda),
-      })
-    );
+    filesToWrite.push(...generateSharedFiles(allFragments));
   }
 
   await Promise.all(
@@ -71,7 +66,7 @@ export async function generateProject(opts: {
       );
       for (const skipFileMatch of skipFileMatches) {
         const {flagName, negate, flagValue} = skipFileMatch.groups ?? {};
-        if (flagMatch({flagName, negate, flagValue}, project)) {
+        if (flagMatch({flagName, negate, flagValue}, project, allFragments)) {
           return;
         }
       }
@@ -98,7 +93,9 @@ export async function generateProject(opts: {
           );
         if (matchStart) {
           const {flagName, negate, flagValue} = matchStart.groups ?? {};
-          depth.push(flagMatch({flagName, negate, flagValue}, project) ? 'include' : 'exclude');
+          depth.push(
+            flagMatch({flagName, negate, flagValue}, project, allFragments) ? 'include' : 'exclude'
+          );
           continue;
         }
 
@@ -123,13 +120,14 @@ export async function generateProject(opts: {
 
 function flagMatch(
   flag: {flagName?: string; negate?: string; flagValue?: string},
-  project: WorkspaceProject
+  project: WorkspaceProject,
+  allFragments: WorkspaceFragment[]
 ): boolean {
   const {flagName, negate, flagValue} = flag;
   if (flagName === undefined || flagValue === undefined) {
     return false;
   }
-  const projectFlagValue = project.flags[flagName];
+  const projectFlagValue = project.flags(allFragments)[flagName];
   const projectFlagMatchValue = projectFlagValue === flagValue;
   return negate !== undefined ? !projectFlagMatchValue : projectFlagMatchValue;
 }

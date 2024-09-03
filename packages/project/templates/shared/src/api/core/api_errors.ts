@@ -1,3 +1,4 @@
+// @matthis/skip-file:HAS_API:not:true
 export const NOT_FOUND_CODE = 404;
 export const BAD_REQUEST_CODE = 400;
 export const UNAUTHORIZED_CODE = 401;
