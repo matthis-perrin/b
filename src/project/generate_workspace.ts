@@ -70,6 +70,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         fromFragment: fragment,
         vars: {
           __PROJECT_NAME__: fragment.websiteName,
+          __APP_NAME__: fragment.websiteName,
         },
         flags: fragmentFlags({}),
       },

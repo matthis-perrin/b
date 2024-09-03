@@ -8,7 +8,7 @@ import {HomePage} from '@src/components/home_page';
 import {LoginPage} from '@src/components/login_page';
 // @matthis/end
 import {NavBar} from '@src/components/nav_bar';
-import {TestPage} from '@src/components/test_page';
+import {ThemePage} from '@src/components/theme_page';
 // @matthis/start:AUTHENTICATION:true
 import {useUser} from '@src/stores/user_store';
 // @matthis/end
@@ -20,7 +20,7 @@ export const App: React.FC = () => {
   const routes = user ? (
     <>
       <Route path="/" component={HomePage} />
-      <Route path="/test-page" component={TestPage} />
+      <Route path="/theme" component={ThemePage} />
     </>
   ) : (
     <Route path="*" component={LoginPage} />
@@ -30,7 +30,7 @@ export const App: React.FC = () => {
   const routes = (
     <>
       <Route path="/" component={HomePage} />
-      <Route path="/test-page" component={TestPage} />
+      <Route path="/theme" component={ThemePage} />
     </>
   );
   // @matthis/end
@@ -55,8 +55,6 @@ const Wrapper = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: #ccc;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 `;

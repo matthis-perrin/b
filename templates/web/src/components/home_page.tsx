@@ -21,11 +21,17 @@ export const HomePage: React.FC = () => {
 HomePage.displayName = 'HomePage';
 
 const Wrapper = styled.div`
+  flex-grow: 1;
   width: 100%;
-  height: 100%;
   padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
+  &:first-child {
+    margin-top: auto;
+  }
+  &:last-child {
+    margin-bottom: auto;
+  }
 `;

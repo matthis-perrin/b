@@ -731,7 +731,8 @@ function getProjectsFromWorkspaceFragment(fragment) {
       type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.Web,
       fromFragment: fragment,
       vars: {
-        __PROJECT_NAME__: fragment.websiteName
+        __PROJECT_NAME__: fragment.websiteName,
+        __APP_NAME__: fragment.websiteName
       },
       flags: fragmentFlags({})
     }];
@@ -1370,7 +1371,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.27',
+  project: '1.11.33',
   eslint: '1.8.5',
   prettier: '1.5.0',
   tsconfig: '1.7.4',
