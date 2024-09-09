@@ -1,9 +1,14 @@
 import {ProjectName} from '@src/models';
 import {AppDomain} from '@src/project/terraform/all';
 
+export interface WorkspaceProjectTerraformFrontend {
+  type: 'frontend';
+  domain: AppDomain | undefined;
+}
+
 export function generateFrontendTerraform(
   projectName: ProjectName,
-  opts: {domain: AppDomain | undefined}
+  opts: WorkspaceProjectTerraformFrontend
 ): string {
   const {domain} = opts;
   const bucketName = projectName.toLowerCase().replace(/[^\d.a-z-]+/gu, '-');

@@ -1,4 +1,4 @@
-import {ProjectType, WorkspaceFragment, WorkspaceName} from '@src/models';
+import {ProjectType, WorkspaceName} from '@src/models';
 import {WorkspaceProject} from '@src/project/generate_workspace';
 import {generateFrontendTerraform} from '@src/project/terraform/frontend';
 import {generateLambdaTerraform} from '@src/project/terraform/lambda';
@@ -26,61 +26,18 @@ export function generateCommonTerraform(
 
 export function generateWorkspaceProjectTerraform(
   workspaceName: WorkspaceName,
-  project: WorkspaceProject,
-  allFragments: WorkspaceFragment[]
+  project: WorkspaceProject
 ): string | undefined {
-  const {projectName, type, fromFragment, flags} = project;
-  const cloudwatchTriggerMinutes =
-    'cloudwatchTriggerMinutes' in fromFragment ? fromFragment.cloudwatchTriggerMinutes : undefined;
-  const alarmEmail = 'alarmEmail' in fromFragment ? fromFragment.alarmEmail : undefined;
-  const domainStr = 'domain' in fromFragment ? fromFragment.domain : undefined;
-  const webAppName = 'appName' in fromFragment ? fromFragment.appName : undefined;
-  let domain: AppDomain | undefined;
-  if (domainStr !== undefined) {
-    const [subDomain = '', ...rest] = domainStr.split('.');
-    const rootDomain = rest.join('.');
-    domain = {subDomain, rootDomain};
+  const {projectName, terraform} = project;
+
+  if (terraform.type === 'frontend') {
+    return generateFrontendTerraform(projectName, terraform);
+  } else if (terraform.type === 'lambda') {
+    return generateLambdaTerraform(workspaceName, projectName, terraform);
   }
-  if (type === ProjectType.Web) {
-    return generateFrontendTerraform(projectName, {
-      domain,
-    });
-  } else if (type === ProjectType.LambdaFunction) {
-    return generateLambdaTerraform(workspaceName, projectName, {
-      api: false,
-      webAppName,
-      alarmEmail,
-      cloudwatchTriggerMinutes,
-      domain,
-      authentication: false,
-    });
-  } else if (type === ProjectType.LambdaApi) {
-    return generateLambdaTerraform(workspaceName, projectName, {
-      api: true,
-      webAppName,
-      alarmEmail,
-      cloudwatchTriggerMinutes,
-      domain,
-      authentication: false,
-    });
-  } else if (type === ProjectType.LambdaWebApi) {
-    return generateLambdaTerraform(workspaceName, projectName, {
-      api: true,
-      webAppName,
-      alarmEmail,
-      cloudwatchTriggerMinutes,
-      domain,
-      authentication: flags(allFragments)['AUTHENTICATION'] === 'true',
-    });
-  } else if (type === ProjectType.NodeScript) {
-    return undefined;
-  } else if (type === ProjectType.SharedNode) {
-    return undefined;
-  } else if (type === ProjectType.SharedWeb) {
-    return undefined;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  } else if (type === ProjectType.Shared) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  else if (terraform.type === 'no-terraform') {
     return undefined;
   }
-  neverHappens(type, 'ProjectType');
+  neverHappens(terraform, 'Terraform type');
 }

@@ -14,8 +14,7 @@ export function globalError(...val: unknown[]): void {
       error(str);
       appendFileSync('error.log', str);
     } catch {
-      error(String(val));
-      appendFileSync('error.log', String(val));
+      // Don't log anything that went wrong during logging to prevent infinite loops
     }
   }
 }

@@ -753,8 +753,7 @@ function globalError(...val) {
       (0,_src_logger__WEBPACK_IMPORTED_MODULE_1__.error)(str);
       (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', str);
     } catch {
-      (0,_src_logger__WEBPACK_IMPORTED_MODULE_1__.error)(String(val));
-      (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', String(val));
+      // Don't log anything that went wrong during logging to prevent infinite loops
     }
   }
 }

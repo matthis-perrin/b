@@ -2,6 +2,7 @@ import {execSync} from 'node:child_process';
 import {join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
+import {splitLast} from '@src/array_utils';
 import {listFiles, prettyJs, prettyJson, prettyJsonc, readFile, writeRawFile} from '@src/fs';
 import {md5} from '@src/hash';
 import {log} from '@src/logger';
@@ -16,11 +17,14 @@ import {generateProject} from '@src/project/generate_project';
 import {generateGitIgnore} from '@src/project/gitignore';
 import {generateWorkspacePackageJson} from '@src/project/package_json';
 import {
+  AppDomain,
   generateCommonTerraform,
   generateWorkspaceProjectTerraform,
 } from '@src/project/terraform/all';
 import {generateDynamoUserTerraform} from '@src/project/terraform/dynamo_user';
 import {generateDynamoUserSessionTerraform} from '@src/project/terraform/dynamo_user_session';
+import {WorkspaceProjectTerraformFrontend} from '@src/project/terraform/frontend';
+import {WorkspaceProjectTerraformLambda} from '@src/project/terraform/lambda';
 import {
   FileHash,
   generateCodeWorkspace,
@@ -44,12 +48,18 @@ export function hasApi(allFragments: WorkspaceFragment[]): boolean {
   );
 }
 
+export type WorkspaceProjectTerraform =
+  | WorkspaceProjectTerraformLambda
+  | WorkspaceProjectTerraformFrontend
+  | {type: 'no-terraform'};
+
 export interface WorkspaceProject {
   projectName: ProjectName;
   type: ProjectType;
   fromFragment: WorkspaceFragment;
   vars: Record<string, string>;
   flags: (allFragments: WorkspaceFragment[]) => Flag;
+  terraform: WorkspaceProjectTerraform;
 }
 
 function fragmentFlags(baseFlags: Flag): (allFragments: WorkspaceFragment[]) => Flag {
@@ -59,6 +69,18 @@ function fragmentFlags(baseFlags: Flag): (allFragments: WorkspaceFragment[]) => 
     };
     return {...workspaceFlags, ...baseFlags};
   };
+}
+
+// Parse a string into its domain/subdomain.
+// We assume the root domain (the hosted zone registered in AWS)
+// is the in form of <second-level-domain>.<first-level-domain> (eg: "matthis.link")
+function parseDomain(domainStr?: string): AppDomain | undefined {
+  if (domainStr === undefined) {
+    return undefined;
+  }
+  const [subDomain = '', ...rest] = splitLast(domainStr, '.');
+  const rootDomain = rest.join('.');
+  return {subDomain, rootDomain};
 }
 
 export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): WorkspaceProject[] {
@@ -73,6 +95,10 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __APP_NAME__: fragment.websiteName,
         },
         flags: fragmentFlags({}),
+        terraform: {
+          type: 'frontend',
+          domain: parseDomain(fragment.domain),
+        },
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.StandaloneLambda) {
@@ -86,6 +112,15 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME_UPPERCASE__: fragment.lambdaName.toUpperCase(),
         },
         flags: fragmentFlags({}),
+        terraform: {
+          type: 'lambda',
+          api: false,
+          webAppName: undefined,
+          alarmEmail: fragment.alarmEmail,
+          cloudwatchTriggerMinutes: fragment.cloudwatchTriggerMinutes,
+          domain: undefined,
+          authentication: undefined,
+        },
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.ApiLambda) {
@@ -99,6 +134,15 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME_UPPERCASE__: fragment.apiName.toUpperCase(),
         },
         flags: fragmentFlags({}),
+        terraform: {
+          type: 'lambda',
+          api: true,
+          webAppName: undefined,
+          alarmEmail: fragment.alarmEmail,
+          cloudwatchTriggerMinutes: undefined,
+          domain: parseDomain(fragment.domain),
+          authentication: undefined,
+        },
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.WebApp) {
@@ -119,6 +163,10 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         fromFragment: fragment,
         vars,
         flags,
+        terraform: {
+          type: 'frontend',
+          domain: parseDomain(`static.${fragment.domain}`),
+        },
       },
       {
         projectName: backendName,
@@ -126,6 +174,15 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         fromFragment: fragment,
         vars,
         flags,
+        terraform: {
+          type: 'lambda',
+          api: true,
+          webAppName: fragment.appName,
+          alarmEmail: fragment.alarmEmail,
+          cloudwatchTriggerMinutes: undefined,
+          domain: parseDomain(fragment.domain),
+          authentication: fragment.authentication,
+        },
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.NodeScript) {
@@ -138,6 +195,9 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME__: fragment.scriptName,
         },
         flags: fragmentFlags({}),
+        terraform: {
+          type: 'no-terraform',
+        },
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.SharedNode) {
@@ -151,6 +211,9 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME__: projectName,
         },
         flags: fragmentFlags({}),
+        terraform: {
+          type: 'no-terraform',
+        },
       },
     ];
   } else if (fragment.type === WorkspaceFragmentType.SharedWeb) {
@@ -164,6 +227,9 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME__: projectName,
         },
         flags: fragmentFlags({}),
+        terraform: {
+          type: 'no-terraform',
+        },
       },
     ];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -178,6 +244,9 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           __PROJECT_NAME__: projectName,
         },
         flags: fragmentFlags({}),
+        terraform: {
+          type: 'no-terraform',
+        },
       },
     ];
   }
@@ -272,7 +341,7 @@ export async function generateWorkspace(
       addLineBreak(generateCommonTerraform(workspaceName, projects))
     ),
     ...projects.map(async p => {
-      const content = generateWorkspaceProjectTerraform(workspaceName, p, workspaceFragments);
+      const content = generateWorkspaceProjectTerraform(workspaceName, p);
       if (content === undefined) {
         return;
       }

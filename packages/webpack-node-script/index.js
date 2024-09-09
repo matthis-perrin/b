@@ -865,8 +865,7 @@ function globalError(...val) {
       (0,_src_logger__WEBPACK_IMPORTED_MODULE_1__.error)(str);
       (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', str);
     } catch {
-      (0,_src_logger__WEBPACK_IMPORTED_MODULE_1__.error)(String(val));
-      (0,node_fs__WEBPACK_IMPORTED_MODULE_0__.appendFileSync)('error.log', String(val));
+      // Don't log anything that went wrong during logging to prevent infinite loops
     }
   }
 }
@@ -1060,7 +1059,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.33',
+  project: '1.11.34',
   eslint: '1.8.5',
   prettier: '1.5.0',
   tsconfig: '1.7.4',

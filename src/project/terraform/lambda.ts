@@ -1,25 +1,28 @@
-import {ProjectName, WorkspaceName} from '@src/models';
+import {ProjectName, WebAppAuthentication, WorkspaceName} from '@src/models';
 import {AppDomain} from '@src/project/terraform/all';
 import {lowerCase} from '@src/string_utils';
+
+export interface WorkspaceProjectTerraformLambda {
+  type: 'lambda';
+  api: boolean;
+  webAppName: string | undefined;
+  alarmEmail: string | undefined;
+  cloudwatchTriggerMinutes: number | undefined;
+  domain: AppDomain | undefined;
+  authentication: WebAppAuthentication | undefined;
+}
 
 export function generateLambdaTerraform(
   workspaceName: WorkspaceName,
   projectName: ProjectName,
-  opts: {
-    api: boolean;
-    webAppName?: string;
-    alarmEmail: string | undefined;
-    cloudwatchTriggerMinutes: number | undefined;
-    domain: AppDomain | undefined;
-    authentication: boolean | undefined;
-  }
+  opts: WorkspaceProjectTerraformLambda
 ): string {
   const {api, webAppName, alarmEmail, cloudwatchTriggerMinutes, domain, authentication} = opts;
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_extra_policy" {
   ${
-    authentication
+    authentication?.enabled
       ? `statement {
     actions = [
       "dynamodb:GetItem",
