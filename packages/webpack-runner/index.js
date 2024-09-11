@@ -1388,12 +1388,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.34',
+  project: '1.11.36',
   eslint: '1.8.5',
   prettier: '1.5.0',
   tsconfig: '1.7.4',
   webpack: '1.7.6',
-  runner: '1.5.29',
+  runner: '1.5.30',
   lambdaServerRuntime: '1.0.7'
 };
 const ESLINT_VERSION = '9.8.x';
@@ -2847,9 +2847,202 @@ function parseError(err, opts) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   startIconServer: () => (/* binding */ startIconServer)
+/* harmony export */ });
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(17);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(35);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(40);
+/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_http__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(2);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+function iterFiles(opts) {
+  const {
+    root,
+    excludeDirs,
+    excludeFiles
+  } = opts;
+  const dirs = [root];
+  const files = [];
+  async function next() {
+    // If we have a file in the queue, we process it
+    const nextFile = files.shift();
+    if (nextFile !== undefined) {
+      const buffer = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.readFile)(nextFile);
+      return {
+        done: false,
+        value: {
+          path: nextFile,
+          content: buffer.toString()
+        }
+      };
+    }
+    // Otherwise we need to find more files
+    // Check if we still have dir to walk
+    const nextDir = dirs.shift();
+    if (nextDir === undefined) {
+      return {
+        done: true,
+        value: undefined
+      };
+    }
+    // List dir and add to queues
+    const dirEnts = await (0,node_fs_promises__WEBPACK_IMPORTED_MODULE_1__.readdir)(nextDir, {
+      withFileTypes: true
+    });
+    for (const dirEnt of dirEnts) {
+      const path = (0,node_path__WEBPACK_IMPORTED_MODULE_3__.join)(nextDir, dirEnt.name);
+      if (dirEnt.isDirectory()) {
+        if (excludeDirs?.(path)) {
+          continue;
+        }
+        dirs.push(path);
+      } else if (dirEnt.isFile()) {
+        if (excludeFiles?.(path)) {
+          continue;
+        }
+        files.push(path);
+      }
+    }
+    // Reprocess
+    return await next();
+  }
+  return {
+    [Symbol.asyncIterator]() {
+      return {
+        next
+      };
+    }
+  };
+}
+const extension = '.tsx';
+async function findIcons(root) {
+  const icons = [];
+  for await (const f of iterFiles({
+    root,
+    excludeDirs: p => p.includes('node_modules') || p.includes('/.'),
+    excludeFiles: p => !p.endsWith(extension)
+  })) {
+    if (f.content.includes('SvgIconData')) {
+      const [viewBox, element] = /\{\s*viewBox:\s*'(?<viewbox>[^']*)',\s*element:\s*(?<element>[^;]+);/u.exec(f.content)?.slice(1) ?? [];
+      if (viewBox === undefined) {
+        continue;
+      }
+      if (element === undefined) {
+        continue;
+      }
+      let trimmed = element;
+      while (true) {
+        if (trimmed.includes('\n')) {
+          trimmed = trimmed.replace('\n', '');
+        } else if (trimmed.startsWith(' ') || trimmed.startsWith('\t') || trimmed.startsWith('(')) {
+          trimmed = trimmed.slice(1);
+        } else if (trimmed.endsWith(' ') || trimmed.endsWith('\t') || trimmed.endsWith(')') || trimmed.endsWith(',') || trimmed.endsWith('}')) {
+          trimmed = trimmed.slice(0, -1);
+        } else {
+          break;
+        }
+      }
+      icons.push({
+        name: (0,node_path__WEBPACK_IMPORTED_MODULE_3__.basename)(f.path).slice(0, -extension.length),
+        viewBox,
+        element: trimmed
+      });
+    }
+  }
+  return icons;
+}
+function html(body) {
+  return `
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>ICONS</title>
+        <style>
+            .wrapper {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 32px;
+                padding: 32px;
+            }
+            .icon {
+                width: 80px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                align-items: center;
+                justify-content: center;
+            }
+            .icon svg {
+                fill: #000;
+            }
+            .icon-label {
+                color: #aaa;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        ${body}
+    </body>
+</html>
+
+  `.trim();
+}
+async function startIconServer(root) {
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+  const hexHash = (0,node_crypto__WEBPACK_IMPORTED_MODULE_0__.createHash)('md5').update(root).digest('hex').slice(0, 4);
+  const port = 1024 + Math.floor(parseInt(hexHash, 16) / 2);
+  const initialIcons = await findIcons(root);
+  const server = (0,node_http__WEBPACK_IMPORTED_MODULE_2__.createServer)((req, res) => {
+    findIcons(root).then(icons => {
+      const body = html(`<div class="wrapper">${icons.map(icon => `
+              <div class="icon">
+                  <svg viewbox="${icon.viewBox}" width="48" height="48">${icon.element}</svg>
+                  <div class="icon-label" title="${icon.name}">${icon.name}</div>
+              </div>
+          `).join('')}</div>`);
+      res.write(body);
+      res.end();
+    }).catch(err => {
+      res.write(html(`Failure to load icons: ${String(err)}`));
+      res.end();
+    });
+  }).listen(port);
+  return {
+    port,
+    hasIcons: initialIcons.length > 0,
+    stopServer: () => server.close()
+  };
+}
+
+/***/ }),
+/* 40 */
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:http");
+
+/***/ }),
+/* 41 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getLocalIp: () => (/* binding */ getLocalIp)
 /* harmony export */ });
-/* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(40);
+/* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(42);
 /* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_os__WEBPACK_IMPORTED_MODULE_0__);
 
 function getLocalIp() {
@@ -2857,13 +3050,13 @@ function getLocalIp() {
 }
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:os");
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2902,7 +3095,7 @@ function readLines(filePath, cb) {
 }
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2917,8 +3110,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
 /* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(30);
-/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(43);
-/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(39);
+/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(45);
+/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(41);
 
 
 
@@ -3031,7 +3224,7 @@ function renderWebpackDevServerEvent(event) {
 }
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3080,7 +3273,7 @@ function formatError(err) {
 }
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3166,7 +3359,7 @@ async function takelock(root) {
 }
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3300,11 +3493,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(36);
 /* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(37);
 /* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(38);
-/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(39);
-/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(41);
-/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(42);
-/* harmony import */ var _src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(44);
-/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(45);
+/* harmony import */ var _src_webpack_runner_icon_server__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(39);
+/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(41);
+/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(43);
+/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(44);
+/* harmony import */ var _src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(46);
+/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(47);
+
 
 
 
@@ -3328,8 +3523,10 @@ __webpack_require__.r(__webpack_exports__);
 
 const name = 'WebpackRunner';
 let globalRoot = '';
+let stopIconServer;
 function exit() {
-  (0,_src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_19__.releaseLock)(globalRoot);
+  stopIconServer?.();
+  (0,_src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_20__.releaseLock)(globalRoot);
   process.stdin.setRawMode(false);
   (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)('See you soon!');
   // eslint-disable-next-line n/no-process-exit
@@ -3353,18 +3550,20 @@ async function runWebpacks(opts) {
         if (type === _src_models__WEBPACK_IMPORTED_MODULE_8__.ProjectType.LambdaApi || type === _src_models__WEBPACK_IMPORTED_MODULE_8__.ProjectType.LambdaWebApi) {
           const status = statuses.get(projectName);
           const port = status?.lambdaServerEvents.startEvent?.port ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_12__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, projectName));
-          overrides[`${projectName.toUpperCase()}_URL`] = `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_16__.getLocalIp)()}:${port}/`;
+          overrides[`${projectName.toUpperCase()}_URL`] = `http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_17__.getLocalIp)()}:${port}/`;
         }
         if (type === _src_models__WEBPACK_IMPORTED_MODULE_8__.ProjectType.Web) {
           const status = statuses.get(projectName);
           const port = status?.webpackDevServerEvents.startEvent?.port ?? (0,_src_webpack_utils__WEBPACK_IMPORTED_MODULE_12__.getPort)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, projectName));
-          overrides[`${projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`] = `${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_16__.getLocalIp)()}:${port}`;
+          overrides[`${projectName.toUpperCase()}_CLOUDFRONT_DOMAIN_NAME`] = `${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_17__.getLocalIp)()}:${port}`;
         }
       }
     }
     await (0,_src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_13__.generateEnvFile)(root, overrides);
   }
   await regenerateEnvFile();
+  const iconServer = await (0,_src_webpack_runner_icon_server__WEBPACK_IMPORTED_MODULE_16__.startIconServer)(root);
+  stopIconServer = iconServer.stopServer;
   function handleStart(project) {
     const {
       projectName
@@ -3418,16 +3617,19 @@ async function runWebpacks(opts) {
     const errors = [...statuses.values()].flatMap(v => v.errors);
     const groupedErrors = (0,_src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_14__.groupAndSortErrors)(errors);
     const summary = [...statuses.values()].map(status => {
-      return (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__.renderProjectStatus)(status.project, status.firstRun, status.isRunning, groupedErrors, status.compilationFailure, status.lambdaServerEvents, status.webpackDevServerEvents);
+      return (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_19__.renderProjectStatus)(status.project, status.firstRun, status.isRunning, groupedErrors, status.compilationFailure, status.lambdaServerEvents, status.webpackDevServerEvents);
     });
     summary.unshift([(0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)(`Projects (${projects.length})`), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Status'), (0,ansi_colors__WEBPACK_IMPORTED_MODULE_2__.underline)('Run')]);
-    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__.renderErrors)(groupedErrors);
+    const report = (0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_19__.renderErrors)(groupedErrors);
     if (watch) {
       process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
     }
-    (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_20__.table)(summary));
+    (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_21__.table)(summary));
+    if (iconServer.hasIcons) {
+      (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)(`icons: http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_17__.getLocalIp)()}:${iconServer.port}`);
+    }
     if (report.length > 0) {
-      (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_18__.renderErrorWarningCount)(errors)}\n`);
+      (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)(`\nBuild completed with ${(0,_src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_19__.renderErrorWarningCount)(errors)}\n`);
       (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)(report);
     }
   }
@@ -3505,7 +3707,7 @@ async function runWebpacks(opts) {
 
     // Read events in the lambda server logs to update the globalInfo
     let lastProcessedLambdaLog = Date.now();
-    const tailLambdaServerCleanup = watch ? (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_17__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
+    const tailLambdaServerCleanup = watch ? (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_18__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'lambda_server_runtime.txt'), lines => {
       const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
       let shouldRedraw = false;
       for (const log of logs) {
@@ -3535,7 +3737,7 @@ async function runWebpacks(opts) {
 
     // Read events in the webpack dev server logs to update the globalInfo
     let lastProcessedDevServerLog = Date.now();
-    const tailWebpackServerCleanup = watch ? (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_17__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
+    const tailWebpackServerCleanup = watch ? (0,_src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_18__.readLines)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(projectPath, 'log', 'webpack_dev_server.txt'), lines => {
       const logs = lines.map(l => l.trim()).filter(l => l.length > 0).map(l => JSON.parse(l));
       let shouldRedraw = false;
       for (const log of logs) {
@@ -3623,7 +3825,7 @@ async function runWebpacks(opts) {
     cleanupCalled = true;
     await Promise.all(cleanupFunctions.map(async fn => await fn?.()));
     redraw();
-    (0,_src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_19__.releaseLock)(globalRoot);
+    (0,_src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_20__.releaseLock)(globalRoot);
     process.stdin.setRawMode(false);
   };
   const reject = err => {
@@ -3687,7 +3889,7 @@ async function runAllWebpacks(options) {
     watch
   } = options;
   globalRoot = root;
-  await (0,_src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_19__.takelock)(root);
+  await (0,_src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_20__.takelock)(root);
   const {
     fragments
   } = (await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__.readWorkspace)(root)) ?? {};
