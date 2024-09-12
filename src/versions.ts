@@ -1,10 +1,10 @@
 export const PACKAGE_VERSIONS = {
-  project: '1.11.36',
+  project: '1.11.39',
   eslint: '1.8.5',
   prettier: '1.5.0',
   tsconfig: '1.7.4',
-  webpack: '1.7.6',
-  runner: '1.5.30',
+  webpack: '1.7.7',
+  runner: '1.5.31',
   lambdaServerRuntime: '1.0.7',
 };
 

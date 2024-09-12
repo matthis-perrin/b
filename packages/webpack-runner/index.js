@@ -1388,12 +1388,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.36',
+  project: '1.11.39',
   eslint: '1.8.5',
   prettier: '1.5.0',
   tsconfig: '1.7.4',
-  webpack: '1.7.6',
-  runner: '1.5.30',
+  webpack: '1.7.7',
+  runner: '1.5.31',
   lambdaServerRuntime: '1.0.7'
 };
 const ESLINT_VERSION = '9.8.x';
@@ -3562,8 +3562,11 @@ async function runWebpacks(opts) {
     await (0,_src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_13__.generateEnvFile)(root, overrides);
   }
   await regenerateEnvFile();
-  const iconServer = await (0,_src_webpack_runner_icon_server__WEBPACK_IMPORTED_MODULE_16__.startIconServer)(root);
-  stopIconServer = iconServer.stopServer;
+  let iconServer;
+  if (watch) {
+    iconServer = await (0,_src_webpack_runner_icon_server__WEBPACK_IMPORTED_MODULE_16__.startIconServer)(root);
+    stopIconServer = iconServer.stopServer;
+  }
   function handleStart(project) {
     const {
       projectName
@@ -3625,7 +3628,7 @@ async function runWebpacks(opts) {
       process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
     }
     (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)((0,_src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_21__.table)(summary));
-    if (iconServer.hasIcons) {
+    if (iconServer?.hasIcons) {
       (0,_src_logger__WEBPACK_IMPORTED_MODULE_7__.log)(`icons: http://${(0,_src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_17__.getLocalIp)()}:${iconServer.port}`);
     }
     if (report.length > 0) {

@@ -152,9 +152,13 @@ function html(body: string): string {
   `.trim();
 }
 
-export async function startIconServer(
-  root: string
-): Promise<{port: number; hasIcons: boolean; stopServer: () => void}> {
+export interface IconServer {
+  port: number;
+  hasIcons: boolean;
+  stopServer: () => void;
+}
+
+export async function startIconServer(root: string): Promise<IconServer> {
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   const hexHash = createHash('md5').update(root).digest('hex').slice(0, 4);
   const port = 1024 + Math.floor(parseInt(hexHash, 16) / 2);

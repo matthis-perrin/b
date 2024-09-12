@@ -25,7 +25,7 @@ import {getEnv, getPort} from '@src/webpack/utils';
 import {generateEnvFile} from '@src/webpack-runner/env_definition_file';
 import {groupAndSortErrors} from '@src/webpack-runner/error_grouper';
 import {ParsedError, parseError} from '@src/webpack-runner/error_parser';
-import {startIconServer} from '@src/webpack-runner/icon_server';
+import {IconServer, startIconServer} from '@src/webpack-runner/icon_server';
 import {getLocalIp} from '@src/webpack-runner/ip';
 import {readLines} from '@src/webpack-runner/line_reader';
 import {
@@ -103,8 +103,11 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
   }
   await regenerateEnvFile();
 
-  const iconServer = await startIconServer(root);
-  stopIconServer = iconServer.stopServer;
+  let iconServer: IconServer | undefined;
+  if (watch) {
+    iconServer = await startIconServer(root);
+    stopIconServer = iconServer.stopServer;
+  }
 
   function handleStart(project: WorkspaceProject): void {
     const {projectName} = project;
@@ -167,7 +170,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       process.stdout.write('\u001B[2J\u001B[3J\u001B[H'); // clear terminal
     }
     log(table(summary));
-    if (iconServer.hasIcons) {
+    if (iconServer?.hasIcons) {
       log(`icons: http://${getLocalIp()}:${iconServer.port}`);
     }
     if (report.length > 0) {
