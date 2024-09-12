@@ -1,6 +1,10 @@
 import {WorkspaceName} from '@src/models';
 
-export function generateAwsProviderTerraform(workspaceName: WorkspaceName): string {
+export function generateAwsProviderTerraform(
+  workspaceName: WorkspaceName,
+  opts: {region: string}
+): string {
+  const {region} = opts;
   return `
 terraform {
   required_providers {
@@ -12,7 +16,7 @@ terraform {
 }
 
 provider "aws" {
-  region                   = "eu-west-3"
+  region                   = "${region}"
   default_tags {
     tags = {
       Project = "${workspaceName}"

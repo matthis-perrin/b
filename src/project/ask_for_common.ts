@@ -1,6 +1,8 @@
 import {prompt} from 'prompts';
 
 import {ProjectName, WebAppAuthentication} from '@src/models';
+import {DEFAULT_REGION} from '@src/project/generate_workspace';
+import {asStringOrThrow} from '@src/type_utils';
 
 //
 // WORKSPACE NAME
@@ -13,7 +15,22 @@ export async function askForWorkspaceName(): Promise<string> {
     message: 'Workspace name',
     validate: (v: string) => v.length > 0,
   });
-  return workspaceName;
+  return asStringOrThrow(workspaceName);
+}
+
+//
+// WORKSPACE REGION
+//
+
+export async function askForWorkspaceRegion(): Promise<string> {
+  const {workspaceRegion} = await prompt({
+    type: 'text',
+    name: 'workspaceRegion',
+    message: 'AWS Region',
+    initial: DEFAULT_REGION,
+    validate: (v: string) => v.length > 0,
+  });
+  return asStringOrThrow(workspaceRegion);
 }
 
 //

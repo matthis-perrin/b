@@ -1,34 +1,37 @@
 import {mkdir} from 'node:fs/promises';
 import {basename, join} from 'node:path';
 
-import {rmDir} from '@src/fs';
-import {error, log} from '@src/logger';
+import {error} from '@src/logger';
 import {
   WorkspaceFragment,
   WorkspaceFragmentRegistry,
   WorkspaceFragmentType,
   WorkspaceName,
 } from '@src/models';
-import {askForWorkspaceName} from '@src/project/ask_for_common';
+import {askForWorkspaceName, askForWorkspaceRegion} from '@src/project/ask_for_common';
 import {askForWorkspaceFragments} from '@src/project/ask_for_workspace_fragments';
 import {generateWorkspace} from '@src/project/generate_workspace';
-import {readWorkspace} from '@src/project/vscode_workspace';
+import {readWorkspace, WorkspaceOptions} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 
 async function initProject(): Promise<void> {
   let workspaceName: string;
   let workspacePath = process.cwd();
   let frags: WorkspaceFragment[] = [];
+  let workspaceOptions: WorkspaceOptions;
 
   // Check if we are already in a workspace, otherwise ask for the workspace name
   const workspace = await readWorkspace(workspacePath);
-  if (workspace !== undefined) {
-    workspaceName = basename(workspacePath);
-    frags = removeBaseFragments(workspace.fragments);
-  } else {
+
+  if (workspace === undefined) {
     workspaceName = await askForWorkspaceName();
     workspacePath = join(workspacePath, workspaceName);
+    workspaceOptions = {region: await askForWorkspaceRegion()};
     await mkdir(workspacePath);
+  } else {
+    workspaceName = basename(workspacePath);
+    workspaceOptions = workspace.options;
+    frags = removeBaseFragments(workspace.fragments);
   }
 
   // Ask for changes on the workspace
@@ -42,17 +45,13 @@ async function initProject(): Promise<void> {
   }
 
   const name = workspaceName as WorkspaceName;
-  await generateWorkspace(workspacePath, name, refreshBaseFragments(frags), workspace);
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function cancel(workspacePath?: string): Promise<never> {
-  log('Cancelling...');
-  if (workspacePath !== undefined) {
-    await rmDir(workspacePath);
-  }
-  // eslint-disable-next-line n/no-process-exit
-  process.exit(0);
+  await generateWorkspace(
+    workspacePath,
+    name,
+    refreshBaseFragments(frags),
+    workspaceOptions,
+    workspace
+  );
 }
 
 type BaseFragment =

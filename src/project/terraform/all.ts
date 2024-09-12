@@ -4,6 +4,7 @@ import {generateFrontendTerraform} from '@src/project/terraform/frontend';
 import {generateLambdaTerraform} from '@src/project/terraform/lambda';
 import {generateAwsProviderTerraform} from '@src/project/terraform/provider';
 import {generateS3BucketTerraform} from '@src/project/terraform/s3';
+import {WorkspaceOptions} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 
 export interface AppDomain {
@@ -13,10 +14,12 @@ export interface AppDomain {
 
 export function generateCommonTerraform(
   workspaceName: WorkspaceName,
-  projects: WorkspaceProject[]
+  projects: WorkspaceProject[],
+  workspaceOptions: WorkspaceOptions
 ): string {
+  const {region} = workspaceOptions;
   return [
-    generateAwsProviderTerraform(workspaceName),
+    generateAwsProviderTerraform(workspaceName, {region}),
     generateS3BucketTerraform(
       workspaceName,
       projects.filter(p => p.type === ProjectType.Web).map(p => p.projectName)

@@ -226,6 +226,7 @@ function filterFragments(frags, type) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DEFAULT_REGION: () => (/* binding */ DEFAULT_REGION),
 /* harmony export */   generateWorkspace: () => (/* binding */ generateWorkspace),
 /* harmony export */   getProjectsFromWorkspaceFragment: () => (/* binding */ getProjectsFromWorkspaceFragment),
 /* harmony export */   hasApi: () => (/* binding */ hasApi),
@@ -237,21 +238,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(12);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _src_array_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(14);
-/* harmony import */ var _src_hash__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(16);
-/* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9);
-/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(10);
-/* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(18);
-/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(22);
-/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(23);
-/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(25);
-/* harmony import */ var _src_project_terraform_dynamo_user__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(31);
-/* harmony import */ var _src_project_terraform_dynamo_user_session__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(32);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(33);
-/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(20);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(30);
-/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(24);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
+/* harmony import */ var _src_hash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(15);
+/* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(10);
+/* harmony import */ var _src_project_generate_project__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(17);
+/* harmony import */ var _src_project_gitignore__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(21);
+/* harmony import */ var _src_project_package_json__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(22);
+/* harmony import */ var _src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(24);
+/* harmony import */ var _src_project_terraform_dynamo_user__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(30);
+/* harmony import */ var _src_project_terraform_dynamo_user_session__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(31);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(32);
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(19);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(29);
+/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(23);
 
 
 
@@ -269,11 +269,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
+const DEFAULT_REGION = 'eu-west-3';
 const TEMPLATES_PATH = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)((0,node_url__WEBPACK_IMPORTED_MODULE_2__.fileURLToPath)(import.meta.url), '../templates');
 const booleanFlag = bool => bool ? 'true' : 'false';
 function hasApi(allFragments) {
-  return allFragments.find(f => f.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.ApiLambda || f.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.WebApp) !== undefined;
+  return allFragments.find(f => f.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.ApiLambda || f.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp) !== undefined;
 }
 function fragmentFlags(baseFlags) {
   return allFragments => {
@@ -294,18 +294,19 @@ function parseDomain(domainStr) {
   if (domainStr === undefined) {
     return undefined;
   }
-  const [subDomain = '', ...rest] = (0,_src_array_utils__WEBPACK_IMPORTED_MODULE_3__.splitLast)(domainStr, '.');
-  const rootDomain = rest.join('.');
+  const parts = domainStr.split('.');
+  const rootDomain = parts.slice(-2).join('.'); // eslint-disable-line @typescript-eslint/no-magic-numbers
+  const subDomain = parts.slice(0, -2).join('.'); // eslint-disable-line @typescript-eslint/no-magic-numbers
   return {
     subDomain,
     rootDomain
   };
 }
 function getProjectsFromWorkspaceFragment(fragment) {
-  if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.StaticWebsite) {
+  if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.StaticWebsite) {
     return [{
       projectName: fragment.websiteName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.Web,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.Web,
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: fragment.websiteName,
@@ -317,10 +318,10 @@ function getProjectsFromWorkspaceFragment(fragment) {
         domain: parseDomain(fragment.domain)
       }
     }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.StandaloneLambda) {
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.StandaloneLambda) {
     return [{
       projectName: fragment.lambdaName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.LambdaFunction,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.LambdaFunction,
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: fragment.lambdaName,
@@ -337,10 +338,10 @@ function getProjectsFromWorkspaceFragment(fragment) {
         authentication: undefined
       }
     }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.ApiLambda) {
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.ApiLambda) {
     return [{
       projectName: fragment.apiName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.LambdaApi,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.LambdaApi,
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: fragment.apiName,
@@ -357,30 +358,30 @@ function getProjectsFromWorkspaceFragment(fragment) {
         authentication: undefined
       }
     }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.WebApp) {
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp) {
     const backendName = `${fragment.appName}_backend`;
     const frontendName = `${fragment.appName}_frontend`;
     const vars = {
       __APP_NAME__: fragment.appName,
       __APP_NAME_UPPERCASE__: fragment.appName.toUpperCase(),
-      __APP_NAME_PASCALCASE__: (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_15__.pascalCase)(fragment.appName)
+      __APP_NAME_PASCALCASE__: (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_14__.pascalCase)(fragment.appName)
     };
     const flags = fragmentFlags({
       AUTHENTICATION: booleanFlag(fragment.authentication.enabled)
     });
     return [{
       projectName: frontendName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.Web,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.Web,
       fromFragment: fragment,
       vars,
       flags,
       terraform: {
         type: 'frontend',
-        domain: parseDomain(`static.${fragment.domain}`)
+        domain: fragment.domain === undefined ? undefined : parseDomain(`static.${fragment.domain}`)
       }
     }, {
       projectName: backendName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.LambdaWebApi,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.LambdaWebApi,
       fromFragment: fragment,
       vars,
       flags,
@@ -394,10 +395,10 @@ function getProjectsFromWorkspaceFragment(fragment) {
         authentication: fragment.authentication
       }
     }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.NodeScript) {
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.NodeScript) {
     return [{
       projectName: fragment.scriptName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.NodeScript,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.NodeScript,
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: fragment.scriptName
@@ -407,11 +408,11 @@ function getProjectsFromWorkspaceFragment(fragment) {
         type: 'no-terraform'
       }
     }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.SharedNode) {
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.SharedNode) {
     const projectName = 'shared-node';
     return [{
       projectName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.SharedNode,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.SharedNode,
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: projectName
@@ -421,11 +422,11 @@ function getProjectsFromWorkspaceFragment(fragment) {
         type: 'no-terraform'
       }
     }];
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.SharedWeb) {
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.SharedWeb) {
     const projectName = 'shared-web';
     return [{
       projectName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.SharedWeb,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.SharedWeb,
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: projectName
@@ -436,11 +437,11 @@ function getProjectsFromWorkspaceFragment(fragment) {
       }
     }];
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.Shared) {
+  } else if (fragment.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.Shared) {
     const projectName = 'shared';
     return [{
       projectName,
-      type: _src_models__WEBPACK_IMPORTED_MODULE_7__.ProjectType.Shared,
+      type: _src_models__WEBPACK_IMPORTED_MODULE_6__.ProjectType.Shared,
       fromFragment: fragment,
       vars: {
         __PROJECT_NAME__: projectName
@@ -451,13 +452,13 @@ function getProjectsFromWorkspaceFragment(fragment) {
       }
     }];
   }
-  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_16__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
+  (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_15__.neverHappens)(fragment, `Unknown ProjectType ${fragment.type}`);
 }
-async function generateWorkspace(dst, workspaceName, workspaceFragments, workspace) {
+async function generateWorkspace(dst, workspaceName, workspaceFragments, workspaceOptions, workspace) {
   const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f));
 
   // Create projects files from templates
-  const projectFiles = await Promise.all(projects.map(async project => await (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_8__.generateProject)({
+  const projectFiles = await Promise.all(projects.map(async project => await (0,_src_project_generate_project__WEBPACK_IMPORTED_MODULE_7__.generateProject)({
     dst,
     project,
     allFragments: workspaceFragments,
@@ -470,66 +471,67 @@ async function generateWorkspace(dst, workspaceName, workspaceFragments, workspa
   const writeFile = async (path, file) => await writeWorkspaceFile(workspace, dst, path, file);
   const workspaceFiles = await Promise.all([
   // package.json
-  writeFile('package.json', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.prettyJson)((0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_10__.generateWorkspacePackageJson)(workspaceName, projects))),
+  writeFile('package.json', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJson)((0,_src_project_package_json__WEBPACK_IMPORTED_MODULE_9__.generateWorkspacePackageJson)(workspaceName, projects))),
   // app.code-workspace
-  writeFile('app.code-workspace', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.prettyJsonc)((0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_14__.generateCodeWorkspace)(workspaceName, workspaceFragments))),
+  writeFile('app.code-workspace', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJsonc)((0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_13__.generateCodeWorkspace)(workspaceName, workspaceFragments))),
   // .gitignore
-  writeFile('.gitignore', (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_9__.generateGitIgnore)()),
+  writeFile('.gitignore', (0,_src_project_gitignore__WEBPACK_IMPORTED_MODULE_8__.generateGitIgnore)()),
   // setup.js
-  writeFile('setup.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'setup.js')))),
+  writeFile('setup.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'setup.js')))),
   // deploy.js
-  writeFile('deploy.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'deploy.js')).then(res => res.replaceAll('__WORKSPACE_NAME__', workspaceName)))),
+  writeFile('deploy.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'deploy.js')).then(res => res.replaceAll('__WORKSPACE_NAME__', workspaceName)))),
   // build.js
-  writeFile('build.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'build.js'))))]);
+  writeFile('build.js', await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.prettyJs)(await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(SCRIPTS_PATH, 'build.js'))))]);
 
   // Vscode folder
   const vscodePath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(TEMPLATES_PATH, '.vscode');
-  const vscodeFileList = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.listFiles)(vscodePath);
+  const vscodeFileList = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.listFiles)(vscodePath);
   const vscodeFiles = await Promise.all(vscodeFileList.map(async file => {
     const relativePath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.relative)(vscodePath, file);
     const dstPath = (0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('.vscode', relativePath);
-    const content = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.readFile)(file);
+    const content = await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.readFile)(file);
     return await writeFile(dstPath, content);
   }));
 
   // Terraform folder generation
-  const terraformFiles = await Promise.all([...workspaceFragments.filter(frag => frag.type === _src_models__WEBPACK_IMPORTED_MODULE_7__.WorkspaceFragmentType.WebApp).filter(frag => frag.authentication.enabled).flatMap(frag => {
-    return [writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_15__.lowerCase)(frag.appName)}_user.tf`), addLineBreak((0,_src_project_terraform_dynamo_user__WEBPACK_IMPORTED_MODULE_12__.generateDynamoUserTerraform)(workspaceName, frag.appName))), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_15__.lowerCase)(frag.appName)}_user_session.tf`), addLineBreak((0,_src_project_terraform_dynamo_user_session__WEBPACK_IMPORTED_MODULE_13__.generateDynamoUserSessionTerraform)(workspaceName, frag.appName)))];
-  }), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', 'base.tf'), addLineBreak((0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_11__.generateCommonTerraform)(workspaceName, projects))), ...projects.map(async p => {
-    const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_11__.generateWorkspaceProjectTerraform)(workspaceName, p);
+  const terraformFiles = await Promise.all([...workspaceFragments.filter(frag => frag.type === _src_models__WEBPACK_IMPORTED_MODULE_6__.WorkspaceFragmentType.WebApp).filter(frag => frag.authentication.enabled).flatMap(frag => {
+    return [writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_14__.lowerCase)(frag.appName)}_user.tf`), addLineBreak((0,_src_project_terraform_dynamo_user__WEBPACK_IMPORTED_MODULE_11__.generateDynamoUserTerraform)(workspaceName, frag.appName))), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `dynamo_table_${(0,_src_string_utils__WEBPACK_IMPORTED_MODULE_14__.lowerCase)(frag.appName)}_user_session.tf`), addLineBreak((0,_src_project_terraform_dynamo_user_session__WEBPACK_IMPORTED_MODULE_12__.generateDynamoUserSessionTerraform)(workspaceName, frag.appName)))];
+  }), writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', 'base.tf'), addLineBreak((0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateCommonTerraform)(workspaceName, projects, workspaceOptions))), ...projects.map(async p => {
+    const content = (0,_src_project_terraform_all__WEBPACK_IMPORTED_MODULE_10__.generateWorkspaceProjectTerraform)(workspaceName, p);
     if (content === undefined) {
       return;
     }
     const name = `${p.projectName}_terraform`;
     return await writeFile((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)('terraform', `${name}.tf`), addLineBreak(content));
   })]);
-  await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_14__.writeWorkspace)(dst, {
-    files: (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_16__.removeUndefined)([...projectFiles.flat(), ...workspaceFiles, ...terraformFiles, ...vscodeFiles]),
+  await (0,_src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_13__.writeWorkspace)(dst, {
+    files: (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_15__.removeUndefined)([...projectFiles.flat(), ...workspaceFiles, ...terraformFiles, ...vscodeFiles]),
     fragments: workspaceFragments,
-    version: _src_versions__WEBPACK_IMPORTED_MODULE_17__.PACKAGE_VERSIONS.project
+    version: _src_versions__WEBPACK_IMPORTED_MODULE_16__.PACKAGE_VERSIONS.project,
+    options: workspaceOptions
   });
 
   // Run setup.js
-  (0,_src_logger__WEBPACK_IMPORTED_MODULE_6__.log)('Running post install script');
+  (0,_src_logger__WEBPACK_IMPORTED_MODULE_5__.log)('Running post install script');
   const commands = [`cd ${dst}`, `node setup.js`, `git init`];
   (0,node_child_process__WEBPACK_IMPORTED_MODULE_0__.execSync)(commands.join(' && '), {
     stdio: ['ignore', 'inherit', 'inherit']
   });
 
   // Final instructions
-  (0,_src_logger__WEBPACK_IMPORTED_MODULE_6__.log)(`Run the following to get started:`);
-  (0,_src_logger__WEBPACK_IMPORTED_MODULE_6__.log)(`cd ${(0,node_path__WEBPACK_IMPORTED_MODULE_1__.relative)(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
+  (0,_src_logger__WEBPACK_IMPORTED_MODULE_5__.log)(`Run the following to get started:`);
+  (0,_src_logger__WEBPACK_IMPORTED_MODULE_5__.log)(`cd ${(0,node_path__WEBPACK_IMPORTED_MODULE_1__.relative)(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
 }
 async function writeWorkspaceFile(workspace, root, path, file) {
   const fileLines = file.split('\n');
   const fileToHash = fileLines.filter(line => !line.endsWith(' // @matthis/ignore')).join('\n');
-  const newHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_5__.md5)(fileToHash);
+  const newHash = (0,_src_hash__WEBPACK_IMPORTED_MODULE_4__.md5)(fileToHash);
   const oldHash = workspace?.files.find(f => f.path === path)?.hash;
   // Only write the file if it is different since last time we've generated the project.
   // Prevent needlessly overwriting changes made in the project in between.
   if (newHash !== oldHash) {
     const fileToWrite = fileLines.map(l => l.replaceAll(' // @matthis/ignore', '')).join('\n');
-    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_4__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, path), fileToWrite);
+    await (0,_src_fs__WEBPACK_IMPORTED_MODULE_3__.writeRawFile)((0,node_path__WEBPACK_IMPORTED_MODULE_1__.join)(root, path), fileToWrite);
   }
   return {
     path,
@@ -546,222 +548,6 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:url");
 
 /***/ }),
 /* 13 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   any: () => (/* binding */ any),
-/* harmony export */   arrayJoin: () => (/* binding */ arrayJoin),
-/* harmony export */   chunkArray: () => (/* binding */ chunkArray),
-/* harmony export */   dedup: () => (/* binding */ dedup),
-/* harmony export */   every: () => (/* binding */ every),
-/* harmony export */   flatten: () => (/* binding */ flatten),
-/* harmony export */   groupBy: () => (/* binding */ groupBy),
-/* harmony export */   halves: () => (/* binding */ halves),
-/* harmony export */   last: () => (/* binding */ last),
-/* harmony export */   mapSum: () => (/* binding */ mapSum),
-/* harmony export */   max: () => (/* binding */ max),
-/* harmony export */   min: () => (/* binding */ min),
-/* harmony export */   splitBothEndOrThrow: () => (/* binding */ splitBothEndOrThrow),
-/* harmony export */   splitLast: () => (/* binding */ splitLast),
-/* harmony export */   splitLastOrThrow: () => (/* binding */ splitLastOrThrow),
-/* harmony export */   splitOnce: () => (/* binding */ splitOnce),
-/* harmony export */   splitOnceOrThrow: () => (/* binding */ splitOnceOrThrow),
-/* harmony export */   sum: () => (/* binding */ sum),
-/* harmony export */   zip: () => (/* binding */ zip)
-/* harmony export */ });
-function last(arr) {
-  return arr.length > 0 ? arr.at(-1) : undefined;
-}
-function arrayJoin(arr, joiner) {
-  const joined = [];
-  for (const [i, element] of arr.entries()) {
-    joined.push(element);
-    if (i !== arr.length - 1) {
-      joined.push(joiner(i));
-    }
-  }
-  return joined;
-}
-function splitOnce(value, splitter) {
-  const splitterIndex = value.indexOf(splitter);
-  if (splitterIndex === -1) {
-    return [value];
-  }
-  return [value.slice(0, splitterIndex), value.slice(splitterIndex + splitter.length)];
-}
-function splitOnceOrThrow(value, splitter) {
-  const splitterIndex = value.indexOf(splitter);
-  if (splitterIndex === -1) {
-    throw new Error(`Expected two values when splitting "${value}" with "${splitter}"`);
-  }
-  return [value.slice(0, splitterIndex), value.slice(splitterIndex + splitter.length)];
-}
-function splitLastOrThrow(value, splitter) {
-  const lastIndex = value.lastIndexOf(splitter);
-  if (lastIndex === -1) {
-    throw new Error(`Expected two values when splitting "${value}" with "${splitter}"`);
-  }
-  const first = value.slice(0, lastIndex);
-  const last = value.slice(lastIndex + splitter.length);
-  return [first, last];
-}
-function splitLast(value, splitter) {
-  try {
-    return splitLastOrThrow(value, splitter);
-  } catch {
-    return [value];
-  }
-}
-function splitBothEndOrThrow(value, splitter) {
-  const firstSlash = value.indexOf(splitter);
-  const lastSlash = value.lastIndexOf(splitter);
-  if (firstSlash === -1 || lastSlash === -1) {
-    throw new Error(`Expected three values when splitting "${value}" with "${splitter}"`);
-  }
-  const first = value.slice(0, firstSlash);
-  const middle = value.slice(firstSlash + splitter.length, lastSlash);
-  const last = value.slice(lastSlash + splitter.length);
-  return [first, middle, last];
-}
-function halves(arr, isLeft) {
-  const left = [];
-  const right = [];
-  for (const val of arr) {
-    (isLeft(val) ? left : right).push(val);
-  }
-  return [left, right];
-}
-
-// type Flattened<T> = T extends NestedArray<infer U> ? U[] : T[];
-// export function flattenDeep<T>(arr: NestedArray<T>): Flattened<T> {
-//   const all: T[] = [];
-//   for (const val of arr) {
-//     if (!Array.isArray(val)) {
-//       return arr as Flattened<T>;
-//     }
-//     all.push(...(flattenDeep(val) as T[]));
-//   }
-//   return all as Flattened<T>;
-// }
-
-function flatten(arr) {
-  const all = [];
-  for (const val of arr) {
-    all.push(...val);
-  }
-  return all;
-}
-function groupBy(arr, predicate) {
-  const groups = new Map();
-  for (const val of arr) {
-    const groupKey = typeof predicate === 'function' ? predicate(val) : val[predicate];
-    const group = groups.get(groupKey);
-    if (group === undefined) {
-      groups.set(groupKey, [val]);
-    } else {
-      group.push(val);
-    }
-  }
-  return groups;
-}
-function chunkArray(arr, maxSize) {
-  if (maxSize < 1) {
-    throw new Error(`maxSize must be greater or equal to 1`);
-  }
-  const total = arr.length;
-  const chunkCount = Math.ceil(total / maxSize);
-  const chunkMinSize = Math.floor(total / chunkCount);
-  const chunkMaxSize = Math.ceil(total / chunkCount);
-  const lastMaxChunkIndex = chunkCount - (total - chunkCount * chunkMinSize);
-  const chunks = [];
-  let elementIndex = 0;
-  for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++) {
-    const chunkSize = chunkIndex > lastMaxChunkIndex ? chunkMinSize : chunkMaxSize;
-    chunks.push(arr.slice(elementIndex, elementIndex + chunkSize));
-    elementIndex += chunkSize;
-  }
-  return chunks;
-}
-function sum(arr) {
-  let res = 0;
-  for (const val of arr) {
-    res += val;
-  }
-  return res;
-}
-function mapSum(arr, fn) {
-  let res = 0;
-  for (const val of arr) {
-    res += fn(val);
-  }
-  return res;
-}
-function dedup(arr, dedupAttr) {
-  const dedupMap = new Map();
-  for (const element of arr) {
-    dedupMap.set(dedupAttr(element), element);
-  }
-  return [...dedupMap.values()];
-}
-function every(arr, condition) {
-  for (const val of arr) {
-    if (!condition(val)) {
-      return false;
-    }
-  }
-  return true;
-}
-function any(arr, condition) {
-  for (const val of arr) {
-    if (condition(val)) {
-      return true;
-    }
-  }
-  return false;
-}
-function zip(arr1, arr2) {
-  if (arr1.length !== arr2.length) {
-    throw new Error(`Arrays have different sizes: ${arr1.length} and ${arr2.length}`);
-  }
-  const res = [];
-  for (const [i, element] of arr1.entries()) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    res.push([element, arr2[i]]);
-  }
-  return res;
-}
-function min(arr, fn) {
-  let min;
-  for (const element of arr) {
-    if (element === undefined) {
-      continue;
-    }
-    const val = fn(element);
-    if (val === undefined) {
-      continue;
-    }
-    min = min === undefined ? val : Math.min(min, val);
-  }
-  return min;
-}
-function max(arr, fn) {
-  let max;
-  for (const element of arr) {
-    if (element === undefined) {
-      continue;
-    }
-    const val = fn(element);
-    if (val === undefined) {
-      continue;
-    }
-    max = max === undefined ? val : Math.max(max, val);
-  }
-  return max;
-}
-
-/***/ }),
-/* 14 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -795,7 +581,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(15);
+/* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
 /* harmony import */ var prettier__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(prettier__WEBPACK_IMPORTED_MODULE_3__);
 
 
@@ -932,13 +718,13 @@ async function listFiles(path) {
 }
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("prettier");
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -946,7 +732,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   hashPassword: () => (/* binding */ hashPassword),
 /* harmony export */   md5: () => (/* binding */ md5)
 /* harmony export */ });
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(17);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(16);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
 
 function md5(data) {
@@ -958,13 +744,13 @@ function hashPassword(password, salt) {
 }
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:crypto");
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -975,12 +761,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(12);
 /* harmony import */ var node_url__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_url__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(14);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(10);
-/* harmony import */ var _src_project_dynamic_template__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(19);
+/* harmony import */ var _src_project_dynamic_template__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(18);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(11);
-/* harmony import */ var _src_rand_safe__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(21);
-/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(20);
+/* harmony import */ var _src_rand_safe__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(20);
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(19);
 
 
 
@@ -1117,7 +903,7 @@ function flagMatch(flag, project, allFragments) {
 }
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1126,7 +912,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
-/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(20);
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(19);
 
 
 
@@ -1244,7 +1030,7 @@ sessionDuration: number; // in seconds
 }
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1274,7 +1060,7 @@ function lowerCase(str) {
 }
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1283,7 +1069,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   randomStringSafe: () => (/* binding */ randomStringSafe),
 /* harmony export */   uidSafe: () => (/* binding */ uidSafe)
 /* harmony export */ });
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(17);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(16);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
 
 const ALPHANUM = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -1308,7 +1094,7 @@ function generateNonce() {
 }
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1336,7 +1122,7 @@ terraform/archives
 }
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1344,7 +1130,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   generateWorkspacePackageJson: () => (/* binding */ generateWorkspacePackageJson)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
-/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(24);
+/* harmony import */ var _src_versions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(23);
 
 
 function uniq(val) {
@@ -1373,7 +1159,7 @@ function generateWorkspacePackageJson(workspaceName, projects) {
 }
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1388,7 +1174,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TYPESCRIPT_VERSION: () => (/* binding */ TYPESCRIPT_VERSION)
 /* harmony export */ });
 const PACKAGE_VERSIONS = {
-  project: '1.11.39',
+  project: '1.11.42',
   eslint: '1.8.5',
   prettier: '1.5.0',
   tsconfig: '1.7.4',
@@ -1411,7 +1197,7 @@ const LIB_VERSIONS = {
 };
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1420,19 +1206,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   generateWorkspaceProjectTerraform: () => (/* binding */ generateWorkspaceProjectTerraform)
 /* harmony export */ });
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
-/* harmony import */ var _src_project_terraform_frontend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(26);
-/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(27);
-/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(28);
-/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(29);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(30);
+/* harmony import */ var _src_project_terraform_frontend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(25);
+/* harmony import */ var _src_project_terraform_lambda__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(26);
+/* harmony import */ var _src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(27);
+/* harmony import */ var _src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(28);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(29);
 
 
 
 
 
 
-function generateCommonTerraform(workspaceName, projects) {
-  return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__.generateAwsProviderTerraform)(workspaceName), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__.generateS3BucketTerraform)(workspaceName, projects.filter(p => p.type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web).map(p => p.projectName))].join('\n\n');
+function generateCommonTerraform(workspaceName, projects, workspaceOptions) {
+  const {
+    region
+  } = workspaceOptions;
+  return [(0,_src_project_terraform_provider__WEBPACK_IMPORTED_MODULE_3__.generateAwsProviderTerraform)(workspaceName, {
+    region
+  }), (0,_src_project_terraform_s3__WEBPACK_IMPORTED_MODULE_4__.generateS3BucketTerraform)(workspaceName, projects.filter(p => p.type === _src_models__WEBPACK_IMPORTED_MODULE_0__.ProjectType.Web).map(p => p.projectName))].join('\n\n');
 }
 function generateWorkspaceProjectTerraform(workspaceName, project) {
   const {
@@ -1452,7 +1243,7 @@ function generateWorkspaceProjectTerraform(workspaceName, project) {
 }
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1601,14 +1392,14 @@ resource "aws_cloudfront_distribution" "${projectName}" {
 }
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateLambdaTerraform: () => (/* binding */ generateLambdaTerraform)
 /* harmony export */ });
-/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
 
 function generateLambdaTerraform(workspaceName, projectName, opts) {
   const {
@@ -1942,14 +1733,17 @@ resource "aws_s3_object" "${projectName}_archive" {
 }
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateAwsProviderTerraform: () => (/* binding */ generateAwsProviderTerraform)
 /* harmony export */ });
-function generateAwsProviderTerraform(workspaceName) {
+function generateAwsProviderTerraform(workspaceName, opts) {
+  const {
+    region
+  } = opts;
   return `
 terraform {
   required_providers {
@@ -1961,7 +1755,7 @@ terraform {
 }
 
 provider "aws" {
-  region                   = "eu-west-3"
+  region                   = "${region}"
   default_tags {
     tags = {
       Project = "${workspaceName}"
@@ -1999,7 +1793,7 @@ output "administrator_role_arn" {
 }
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2046,7 +1840,7 @@ resource "aws_s3_bucket_policy" "cloudfront_access_to_code" {
 }
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2339,14 +2133,14 @@ function addPrefix(attr, prefix) {
 }
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateDynamoUserTerraform: () => (/* binding */ generateDynamoUserTerraform)
 /* harmony export */ });
-/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
 
 function generateDynamoUserTerraform(workspaceName, appName) {
   const prefixLower = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.lowerCase)(appName);
@@ -2375,14 +2169,14 @@ resource "aws_dynamodb_table" "${prefixLower}_user_table" {
 }
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   generateDynamoUserSessionTerraform: () => (/* binding */ generateDynamoUserSessionTerraform)
 /* harmony export */ });
-/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* harmony import */ var _src_string_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
 
 function generateDynamoUserSessionTerraform(workspaceName, appName) {
   const prefixLower = (0,_src_string_utils__WEBPACK_IMPORTED_MODULE_0__.lowerCase)(appName);
@@ -2415,7 +2209,7 @@ resource "aws_dynamodb_table" "${prefixLower}_user_session_table" {
 }
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2426,15 +2220,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(14);
-/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(30);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(13);
+/* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(10);
+/* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(29);
+
 
 
 
 
 function generateCodeWorkspace(workspaceName, workspaceFragments) {
-  const projects = workspaceFragments.flatMap(f => (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_2__.getProjectsFromWorkspaceFragment)(f));
+  const projects = workspaceFragments.flatMap(f => (0,_src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_3__.getProjectsFromWorkspaceFragment)(f));
   const projectNames = projects.map(p => p.projectName);
   return {
     folders: [...projectNames.map(p => ({
@@ -2488,16 +2284,107 @@ async function readWorkspace(workspacePath) {
   if (workspaceContent === undefined) {
     return undefined;
   }
-  const workspaceData = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_3__.asMap)(JSON.parse(workspaceContent), {});
-  const {
-    fragments = [],
-    version = '',
-    files = []
-  } = workspaceData;
+  const workspaceData = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asMap)(JSON.parse(workspaceContent), {});
+  const fragments = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.removeUndefined)((0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asMapArray)(workspaceData['fragments'], []).map(fragData => {
+    const type = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(fragData['type']);
+    if (type === undefined) {
+      return undefined;
+    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.Shared) {
+      const frag = {
+        type: _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.Shared
+      };
+      return frag;
+    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.SharedWeb) {
+      const frag = {
+        type: _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.SharedWeb
+      };
+      return frag;
+    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.SharedNode) {
+      const frag = {
+        type: _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.SharedNode
+      };
+      return frag;
+    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.WebApp) {
+      const alarmEmail = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(fragData['alarmEmail']);
+      const appName = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asStringOrThrow)(fragData['appName']);
+      const authenticationData = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asMap)(fragData['authentication'], {});
+      const enabled = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asBoolean)(authenticationData['enabled'], false);
+      const domain = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(fragData['domain']);
+      const frag = {
+        type: _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.WebApp,
+        alarmEmail,
+        appName,
+        authentication: {
+          enabled
+        },
+        domain
+      };
+      return frag;
+    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.StaticWebsite) {
+      const websiteName = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asStringOrThrow)(fragData['websiteName']);
+      const domain = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(fragData['domain']);
+      const frag = {
+        type: _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.StaticWebsite,
+        websiteName,
+        domain
+      };
+      return frag;
+    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.ApiLambda) {
+      const alarmEmail = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(fragData['alarmEmail']);
+      const apiName = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asStringOrThrow)(fragData['apiName']);
+      const domain = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(fragData['domain']);
+      const frag = {
+        type: _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.ApiLambda,
+        alarmEmail,
+        apiName,
+        domain
+      };
+      return frag;
+    } else if (type === _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.NodeScript) {
+      const scriptName = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asStringOrThrow)(fragData['scriptName']);
+      const frag = {
+        type: _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.NodeScript,
+        scriptName
+      };
+      return frag;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    else if (type === _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.StandaloneLambda) {
+      const lambdaName = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asStringOrThrow)(fragData['lambdaName']);
+      const alarmEmail = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(fragData['alarmEmail']);
+      const cloudwatchTriggerMinutes = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asNumber)(fragData['cloudwatchTriggerMinutes']);
+      const frag = {
+        type: _src_models__WEBPACK_IMPORTED_MODULE_2__.WorkspaceFragmentType.StandaloneLambda,
+        lambdaName,
+        alarmEmail,
+        cloudwatchTriggerMinutes
+      };
+      return frag;
+    }
+    return undefined;
+  }));
+  const version = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asStringOrThrow)(workspaceData['version']);
+  const files = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.removeUndefined)((0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asMapArray)(workspaceData['files'], []).map(fileData => {
+    const path = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(fileData['path']);
+    const hash = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(fileData['hash']);
+    if (path === undefined || hash === undefined) {
+      return undefined;
+    }
+    return {
+      path,
+      hash
+    };
+  }));
+  const optionsData = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asMap)(workspaceData['options'], {});
+  const region = (0,_src_type_utils__WEBPACK_IMPORTED_MODULE_4__.asString)(optionsData['region'], _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_3__.DEFAULT_REGION);
+  const options = {
+    region
+  };
   return {
     fragments,
     version,
-    files
+    files,
+    options
   };
 }
 async function writeWorkspace(workspacePath, workspace) {
@@ -2506,7 +2393,7 @@ async function writeWorkspace(workspacePath, workspace) {
 }
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2518,13 +2405,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   isProd: () => (/* binding */ isProd),
 /* harmony export */   isSelenium: () => (/* binding */ isSelenium)
 /* harmony export */ });
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(17);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(16);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(35);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(34);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
 /* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
 
 
@@ -2605,13 +2492,13 @@ async function lookupRoot(fromPath) {
 }
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs/promises");
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2620,13 +2507,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var node_child_process__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_child_process__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(35);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(34);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(30);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(34);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(29);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(33);
 
 
 
@@ -2669,7 +2556,7 @@ async function generateEnvFile(root, overrides) {
 }
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2728,7 +2615,7 @@ function groupAndSortErrors(errors) {
 }
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2842,18 +2729,18 @@ function parseError(err, opts) {
 }
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   startIconServer: () => (/* binding */ startIconServer)
 /* harmony export */ });
-/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(17);
+/* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(16);
 /* harmony import */ var node_crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_crypto__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(35);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(34);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(40);
+/* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(39);
 /* harmony import */ var node_http__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_http__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_3__);
@@ -3029,20 +2916,20 @@ async function startIconServer(root) {
 }
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:http");
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getLocalIp: () => (/* binding */ getLocalIp)
 /* harmony export */ });
-/* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(42);
+/* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(41);
 /* harmony import */ var node_os__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_os__WEBPACK_IMPORTED_MODULE_0__);
 
 function getLocalIp() {
@@ -3050,13 +2937,13 @@ function getLocalIp() {
 }
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:os");
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3095,7 +2982,7 @@ function readLines(filePath, cb) {
 }
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3109,9 +2996,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var ansi_colors__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ansi_colors__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(30);
-/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(45);
-/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(41);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(29);
+/* harmony import */ var _src_webpack_runner_error_formatter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(44);
+/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(40);
 
 
 
@@ -3224,7 +3111,7 @@ function renderWebpackDevServerEvent(event) {
 }
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3273,7 +3160,7 @@ function formatError(err) {
 }
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3283,12 +3170,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
 /* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(35);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(34);
 /* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(node_fs_promises__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 /* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(node_path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(30);
+/* harmony import */ var _src_fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(29);
 // Handle the locking logic.
 // We write a file /.build.lock with the current process and timestamp.
 // We continuously update the lock timestamp throughout runtime.
@@ -3359,7 +3246,7 @@ async function takelock(root) {
 }
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3487,18 +3374,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_logger__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9);
 /* harmony import */ var _src_models__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(10);
 /* harmony import */ var _src_project_generate_workspace__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(11);
-/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(33);
-/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(30);
-/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(34);
-/* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(36);
-/* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(37);
-/* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(38);
-/* harmony import */ var _src_webpack_runner_icon_server__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(39);
-/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(41);
-/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(43);
-/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(44);
-/* harmony import */ var _src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(46);
-/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(47);
+/* harmony import */ var _src_project_vscode_workspace__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(32);
+/* harmony import */ var _src_type_utils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(29);
+/* harmony import */ var _src_webpack_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(33);
+/* harmony import */ var _src_webpack_runner_env_definition_file__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(35);
+/* harmony import */ var _src_webpack_runner_error_grouper__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(36);
+/* harmony import */ var _src_webpack_runner_error_parser__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(37);
+/* harmony import */ var _src_webpack_runner_icon_server__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(38);
+/* harmony import */ var _src_webpack_runner_ip__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(40);
+/* harmony import */ var _src_webpack_runner_line_reader__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(42);
+/* harmony import */ var _src_webpack_runner_renderer__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(43);
+/* harmony import */ var _src_webpack_runner_runner_lock__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(45);
+/* harmony import */ var _src_webpack_runner_text_table__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(46);
 
 
 

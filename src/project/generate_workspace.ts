@@ -2,7 +2,6 @@ import {execSync} from 'node:child_process';
 import {join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {splitLast} from '@src/array_utils';
 import {listFiles, prettyJs, prettyJson, prettyJsonc, readFile, writeRawFile} from '@src/fs';
 import {md5} from '@src/hash';
 import {log} from '@src/logger';
@@ -29,12 +28,14 @@ import {
   FileHash,
   generateCodeWorkspace,
   Workspace,
+  WorkspaceOptions,
   writeWorkspace,
 } from '@src/project/vscode_workspace';
 import {lowerCase, pascalCase} from '@src/string_utils';
 import {neverHappens, removeUndefined} from '@src/type_utils';
 import {PACKAGE_VERSIONS} from '@src/versions';
 
+export const DEFAULT_REGION = 'eu-west-3';
 const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 
 type Flag = Record<string, string>;
@@ -78,8 +79,9 @@ function parseDomain(domainStr?: string): AppDomain | undefined {
   if (domainStr === undefined) {
     return undefined;
   }
-  const [subDomain = '', ...rest] = splitLast(domainStr, '.');
-  const rootDomain = rest.join('.');
+  const parts = domainStr.split('.');
+  const rootDomain = parts.slice(-2).join('.'); // eslint-disable-line @typescript-eslint/no-magic-numbers
+  const subDomain = parts.slice(0, -2).join('.'); // eslint-disable-line @typescript-eslint/no-magic-numbers
   return {subDomain, rootDomain};
 }
 
@@ -165,7 +167,8 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         flags,
         terraform: {
           type: 'frontend',
-          domain: parseDomain(`static.${fragment.domain}`),
+          domain:
+            fragment.domain === undefined ? undefined : parseDomain(`static.${fragment.domain}`),
         },
       },
       {
@@ -257,6 +260,7 @@ export async function generateWorkspace(
   dst: string,
   workspaceName: WorkspaceName,
   workspaceFragments: WorkspaceFragment[],
+  workspaceOptions: WorkspaceOptions,
   workspace: Workspace | undefined
 ): Promise<void> {
   const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f));
@@ -338,7 +342,7 @@ export async function generateWorkspace(
       }),
     writeFile(
       join('terraform', 'base.tf'),
-      addLineBreak(generateCommonTerraform(workspaceName, projects))
+      addLineBreak(generateCommonTerraform(workspaceName, projects, workspaceOptions))
     ),
     ...projects.map(async p => {
       const content = generateWorkspaceProjectTerraform(workspaceName, p);
@@ -359,6 +363,7 @@ export async function generateWorkspace(
     ]),
     fragments: workspaceFragments,
     version: PACKAGE_VERSIONS.project,
+    options: workspaceOptions,
   });
 
   // Run setup.js
