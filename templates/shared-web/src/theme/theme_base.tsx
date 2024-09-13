@@ -1,13 +1,18 @@
+import {DeepPartial} from '@shared/lib/type_utils';
+
 import {hexToRgb, hslToRgb, RGB, rgbToHex, rgbToHsl, textColor} from '@shared-web/theme/colors';
 import {FrontendTheme} from '@shared-web/theme/theme_model';
 import {background, borderColor, paddings} from '@shared-web/theme/theme_utils';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-export function createTheme(opts?: {
-  accentColor?: string;
-  dark?: boolean;
-  contrast?: number;
-}): FrontendTheme {
+export function createTheme(
+  opts?: {
+    accentColor?: string;
+    dark?: boolean;
+    contrast?: number;
+  },
+  overrides?: DeepPartial<FrontendTheme>
+): FrontendTheme {
   const {accentColor = 'rgb(0, 0, 0)', dark = false, contrast = 7} = opts ?? {};
 
   // Compute accent color
@@ -118,6 +123,7 @@ export function createTheme(opts?: {
       loaderColor: accentTextColor,
       loaderOpacity: 1,
       loaderSize: 24,
+      ...overrides?.button,
     },
     link: {
       ...buttonBase,
@@ -137,6 +143,7 @@ export function createTheme(opts?: {
       loaderColor: accentColor,
       loaderOpacity: 0.3,
       loaderSize: 20,
+      ...overrides?.link,
     },
     checkbox: {
       labelPaddingTop: 8,
@@ -153,6 +160,7 @@ export function createTheme(opts?: {
       borderRadius: 4,
       borderWidth: 2,
       marginRight: 8,
+      ...overrides?.checkbox,
     },
     radio: {
       color: backgroundTextColor,
@@ -168,12 +176,14 @@ export function createTheme(opts?: {
       size: undefined,
       titleMarginBottom: '0.4em',
       inputHeight: undefined,
+      ...overrides?.radio,
     },
     input: {
       ...baseTextfield,
       paddingRight: 16,
       paddingLeft: 16,
       height: 48,
+      ...overrides?.input,
     },
     textarea: {
       ...baseTextfield,
@@ -181,6 +191,7 @@ export function createTheme(opts?: {
       paddingRight: 16,
       paddingBottom: 8,
       paddingLeft: 16,
+      ...overrides?.textarea,
     },
   };
 }

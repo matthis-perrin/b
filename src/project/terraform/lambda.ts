@@ -283,7 +283,6 @@ resource "aws_iam_role" "${projectName}_role" {
         Action = "sts:AssumeRole"
         Principal = {
           Service = "lambda.amazonaws.com"
-          AWS     = data.aws_iam_roles.administrator_roles.arns
         }
         Effect = "Allow"
       },

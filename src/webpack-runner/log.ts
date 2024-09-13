@@ -1,6 +1,6 @@
 import {appendFileSync, rmSync} from 'node:fs';
 
-const ENABLED = true as boolean;
+const ENABLED = false as boolean;
 let startTs: number | undefined;
 const logFilePath = '.build.log';
 
