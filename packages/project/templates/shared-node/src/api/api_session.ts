@@ -1,6 +1,5 @@
 import {UnauthorizedError} from '@shared/api/core/api_errors';
 import {ApiContext} from '@shared/api/core/api_types';
-import {NODE_ENV} from '@shared/env';
 import {splitOnce} from '@shared/lib/array_utils';
 import {asMapOrThrow, asNumberOrThrow, asStringOrThrow, Brand} from '@shared/lib/type_utils';
 
@@ -17,8 +16,6 @@ export interface UserSessionItem<UserId extends string> {
 export type UserSessionToken = Brand<'UserSessionToken', string>;
 
 export class SessionManager<UserItem extends {id: string; sessionDuration: number}, FrontendUser> {
-  private static readonly COOKIE_SECURE = NODE_ENV === 'development' ? '' : 'Secure; ';
-
   public constructor(
     private readonly opts: {
       cookieName: string;
@@ -117,7 +114,7 @@ export class SessionManager<UserItem extends {id: string; sessionDuration: numbe
       `${this.opts.cookieName}=${this.serializeSession(
         token,
         expiresAt
-      )}; Max-Age=${sessionDuration}; ${SessionManager.COOKIE_SECURE}HttpOnly; Path=/; Domain=${
+      )}; Max-Age=${sessionDuration}; Secure; HttpOnly; Path=/; Domain=${
         this.opts.domain
       }; SameSite=Strict`
     );
@@ -148,7 +145,7 @@ export class SessionManager<UserItem extends {id: string; sessionDuration: numbe
   private removeSessionCookie(context: ApiContext): void {
     context.setResponseHeader(
       'Set-Cookie',
-      `${this.opts.cookieName}=; Max-Age=0; ${SessionManager.COOKIE_SECURE}HttpOnly; Path=/; Domain=${this.opts.domain}; SameSite=Strict`
+      `${this.opts.cookieName}=; Max-Age=0; Secure; HttpOnly; Path=/; Domain=${this.opts.domain}; SameSite=Strict`
     );
   }
 

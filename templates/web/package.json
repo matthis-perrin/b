@@ -2,6 +2,7 @@
   "name": "web",
   "license": "UNLICENSED",
   "type": "module",
+  "sideEffects": false,
   "prettier": "@matthis/prettier-config",
   "scripts": {
     "test": "node --import tsx --test **/*.test.tsx"

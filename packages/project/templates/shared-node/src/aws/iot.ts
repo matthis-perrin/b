@@ -6,12 +6,10 @@ import {
 
 import {REGION} from '@shared/env';
 
-import {credentialsProvider} from '@shared-node/aws/credentials';
-
 let client: IoTDataPlaneClient | undefined;
 function getClient(): IoTDataPlaneClient {
   if (!client) {
-    client = new IoTDataPlaneClient({region: REGION, credentials: credentialsProvider()});
+    client = new IoTDataPlaneClient({region: REGION});
   }
   return client;
 }

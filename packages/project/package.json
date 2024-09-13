@@ -1,6 +1,6 @@
 {
   "name": "@matthis/project",
-  "version": "1.11.42",
+  "version": "1.12.21",
   "type": "module",
   "main": "index.js",
   "license": "UNLICENSED",

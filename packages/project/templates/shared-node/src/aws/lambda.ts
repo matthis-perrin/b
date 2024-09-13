@@ -2,8 +2,6 @@ import {InvokeCommand, LambdaClient} from '@aws-sdk/client-lambda';
 
 import {REGION} from '@shared/env';
 
-import {credentialsProvider} from '@shared-node/aws/credentials';
-
 export interface LambdaContext {
   getRemainingTimeInMillis: () => number;
 }
@@ -11,7 +9,7 @@ export interface LambdaContext {
 let client: LambdaClient | undefined;
 function getClient(): LambdaClient {
   if (!client) {
-    client = new LambdaClient({region: REGION, credentials: credentialsProvider()});
+    client = new LambdaClient({region: REGION});
   }
   return client;
 }

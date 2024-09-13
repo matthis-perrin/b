@@ -29,7 +29,6 @@ import {REGION} from '@shared/env';
 import {chunkArray} from '@shared/lib/array_utils';
 import {AnyInterface, removeUndefined} from '@shared/lib/type_utils';
 
-import {credentialsProvider} from '@shared-node/aws/credentials';
 import {uidSafe} from '@shared-node/lib/rand_safe';
 
 const MAX_BATCH_GET_ITEMS = 100;
@@ -39,7 +38,7 @@ const PUT_ITEMS_MAX_RETRIES = 3;
 let client: DynamoDBClient | undefined;
 function getClient(): DynamoDBClient {
   if (!client) {
-    client = new DynamoDBClient({region: REGION, credentials: credentialsProvider()});
+    client = new DynamoDBClient({region: REGION});
   }
   return client;
 }

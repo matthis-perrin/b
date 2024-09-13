@@ -1,5 +1,3 @@
-import {NODE_ENV} from '@shared/env';
-
 import {ApiRequest, ApiResponse} from '@shared-node/api/api_interface';
 
 export interface LambdaEvent {
@@ -31,7 +29,7 @@ export function lambdaEventToApiRequest(event: LambdaEvent): ApiRequest {
   const {http} = requestContext;
   const method = http.method.toUpperCase();
   const path = normalizePath(http.path);
-  const parsedBody = method === 'GET' ? queryStringParameters ?? {} : parseBody(body);
+  const parsedBody = method === 'GET' ? (queryStringParameters ?? {}) : parseBody(body);
   return {method, path, headers, body: parsedBody};
 }
 
@@ -61,8 +59,7 @@ export function apiResponseToLambdaResonse(opts: {
     // Add cors headers to restrict to the frontend domain if there is one
     let corsHeaders: Record<string, string | undefined> = {};
     if (frontendDomain !== undefined) {
-      const httpProtocol = `http${NODE_ENV === 'development' ? '' : 's'}://`;
-      const frontendUrl = `${httpProtocol}${frontendDomain}`;
+      const frontendUrl = `https://${frontendDomain}`;
       const allowedOrigin = new Set([frontendUrl]);
       corsHeaders = allowedOrigin.has(origin)
         ? {

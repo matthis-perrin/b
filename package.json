@@ -27,7 +27,7 @@
     "@types/semver": "7.3.x",
     "ansi-colors": "4.1.x",
     "babel-loader": "9.1.x",
-    "babel-plugin-react-remove-properties": "0.3.x",
+    "babel-plugin-styled-components": "2.1.x",
     "chokidar": "3.6.x",
     "favicons": "7.2.x",
     "favicons-webpack-plugin": "6.0.x",

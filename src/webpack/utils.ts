@@ -11,18 +11,6 @@ export interface WebpackConfigFragment {
   dependencies: Record<string, string>;
 }
 
-export function isProd(): boolean {
-  return process.env['NODE_ENV'] === 'production'; // eslint-disable-line n/no-process-env
-}
-
-export function isSelenium(): boolean {
-  return process.env['IS_SELENIUM'] === '1'; // eslint-disable-line n/no-process-env
-}
-
-export function getEnv(): 'production' | 'development' {
-  return isProd() ? 'production' : 'development';
-}
-
 const packageJsonCache = new Map<string, Record<string, unknown> | undefined>();
 
 export async function findPackageJson(p: string): Promise<Record<string, unknown> | undefined> {

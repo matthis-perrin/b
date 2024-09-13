@@ -2,9 +2,7 @@ import {SES} from '@aws-sdk/client-ses';
 
 import {REGION} from '@shared/env';
 
-import {credentialsProvider} from '@shared-node/aws/credentials';
-
-const client = new SES({region: REGION, credentials: credentialsProvider()});
+const client = new SES({region: REGION});
 
 export async function sendEmail(opts: {
   to: string;

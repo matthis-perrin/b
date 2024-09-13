@@ -1,5 +1,4 @@
 import {
-  __APP_NAME_UPPERCASE___BACKEND_ROLE_ARN,
   __APP_NAME_UPPERCASE___BACKEND_URL,
   __APP_NAME_UPPERCASE___FRONTEND_CLOUDFRONT_DOMAIN_NAME,
 } from '@shared/env';
@@ -13,7 +12,6 @@ import {
 } from '@shared-node/api/api_lambda';
 import {handleApi} from '@shared-node/api/api_router';
 import {getIndex, handleStatics} from '@shared-node/api/api_statics';
-import {registerAwsRole} from '@shared-node/aws/credentials';
 
 // @matthis/start:AUTHENTICATION:true
 import {loginHandler} from '@src/handlers/login_handler';
@@ -22,8 +20,6 @@ import {testHandler} from '@src/handlers/test_handler';
 // @matthis/start:AUTHENTICATION:true
 import {session} from '@src/session';
 // @matthis/end
-
-registerAwsRole(__APP_NAME_UPPERCASE___BACKEND_ROLE_ARN);
 
 const frontendName = '__APP_NAME___frontend';
 const frontendDomain = __APP_NAME_UPPERCASE___FRONTEND_CLOUDFRONT_DOMAIN_NAME;

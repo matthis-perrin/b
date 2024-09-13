@@ -1,6 +1,4 @@
-import {readFile} from 'node:fs/promises';
-
-import {CODE_BUCKET, NODE_ENV} from '@shared/env';
+import {CODE_BUCKET} from '@shared/env';
 
 import {ApiRequest, ApiResponse} from '@shared-node/api/api_interface';
 import {SessionManager} from '@shared-node/api/api_session';
@@ -40,8 +38,6 @@ export async function handleStatics<SessionManagerType extends AnySessionManager
   return undefined;
 }
 
-const staticsCache: Record<string, string> = {};
-
 const replaceManifestPath = (str: string): string =>
   str.replaceAll(
     /<link rel="manifest" href="[^"]+">/gu,
@@ -54,16 +50,6 @@ async function loadStatic(opts: {
   contentType: string;
 }): Promise<ApiResponse> {
   const {frontendName, path, contentType} = opts;
-  const cacheKey = `${frontendName}::${path}`;
-  if (staticsCache[cacheKey] !== undefined && NODE_ENV !== 'development') {
-    return {body: staticsCache[cacheKey], opts: {contentType}};
-  }
-  if (NODE_ENV === 'development') {
-    const buffer = await readFile(`./${frontendName}/dist/${path}`);
-    // eslint-disable-next-line require-atomic-updates
-    staticsCache[cacheKey] = replaceManifestPath(buffer.toString());
-    return {body: staticsCache[cacheKey], opts: {contentType}};
-  }
   const content = await getObject({
     bucket: CODE_BUCKET,
     key: `${frontendName}/${path}`,
@@ -72,9 +58,8 @@ async function loadStatic(opts: {
   if (content === undefined) {
     return {body: '', opts: {contentType}};
   }
-  // eslint-disable-next-line require-atomic-updates
-  staticsCache[cacheKey] = replaceManifestPath(content);
-  return {body: staticsCache[cacheKey], opts: {contentType}};
+  const body = replaceManifestPath(content);
+  return {body, opts: {contentType}};
 }
 
 export async function getIndex<SessionManagerType extends AnySessionManager>(

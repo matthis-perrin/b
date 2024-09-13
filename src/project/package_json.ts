@@ -24,8 +24,8 @@ export function generateWorkspacePackageJson(
     scripts: {
       setup: 'node ./setup.js',
       deploy: 'node ./deploy.js',
-      build: 'NODE_ENV=production node ./build.js',
-      watch: 'NODE_ENV=development node ./build.js --watch',
+      build: 'node ./build.js',
+      watch: 'node ./build.js --watch',
     },
     prettier: '@matthis/prettier-config',
     devDependencies: Object.fromEntries(

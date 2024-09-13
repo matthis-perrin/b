@@ -13,13 +13,12 @@ import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 
 import {REGION} from '@shared/env';
 
-import {credentialsProvider} from '@shared-node/aws/credentials';
 import {compress as gzipCompress, decompress as gzipDecompress} from '@shared-node/lib/gzip';
 
 let client: S3Client | undefined;
 function getClient(): S3Client {
   if (!client) {
-    client = new S3Client({region: REGION, credentials: credentialsProvider()});
+    client = new S3Client({region: REGION});
   }
   return client;
 }

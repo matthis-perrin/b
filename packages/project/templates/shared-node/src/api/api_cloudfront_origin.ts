@@ -1,5 +1,3 @@
-import {NODE_ENV} from '@shared/env';
-
 import {LambdaEvent} from '@shared-node/api/api_lambda';
 
 /* eslint-disable n/no-process-env */
@@ -9,10 +7,7 @@ const CLOUDFRONT_HEADER_VALUE = process.env['CLOUDFRONT_HEADER_VALUE'] ?? '';
 
 export function enforceCloudfrontOrigin(event: LambdaEvent): void {
   // Ensure the request comes from Cloudfront
-  if (
-    NODE_ENV !== 'development' &&
-    event.headers[CLOUDFRONT_HEADER_NAME] !== CLOUDFRONT_HEADER_VALUE
-  ) {
+  if (event.headers[CLOUDFRONT_HEADER_NAME] !== CLOUDFRONT_HEADER_VALUE) {
     throw new Error('Direct access not allowed');
   }
 }

@@ -9,8 +9,6 @@ import {imagesLoader} from '@src/webpack/loaders/images_loader';
 import {sourceMapLoader} from '@src/webpack/loaders/source_map_loader';
 import {faviconsWebpackPlugin} from '@src/webpack/plugins/favicons_webpack_plugin';
 import {htmlPlugin} from '@src/webpack/plugins/html_plugin';
-import {webpackDevServer} from '@src/webpack/plugins/webpack_dev_server';
-import {isProd} from '@src/webpack/utils';
 
 export function webConfig(opts: {context: string; watch: boolean}): Configuration {
   const {context, watch} = opts;
@@ -24,7 +22,7 @@ export function webConfig(opts: {context: string; watch: boolean}): Configuratio
     'u'
   ).exec(readFileSync(envVariableFilePath).toString());
   const domainName = match?.[1] ?? 'domain-not-found';
-  const publicUrl = `http${isProd() ? 's' : ''}://${domainName}`;
+  const publicUrl = `https://${domainName}`;
 
   return {
     ...base,
@@ -53,7 +51,6 @@ export function webConfig(opts: {context: string; watch: boolean}): Configuratio
       htmlPlugin(context, publicUrl),
       faviconsWebpackPlugin(context, publicUrl),
     ],
-    devServer: watch ? webpackDevServer(context) : undefined,
     optimization: {
       ...base.optimization,
       splitChunks: {

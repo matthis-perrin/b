@@ -159,7 +159,6 @@ const grayScale = [...new Array(256)].map((_, gray) => {
     lum: luminance(rgb),
   };
 });
-console.log(grayScale);
 
 // Return the color that has the highest contrast when displayed over the `backgroundColor`
 export function textColor(backgroundColor: RGB, contrast: number): string {
@@ -188,8 +187,6 @@ export function textColor(backgroundColor: RGB, contrast: number): string {
       bestGray = {...gray, c};
     }
   }
-
-  console.log(bestGray);
 
   return bestGray?.hex ?? '#000000';
 }

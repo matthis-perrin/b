@@ -4,11 +4,10 @@ import '@babel/preset-env';
 import '@babel/preset-typescript';
 import 'babel-loader';
 import '@babel/preset-react';
-import 'babel-plugin-react-remove-properties';
+import 'babel-plugin-styled-components';
 
 import {CORE_JS_VERSION} from '@src/versions';
 import {WebpackLoader} from '@src/webpack/models';
-import {isSelenium} from '@src/webpack/utils';
 /* eslint-enable import/no-unassigned-import */
 
 export function babelLoaderWeb(): WebpackLoader {
@@ -30,7 +29,14 @@ export function babelLoaderWeb(): WebpackLoader {
         ['@babel/preset-react', {runtime: 'automatic'}],
         ['@babel/preset-typescript'],
       ],
-      plugins: isSelenium() ? [] : [['react-remove-properties', {properties: ['data-test-id']}]],
+      plugins: [
+        [
+          'babel-plugin-styled-components',
+          {
+            pure: true,
+          },
+        ],
+      ],
     },
   };
 }
