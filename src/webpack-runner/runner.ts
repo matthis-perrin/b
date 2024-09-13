@@ -126,6 +126,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
     if (!isDone) {
       return;
     }
+    redraw();
 
     const errors = [...statuses.values()].flatMap(v => v.errors);
     const {globalErrors} = groupAndSortErrors(errors);
@@ -263,9 +264,8 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
       // START
       //
       const compiler = webpack({...config, watch}, buildEnd);
-      // compiler.hooks.run.tap(name, buildStart);
+      compiler.hooks.run.tap(name, buildStart);
       compiler.hooks.watchRun.tap(name, buildStart);
-      compiler.hooks.beforeRun.tap(name, buildStart);
       return compiler;
     })
   );
