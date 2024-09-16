@@ -58,12 +58,13 @@ export function faviconsWebpackPlugin(
     mode: 'webapp',
     favicons: {
       appName,
-      appleStatusBarStyle: 'default',
+      appleStatusBarStyle: 'black-translucent',
       start_url: '/',
       lang: locale.replace('_', '-'),
       path: `${publicUrl}/assets`,
       background,
       theme_color: background,
+      display: 'fullscreen',
       icons: {
         appleIcon: iconInfo,
         appleStartup: iconInfo,

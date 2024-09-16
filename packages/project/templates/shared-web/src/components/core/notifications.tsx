@@ -115,7 +115,7 @@ const Wrapper = styled.div`
 `;
 
 const Notif = styled.div<{$bg: string}>`
-  margin-top: ${marginTop}px;
+  margin-top: calc(env(safe-area-inset-top) + ${marginTop}px);
   display: flex;
   align-items: center;
   padding: 12px 24px;

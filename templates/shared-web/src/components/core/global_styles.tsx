@@ -15,9 +15,9 @@ export const ThemeGlobalCss = css<AddPrefix<FrontendTheme['main'], '$'>>`
 export const GlobalStyle = createGlobalStyle`${css<AddPrefix<FrontendTheme['main'], '$'>>`
   html,
   body,
-  #app {
+  #root {
     width: 100%;
-    height: 100%;
+    height: calc(100% + env(safe-area-inset-bottom));
     font-weight: 400;
     ${ThemeGlobalCss};
   }
