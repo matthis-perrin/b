@@ -10,6 +10,8 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
+  useLayoutEffect,
+  useRef,
   useState,
 } from 'react';
 import {styled} from 'styled-components';
@@ -27,13 +29,16 @@ type Dispatch<T> = ReactDispatch<SetStateAction<T>> | ((val: T) => void);
 
 export type LabelPosition = 'left' | 'center';
 
-export interface InputProps<T> {
-  ref?: Ref<HTMLInputElement>;
+export interface InputControlProps<T> {
   value: T;
   syncState?: Dispatch<T>;
   syncStateWithEvent?: (value: T, evt: React.ChangeEvent<HTMLInputElement>) => void;
   asString?: (value: T) => string;
   fromString?: (value: string) => T;
+}
+
+export interface InputDisplayProps {
+  ref?: Ref<HTMLInputElement>;
   overrides?: Partial<FrontendTheme['input']>;
   label?: string | JSX.Element;
   labelPosition?: LabelPosition;
@@ -42,7 +47,10 @@ export interface InputProps<T> {
   noAutoFormat?: boolean;
   forceFormat?: number;
   rowLabel?: boolean;
+  icon?: JSX.Element;
 }
+
+export type InputProps<T> = InputControlProps<T> & InputDisplayProps;
 
 export type FullInputProps<T> = InputProps<T> &
   Omit<ComponentPropsWithoutRef<'input'>, 'style' | 'value' | 'children'>;
@@ -65,9 +73,12 @@ function InputInternal<T>(props: FullInputProps<T>, ref: Ref<HTMLInputElement>):
     noAutoFormat = asString !== undefined,
     forceFormat,
     rowLabel,
+    icon,
     ...inputProps
   } = props;
   const internalRef = createRef<HTMLInputElement>();
+  const inputIconWrapperRef = useRef<HTMLDivElement>(null);
+  const [iconWrapperWidth, setIconWrapperWidth] = useState<number>();
   const {input: themeDefault} = useTheme();
   const inputTheme = addPrefix({...themeDefault, ...overrides}, '$');
   const stringify = useCallback(
@@ -125,6 +136,13 @@ function InputInternal<T>(props: FullInputProps<T>, ref: Ref<HTMLInputElement>):
     }
   }, [focusOnMount, internalRef, ref]);
 
+  useLayoutEffect(() => {
+    if (icon && inputIconWrapperRef.current) {
+      const {width} = inputIconWrapperRef.current.getBoundingClientRect();
+      setIconWrapperWidth(width);
+    }
+  }, [icon]);
+
   const input = (
     <StyledInput
       ref={ref ?? internalRef}
@@ -136,9 +154,21 @@ function InputInternal<T>(props: FullInputProps<T>, ref: Ref<HTMLInputElement>):
       onBlur={handleBlur}
       type="text"
       value={internalStr}
+      $iconWidth={iconWrapperWidth}
       {...inputTheme}
       {...inputProps}
-    />
+    ></StyledInput>
+  );
+
+  const inputAndIcon = icon ? (
+    <InputWrapper>
+      {input}
+      <IconWrapper ref={inputIconWrapperRef} {...inputTheme}>
+        {icon}
+      </IconWrapper>
+    </InputWrapper>
+  ) : (
+    input
   );
 
   if (label !== undefined) {
@@ -157,14 +187,14 @@ function InputInternal<T>(props: FullInputProps<T>, ref: Ref<HTMLInputElement>):
         $marginBottom={inputTheme.$titleMarginBottom}
         $textColor={labelColor}
       >
-        {input}
+        {inputAndIcon}
       </StyledLabel>
     );
     // Wrap in a <div> (flex column) so that the label is on top of the input (unless `rowLabel` is enabled)
     return rowLabel ? el : <ColumnLabel>{el}</ColumnLabel>;
   }
 
-  return input;
+  return inputAndIcon;
 }
 InputInternal.displayName = 'Input';
 
@@ -195,16 +225,17 @@ export function borderAndBackground(opts: {
     `;
 }
 
-const StyledInput = styled.input<AddPrefix<FrontendTheme['input'], '$'>>`
+const StyledInput = styled.input<AddPrefix<FrontendTheme['input'], '$'> & {$iconWidth?: number}>`
   display: block;
   ${p => optionalPx('width', p.width)}
   ${p => optionalPx('height', p.$height)}
   box-sizing: border-box;
 
   outline: none;
-  ${p => optionalPx('padding-right', p.$paddingRight)}
+  padding-right: ${p =>
+    p.$iconWidth === undefined ? cssPx(p.$paddingRight) : `${p.$iconWidth}px`};
   ${p => optionalPx('padding-left', p.$paddingLeft)}
-  
+
   ${p => optional('font-family', p.$fontFamily)}
   ${p => optional('font-weight', p.$fontWeight)}
   ${p => optionalPx('font-size', p.$fontSize)}
@@ -276,4 +307,21 @@ const StyledLabel = styled(Label)<{
 const ColumnLabel = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+const InputWrapper = styled.div`
+  position: relative;
+`;
+
+const IconWrapper = styled.div<AddPrefix<FrontendTheme['input'], '$'>>`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-right-radius: ${p => p.$borderRadius}px;
+  border-bottom-right-radius: ${p => p.$borderRadius}px;
+  overflow: hidden;
 `;

@@ -58,3 +58,7 @@ function wrapElements(classes: ComponentClass[]): JSX.Element {
 export function useWrappedComponentClass(classes: ComponentClass[]): ComponentClass {
   return useComponentClass(wrapElements(classes));
 }
+
+export interface ReadOnlyRefObject<T> {
+  readonly current: T;
+}
