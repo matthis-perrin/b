@@ -1,12 +1,11 @@
 import {Dispatch, SetStateAction, useCallback, useRef, useState} from 'react';
 
+import {ReadOnlyRefObject} from '@shared-web/lib/react';
+
 function isFunction<S>(setStateAction: SetStateAction<S>): setStateAction is (prevState: S) => S {
   return typeof setStateAction === 'function';
 }
 
-interface ReadOnlyRefObject<T> {
-  readonly current: T;
-}
 type UseStateRef<T> = [T, Dispatch<SetStateAction<T>>, ReadOnlyRefObject<T>];
 type ExtractState<T> = T extends () => infer U ? U : T;
 

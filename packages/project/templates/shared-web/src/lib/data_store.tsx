@@ -1,5 +1,13 @@
 import {useEffect, useState} from 'react';
 
+import {asJsonString} from '@shared/lib/type_utils';
+
+export interface DataStoreOptions {
+  persist?: {
+    key: string;
+  };
+}
+
 export interface DataStoreApi<GetData, SetData> {
   getData: () => GetData;
   setData: (data: SetData) => void;
@@ -7,10 +15,19 @@ export interface DataStoreApi<GetData, SetData> {
   useData: () => GetData;
 }
 
-export function createDataStore<T>(): DataStoreApi<T | undefined, T>;
-export function createDataStore<T>(initialValue: T): DataStoreApi<T, T>;
-export function createDataStore<T>(initialValue?: T): DataStoreApi<T | undefined, T> {
-  let currentData = initialValue;
+export function createDataStore<T>(
+  initialValue?: undefined,
+  opts?: DataStoreOptions
+): DataStoreApi<T | undefined, T>;
+export function createDataStore<T>(initialValue: T, opts?: DataStoreOptions): DataStoreApi<T, T>;
+export function createDataStore<T>(
+  initialValue?: T,
+  opts?: DataStoreOptions
+): DataStoreApi<T | undefined, T> {
+  const {persist} = opts ?? {};
+  let currentData =
+    initialValue ??
+    (persist ? (asJsonString(localStorage.getItem(persist.key)) as T | undefined) : undefined);
   const storeListeners: ((dataStore: T | undefined) => void)[] = [];
 
   function getData(): T | undefined {
@@ -19,16 +36,20 @@ export function createDataStore<T>(initialValue?: T): DataStoreApi<T | undefined
 
   function setData(data: T | undefined): void {
     currentData = data;
+    if (persist) {
+      if (data === undefined) {
+        localStorage.removeItem(persist.key);
+      } else {
+        localStorage.setItem(persist.key, JSON.stringify(data));
+      }
+    }
     for (const listener of storeListeners) {
       listener(currentData);
     }
   }
 
   function updateData(fn: (current: T | undefined) => T): void {
-    currentData = fn(currentData);
-    for (const listener of storeListeners) {
-      listener(currentData);
-    }
+    setData(fn(currentData));
   }
 
   function useData(): T | undefined {

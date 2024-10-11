@@ -15,7 +15,7 @@ import {
 } from 'react';
 import {styled} from 'styled-components';
 
-import {Input} from '@shared-web/components/core/input';
+import {Input, InputDisplayProps} from '@shared-web/components/core/input';
 import {debounce} from '@shared-web/lib/debounce';
 import {notifyError} from '@shared-web/lib/notification';
 import {EmptyFragment} from '@shared-web/lib/react';
@@ -42,7 +42,8 @@ interface AutocompleteProps<Item> {
   className?: string;
   maxHeight?: string | number;
   disabled?: boolean;
-  inputProps?: Omit<ComponentPropsWithoutRef<'input'>, 'style' | 'value' | 'children'>;
+  inputProps?: Omit<ComponentPropsWithoutRef<'input'>, 'style' | 'value' | 'children'> &
+    InputDisplayProps;
 }
 // eslint-disable-next-line react/function-component-definition
 export function Autocomplete<Item>(props: AutocompleteProps<Item>): JSX.Element {

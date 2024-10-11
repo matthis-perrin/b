@@ -1,5 +1,7 @@
 import {useEffect, useState} from 'react';
 
+import {DataStoreOptions} from '@shared-web/lib/data_store';
+
 interface InternalData<T> {
   val: T | undefined;
   v: number;
@@ -17,9 +19,15 @@ interface MapStoreApi<Key, Value> {
   batchUnsetData: (batch: Key[]) => void;
 }
 
-export function createMapStore<Key, Value>(): MapStoreApi<Key, Value> {
-  const data = new Map<Key, InternalData<Value>>();
-  let rawData: InternalData<Map<Key, Value>> = {val: new Map<Key, Value>(), v: 0};
+export function createMapStore<Key, Value>(opts?: DataStoreOptions): MapStoreApi<Key, Value> {
+  const {persist} = opts ?? {};
+  const initialData = new Map(
+    persist ? (JSON.parse(localStorage.getItem(persist.key) ?? '[]') as [Key, Value][]) : []
+  );
+  const data = new Map<Key, InternalData<Value>>(
+    [...initialData.entries()].map(([k, val]) => [k, {val, v: 0}])
+  );
+  let rawData: InternalData<Map<Key, Value>> = {val: initialData, v: 0};
   const listeners = new Map<Key, InternalListener<Value>[]>();
   const multiListeners = new Set<InternalListener<Map<Key, Value>>>();
 
@@ -35,7 +43,7 @@ export function createMapStore<Key, Value>(): MapStoreApi<Key, Value> {
     batchSetData([{key, value}]);
   }
 
-  function batchSetData(batch: {key: Key; value: Value}[]): void {
+  function batchSetDataInternal(batch: {key: Key; value: Value | undefined}[]): void {
     const newRawDataVal = new Map(rawData.val === undefined ? [] : [...rawData.val.entries()]);
     for (const {key, value} of batch) {
       const listenersForKey = listeners.get(key);
@@ -44,7 +52,11 @@ export function createMapStore<Key, Value>(): MapStoreApi<Key, Value> {
       const newValueForKey = {val: value, v};
 
       data.set(key, newValueForKey);
-      newRawDataVal.set(key, value);
+      if (value === undefined) {
+        newRawDataVal.delete(key);
+      } else {
+        newRawDataVal.set(key, value);
+      }
 
       for (const listener of listenersForKey ?? []) {
         listener(newValueForKey);
@@ -52,35 +64,24 @@ export function createMapStore<Key, Value>(): MapStoreApi<Key, Value> {
     }
 
     rawData = {val: newRawDataVal, v: rawData.v + 1};
+    if (persist) {
+      localStorage.setItem(persist.key, JSON.stringify([...newRawDataVal.entries()]));
+    }
     for (const listener of multiListeners.values()) {
       listener(rawData);
     }
+  }
+
+  function batchSetData(batch: {key: Key; value: Value}[]): void {
+    batchSetDataInternal(batch);
   }
 
   function unsetData(key: Key): void {
     batchUnsetData([key]);
   }
 
-  function batchUnsetData(batch: Key[]): void {
-    const newRawDataVal = new Map(rawData.val === undefined ? [] : [...rawData.val.entries()]);
-    for (const key of batch) {
-      const listenersForKey = listeners.get(key);
-      const valueForKey = data.get(key);
-      const v = (valueForKey?.v ?? -1) + 1;
-      const newValueForKey = {val: undefined, v};
-
-      data.set(key, newValueForKey);
-      newRawDataVal.delete(key);
-
-      for (const listener of listenersForKey ?? []) {
-        listener(newValueForKey);
-      }
-    }
-
-    rawData = {val: newRawDataVal, v: rawData.v + 1};
-    for (const listener of multiListeners.values()) {
-      listener(rawData);
-    }
+  function batchUnsetData(keys: Key[]): void {
+    batchSetDataInternal(keys.map(key => ({key, value: undefined})));
   }
 
   function useData(key: Key): Value | undefined {
