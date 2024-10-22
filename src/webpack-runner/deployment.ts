@@ -91,7 +91,7 @@ async function deployLambda(
     await execAsync(
       `aws lambda update-function-code --function-name ${
         lambdaNameTerraform
-      } --s3-bucket ${codeBucket} --s3-key ${lambdaName}/dist.zip --region ${region} --publish --no-cli-pager`
+      } --s3-bucket ${codeBucket} --s3-key ${lambdaName}/dist.zip --region ${region} --no-cli-pager`
     );
     runnerLog(`${project.projectName}: update done`);
 

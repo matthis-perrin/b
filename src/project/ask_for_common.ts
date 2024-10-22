@@ -113,28 +113,17 @@ export async function askForAlarmEmailValue(): Promise<string | undefined> {
 // DOMAIN NAME
 //
 
-export async function askForDomainName(): Promise<string | undefined> {
-  const useDomain = await prompt({
-    type: 'confirm',
-    name: 'value',
-    message: 'Use a custom domain?',
-  });
-  if (useDomain.value !== true) {
-    return undefined;
-  }
-  return await askForDomainNameValue();
-}
-
-export async function askForDomainNameValue(): Promise<string | undefined> {
-  const domain = await prompt({
+export async function askForSubdomain(): Promise<string> {
+  const subdomain = await prompt({
     type: 'text',
     name: 'value',
-    message: 'Enter the domain name (leave empty for no domain).',
+    message: 'Subdomain (leave empty for root domain).',
   });
-  if (typeof domain.value !== 'string' || domain.value.length === 0) {
-    return undefined;
+  const value = subdomain.value;
+  if (typeof value !== 'string') {
+    throw new Error('Subdomain is mandatory');
   }
-  return domain.value;
+  return value.length === 0 || value.endsWith('.') ? value : `${value}.`;
 }
 
 //
@@ -180,4 +169,55 @@ export async function askForCloudwatchTriggerValue(): Promise<number | undefined
     return undefined;
   }
   return minutesValue;
+}
+
+//
+// TERRAFORM ENV
+//
+
+export async function askForTerraformEnvName(): Promise<string | undefined> {
+  const domain = await prompt({
+    type: 'text',
+    name: 'value',
+    message: 'Enter terraform env name',
+  });
+  if (typeof domain.value !== 'string' || domain.value.length === 0) {
+    return undefined;
+  }
+  return domain.value;
+}
+
+export async function askForTerraformAccountId(): Promise<string | undefined> {
+  const domain = await prompt({
+    type: 'text',
+    name: 'value',
+    message: 'Enter AWS account ID',
+  });
+  if (typeof domain.value !== 'string' || domain.value.length === 0) {
+    return undefined;
+  }
+  return domain.value;
+}
+
+export async function askForTerraformEnvIsDefault(): Promise<boolean | undefined> {
+  const enabled = await prompt({
+    type: 'confirm',
+    name: 'value',
+    message: 'Is it the default env?',
+    initial: true,
+  });
+  return enabled.value === true;
+}
+
+export async function askForTerraformHostedZone(): Promise<string> {
+  const hostedZone = await prompt({
+    type: 'text',
+    name: 'value',
+    message: 'Hosted zone',
+  });
+  const value = hostedZone.value;
+  if (typeof value !== 'string' || value.length === 0) {
+    throw new Error('Hosted zone is mandatory');
+  }
+  return value;
 }

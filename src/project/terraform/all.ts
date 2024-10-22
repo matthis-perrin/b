@@ -17,9 +17,8 @@ export function generateCommonTerraform(
   projects: WorkspaceProject[],
   workspaceOptions: WorkspaceOptions
 ): string {
-  const {region} = workspaceOptions;
   return [
-    generateAwsProviderTerraform(workspaceName, {region}),
+    generateAwsProviderTerraform(workspaceName, workspaceOptions),
     generateS3BucketTerraform(
       workspaceName,
       projects.filter(p => p.type === ProjectType.Web).map(p => p.projectName)

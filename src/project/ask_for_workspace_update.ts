@@ -5,7 +5,7 @@ import {
   askForAlarmEmailValue,
   askForAuthentication,
   askForCloudwatchTriggerValue,
-  askForDomainNameValue,
+  askForSubdomain,
 } from '@src/project/ask_for_common';
 import {neverHappens} from '@src/type_utils';
 
@@ -79,13 +79,13 @@ async function askForWorkspaceFragmentUpdate(frag: WorkspaceFragment): Promise<W
 async function askForStaticWebsiteFragmentUpdate(
   frag: WorkspaceFragmentRegistry['static-website']
 ): Promise<WorkspaceFragmentRegistry['static-website']> {
-  const {type, websiteName, domain} = frag;
+  const {type, websiteName, subDomain} = frag;
   const {attribute} = await prompt({
     type: 'select',
     name: 'attribute',
     message: 'What do you want to update?',
     choices: [
-      {title: `Domain name: ${domain ?? '<not set>'}`, value: 'domain'},
+      {title: `Subdomain: "${subDomain}"`, value: 'subDomain'},
       {title: `I'm done`, value: I_AM_DONE},
     ],
   });
@@ -94,9 +94,9 @@ async function askForStaticWebsiteFragmentUpdate(
     return frag;
   }
 
-  if (attribute === 'domain') {
-    const domain = await askForDomainNameValue();
-    return {type, websiteName, domain};
+  if (attribute === 'subDomain') {
+    const subDomain = await askForSubdomain();
+    return {type, websiteName, subDomain};
   }
 
   return frag;
@@ -140,13 +140,13 @@ async function askForStandaloneLambdaFragmentUpdate(
 async function askForApiLambdaFragmentUpdate(
   frag: WorkspaceFragmentRegistry['api-lambda']
 ): Promise<WorkspaceFragmentRegistry['api-lambda']> {
-  const {type, apiName, alarmEmail, domain} = frag;
+  const {type, apiName, alarmEmail, subDomain} = frag;
   const {attribute} = await prompt({
     type: 'select',
     name: 'attribute',
     message: 'What do you want to update?',
     choices: [
-      {title: `Domain name: ${domain ?? '<not set>'}`, value: 'domain'},
+      {title: `Subdomain: "${subDomain}"`, value: 'subDomain'},
       {title: `Alarm email: ${alarmEmail ?? '<not set>'}`, value: 'alarmEmail'},
       {title: `I'm done`, value: I_AM_DONE},
     ],
@@ -156,14 +156,14 @@ async function askForApiLambdaFragmentUpdate(
     return frag;
   }
 
-  if (attribute === 'domain') {
-    const domain = await askForDomainNameValue();
-    return {type, apiName, alarmEmail, domain};
+  if (attribute === 'subDomain') {
+    const subDomain = await askForSubdomain();
+    return {type, apiName, alarmEmail, subDomain};
   }
 
   if (attribute === 'alarmEmail') {
     const alarmEmail = await askForAlarmEmailValue();
-    return {type, apiName, alarmEmail, domain};
+    return {type, apiName, alarmEmail, subDomain};
   }
 
   return frag;
@@ -172,13 +172,13 @@ async function askForApiLambdaFragmentUpdate(
 async function askForWebAppFragmentUpdate(
   frag: WorkspaceFragmentRegistry['web-app']
 ): Promise<WorkspaceFragmentRegistry['web-app']> {
-  const {type, appName, alarmEmail, authentication, domain} = frag;
+  const {type, appName, alarmEmail, authentication, subDomain} = frag;
   const {attribute} = await prompt({
     type: 'select',
     name: 'attribute',
     message: 'What do you want to update?',
     choices: [
-      {title: `Domain name: ${domain ?? '<not set>'}`, value: 'domain'},
+      {title: `Subdomain: "${subDomain}"`, value: 'subDomain'},
       {title: `Alarm email: ${alarmEmail ?? '<not set>'}`, value: 'alarmEmail'},
       {title: `Authentication: ${authentication.enabled ? 'yes' : 'no'}`, value: 'authentication'},
       {title: `I'm done`, value: I_AM_DONE},
@@ -189,19 +189,19 @@ async function askForWebAppFragmentUpdate(
     return frag;
   }
 
-  if (attribute === 'domain') {
-    const domain = await askForDomainNameValue();
-    return {type, appName, alarmEmail, authentication, domain};
+  if (attribute === 'subDomain') {
+    const subDomain = await askForSubdomain();
+    return {type, appName, alarmEmail, authentication, subDomain};
   }
 
   if (attribute === 'alarmEmail') {
     const alarmEmail = await askForAlarmEmailValue();
-    return {type, appName, alarmEmail, authentication, domain};
+    return {type, appName, alarmEmail, authentication, subDomain};
   }
 
   if (attribute === 'authentication') {
     const authentication = await askForAuthentication();
-    return {type, appName, alarmEmail, authentication, domain};
+    return {type, appName, alarmEmail, authentication, subDomain};
   }
 
   return frag;

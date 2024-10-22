@@ -16,7 +16,6 @@ import {generateProject} from '@src/project/generate_project';
 import {generateGitIgnore} from '@src/project/gitignore';
 import {generateWorkspacePackageJson} from '@src/project/package_json';
 import {
-  AppDomain,
   generateCommonTerraform,
   generateWorkspaceProjectTerraform,
 } from '@src/project/terraform/all';
@@ -72,19 +71,6 @@ function fragmentFlags(baseFlags: Flag): (allFragments: WorkspaceFragment[]) => 
   };
 }
 
-// Parse a string into its domain/subdomain.
-// We assume the root domain (the hosted zone registered in AWS)
-// is the in form of <second-level-domain>.<first-level-domain> (eg: "matthis.link")
-function parseDomain(domainStr?: string): AppDomain | undefined {
-  if (domainStr === undefined) {
-    return undefined;
-  }
-  const parts = domainStr.split('.');
-  const rootDomain = parts.slice(-2).join('.'); // eslint-disable-line @typescript-eslint/no-magic-numbers
-  const subDomain = parts.slice(0, -2).join('.'); // eslint-disable-line @typescript-eslint/no-magic-numbers
-  return {subDomain, rootDomain};
-}
-
 export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): WorkspaceProject[] {
   if (fragment.type === WorkspaceFragmentType.StaticWebsite) {
     return [
@@ -99,7 +85,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         flags: fragmentFlags({}),
         terraform: {
           type: 'frontend',
-          domain: parseDomain(fragment.domain),
+          subDomain: fragment.subDomain,
         },
       },
     ];
@@ -120,7 +106,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           webAppName: undefined,
           alarmEmail: fragment.alarmEmail,
           cloudwatchTriggerMinutes: fragment.cloudwatchTriggerMinutes,
-          domain: undefined,
+          subDomain: undefined,
           authentication: undefined,
         },
       },
@@ -142,7 +128,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           webAppName: undefined,
           alarmEmail: fragment.alarmEmail,
           cloudwatchTriggerMinutes: undefined,
-          domain: parseDomain(fragment.domain),
+          subDomain: fragment.subDomain,
           authentication: undefined,
         },
       },
@@ -167,8 +153,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
         flags,
         terraform: {
           type: 'frontend',
-          domain:
-            fragment.domain === undefined ? undefined : parseDomain(`static.${fragment.domain}`),
+          subDomain: `static.${fragment.subDomain}`,
         },
       },
       {
@@ -183,7 +168,7 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
           webAppName: fragment.appName,
           alarmEmail: fragment.alarmEmail,
           cloudwatchTriggerMinutes: undefined,
-          domain: parseDomain(fragment.domain),
+          subDomain: fragment.subDomain,
           authentication: fragment.authentication,
         },
       },
@@ -370,10 +355,6 @@ export async function generateWorkspace(
   log('Running post install script');
   const commands = [`cd ${dst}`, `node setup.js`, `git init`];
   execSync(commands.join(' && '), {stdio: ['ignore', 'inherit', 'inherit']});
-
-  // Final instructions
-  log(`Run the following to get started:`);
-  log(`cd ${relative(process.cwd(), dst)}; code app.code-workspace; yarn watch`);
 }
 
 export async function writeWorkspaceFile(

@@ -80,8 +80,15 @@ export interface FileHash {
   hash: string;
 }
 
+export interface TerraformEnv {
+  accountId?: string;
+  hostedZone?: string;
+  isDefault?: boolean;
+}
+
 export interface WorkspaceOptions {
   region: string;
+  envs: Record<string, TerraformEnv>;
 }
 
 export interface Workspace {
@@ -117,33 +124,33 @@ export async function readWorkspace(workspacePath: string): Promise<Workspace | 
         const appName = asStringOrThrow(fragData['appName']);
         const authenticationData = asMap(fragData['authentication'], {});
         const enabled = asBoolean(authenticationData['enabled'], false);
-        const domain = asString(fragData['domain']);
+        const subDomain = asStringOrThrow(fragData['subDomain']);
         const frag: WorkspaceFragment = {
           type: WorkspaceFragmentType.WebApp,
           alarmEmail,
           appName,
           authentication: {enabled},
-          domain,
+          subDomain,
         };
         return frag;
       } else if (type === WorkspaceFragmentType.StaticWebsite) {
         const websiteName = asStringOrThrow<ProjectName>(fragData['websiteName']);
-        const domain = asString(fragData['domain']);
+        const subDomain = asStringOrThrow(fragData['subDomain']);
         const frag: WorkspaceFragment = {
           type: WorkspaceFragmentType.StaticWebsite,
           websiteName,
-          domain,
+          subDomain,
         };
         return frag;
       } else if (type === WorkspaceFragmentType.ApiLambda) {
         const alarmEmail = asString(fragData['alarmEmail']);
         const apiName = asStringOrThrow<ProjectName>(fragData['apiName']);
-        const domain = asString(fragData['domain']);
+        const subDomain = asStringOrThrow(fragData['subDomain']);
         const frag: WorkspaceFragment = {
           type: WorkspaceFragmentType.ApiLambda,
           alarmEmail,
           apiName,
-          domain,
+          subDomain,
         };
         return frag;
       } else if (type === WorkspaceFragmentType.NodeScript) {
@@ -185,7 +192,15 @@ export async function readWorkspace(workspacePath: string): Promise<Workspace | 
 
   const optionsData = asMap(workspaceData['options'], {});
   const region = asString(optionsData['region'], DEFAULT_REGION);
-  const options: WorkspaceOptions = {region};
+  const envs = Object.fromEntries(
+    Object.entries(asMap(optionsData['envs'], {})).map(([name, envData]) => {
+      const envMap = asMap(envData, {});
+      const accountId = asString(envMap['accountId']);
+      const hostedZone = asString(envMap['hostedZone']);
+      return [name, {accountId, hostedZone}];
+    })
+  );
+  const options: WorkspaceOptions = {region, envs};
 
   return {fragments, version, files, options};
 }

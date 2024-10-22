@@ -7,15 +7,16 @@ function isFunction<S>(setStateAction: SetStateAction<S>): setStateAction is (pr
 }
 
 type UseStateRef<T> = [T, Dispatch<SetStateAction<T>>, ReadOnlyRefObject<T>];
-type ExtractState<T> = T extends () => infer U ? U : T;
 
 export function useStateRef<State>(): UseStateRef<State | undefined>;
-export function useStateRef<Initial>(initialState: Initial): UseStateRef<ExtractState<Initial>>;
-export function useStateRef<Initial>(initialState?: Initial): UseStateRef<ExtractState<Initial>> {
-  const [state, setState] = useState<ExtractState<Initial>>(initialState as ExtractState<Initial>);
+export function useStateRef<Initial>(initialState: Initial | (() => Initial)): UseStateRef<Initial>;
+export function useStateRef<Initial>(
+  initialState?: Initial | (() => Initial)
+): UseStateRef<Initial | undefined> {
+  const [state, setState] = useState<Initial | undefined>(initialState);
   const ref = useRef(state);
 
-  const dispatch = useCallback((setStateAction: SetStateAction<ExtractState<Initial>>) => {
+  const dispatch = useCallback((setStateAction: SetStateAction<Initial | undefined>) => {
     ref.current = isFunction(setStateAction) ? setStateAction(ref.current) : setStateAction;
     setState(ref.current);
   }, []);

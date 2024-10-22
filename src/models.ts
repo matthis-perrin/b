@@ -112,7 +112,7 @@ export interface WorkspaceFragmentRegistry {
   [WorkspaceFragmentType.StaticWebsite]: {
     type: WorkspaceFragmentType.StaticWebsite;
     websiteName: ProjectName;
-    domain: string | undefined;
+    subDomain: string;
   };
   [WorkspaceFragmentType.StandaloneLambda]: {
     type: WorkspaceFragmentType.StandaloneLambda;
@@ -124,13 +124,13 @@ export interface WorkspaceFragmentRegistry {
     type: WorkspaceFragmentType.ApiLambda;
     apiName: ProjectName;
     alarmEmail: string | undefined;
-    domain: string | undefined;
+    subDomain: string;
   };
   [WorkspaceFragmentType.WebApp]: {
     type: WorkspaceFragmentType.WebApp;
     appName: string;
     alarmEmail: string | undefined;
-    domain: string | undefined;
+    subDomain: string;
     authentication: WebAppAuthentication;
   };
   [WorkspaceFragmentType.NodeScript]: {

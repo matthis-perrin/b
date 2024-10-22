@@ -5,8 +5,8 @@ import {
   askForAlarmEmail,
   askForAuthentication,
   askForCloudwatchTrigger,
-  askForDomainName,
   askForProjectName,
+  askForSubdomain,
 } from '@src/project/ask_for_common';
 import {getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
 import {neverHappens} from '@src/type_utils';
@@ -54,8 +54,8 @@ export async function askForNewWorkspaceFragment(
 
   if (type === WorkspaceFragmentType.StaticWebsite) {
     const websiteName = await askForProjectName('Website project name', 'website', takenNames);
-    const domain = await askForDomainName();
-    return [...frags, {type, websiteName, domain}];
+    const subDomain = await askForSubdomain();
+    return [...frags, {type, websiteName, subDomain}];
   } else if (type === WorkspaceFragmentType.StandaloneLambda) {
     const lambdaName = await askForProjectName('Lambda project name', 'lambda', takenNames);
     const alarmEmail = await askForAlarmEmail(true);
@@ -64,14 +64,14 @@ export async function askForNewWorkspaceFragment(
   } else if (type === WorkspaceFragmentType.ApiLambda) {
     const apiName = await askForProjectName('API name', 'api', takenNames);
     const alarmEmail = await askForAlarmEmail(false);
-    const domain = await askForDomainName();
-    return [...frags, {type, apiName, alarmEmail, domain}];
+    const subDomain = await askForSubdomain();
+    return [...frags, {type, apiName, alarmEmail, subDomain}];
   } else if (type === WorkspaceFragmentType.WebApp) {
     const appName = await askForProjectName('App name', 'app', takenNames);
     const alarmEmail = await askForAlarmEmail(false);
-    const domain = await askForDomainName();
+    const subDomain = await askForSubdomain();
     const authentication = await askForAuthentication();
-    return [...frags, {type, appName, alarmEmail, domain, authentication}];
+    return [...frags, {type, appName, alarmEmail, subDomain, authentication}];
   }
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   else if (type === WorkspaceFragmentType.NodeScript) {

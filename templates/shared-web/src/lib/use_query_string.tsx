@@ -1,12 +1,17 @@
-import {Dispatch, SetStateAction, useCallback, useEffect, useRef, useState} from 'react';
+import {Dispatch, SetStateAction, useCallback, useEffect, useRef} from 'react';
 import {useLocation, useSearch} from 'wouter';
 
 import {asDate, asNumber, NumberBrand, StringBrand} from '@shared/lib/type_utils';
 
+import {ReadOnlyRefObject} from '@shared-web/lib/react';
+import {useStateRef} from '@shared-web/lib/use_state_ref';
+
+type UseQueryStringReturnType<T> = [T, Dispatch<SetStateAction<T>>, ReadOnlyRefObject<T>];
+
 export function useStringQueryString<T extends StringBrand | string = string>(
   key: string,
   initial: string
-): [T, Dispatch<SetStateAction<T>>] {
+): UseQueryStringReturnType<T> {
   const serialize = useCallback((v: T) => v, []);
   const deserialize = useCallback((v: string) => v as T, []);
   return useGenericQueryString(key, initial as T, serialize, deserialize);
@@ -14,7 +19,7 @@ export function useStringQueryString<T extends StringBrand | string = string>(
 export function useOptionalStringQueryString<T extends StringBrand | string = string>(
   key: string,
   initial?: T | undefined
-): [T | undefined, Dispatch<SetStateAction<T | undefined>>] {
+): UseQueryStringReturnType<T | undefined> {
   const serialize = useCallback((v: T) => v, []);
   const deserialize = useCallback((v: string) => v as T, []);
   return useGenericOptionalQueryString(key, initial, serialize, deserialize);
@@ -23,14 +28,14 @@ export function useOptionalStringQueryString<T extends StringBrand | string = st
 export function useNumberQueryString<T extends NumberBrand | number = number>(
   key: string,
   initial: number
-): [T, Dispatch<SetStateAction<T>>] {
+): UseQueryStringReturnType<T> {
   const deserialize = useCallback((v: string) => asNumber<T>(v, initial), [initial]);
   return useGenericQueryString(key, initial as T, String, deserialize);
 }
 export function useOptionalNumberQueryString<T extends NumberBrand | number = number>(
   key: string,
   initial?: T | undefined
-): [T | undefined, Dispatch<SetStateAction<T | undefined>>] {
+): UseQueryStringReturnType<T | undefined> {
   const deserialize = useCallback((v: string) => asNumber<T>(v, initial as T), [initial]);
   return useGenericOptionalQueryString(key, initial, String, deserialize);
 }
@@ -38,16 +43,13 @@ export function useOptionalNumberQueryString<T extends NumberBrand | number = nu
 export function useStringArrayQueryString<T extends StringBrand | string = string>(
   key: string,
   initial: string[]
-): [T[], Dispatch<SetStateAction<T[]>>] {
+): UseQueryStringReturnType<T[]> {
   const serialize = useCallback((arr: T[]) => arr.join(','), []);
   const deserialize = useCallback((v: string) => (v.length === 0 ? [] : v.split(',')) as T[], []);
   return useGenericQueryString(key, initial as T[], serialize, deserialize);
 }
 
-export function useDateQueryString(
-  key: string,
-  initial: Date
-): [Date, Dispatch<SetStateAction<Date>>] {
+export function useDateQueryString(key: string, initial: Date): UseQueryStringReturnType<Date> {
   const serialize = useCallback((v: Date) => String(v.getTime()), []);
   const deserialize = useCallback((v: string) => asDate(v, initial), [initial]);
   return useGenericQueryString(key, initial, serialize, deserialize);
@@ -56,7 +58,7 @@ export function useDateQueryString(
 export function useBooleanQueryString(
   key: string,
   initial: boolean
-): [boolean, Dispatch<SetStateAction<boolean>>] {
+): UseQueryStringReturnType<boolean> {
   const serialize = useCallback((v: boolean) => (v ? '1' : '0'), []);
   const deserialize = useCallback((v: string) => v.length > 0 && v !== '0', []);
   return useGenericQueryString(key, initial, serialize, deserialize);
@@ -65,7 +67,7 @@ export function useBooleanQueryString(
 export function useOptionalBooleanQueryString(
   key: string,
   initial?: boolean | undefined
-): [boolean | undefined, Dispatch<SetStateAction<boolean | undefined>>] {
+): UseQueryStringReturnType<boolean | undefined> {
   const serialize = useCallback((v: boolean) => (v ? '1' : '0'), []);
   const deserialize = useCallback((v: string) => v.length > 0 && v !== '0', []);
   return useGenericOptionalQueryString(key, initial, serialize, deserialize);
@@ -78,11 +80,13 @@ function useGenericQueryString<T>(
   initialValue: T,
   serializer: (val: T) => string,
   deserializer: (val: string) => T
-): [T, Dispatch<SetStateAction<T>>] {
-  return useGenericOptionalQueryString(key, initialValue, serializer, deserializer) as [
-    T,
-    Dispatch<SetStateAction<T>>,
-  ];
+): UseQueryStringReturnType<T> {
+  return useGenericOptionalQueryString(
+    key,
+    initialValue,
+    serializer,
+    deserializer
+  ) as UseQueryStringReturnType<T>;
 }
 
 function useGenericOptionalQueryString<T>(
@@ -90,7 +94,7 @@ function useGenericOptionalQueryString<T>(
   initialValue: T | undefined,
   serializer: (val: T) => string,
   deserializer: (val: string) => T
-): [T | undefined, Dispatch<SetStateAction<T | undefined>>] {
+): UseQueryStringReturnType<T | undefined> {
   const search = useSearch();
   const [location, setLocation] = useLocation();
   const current = getQueryString(key);
@@ -100,7 +104,7 @@ function useGenericOptionalQueryString<T>(
     initialValueRef.current = initialValue;
   }, [initialValue]);
 
-  const [state, setState] = useState<T | undefined>(
+  const [state, setState, stateRef] = useStateRef<T | undefined>(
     current === undefined ? initialValueRef.current : deserializer(current)
   );
 
@@ -131,7 +135,7 @@ function useGenericOptionalQueryString<T>(
     const current = getQueryString(key);
     const newVal = current === undefined ? initialValueRef.current : deserializer(current);
     setState(newVal);
-  }, [deserializer, key, search, serializer, setQueryString]);
+  }, [deserializer, key, search, serializer, setQueryString, setState]);
 
   const setParam = useCallback(
     (setter: T | undefined | ((current: T | undefined) => T | undefined)) => {
@@ -145,10 +149,10 @@ function useGenericOptionalQueryString<T>(
       setQueryString(key, newVal === undefined ? undefined : serializer(newVal));
       setState(newVal);
     },
-    [deserializer, key, serializer, setQueryString]
+    [deserializer, key, serializer, setQueryString, setState]
   );
 
-  return [state, setParam];
+  return [state, setParam, stateRef];
 }
 
 function getQueryString(key: string): string | undefined {

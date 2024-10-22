@@ -82,25 +82,6 @@ export function createMapStore<Key, Value>(opts?: DataStoreOptions): MapStoreApi
 
   function batchUnsetData(keys: Key[]): void {
     batchSetDataInternal(keys.map(key => ({key, value: undefined})));
-    // const newRawDataVal = new Map(rawData.val === undefined ? [] : [...rawData.val.entries()]);
-    // for (const key of batch) {
-    //   const listenersForKey = listeners.get(key);
-    //   const valueForKey = data.get(key);
-    //   const v = (valueForKey?.v ?? -1) + 1;
-    //   const newValueForKey = {val: undefined, v};
-
-    //   data.set(key, newValueForKey);
-    //   newRawDataVal.delete(key);
-
-    //   for (const listener of listenersForKey ?? []) {
-    //     listener(newValueForKey);
-    //   }
-    // }
-
-    // rawData = {val: newRawDataVal, v: rawData.v + 1};
-    // for (const listener of multiListeners.values()) {
-    //   listener(rawData);
-    // }
   }
 
   function useData(key: Key): Value | undefined {

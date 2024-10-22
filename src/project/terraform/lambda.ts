@@ -1,5 +1,4 @@
 import {ProjectName, WebAppAuthentication, WorkspaceName} from '@src/models';
-import {AppDomain} from '@src/project/terraform/all';
 import {lowerCase} from '@src/string_utils';
 
 export interface WorkspaceProjectTerraformLambda {
@@ -8,7 +7,7 @@ export interface WorkspaceProjectTerraformLambda {
   webAppName: string | undefined;
   alarmEmail: string | undefined;
   cloudwatchTriggerMinutes: number | undefined;
-  domain: AppDomain | undefined;
+  subDomain?: string;
   authentication: WebAppAuthentication | undefined;
 }
 
@@ -17,7 +16,7 @@ export function generateLambdaTerraform(
   projectName: ProjectName,
   opts: WorkspaceProjectTerraformLambda
 ): string {
-  const {api, webAppName, alarmEmail, cloudwatchTriggerMinutes, domain, authentication} = opts;
+  const {api, webAppName, alarmEmail, cloudwatchTriggerMinutes, subDomain, authentication} = opts;
   return `
 # Define any extra role for the lambda here
 data "aws_iam_policy_document" "${projectName}_extra_policy" {
@@ -90,7 +89,7 @@ output "${projectName}_function_name" {
   description = "Function name of the \\"${workspaceName}-${projectName}\\" lambda"
 }
 ${
-  api
+  api && subDomain !== undefined
     ? `
 # Lambda URL
 
@@ -100,25 +99,15 @@ resource "aws_lambda_function_url" "${projectName}" {
 }
 
 output "${projectName}_url" {
-  value       = "${
-    domain
-      ? `https://${domain.subDomain}.${domain.rootDomain}/`
-      : `https://\${aws_cloudfront_distribution.${projectName}.domain_name}/`
-  }"
+  value       = "https://${subDomain}\${local.current_env.hosted_zone}/"
   description = "URL of \\"${projectName}\\""
-}${
-        domain !== undefined
-          ? `
+}
 
 # Domain
 
-data "aws_route53_zone" "${projectName}" {
-  name = "${domain.rootDomain}"
-}
-
 resource "aws_route53_record" "${projectName}_a" {
-  zone_id = data.aws_route53_zone.${projectName}.zone_id
-  name    = "${domain.subDomain}.${domain.rootDomain}"
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "${subDomain}\${local.current_env.hosted_zone}"
   type    = "A"
 
   alias {
@@ -129,8 +118,8 @@ resource "aws_route53_record" "${projectName}_a" {
 }
 
 resource "aws_route53_record" "${projectName}_aaaa" {
-  zone_id = data.aws_route53_zone.${projectName}.zone_id
-  name    = "${domain.subDomain}.${domain.rootDomain}"
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "${subDomain}\${local.current_env.hosted_zone}"
   type    = "AAAA"
 
   alias {
@@ -141,8 +130,8 @@ resource "aws_route53_record" "${projectName}_aaaa" {
 }
 
 resource "aws_acm_certificate" "${projectName}" {
-  domain_name               = "*.${domain.subDomain}.${domain.rootDomain}"
-  subject_alternative_names = ["${domain.subDomain}.${domain.rootDomain}"]
+  domain_name               = "*.${subDomain}\${local.current_env.hosted_zone}"
+  subject_alternative_names = ["${subDomain}\${local.current_env.hosted_zone}"]
   validation_method         = "DNS"
   provider                  = aws.us-east-1
 }
@@ -161,7 +150,7 @@ resource "aws_route53_record" "${projectName}_certificate_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.${projectName}.zone_id
+  zone_id         = data.aws_route53_zone.main.zone_id
 }
 
 resource "aws_acm_certificate_validation" "${projectName}" {
@@ -169,8 +158,8 @@ resource "aws_acm_certificate_validation" "${projectName}" {
   certificate_arn         = aws_acm_certificate.${projectName}.arn
   validation_record_fqdns = [for record in aws_route53_record.${projectName}_certificate_validation : record.fqdn]
 }`
-          : ''
-      }
+    : ''
+}
 
 # Cloudfront Distribution
 
@@ -208,12 +197,8 @@ resource "aws_cloudfront_distribution" "${projectName}" {
   enabled             = true
   wait_for_deployment = false
   is_ipv6_enabled     = true
-  price_class         = "PriceClass_100"${
-    domain
-      ? `
-  aliases             = ["${domain.subDomain}.${domain.rootDomain}"]`
-      : ''
-  }
+  price_class         = "PriceClass_100"
+  aliases             = ["${subDomain}\${local.current_env.hosted_zone}"]
 
   default_cache_behavior {
     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -233,18 +218,11 @@ resource "aws_cloudfront_distribution" "${projectName}" {
     }
   }
 
-  viewer_certificate {${
-    domain
-      ? `
+  viewer_certificate {
     acm_certificate_arn      = aws_acm_certificate.${projectName}.arn
     ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"`
-      : `
-    cloudfront_default_certificate = true`
+    minimum_protocol_version = "TLSv1.2_2021"
   }
-  }
-}`
-    : ''
 }
 ${
   cloudwatchTriggerMinutes !== undefined

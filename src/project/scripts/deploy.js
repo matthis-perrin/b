@@ -49,7 +49,7 @@ async function run() {
     execSync(
       `aws lambda update-function-code --function-name ${
         outputs[`${lambdaName}_function_name`]
-      } --s3-bucket ${code_bucket} --s3-key ${lambdaName}/dist.zip --region ${region} --publish --no-cli-pager`
+      } --s3-bucket ${code_bucket} --s3-key ${lambdaName}/dist.zip --region ${region} --no-cli-pager`
     );
   }
 
