@@ -1,6 +1,6 @@
 import {prompt} from 'prompts';
 
-import {ProjectName, WebAppAuthentication} from '@src/models';
+import {ProjectName, WebAppAuthentication, WorkspaceName} from '@src/models';
 import {DEFAULT_REGION} from '@src/project/generate_workspace';
 import {asStringOrThrow} from '@src/type_utils';
 
@@ -8,14 +8,14 @@ import {asStringOrThrow} from '@src/type_utils';
 // WORKSPACE NAME
 //
 
-export async function askForWorkspaceName(): Promise<string> {
+export async function askForWorkspaceName(): Promise<WorkspaceName> {
   const {workspaceName} = await prompt({
     type: 'text',
     name: 'workspaceName',
     message: 'Workspace name',
     validate: (v: string) => v.length > 0,
   });
-  return asStringOrThrow(workspaceName);
+  return asStringOrThrow<WorkspaceName>(workspaceName);
 }
 
 //

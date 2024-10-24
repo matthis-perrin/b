@@ -10,6 +10,7 @@ import {runnerLog} from '@src/webpack-runner/log';
 
 export async function deployProject(
   project: WorkspaceProject,
+  workspaceName: string,
   opts: {root: string}
 ): Promise<{url?: string}> {
   const {root} = opts;
@@ -35,8 +36,8 @@ export async function deployProject(
   // Deploy
   const [url] = removeUndefined(
     await Promise.all([
-      deployLambda(project, terraformOutputs),
-      deployWebsite(project, terraformOutputs),
+      deployLambda(project, workspaceName, terraformOutputs),
+      deployWebsite(project, workspaceName, terraformOutputs),
     ])
   );
   return {url};
@@ -52,6 +53,7 @@ function getTerraformOutput(terraformOutputs: Record<string, unknown>, name: str
 
 async function deployLambda(
   project: WorkspaceProject,
+  workspaceName: string,
   terraformOutputs: Record<string, unknown>
 ): Promise<string | undefined> {
   if (
@@ -69,7 +71,6 @@ async function deployLambda(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     project.type === ProjectType.LambdaFunction
   ) {
-    const workspaceName = project.vars['__WORKSPACE_NAME__'];
     const lambdaName = project.projectName;
     const tmp = tmpdir();
     const zipPath = `${join(tmp, randomUUID())}.zip`;
@@ -102,6 +103,7 @@ async function deployLambda(
 
 async function deployWebsite(
   project: WorkspaceProject,
+  workspaceName: string,
   terraformOutputs: Record<string, unknown>
 ): Promise<string | undefined> {
   if (
@@ -126,6 +128,7 @@ async function deployWebsite(
       terraformOutputs,
       `${websiteName}_cloudfront_domain_name`
     );
+
     await execAsync(`aws s3 sync ${websiteName}/dist s3://${codeBucket}/${websiteName}`);
     runnerLog(`${project.projectName}: sync done`);
     return websiteUrl;

@@ -22,6 +22,7 @@ import {releaseLock, takelock} from '@src/webpack-runner/runner_lock';
 interface RunWebpacksOptions {
   root: string;
   workspaceFragments: WorkspaceFragment[];
+  workspaceName: string;
   watch: boolean;
 }
 
@@ -55,7 +56,7 @@ function exit(): void {
 }
 
 export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
-  const {root, workspaceFragments, watch} = opts;
+  const {root, workspaceFragments, workspaceName, watch} = opts;
   const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f));
   const statuses = new Map<ProjectName, ProjectStatus>(
     projects.map(p => {
@@ -236,7 +237,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
         onChange();
         runnerLog(`Deploy START ${projectName} ${buildId}`);
 
-        deployProject(project, {root})
+        deployProject(project, workspaceName, {root})
           .then(({url}) => deployEnd({buildId, status: 'done', url, startTs}))
           .catch((err: unknown) => deployEnd({buildId, status: 'done', err: String(err), startTs}));
       }
@@ -369,7 +370,7 @@ export async function runWebpacks(opts: RunWebpacksOptions): Promise<void> {
 }
 
 export async function runAllWebpacks(
-  options: Omit<RunWebpacksOptions, 'projectPaths'>
+  options: Pick<RunWebpacksOptions, 'root' | 'watch'>
 ): Promise<void> {
   const {root, watch} = options;
   runnerLog(`Build runner START ${root}`);
@@ -377,14 +378,19 @@ export async function runAllWebpacks(
   await takelock(root);
   runnerLog(`Lock taken`);
 
-  const {fragments} = (await readWorkspace(root)) ?? {};
+  const workspace = await readWorkspace(root);
   runnerLog(`Workspace read`);
-  if (!fragments) {
+  if (!workspace) {
     throw new Error(`No workspace projects at path ${root}`);
   }
+  const {
+    fragments,
+    options: {workspaceName},
+  } = workspace;
   await runWebpacks({
     root,
     workspaceFragments: fragments,
+    workspaceName,
     watch,
   });
 }

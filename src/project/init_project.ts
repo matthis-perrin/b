@@ -1,5 +1,5 @@
 import {mkdir} from 'node:fs/promises';
-import {basename, join} from 'node:path';
+import {join} from 'node:path';
 
 import {error} from '@src/logger';
 import {
@@ -15,14 +15,14 @@ import {readWorkspace, WorkspaceOptions} from '@src/project/vscode_workspace';
 import {neverHappens} from '@src/type_utils';
 
 async function initProject(): Promise<void> {
-  let workspaceName: string;
+  let workspaceName: WorkspaceName;
   let workspacePath = process.cwd();
   let frags: WorkspaceFragment[] = [];
   let workspaceOptions: WorkspaceOptions;
 
   // Check if we are already in a workspace, otherwise ask for the workspace name
-  const workspace = await readWorkspace(workspacePath);
-  const newProject = workspace === undefined;
+  const previousWorkspace = await readWorkspace(workspacePath);
+  const newProject = previousWorkspace === undefined;
 
   if (newProject) {
     console.log('----------------------------------');
@@ -31,16 +31,16 @@ async function initProject(): Promise<void> {
     console.log('----------------------------------');
     workspaceName = await askForWorkspaceName();
     workspacePath = join(workspacePath, workspaceName);
-    workspaceOptions = {region: await askForWorkspaceRegion(), envs: {}};
+    workspaceOptions = {workspaceName, region: await askForWorkspaceRegion(), envs: {}};
     await mkdir(workspacePath);
   } else {
-    workspaceName = basename(workspacePath);
+    workspaceName = previousWorkspace.options.workspaceName;
     console.log('----------------------------------');
     console.log(`Existing project "${workspaceName}" detected.`);
     console.log(`We can update it if you'd like.`);
     console.log('----------------------------------');
-    workspaceOptions = workspace.options;
-    frags = removeBaseFragments(workspace.fragments);
+    workspaceOptions = previousWorkspace.options;
+    frags = removeBaseFragments(previousWorkspace.fragments);
   }
 
   // Ask for changes on the workspace
@@ -98,13 +98,11 @@ async function initProject(): Promise<void> {
   }
 
   // Generate/update the project
-  const name = workspaceName as WorkspaceName;
   await generateWorkspace(
     workspacePath,
-    name,
     refreshBaseFragments(frags),
     workspaceOptions,
-    workspace
+    previousWorkspace
   );
 
   // Final instructions

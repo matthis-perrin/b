@@ -13,14 +13,13 @@ export interface AppDomain {
 }
 
 export function generateCommonTerraform(
-  workspaceName: WorkspaceName,
   projects: WorkspaceProject[],
   workspaceOptions: WorkspaceOptions
 ): string {
   return [
-    generateAwsProviderTerraform(workspaceName, workspaceOptions),
+    generateAwsProviderTerraform(workspaceOptions),
     generateS3BucketTerraform(
-      workspaceName,
+      workspaceOptions,
       projects.filter(p => p.type === ProjectType.Web).map(p => p.projectName)
     ),
   ].join('\n\n');

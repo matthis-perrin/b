@@ -1,7 +1,7 @@
 import {join} from 'node:path';
 
 import {maybeReadFile, prettyJson, writeRawFile} from '@src/fs';
-import {ProjectName, WorkspaceFragment, WorkspaceFragmentType} from '@src/models';
+import {ProjectName, WorkspaceFragment, WorkspaceFragmentType, WorkspaceName} from '@src/models';
 import {DEFAULT_REGION, getProjectsFromWorkspaceFragment} from '@src/project/generate_workspace';
 import {
   asBoolean,
@@ -87,6 +87,7 @@ export interface TerraformEnv {
 }
 
 export interface WorkspaceOptions {
+  workspaceName: WorkspaceName;
   region: string;
   envs: Record<string, TerraformEnv>;
 }
@@ -191,6 +192,7 @@ export async function readWorkspace(workspacePath: string): Promise<Workspace | 
   );
 
   const optionsData = asMap(workspaceData['options'], {});
+  const workspaceName = asStringOrThrow<WorkspaceName>(optionsData['workspaceName']);
   const region = asString(optionsData['region'], DEFAULT_REGION);
   const envs = Object.fromEntries(
     Object.entries(asMap(optionsData['envs'], {})).map(([name, envData]) => {
@@ -200,7 +202,7 @@ export async function readWorkspace(workspacePath: string): Promise<Workspace | 
       return [name, {accountId, hostedZone}];
     })
   );
-  const options: WorkspaceOptions = {region, envs};
+  const options: WorkspaceOptions = {region, envs, workspaceName};
 
   return {fragments, version, files, options};
 }

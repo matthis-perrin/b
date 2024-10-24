@@ -1,15 +1,11 @@
-import {WorkspaceName} from '@src/models';
 import {TerraformEnv, WorkspaceOptions} from '@src/project/vscode_workspace';
 
 function stringOrNull(val?: string): string {
   return val === undefined ? 'null' : `"${val}"`;
 }
 
-export function generateAwsProviderTerraform(
-  workspaceName: WorkspaceName,
-  opts: WorkspaceOptions
-): string {
-  const {region, envs} = opts;
+export function generateAwsProviderTerraform(opts: WorkspaceOptions): string {
+  const {region, envs, workspaceName} = opts;
 
   // If no envs are defined, create a virtual dummy env as default
   let envsAndDefault: {envs: Record<string, TerraformEnv>; defaultEnvName: string};

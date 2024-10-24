@@ -5,13 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {listFiles, prettyJs, prettyJson, prettyJsonc, readFile, writeRawFile} from '@src/fs';
 import {md5} from '@src/hash';
 import {log} from '@src/logger';
-import {
-  ProjectName,
-  ProjectType,
-  WorkspaceFragment,
-  WorkspaceFragmentType,
-  WorkspaceName,
-} from '@src/models';
+import {ProjectName, ProjectType, WorkspaceFragment, WorkspaceFragmentType} from '@src/models';
 import {generateProject} from '@src/project/generate_project';
 import {generateGitIgnore} from '@src/project/gitignore';
 import {generateWorkspacePackageJson} from '@src/project/package_json';
@@ -243,31 +237,24 @@ export function getProjectsFromWorkspaceFragment(fragment: WorkspaceFragment): W
 
 export async function generateWorkspace(
   dst: string,
-  workspaceName: WorkspaceName,
-  workspaceFragments: WorkspaceFragment[],
-  workspaceOptions: WorkspaceOptions,
-  workspace: Workspace | undefined
+  fragments: WorkspaceFragment[],
+  options: WorkspaceOptions,
+  previousWorkspace: Workspace | undefined
 ): Promise<void> {
-  const projects = workspaceFragments.flatMap(f => getProjectsFromWorkspaceFragment(f));
+  const {workspaceName} = options;
+  const projects = fragments.flatMap(f => getProjectsFromWorkspaceFragment(f));
 
   // Create projects files from templates
   const projectFiles = await Promise.all(
     projects.map(
-      async project =>
-        await generateProject({
-          dst,
-          project,
-          allFragments: workspaceFragments,
-          workspace,
-          workspaceName,
-        })
+      async project => await generateProject({dst, project, fragments, options, previousWorkspace})
     )
   );
 
   // Generate workspace root files
   const SCRIPTS_PATH = join(fileURLToPath(import.meta.url), '../scripts');
   const writeFile = async (path: string, file: string): Promise<FileHash> =>
-    await writeWorkspaceFile(workspace, dst, path, file);
+    await writeWorkspaceFile(previousWorkspace, dst, path, file);
   const workspaceFiles = await Promise.all([
     // package.json
     writeFile(
@@ -277,7 +264,7 @@ export async function generateWorkspace(
     // app.code-workspace
     writeFile(
       'app.code-workspace',
-      await prettyJsonc(generateCodeWorkspace(workspaceName, workspaceFragments))
+      await prettyJsonc(generateCodeWorkspace(workspaceName, fragments))
     ),
     // .gitignore
     writeFile('.gitignore', generateGitIgnore()),
@@ -310,7 +297,7 @@ export async function generateWorkspace(
 
   // Terraform folder generation
   const terraformFiles = await Promise.all([
-    ...workspaceFragments
+    ...fragments
       .filter(frag => frag.type === WorkspaceFragmentType.WebApp)
       .filter(frag => frag.authentication.enabled)
       .flatMap(frag => {
@@ -327,7 +314,7 @@ export async function generateWorkspace(
       }),
     writeFile(
       join('terraform', 'base.tf'),
-      addLineBreak(generateCommonTerraform(workspaceName, projects, workspaceOptions))
+      addLineBreak(generateCommonTerraform(projects, options))
     ),
     ...projects.map(async p => {
       const content = generateWorkspaceProjectTerraform(workspaceName, p);
@@ -346,9 +333,9 @@ export async function generateWorkspace(
       ...terraformFiles,
       ...vscodeFiles,
     ]),
-    fragments: workspaceFragments,
+    fragments,
     version: PACKAGE_VERSIONS.project,
-    options: workspaceOptions,
+    options,
   });
 
   // Run setup.js

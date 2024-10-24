@@ -1,9 +1,11 @@
-import {ProjectName, WorkspaceName} from '@src/models';
+import {ProjectName} from '@src/models';
+import {WorkspaceOptions} from '@src/project/vscode_workspace';
 
 export function generateS3BucketTerraform(
-  workspaceName: WorkspaceName,
+  workspaceOptions: WorkspaceOptions,
   webProjectNames: ProjectName[]
 ): string {
+  const {workspaceName} = workspaceOptions;
   const bucketName = workspaceName.toLowerCase().replace(/[^a-z0-9.-]+/gu, '-');
 
   const CODE_BUCKET = `

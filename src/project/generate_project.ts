@@ -5,7 +5,7 @@ import {listFiles, prettierFormat, readFile} from '@src/fs';
 import {ProjectType, WorkspaceFragment} from '@src/models';
 import {generateSharedFiles} from '@src/project/dynamic_template';
 import {WorkspaceProject, writeWorkspaceFile} from '@src/project/generate_workspace';
-import {FileHash, Workspace} from '@src/project/vscode_workspace';
+import {FileHash, Workspace, WorkspaceOptions} from '@src/project/vscode_workspace';
 import {randomStringSafe} from '@src/rand_safe';
 import {upperCase} from '@src/string_utils';
 
@@ -14,11 +14,12 @@ const TEMPLATES_PATH = join(fileURLToPath(import.meta.url), '../templates');
 export async function generateProject(opts: {
   dst: string;
   project: WorkspaceProject;
-  allFragments: WorkspaceFragment[];
-  workspace: Workspace | undefined;
-  workspaceName: string;
+  fragments: WorkspaceFragment[];
+  options: WorkspaceOptions;
+  previousWorkspace: Workspace | undefined;
 }): Promise<FileHash[]> {
-  const {dst, project, allFragments, workspace, workspaceName} = opts;
+  const {dst, project, fragments, options, previousWorkspace} = opts;
+  const workspaceName = options.workspaceName;
 
   const written: FileHash[] = [];
   const {projectName, type, vars} = project;
@@ -53,7 +54,7 @@ export async function generateProject(opts: {
     )),
   ];
   if (type === ProjectType.Shared) {
-    filesToWrite.push(...generateSharedFiles(allFragments));
+    filesToWrite.push(...generateSharedFiles(fragments));
   }
 
   await Promise.all(
@@ -66,7 +67,7 @@ export async function generateProject(opts: {
       );
       for (const skipFileMatch of skipFileMatches) {
         const {flagName, negate, flagValue} = skipFileMatch.groups ?? {};
-        if (flagMatch({flagName, negate, flagValue}, project, allFragments)) {
+        if (flagMatch({flagName, negate, flagValue}, project, fragments)) {
           return;
         }
       }
@@ -94,7 +95,7 @@ export async function generateProject(opts: {
         if (matchStart) {
           const {flagName, negate, flagValue} = matchStart.groups ?? {};
           depth.push(
-            flagMatch({flagName, negate, flagValue}, project, allFragments) ? 'include' : 'exclude'
+            flagMatch({flagName, negate, flagValue}, project, fragments) ? 'include' : 'exclude'
           );
           continue;
         }
@@ -111,7 +112,7 @@ export async function generateProject(opts: {
       if (path.endsWith('.json')) {
         formattedContent = await prettierFormat(formattedContent, 'json');
       }
-      written.push(await writeWorkspaceFile(workspace, dst, path, formattedContent));
+      written.push(await writeWorkspaceFile(previousWorkspace, dst, path, formattedContent));
     })
   );
 
